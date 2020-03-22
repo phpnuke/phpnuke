@@ -218,7 +218,7 @@ class users_system{
 	public function user_statistics()
 	{
 		
-		global $db, $nuke_configs, $block_global_contents, $HijriCalendar, $userinfo, $users_system, $currentpage, $pn_dbcharset;
+		global $db, $nuke_configs, $block_global_contents, $HijriCalendar, $userinfo, $users_system, $currentpage, $pn_dbcharset, $cache;
 
 		$showpms = 1; //1 to Show Private Messages data - 0 is off
 		$showmost = 1; //1 to Show Mostonline data - 0 is off
@@ -418,20 +418,11 @@ class users_system{
 			$login_form = $this->get_login_form_data();
 		}
 		
-		$counter_cache = '';
-		$cache_file = PHPNUKE_ROOT_PATH."/cache/statistics.php";
-		if(file_exists($cache_file))
-		{
-			$handle = fopen($cache_file, 'rb');
-			$counter_cache = fread($handle,filesize($cache_file));
-			$counter_cache = str_replace('<?php exit;?>','', $counter_cache);
-			fclose($handle);
-		}
+		$statistics_data = ($cache->isCached("statistics_data")) ? $cache->retrieve("statistics_data"):array();
+			
+		$statistics_data['update_time'] = isset($statistics_data['update_time']) ? $statistics_data['update_time']:0;
 		
-		$counter_cache = ($counter_cache != '') ? json_decode($counter_cache):new stdClass();		
-		$counter_cache->update_time = isset($counter_cache->update_time) ? $counter_cache->update_time:0;
-		
-		if((_NOWTIME-$counter_cache->update_time) >= 3600 || $counter_cache->update_time == 0)
+		if((_NOWTIME-$statistics_data['update_time']) >= 3600)
 		{
 			$today_year = date("Y");
 			$today_month = date("m");
@@ -484,7 +475,7 @@ class users_system{
 					if($var == "guests")
 						$total_guests		= $row['count'];
 				}
-				$counter_cache = array(
+				$statistics_data = array(
 					"today_register" => $today_register,
 					"yesterday_register" =>	$yesterday_register,
 					"last_user_id" => $last_user_id,
@@ -500,17 +491,12 @@ class users_system{
 					"total_guests" => $total_guests,
 					"update_time" => _NOWTIME
 				);				
-				$counter_cache = json_encode($counter_cache);
-				$handle = fopen($cache_file, 'w');
-				fwrite($handle, '<?php exit;?>'.$counter_cache);
-				fclose($handle);
+				$cache->store("statistics_data", $statistics_data);
 			}
 		}
 		else
 		{
-			unset($counter_cache->update_time);
-			$counter_cache = objectToArray($counter_cache);
-			foreach($counter_cache as $key => $value)
+			foreach($statistics_data as $key => $value)
 				$$key = $value;
 		}
 		

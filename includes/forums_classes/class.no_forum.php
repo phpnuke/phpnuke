@@ -249,56 +249,88 @@ class users_system{
 			$login_form = $this->get_login_form_data();
 		}
 		
-		$today_year = date("Y");
-		$today_month = date("m");
-		$today_day = date("d");
+		$statistics_data = ($cache->isCached("statistics_data")) ? $cache->retrieve("statistics_data"):array();
+			
+		$statistics_data['update_time'] = isset($statistics_data['update_time']) ? $statistics_data['update_time']:0;
 		
-		$nowday = mktime(0,0,0,$today_month,$today_day,$today_year);
-		$yesterday = $nowday-86400;
-		
-		$yesterday_year = date("Y", $yesterday);
-		$yesterday_month = date("m", $yesterday);
-		$yesterday_day = date("d", $yesterday);
-		
-		$result = $db->query("SELECT DISTINCT
-			var, count, 
-			(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_regdate > ?) as today_register,
-			(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE (user_regdate > ? AND user_regdate < ?)) as yesterday_register,
-			(SELECT user_id FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_user_id,
-			(SELECT username FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_username,
-			(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_id > '1') as total_users,
-			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as today_visits,
-			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as yesterday_visits,
-			(SELECT count FROM ".STATISTICS_COUNTER_TABLE." WHERE type='total') as total_visits
-			From ".STATISTICS_COUNTER_TABLE." WHERE type = 'mosts'
-		", array($nowday, $yesterday, $nowday, $today_year, $today_month, $today_day, $yesterday_year, $yesterday_month, $yesterday_day));
-		$total_visits = 0;
-		
-		if($db->count() > 0)
+		if((_NOWTIME-$statistics_data['update_time']) >= 3600)
 		{
-			foreach($result as $row)
+			$today_year = date("Y");
+			$today_month = date("m");
+			$today_day = date("d");
+			
+			$nowday = mktime(0,0,0,$today_month,$today_day,$today_year);
+			$yesterday = $nowday-86400;
+			
+			$yesterday_year = date("Y", $yesterday);
+			$yesterday_month = date("m", $yesterday);
+			$yesterday_day = date("d", $yesterday);
+			
+			$result = $db->query("SELECT DISTINCT
+				var, count, 
+				(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_regdate > ?) as today_register,
+				(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_regdate > ? AND user_regdate < ?) as yesterday_register,
+				(SELECT user_id FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_user_id,
+				(SELECT username FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_username,
+				(SELECT g.group_colour FROM ".$this->users_table." as u LEFT JOIN ".$this->groups_table." AS g ON g.group_id = u.group_id WHERE u.user_type != '2' ORDER BY u.user_id DESC LIMIT 0,1) as last_user_colour,						
+				(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_id > '1') as total_users,
+				(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as today_visits,
+				(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as yesterday_visits,
+				(SELECT count FROM ".STATISTICS_COUNTER_TABLE." WHERE type='total') as total_visits
+				From ".STATISTICS_COUNTER_TABLE." WHERE type = 'mosts'				
+			", array($nowday, $yesterday, $nowday, $today_year, $today_month, $today_day, $yesterday_year, $yesterday_month, $yesterday_day));
+			$total_visits = 0;
+
+			if($db->count() > 0)
 			{
-				if($total_visits == 0)
+				foreach($result as $row)
 				{
-					$today_register			= intval($row['today_register']);
-					$yesterday_register		= intval($row['yesterday_register']);
-					$last_user_id			= intval($row['last_user_id']);
-					$last_username			= filter($row['last_username'], "nohtml");
-					$last_user_profile_url	= LinkToGT("index.php?modname=Users&op=userinfo&username=".filter($row['last_username'], "nohtml")."");
-					$total_users			= intval($row['total_users']);
-					$today_visits			= intval($row['today_visits']);
-					$yesterday_visits		= intval($row['yesterday_visits']);
-					$total_visits			= intval($row['total_visits']);
+					if($total_visits == 0)
+					{
+						$today_register			= intval($row['today_register']);
+						$yesterday_register		= intval($row['yesterday_register']);
+						$last_user_id			= intval($row['last_user_id']);
+						$last_username			= filter($row['last_username'], "nohtml");
+						$last_user_colour		= filter($row['last_user_colour'], "nohtml");
+						$last_user_profile_url	= sprintf($this->profile_url, $last_user_id, $last_username);
+						$total_users			= intval($row['total_users']);
+						$today_visits			= intval($row['today_visits']);
+						$yesterday_visits		= intval($row['yesterday_visits']);
+						$total_visits			= intval($row['total_visits']);
+					}
+					$var = $row['var'];
+					if($var == "total")
+						$total_mostonline	= $row['count'];
+					if($var == "members")
+						$total_members		= $row['count'];
+					if($var == "guests")
+						$total_guests		= $row['count'];
 				}
-				$var = $row['var'];
-				if($var == "total")
-					$total_mostonline	= $row['count'];
-				if($var == "members")
-					$total_members		= $row['count'];
-				if($var == "guests")
-					$total_guests		= $row['count'];
+				$statistics_data = array(
+					"today_register" => $today_register,
+					"yesterday_register" =>	$yesterday_register,
+					"last_user_id" => $last_user_id,
+					"last_username" => $last_username,
+					"last_user_colour" => $last_user_colour,
+					"last_user_profile_url" => $last_user_profile_url,
+					"total_users" => $total_users,
+					"today_visits" => $today_visits,
+					"yesterday_visits" => $yesterday_visits,
+					"total_visits" => $total_visits,
+					"total_mostonline" => $total_mostonline,
+					"total_members" => $total_members,
+					"total_guests" => $total_guests,
+					"update_time" => _NOWTIME
+				);				
+				$cache->store("statistics_data", $statistics_data);
 			}
 		}
+		else
+		{
+			foreach($statistics_data as $key => $value)
+				$$key = $value;
+		}
+		
 		//Break Mostonline Total?
 		if ($total_mostonline < $online_users['total_online'])
 		{
