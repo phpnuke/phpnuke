@@ -1,0 +1,173 @@
+<!-- INCLUDE overall_header.html -->
+
+<a name="maincontent"></a>
+
+<h1>{L_SEOMAP}</h1>
+
+<p>{SEOMAP_VERSION}</p>
+<p>{SEOMAP_URL}</p>
+<p>{SEOMAP_URL_COUNT}</p>
+<p>{L_SEOMAP_EXPLAIN}</p>
+
+<!-- IF S_ERROR -->
+	<div class="errorbox">
+		<h3>{L_WARNING}</h3>
+		<p>{ERROR_MSG}</p>
+	</div>
+<!-- ENDIF -->
+
+<form id="acp_seo_sitemap" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_SEOMAP_SETTINGS}</legend>
+		<dl>
+			<dt><label for="sitemap_seo_cache">{L_SEOMAP_CACHE_TIME}{L_COLON}</label><br /><span>{L_SEOMAP_CACHE_TIME_EXPLAIN}</span></dt>
+			<dd><input type="text" name="sitemap_seo_cache" size="3" value="{SEOMAP_CACHE_TIME}" />&nbsp;{L_HOURS}</dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_url_limit">{L_SEOMAP_URL_LIMIT}{L_COLON}</label><br /><span>{L_SEOMAP_URL_LIMIT_EXPLAIN}</span></dt>
+			<dd><input type="text" name="sitemap_seo_url_limit" size="5" value="{SEOMAP_URL_LIMIT}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_batch_size">{L_SEOMAP_BATCH_SIZE}{L_COLON}</label><br /><span>{L_SEOMAP_BATCH_SIZE_EXPLAIN}</span></dt>
+			<dd>
+				<select name="sitemap_seo_batch_size" id="sitemap_seo_batch_size">
+					<option value="5000"<!-- IF SEOMAP_BATCH_SIZE eq '5000' --> selected="selected"<!-- ENDIF -->>5000</option>
+					<option value="10000"<!-- IF SEOMAP_BATCH_SIZE eq '10000' --> selected="selected"<!-- ENDIF -->>10000</option>
+					<option value="20000"<!-- IF SEOMAP_BATCH_SIZE eq '20000' --> selected="selected"<!-- ENDIF -->>20000</option>
+					<option value="30000"<!-- IF SEOMAP_BATCH_SIZE eq '30000' --> selected="selected"<!-- ENDIF -->>30000</option>
+					<option value="40000"<!-- IF SEOMAP_BATCH_SIZE eq '40000' --> selected="selected"<!-- ENDIF -->>40000</option>
+					<option value="50000"<!-- IF SEOMAP_BATCH_SIZE eq '50000' --> selected="selected"<!-- ENDIF -->>50000</option>
+				</select>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_excluded">{L_SEOMAP_EXCLUDED}{L_COLON}</label><br /><span>{L_SEOMAP_EXCLUDED_EXPLAIN}</span></dt>
+			<dd><select id="sitemap_seo_excluded" name="sitemap_seo_excluded[]" multiple="multiple" size="10">{SEOMAP_EXCLUDED_FORUMS}</select></dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_prior_0">{L_SEOMAP_PRIORITY_0}{L_COLON}</label></dt>
+			<dd><input type="text" name="sitemap_seo_prior_0" value="{SEOMAP_PRIORITY_0}" size="3" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_prior_1">{L_SEOMAP_PRIORITY_1}{L_COLON}</label></dt>
+			<dd><input type="text" name="sitemap_seo_prior_1" value="{SEOMAP_PRIORITY_1}" size="3" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_prior_2">{L_SEOMAP_PRIORITY_2}{L_COLON}</label></dt>
+			<dd><input type="text" name="sitemap_seo_prior_2" value="{SEOMAP_PRIORITY_2}" size="3" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_prior_3">{L_SEOMAP_PRIORITY_3}{L_COLON}</label></dt>
+			<dd><input type="text" name="sitemap_seo_prior_3" value="{SEOMAP_PRIORITY_3}" size="3" /></dd>
+		</dl>
+		<!-- IF S_ARTICLE -->
+			<dl>
+				<dt><label for="sitemap_seo_prior_4">{L_SEOMAP_PRIORITY_4}{L_COLON}</label></dt>
+				<dd><input type="text" name="sitemap_seo_prior_4" value="{SEOMAP_PRIORITY_4}" size="3" /></dd>
+			</dl>
+		<!-- ENDIF -->
+		<dl>
+			<dt><label for="sitemap_seo_prior_f">{L_SEOMAP_PRIORITY_F}{L_COLON}</label></dt>
+			<dd><input type="text" name="sitemap_seo_prior_f" value="{SEOMAP_PRIORITY_F}" size="3" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_freq_0">{L_SEOMAP_FREQ_0}{L_COLON}</label></dt>
+			<dd>
+				<select name="sitemap_seo_freq_0" id="sitemap_seo_freq_0">
+					<option value="0"<!-- IF SEOMAP_FREQ_0 eq '0' --> selected="selected"<!-- ENDIF -->>{L_DISABLED}</option>
+					<option value="never"<!-- IF SEOMAP_FREQ_0 eq 'never' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_NEVER}</option>
+					<option value="yearly"<!-- IF SEOMAP_FREQ_0 eq 'yearly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_YEARLY}</option>
+					<option value="monthly"<!-- IF SEOMAP_FREQ_0 eq 'monthly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_MONTHLY}</option>
+					<option value="weekly"<!-- IF SEOMAP_FREQ_0 eq 'weekly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_WEEKLY}</option>
+					<option value="daily"<!-- IF SEOMAP_FREQ_0 eq 'daily' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_DAILY}</option>
+					<option value="hourly"<!-- IF SEOMAP_FREQ_0 eq 'hourly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_HOURLY}</option>
+					<option value="always"<!-- IF SEOMAP_FREQ_0 eq 'always' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_ALWAYS}</option>
+				</select>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_freq_1">{L_SEOMAP_FREQ_1}{L_COLON}</label></dt>
+			<dd>
+				<select name="sitemap_seo_freq_1" id="sitemap_seo_freq_1">
+					<option value="0"<!-- IF SEOMAP_FREQ_1 eq '0' --> selected="selected"<!-- ENDIF -->>{L_DISABLED}</option>
+					<option value="never"<!-- IF SEOMAP_FREQ_1 eq 'never' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_NEVER}</option>
+					<option value="yearly"<!-- IF SEOMAP_FREQ_1 eq 'yearly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_YEARLY}</option>
+					<option value="monthly"<!-- IF SEOMAP_FREQ_1 eq 'monthly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_MONTHLY}</option>
+					<option value="weekly"<!-- IF SEOMAP_FREQ_1 eq 'weekly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_WEEKLY}</option>
+					<option value="daily"<!-- IF SEOMAP_FREQ_1 eq 'daily' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_DAILY}</option>
+					<option value="hourly"<!-- IF SEOMAP_FREQ_1 eq 'hourly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_HOURLY}</option>
+					<option value="always"<!-- IF SEOMAP_FREQ_1 eq 'always' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_ALWAYS}</option>
+				</select>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_freq_2">{L_SEOMAP_FREQ_2}{L_COLON}</label></dt>
+			<dd>
+				<select name="sitemap_seo_freq_2" id="sitemap_seo_freq_2">
+					<option value="0"<!-- IF SEOMAP_FREQ_2 eq '0' --> selected="selected"<!-- ENDIF -->>{L_DISABLED}</option>
+					<option value="never"<!-- IF SEOMAP_FREQ_2 eq 'never' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_NEVER}</option>
+					<option value="yearly"<!-- IF SEOMAP_FREQ_2 eq 'yearly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_YEARLY}</option>
+					<option value="monthly"<!-- IF SEOMAP_FREQ_2 eq 'monthly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_MONTHLY}</option>
+					<option value="weekly"<!-- IF SEOMAP_FREQ_2 eq 'weekly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_WEEKLY}</option>
+					<option value="daily"<!-- IF SEOMAP_FREQ_2 eq 'daily' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_DAILY}</option>
+					<option value="hourly"<!-- IF SEOMAP_FREQ_2 eq 'hourly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_HOURLY}</option>
+					<option value="always"<!-- IF SEOMAP_FREQ_2 eq 'always' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_ALWAYS}</option>
+				</select>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="sitemap_seo_freq_3">{L_SEOMAP_FREQ_3}{L_COLON}</label></dt>
+			<dd>
+				<select name="sitemap_seo_freq_3" id="sitemap_seo_freq_3">
+					<option value="0"<!-- IF SEOMAP_FREQ_3 eq '0' --> selected="selected"<!-- ENDIF -->>{L_DISABLED}</option>
+					<option value="never"<!-- IF SEOMAP_FREQ_3 eq 'never' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_NEVER}</option>
+					<option value="yearly"<!-- IF SEOMAP_FREQ_3 eq 'yearly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_YEARLY}</option>
+					<option value="monthly"<!-- IF SEOMAP_FREQ_3 eq 'monthly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_MONTHLY}</option>
+					<option value="weekly"<!-- IF SEOMAP_FREQ_3 eq 'weekly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_WEEKLY}</option>
+					<option value="daily"<!-- IF SEOMAP_FREQ_3 eq 'daily' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_DAILY}</option>
+					<option value="hourly"<!-- IF SEOMAP_FREQ_3 eq 'hourly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_HOURLY}</option>
+					<option value="always"<!-- IF SEOMAP_FREQ_3 eq 'always' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_ALWAYS}</option>
+				</select>
+			</dd>
+		</dl>
+		<!-- IF S_ARTICLE -->
+			<dl>
+				<dt><label for="sitemap_seo_freq_4">{L_SEOMAP_FREQ_4}{L_COLON}</label></dt>
+				<dd>
+					<select name="sitemap_seo_freq_4" id="sitemap_seo_freq_4">
+						<option value="0"<!-- IF SEOMAP_FREQ_4 eq '0' --> selected="selected"<!-- ENDIF -->>{L_DISABLED}</option>
+						<option value="never"<!-- IF SEOMAP_FREQ_4 eq 'never' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_NEVER}</option>
+						<option value="yearly"<!-- IF SEOMAP_FREQ_4 eq 'yearly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_YEARLY}</option>
+						<option value="monthly"<!-- IF SEOMAP_FREQ_4 eq 'monthly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_MONTHLY}</option>
+						<option value="weekly"<!-- IF SEOMAP_FREQ_4 eq 'weekly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_WEEKLY}</option>
+						<option value="daily"<!-- IF SEOMAP_FREQ_4 eq 'daily' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_DAILY}</option>
+						<option value="hourly"<!-- IF SEOMAP_FREQ_4 eq 'hourly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_HOURLY}</option>
+						<option value="always"<!-- IF SEOMAP_FREQ_4 eq 'always' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_ALWAYS}</option>
+					</select>
+				</dd>
+			</dl>
+		<!-- ENDIF -->
+		<dl>
+			<dt><label for="sitemap_seo_freq_f">{L_SEOMAP_FREQ_F}{L_COLON}</label></dt>
+			<dd>
+				<select name="sitemap_seo_freq_f" id="sitemap_seo_freq_f">
+					<option value="0"<!-- IF SEOMAP_FREQ_F eq '0' --> selected="selected"<!-- ENDIF -->>{L_DISABLED}</option>
+					<option value="never"<!-- IF SEOMAP_FREQ_F eq 'never' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_NEVER}</option>
+					<option value="yearly"<!-- IF SEOMAP_FREQ_F eq 'yearly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_YEARLY}</option>
+					<option value="monthly"<!-- IF SEOMAP_FREQ_F eq 'monthly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_MONTHLY}</option>
+					<option value="weekly"<!-- IF SEOMAP_FREQ_F eq 'weekly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_WEEKLY}</option>
+					<option value="daily"<!-- IF SEOMAP_FREQ_F eq 'daily' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_DAILY}</option>
+					<option value="hourly"<!-- IF SEOMAP_FREQ_F eq 'hourly' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_HOURLY}</option>
+					<option value="always"<!-- IF SEOMAP_FREQ_F eq 'always' --> selected="selected"<!-- ENDIF -->>{L_SEOMAP_FREQ_ALWAYS}</option>
+				</select>
+			</dd>
+		</dl>
+		<p class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+			<input class="button2" type="reset" id="reset" name="reset" value="{L_RESET}" />
+		</p>
+	{S_FORM_TOKEN}
+	</fieldset>
+</form>
+
+<!-- INCLUDE overall_footer.html -->

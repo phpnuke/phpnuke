@@ -1,0 +1,14 @@
+<!-- IF S_VIEWTOPIC -->
+<!-- INCLUDECSS @boardtools_quickreply/quickreply_main.css -->
+<!-- INCLUDECSS @boardtools_quickreply/quickreply.css -->
+<!-- IF not $INCLUDED_FONTAWESOMECSS -->
+<!-- IF S_ALLOW_CDN -->
+<!-- INCLUDECSS //maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css -->
+<!-- ELSE -->
+<!-- INCLUDECSS {ROOT_PATH}ext/boardtools/quickreply/vendor/fortawesome/font-awesome/css/font-awesome.min.css -->
+<!-- ENDIF -->
+<!-- DEFINE $INCLUDED_FONTAWESOMECSS = true -->
+<!-- ENDIF -->
+<!-- ELSE IF S_IN_POSTING -->
+<!-- INCLUDECSS @boardtools_quickreply/quickreply.css -->
+<!-- ENDIF -->

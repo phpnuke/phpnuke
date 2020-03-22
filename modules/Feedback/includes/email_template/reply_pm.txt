@@ -1,0 +1,29 @@
+<html dir="{{_DIRECTION}}">
+	<head>
+		<meta http-equiv='content-type' content='text/html; charset=utf-8'>
+	</head>
+	<body>
+	<span dir='rtl'>
+		<div style="direction:{{_DIRECTION}};text-align:{{_TEXTALIGN1}};">
+			******************<br />
+			Hi, {{SENDER_NAME}}!<br />
+			******************<br />
+			<br />
+			A new reply to your message has been sent by the {{SITENAME}} administrator;<br />
+			your message:<br />
+			{{MESSAGE}}
+			<br />
+			<hr />
+			<br />
+			administrator reply<br />
+			{{FEEDBACK_REPLY_MESSAGE}}
+			<br />
+			If you have any questions, feel free to contact our team ( {{FEEDBACK_URL}} ). (We're lightning quick at replying.)<br />
+			<br />
+			Thanks,<br />
+			<a href="{{NUKEURL}}">{{SITENAME}}</a><br />
+
+			© 2020 .All rights reserved.
+		</div>
+	</body>
+</html>

@@ -1,0 +1,1 @@
+﻿insert_text=function(a,b){b&&(a=" "+a+" ");opener.MyBBEditor.insertText(a)};

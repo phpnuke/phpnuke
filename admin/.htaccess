@@ -1,0 +1,3 @@
+deny from case.php
+deny from links.php
+deny from modules

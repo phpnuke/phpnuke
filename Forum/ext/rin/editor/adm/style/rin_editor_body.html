@@ -1,0 +1,149 @@
+{% INCLUDE 'overall_header.html' %}
+
+<h1>{{ lang('SETTINGS') }}</h1>
+
+<form id="rin_editor_settings" method="post" action="{{ U_ACTION }}">
+	<fieldset>
+		<dl>
+			<dt><label for="RCE_enb_quick">{{ lang('RCE_ENBQUICK_TITLE') }}</label><br />
+					<span>{{ lang('RCE_ENBQUICK_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_enb_quick" value="1" {% if RCE_ENB_QUICK %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_enb_quick" value="0" {% if not RCE_ENB_QUICK %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_language">{{ lang('RCE_LANGUAGE_TITLE') }}</label><br />
+				<span>{{ lang('RCE_LANGUAGE_DESC') }}</span></dt>
+			<dd>
+				{{ RCE_LANG_SELECT }}
+			</dd>
+		</dl>
+		<dl>
+			<dt><label>{{ lang('RCE_BBCODE_TITLE') }}</label><br />
+				<span>{{ lang('RCE_BBCODE_DESC') }}</span></dt>
+			<dd>
+				{{ RCE_BBCODE_OPTION }}
+			</dd>
+		</dl>
+		{% for RCE_BBCODE_TAGS in loops.RCE_BBCODE_TAGS %}<dl class="permbb" id="{{ RCE_BBCODE_TAGS.bbcode_name_trigger }}" style="display:none">
+			<dt><label for="{{ RCE_BBCODE_TAGS.bbcode_name }}">{{ lang('RCE_PBBCODE_TITLE') }}{{ RCE_BBCODE_TAGS.bbcode_name_trigger }}</label><br />
+				<span>{{ lang('RCE_PBBCODE_DESC') }}</span></dt>
+			<dd>
+				{{ RCE_BBCODE_TAGS.group }}
+			</dd>
+		</dl>{% endfor %}
+		<dl>
+			<dt><label for="RCE_mobm_source">{{ lang('RCE_MOBMS_TITLE') }}</label><br />
+					<span>{{ lang('RCE_MOBMS_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_mobm_source" value="1" {% if RCE_MOBM_SOURCE %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_mobm_source" value="0" {% if not RCE_MOBM_SOURCE %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_smiley_sc">{{ lang('RCE_SCSMILEY_TITLE') }}</label><br />
+					<span>{{ lang('RCE_SCSMILEY_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_smiley_sc" value="1" {% if RCE_SMILEY_SC %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_smiley_sc" value="0" {% if not RCE_SMILEY_SC %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_autosave">{{ lang('RCE_AUTOSAVE_TITLE') }}</label><br />
+					<span>{{ lang('RCE_AUTOSAVE_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_autosave" value="1" {% if RCE_AUTOSAVE %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_autosave" value="0" {% if not RCE_AUTOSAVE %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_autosave_message">{{ lang('RCE_AUTOSAVEMSG_TITLE') }}</label><br />
+					<span>{{ lang('RCE_AUTOSAVEMSG_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_autosave_message" value="1" {% if RCE_AUTOSAVE_MESSAGE %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_autosave_message" value="0" {% if not RCE_AUTOSAVE_MESSAGE %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_height">{{ lang('RCE_HEIGHT_TITLE') }}</label><br />
+				<span>{{ lang('RCE_HEIGHT_DESC') }}</span></dt>
+			<dd><input type="number" name="RCE_height" id="RCE_height" size="10" maxlength="3" value="{{ RCE_HEIGHT }}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_max_height">{{ lang('RCE_MAX_HEIGHT_TITLE') }}</label><br />
+				<span>{{ lang('RCE_MAX_HEIGHT_DESC') }}</span></dt>
+			<dd><input type="number" name="RCE_max_height" id="RCE_max_height" size="10" maxlength="3" value="{{ RCE_MAX_HEIGHT }}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_quickquote">{{ lang('RCE_QUICKQUOTE_TITLE') }}</label><br />
+					<span>{{ lang('RCE_QUICKQUOTE_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_quickquote" value="1" {% if RCE_QUICKQUOTE %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_quickquote" value="0" {% if not RCE_QUICKQUOTE %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_supsment">{{ lang('RCE_SUPSMENT_TITLE') }}</label><br />
+					<span>{{ lang('RCE_SUPSMENT_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_supsment" value="1" {% if RCE_SUPSMENT %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_supsment" value="0" {% if not RCE_SUPSMENT %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_supext">{{ lang('RCE_SUPEXT_TITLE') }}</label><br />
+					<span>{{ lang('RCE_SUPEXT_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_supext" value="1" {% if RCE_SUPEXT %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_supext" value="0" {% if not RCE_SUPEXT %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_desnopop">{{ lang('RCE_DESNOPOP_TITLE') }}</label><br />
+					<span>{{ lang('RCE_DESNOPOP_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_desnopop" value="1" {% if RCE_DESNOPOP %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_desnopop" value="0" {% if not RCE_DESNOPOP %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_partial">{{ lang('RCE_PARTIAL_TITLE') }}</label><br />
+					<span>{{ lang('RCE_PARTIAL_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_partial" value="1" {% if RCE_PARTIAL %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_partial" value="0" {% if not RCE_PARTIAL %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_seltxt">{{ lang('RCE_SELTXT_TITLE') }}</label><br />
+					<span>{{ lang('RCE_SELTXT_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_seltxt" value="1" {% if RCE_SELTXT %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_seltxt" value="0" {% if not RCE_SELTXT %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_rmv_acp_color">{{ lang('RCE_RMV_ACP_COLOR_TITLE') }}</label><br />
+					<span>{{ lang('RCE_RMV_ACP_COLOR_DESC') }}</span</dt>
+			<dd><input type="radio" class="radio" name="RCE_rmv_acp_color" value="1" {% if RCE_RMV_ACP_COLOR %}checked="checked" {% endif %}/> {{ lang('YES') }} &nbsp;
+				<input type="radio" class="radio" name="RCE_rmv_acp_color" value="0" {% if not RCE_RMV_ACP_COLOR %}checked="checked" {% endif %}/> {{ lang('NO') }}</dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_cache">{{ lang('RCE_CACHE_TITLE') }}</label><br />
+				<span>{{ lang('RCE_CACHE_DESC') }}</span></dt>
+			<dd><input type="number" name="RCE_cache" id="RCE_cache" size="10" maxlength="5" value="{{ RCE_CACHE }}" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="RCE_imgurapi">{{ lang('RCE_IMGUR_TITLE') }}</label><br />
+				<span>{{ lang('RCE_IMGUR_DESC') }}</span></dt>
+			<dd><input type="text" name="RCE_imgurapi" id="RCE_imgurapi" size="50" maxlength="100" value="{{ RCE_IMGURAPI }}" /></dd>
+		</dl>
+		<dl>
+			<dt><label>{{ lang('RCE_STYLE_TITLE') }}</label><br />
+				<span>{{ lang('RCE_STYLE_DESC') }}</span></dt>
+			<dd>
+				{{ RCE_STYLE_OPTION }}
+			</dd>
+		</dl>
+		{% for RCE_STYLE_SKIN in loops.RCE_STYLE_SKIN %}<dl class="stypref" id="{{ RCE_STYLE_SKIN.name }}" style="display:none">
+			<dt><label for="{{ RCE_STYLE_SKIN.name }}">{{ lang('RCE_SKIN_TITLE') }}{{ RCE_STYLE_SKIN.name }}</label><br />
+				<span>{{ lang('RCE_SKIN_DESC') }}</span></dt>
+			<dd>
+				{{ RCE_STYLE_SKIN.skin }}
+			</dd>
+		</dl>
+		<dl class="skinpref" id="{{ RCE_STYLE_SKIN.name }}_2" style="display:none">
+			<dt><label for="{{ RCE_STYLE_SKIN.name }}_2">{{ lang('RCE_TXTA_TITLE') }}{{ RCE_STYLE_SKIN.name }}</label><br />
+				<span>{{ lang('RCE_TXTA_DESC') }}</span></dt>
+			<dd>
+				{{ RCE_STYLE_SKIN.black }}
+			</dd>
+		</dl>{% endfor %}
+		<p class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />&nbsp;
+			<input class="button2" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}" />
+		</p>
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+</form>
+{% INCLUDEJS '@rin_editor/js/perm.js' %}
+{% INCLUDE 'overall_footer.html' %}

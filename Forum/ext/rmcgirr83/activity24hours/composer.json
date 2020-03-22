@@ -1,0 +1,37 @@
+{
+    "name": "rmcgirr83/activity24hours",
+    "type": "phpbb-extension",
+    "description": "Extension lists of all registered users who have visited the board in the last 24 hours as well as lists stats on the number of new posts, new topics and new users within the last 24 hours",
+    "version": "1.0.4",
+    "time": "2017-02-23",
+    "keywords": [
+        "phpbb",
+        "extension",
+        "topics",
+        "posts",
+        "stats",
+        "24 hours"
+    ],
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Rich McGirr",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "phpbb/phpbb": ">=3.1.1"
+    },
+    "extra": {
+        "display-name": "24 hour activity stats",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.1.1"
+        },
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/24_hour_activity_stats",
+            "filename": "version_check"
+        }
+    }
+}

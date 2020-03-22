@@ -1,0 +1,35 @@
+{
+    "name": "paul999/mention",
+    "type": "phpbb-extension",
+    "description": "Mention a user by using @USERNAME",
+    "homepage": "https://www.phpbbextensions.io",
+    "version": "1.0.1",
+    "time": "2017-05-07",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "paul999",
+            "email": "paul@phpbb.com",
+            "homepage": "https://www.phpbbextensions.io",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": "~5.4",
+        "phpbb/phpbb": ">=3.2.0RC1,<3.3.0@dev"
+    },
+    "extra": {
+        "display-name": "Simple mentions",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.2.0RC1,<3.3.0@dev"
+        },
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/simple_mentions",
+            "filename": "version_check"
+        }
+    },
+    "require-dev": {
+        "phing/phing": "2.4.*"
+    }
+}

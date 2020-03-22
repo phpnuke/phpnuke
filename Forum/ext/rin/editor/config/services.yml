@@ -1,0 +1,15 @@
+services:
+    rin.editor.event.rce:
+        class: rin\editor\event\main_listener
+        arguments:
+            - '@config_text'
+            - '@auth'
+            - '@request'
+            - '@dbal.conn'
+            - '@template'
+            - '@config'
+            - '@user'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+        tags:
+            - { name: event.listener }

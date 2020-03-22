@@ -1,0 +1,32 @@
+services:
+    paul999.mention.controller:
+        class: paul999\mention\controller\main
+        arguments:
+            - '@user'
+            - '@dbal.conn'
+            - '@auth'
+            - '@request'
+
+    paul999.mention.listener:
+        class: paul999\mention\event\main_listener
+        arguments:
+            - '@controller.helper'
+            - '@template'
+            - '@dbal.conn'
+            - '@notification_manager'
+            - '@user'
+            - '@auth'
+            - '@config'
+            - '%core.php_ext%'
+        tags:
+            - { name: event.listener }
+
+    paul999.mention.notification.type.mention:
+        class: paul999\mention\notification\type\mention
+        shared: false # service MUST not be shared for this to work!
+        parent: notification.type.base
+        calls:
+            - [set_config, ['@config']]
+            - [set_user_loader, ['@user_loader']]
+        tags:
+            - { name: notification.type }

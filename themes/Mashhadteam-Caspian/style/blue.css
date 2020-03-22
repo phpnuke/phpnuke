@@ -1,0 +1,53 @@
+body{background-color:#bfdee3;}
+a {color: #196280 !important;}
+a:hover {color: #0e4c63!important;}
+input:hover, select:hover, textarea:hover {box-shadow: 0 0 5px #0065b2!important;border: 1px #0065b2 solid!important;}
+input:focus, select:focus, textarea:focus {box-shadow: 0 0 5px #0065b2!important;border: 1px #0065b2 solid!important;}
+button,input[type="button"],input[type="reset"],input[type="submit"]{background:#0065b2!important;border: 1px #0364a1 solid!important;}
+button:hover,input:hover[type="button"],input[type="reset"]:hover,input[type="submit"]:hover{box-shadow: 0 0 5px #0065b2!important;border: 1px #0065b2 solid!important;}
+.glyphicon-chevron-left:before {background: #196280;}
+.glyphicon-chevron-right:before{background: #196280;}
+/* Start Header */
+.GSTop{background-color: #2797de;border-bottom: 4px solid #1b597d;}
+.GSHeader .GSlogo{background:url('../images/logo-blue.png')no-repeat top right;}
+.GSTopHeader .GSStatus{background-color: #01334d;}
+.GSTop .navbar{background-color:#21507a;}
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
+background-color: #01334d;}
+.GSTop .navbar a:hover{background-color: #01334d!important;}
+.GSTopHeader input{background: #01334d!important;border: 1px solid #2c3e01!important;}
+.GSTopHeader input:focus{border: 1px solid #1b597d!important;}
+.GSTopHeader button{background: #01334d!important;border: 1px solid #2c3e01!important;}
+.GSTopHeader button:hover{background: #1b597d!important;border: 1px solid #2c3e01!important;}
+/* End Header */
+/* Start Index */
+.GSheading h1,.GSheading h2,.GSheading h3,.GSheading h4, .GSheading h5, .GSheading h6 {border-bottom: 3px solid #196280 ;}
+.GSDes i{background: #196280;}
+.GSPostBody .GSPostTitle{background-color: #196280;}
+/* End Index */
+/* Start Body */
+aside h3{background: #539ec9;background: -webkit-linear-gradient(#539ec9, #277fb3);background: -o-linear-gradient(#539ec9, #277fb3);background: -moz-linear-gradient(#539ec9, #277fb3);background: linear-gradient(#539ec9, #277fb3);}
+aside h3 i{background: #196280;}
+/*aside .GSContent ul li a{color:#196280;}
+aside .GSContent ul li:hover{background: #196280 url(../images/ul-li.png) right 14px center no-repeat;} */
+article h2{background: #539ec9;background: -webkit-linear-gradient(#539ec9, #277fb3);background: -o-linear-gradient(#539ec9, #277fb3);background: -moz-linear-gradient(#539ec9, #277fb3);background: linear-gradient(#539ec9, #277fb3);}
+article h2 i{background: #196280;}
+article h3{background: #69addd;background: -webkit-linear-gradient(#69addd, #5087ae);background: -o-linear-gradient(#69addd, #5087ae);background: -moz-linear-gradient(#69addd, #5087ae);background: linear-gradient(#69addd, #5087ae);}
+article h3 i{background: #2e5876;}
+article .GScat{background: #1d648d;}
+article .meta .more{background: #196280;}
+article .meta .more:hover{background: #0b405c;}
+article .GSComment1{background-color:#f7ffe6;border: 1px solid #c3cead;}
+article .GSComment2{background-color:#e6f4ff;border: 1px solid #cbd6e0;}
+.OpenTable h2{background: #1a4674;border-bottom: 2px solid #123254;}
+/* End Body */
+/* Start Footer */
+footer{background: #2797de;border-top: 4px solid #1b597d;}
+footer .GSFooter {background:#054066 url('../images/bg-footer2.png');}
+footer .GSFooter .line-fooot-box-head {border-right: #039dff 165px solid;}
+footer .GSFooter ul li:hover a{color: #039dff!important;}
+footer .GSFooter ul li:hover{background: #001924 url(../images/ul-li.png) right 14px center no-repeat;}
+footer .GSCopyright{background: #001924;}
+footer .GSCopyright a{color:#088abd !important;}
+footer .GSCopyright a:hover{color:#07699e!important;}
+/* End Footer */

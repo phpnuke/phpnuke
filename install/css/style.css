@@ -1,0 +1,42 @@
+@font-face{font-family:sans;font-style:normal;font-weight:400;src:url(../../includes/fonts/IRANSansWeb.eot);src:url(../../includes/fonts/IRANSansWeb.eot?#iefix) format("embedded-opentype"),url(../../includes/fonts/IRANSansWeb.woff2) format("woff2"),url(../../includes/fonts/IRANSansWeb.woff) format("woff"),url(../../includes/fonts/IRANSansWeb.ttf) format("truetype")} 
+h1,h2,h3{font-family:'sans','tahoma' !important;}
+body{background:#e9e9e9;color:#666;font-family:'sans','tahoma';font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.logo{background:url('../logo.png')no-repeat top;width: 70px;height: 69px;float: right;position: absolute;top: 5px;right: 40px;}
+.pen-title{padding:50px 0;text-align:center;letter-spacing:2px}
+.pen-title h1{margin:0 0 20px;font-size:20px;font-weight:300}
+.pen-title span{font-size:12px}
+.pen-title span .fa{color:#33b5e5}
+.pen-title span a{color:#33b5e5;font-weight:600;text-decoration:none}
+.form-module{position:relative;background:#fff;max-width:650px;width:90%;border-top:5px solid #33b5e5;box-shadow:0 0 3px rgba(0,0,0,0.1);margin:0 auto;top:200px;text-align:right;}
+.form-module .toggle .tooltip:before{content:'';position:absolute;top:5px;left:-5px;display:block;border-top:5px solid transparent;border-bottom:5px solid transparent;border-right:5px solid rgba(0,0,0,0.6)}
+.form-module .form{display:none;padding:40px}
+.form-module .form:nth-child(2){display:block}
+.form-module h1{margin: -10px 80px 0px 0px;font-size:18px;font-weight:300;color:#33b5e5;}
+.form-module h2{margin: 0px 80px 30px 0px;color:#666;font-size:14px;font-weight:400;line-height:1}
+.form-module input{outline:none;display:block;width:100%;border:1px solid #d9d9d9;margin:0 0 20px;padding:10px 15px;box-sizing:border-box;font-wieght:400;-webkit-transition:.3s ease;transition:.3s ease}
+.form-module input:focus{border:1px solid #33b5e5;color:#333}
+.form-module input::-webkit-input-placeholder{text-align:right;direction:rtl;}
+.form-module input:-moz-placeholder{text-align:right;direction:rtl;}
+.form-module input::-moz-placeholder{text-align:right;direction:rtl;}
+.form-module input:-ms-input-placeholder{text-align:right;direction:rtl;}
+.form-module button{cursor:pointer;background:#33b5e5;width:100%;border:0;padding:10px 15px;color:#fff;-webkit-transition:.3s ease;transition:.3s ease}
+.form-module button:hover{background:#178ab4}
+.form-module .cta{background:#f2f2f2;width:100%;padding:15px 40px;box-sizing:border-box;color:#666;font-size:12px;text-align:center}
+.form-module .cta a{color:#333;text-decoration:none}
+.code{margin-top: -61px;float: right;}
+.gscode{width: 53% !important;padding: 11px 5px !important;}
+.form-control {text-align:left;direction:ltr;}
+.form-control::-webkit-input-placeholder{text-align:right !important;direction:rtl !important;}
+.form-control:-moz-placeholder{text-align:right !important;direction:rtl !important;}
+.form-control::-moz-placeholder{text-align:right !important;direction:rtl !important;}
+.form-control:-ms-input-placeholder{text-align:right !important;direction:rtl !important;}
+ul{list-style: none;}
+.fa-check{color:#76cf08;}
+.fa-close{color:#cf0808;}
+.pwdopsdiv{display:block;float:left;margin-right:6px;}
+.pwdopsdiv a{font-size:10px;}
+.pwdstrengthbar{float:right;background:#cccccc;height:4px;margin:0;}
+.pwdstrength{float:right; height:20px;width:70px;margin-top:3px;}
+.pwdstrengthstr{float:right;clear:both;height:14px;margin-top:0px;font-size : 10px; }
+.fail{color:#ff0000;}
+.pass{color:#00cc99;}

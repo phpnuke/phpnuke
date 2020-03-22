@@ -1,0 +1,40 @@
+[main]
+host = https://www.transifex.com
+type = PHP_ARRAY
+
+[quickreply.quickreply]
+file_filter = language/<lang>/quickreply.php
+source_file = language/en/quickreply.php
+source_lang = en
+
+[quickreply.info_acp_quickreply]
+file_filter = language/<lang>/info_acp_quickreply.php
+source_file = language/en/info_acp_quickreply.php
+source_lang = en
+
+[quickreply.permissions_quickreply]
+file_filter = language/<lang>/permissions_quickreply.php
+source_file = language/en/permissions_quickreply.php
+source_lang = en
+
+[quickreply.quickreply_notification]
+file_filter = language/<lang>/quickreply_notification.php
+source_file = language/en/quickreply_notification.php
+source_lang = en
+
+[quickreply.quickreply_ucp]
+file_filter = language/<lang>/quickreply_ucp.php
+source_file = language/en/quickreply_ucp.php
+source_lang = en
+
+[quickreply.email_quicknick]
+file_filter = language/<lang>/email/quicknick.txt
+source_file = language/en/email/quicknick.txt
+source_lang = en
+type = TXT
+
+[quickreply.plurals]
+file_filter = language/<lang>/quickreply_plurals.po
+source_file = language/en/quickreply_plurals.pot
+source_lang = en
+type = PO

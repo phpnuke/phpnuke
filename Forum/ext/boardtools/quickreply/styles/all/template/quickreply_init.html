@@ -1,0 +1,174 @@
+<!-- IF S_QUICK_REPLY -->
+<div id="qr_message" style="display: none;">{MESSAGE}</div>
+<!-- ENDIF -->
+<script type="text/javascript">
+//<![CDATA[
+var quickreply = {};
+<!-- IF S_QUICK_REPLY -->
+
+// External plugins compatible with QuickReply.
+quickreply.plugins = {
+	abbc3: <!-- IF S_ABBC3_INSTALLED -->true<!-- ELSE -->false<!-- ENDIF -->,
+	liveSearch: <!-- IF S_LIVE_SEARCH and LIVE_SEARCH_ON_OFF_USER -->true<!-- ELSE -->false<!-- ENDIF -->,
+	reCAPTCHA2: <!-- IF S_RECAPTCHA_AVAILABLE and RECAPTCHA2_SITEKEY -->true<!-- ELSE -->false<!-- ENDIF -->,
+	seo: <!-- IF SEO_PHPBB_URL -->true<!-- ELSE -->false<!-- ENDIF -->
+};
+
+// Configuration settings for QuickReply.
+quickreply.settings = {
+	ajaxPagination: <!-- IF S_QR_AJAX_PAGINATION -->true<!-- ELSE -->false<!-- ENDIF -->,
+	ajaxSubmit: <!-- IF S_QR_AJAX_SUBMIT -->true<!-- ELSE -->false<!-- ENDIF -->,
+	allowBBCode: <!-- IF S_BBCODE_ALLOWED -->true<!-- ELSE -->false<!-- ENDIF -->,
+	allowedGuest: <!-- IF S_QR_ALLOWED_GUEST -->true<!-- ELSE -->false<!-- ENDIF -->,
+	attachBox: <!-- IF S_QR_SHOW_ATTACH_BOX -->true<!-- ELSE -->false<!-- ENDIF -->,
+	colouredNick: <!-- IF S_QR_COLOUR_NICKNAME -->true<!-- ELSE -->false<!-- ENDIF -->,
+	ctrlEnterNotice: <!-- IF S_QR_CTRL_ENTER_NOTICE -->true<!-- ELSE -->false<!-- ENDIF -->,
+	enableBBCode: <!-- IF S_BBCODE_BUTTONS -->true<!-- ELSE -->false<!-- ENDIF -->,
+	enableComma: <!-- IF S_QR_COMMA_ENABLE -->true<!-- ELSE -->false<!-- ENDIF -->,
+	enableScroll: <!-- IF S_QR_ENABLE_SCROLL -->true<!-- ELSE -->false<!-- ENDIF -->,
+	enableWarning: <!-- IF S_QR_ENABLE_WARNING -->true<!-- ELSE -->false<!-- ENDIF -->,
+	fixEmptyForm: <!-- IF S_QR_FIX_EMPTY_FORM -->true<!-- ELSE -->false<!-- ENDIF -->,
+	formType: {S_QR_FORM_TYPE},
+	fullQuote: <!-- IF S_QR_FULL_QUOTE -->true<!-- ELSE -->false<!-- ENDIF -->,
+	fullQuoteAllowed: <!-- IF S_QR_FULL_QUOTE_ALLOWED -->true<!-- ELSE -->false<!-- ENDIF -->,
+	hideSubjectBox: <!-- IF QR_HIDE_SUBJECT_BOX -->true<!-- ELSE -->false<!-- ENDIF -->,
+	lastQuote: <!-- IF S_QR_LAST_QUOTE -->true<!-- ELSE -->false<!-- ENDIF -->,
+	pluploadEnabled: <!-- IF S_PLUPLOAD and S_QR_SHOW_ATTACH_BOX -->true<!-- ELSE -->false<!-- ENDIF -->,
+	quickNick: <!-- IF S_QR_QUICKNICK_ENABLE -->true<!-- ELSE -->false<!-- ENDIF -->,
+	quickNickString: <!-- IF S_QR_QUICKNICK_STRING -->true<!-- ELSE -->false<!-- ENDIF -->,
+	quickNickUserType: <!-- IF S_QR_QUICKNICK_USERTYPE -->true<!-- ELSE -->false<!-- ENDIF -->,
+	quickNickRef: <!-- IF S_QR_QUICKNICK_REF -->true<!-- ELSE -->false<!-- ENDIF -->,
+	quickNickPM: <!-- IF S_QR_QUICKNICK_PM -->true<!-- ELSE -->false<!-- ENDIF -->,
+	quickQuote: <!-- IF S_QR_QUICKQUOTE_ENABLE -->true<!-- ELSE -->false<!-- ENDIF -->,
+	quickQuoteButton: <!-- IF S_QR_QUICKQUOTE_BUTTON -->true<!-- ELSE -->false<!-- ENDIF -->,
+	saveReply: <!-- IF S_QR_SAVE_REPLY -->true<!-- ELSE -->false<!-- ENDIF -->,
+	scrollInterval: {S_QR_SCROLL_INTERVAL},
+	softScroll: <!-- IF S_QR_SOFT_SCROLL -->true<!-- ELSE -->false<!-- ENDIF -->,
+	unchangedSubject: <!-- IF S_QR_NOT_CHANGE_SUBJECT -->true<!-- ELSE -->false<!-- ENDIF -->
+};
+
+// Useful variables for QuickReply.
+quickreply.editor = {
+	attachPanel: '#attach-panel',
+	currentPost: '',
+	mainForm: '#qr_postform',
+	messageStorage: '#qr_message',
+	postSelector: 'div.post',
+	postTitleSelector: '.postbody div h3:first',
+	profileLinkSelector: 'a.username, a.username-coloured',
+	profileNoLinkSelector: 'span.username, span.username-coloured',
+	tempContainer: '#qr_temp_container',
+	textareaSelector: '#qr_postform #message-box textarea',
+	unreadPostSelector: '.unreadpost',
+	viewtopicLink: '{U_VIEW_TOPIC}'
+};
+
+// Global functions for QuickReply.
+quickreply.functions = {
+	/**
+	 * Converts RGB function to the hex string.
+	 *
+	 * @param {string} color Color in RGB function format
+	 * @returns {string}
+	 */
+	getHexColor: function(color) {
+		color = color.replace(/\s/g, "");
+		var colorRGB = color.match(/^rgb\((\d{1,3}[%]?),(\d{1,3}[%]?),(\d{1,3}[%]?)\)$/i), colorHEX = '';
+		for (var i = 1; i <= 3; i++) {
+			colorHEX += Math.round((colorRGB[i][colorRGB[i].length - 1] === "%" ? 2.55 : 1) *
+				parseInt(colorRGB[i])).toString(16).replace(/^(.)$/, '0$1');
+		}
+		return "#" + colorHEX;
+	},
+	/**
+	 * Generates an HTML string for a link from an object with parameters.
+	 *
+	 * @param {object} parameters Object with HTML attributes
+	 *                            (href, id, className, title) and link text
+	 * @returns {string}
+	 */
+	makeLink: function(parameters) {
+		if (typeof parameters !== 'object') {
+			return '';
+		}
+		var link = '<a';
+		link += (parameters.href) ? ' href="' + parameters.href + '"' : ' href="#"';
+		if (parameters.id) {
+			link += ' id="' + parameters.id + '"';
+		}
+		if (parameters.className) {
+			link += ' class="' + parameters.className + '"';
+		}
+		if (parameters.title) {
+			link += ' title="' + parameters.title + '"';
+		}
+		link += '>' + ((parameters.text) ? parameters.text : '') + '</a>';
+		return link;
+	}
+};
+
+// Language variables for QuickReply.
+quickreply.language = {
+	AJAX_ERROR: '{LA_AJAX_ERROR_TEXT}',
+	AJAX_ERROR_TITLE: '{LA_AJAX_ERROR_TITLE}',
+	BUTTON_QUOTE: '{LA_BUTTON_QUOTE}',
+	CANCEL_SUBMISSION: '{LA_QR_CANCEL_SUBMISSION}',
+	CTRL_ENTER: '{LA_QR_CTRL_ENTER}',
+	ERROR: '{LA_ERROR}',
+	FULLSCREEN: '{LA_QR_FULLSCREEN}',
+	FULLSCREEN_EXIT: '{LA_QR_FULLSCREEN_EXIT}',
+	INFORMATION: '{LA_INFORMATION}',
+	INSERT_TEXT: '{LA_QR_INSERT_TEXT}',
+	loading: {
+		text: '{LA_QR_LOADING}',
+		ATTACHMENTS: '{LA_QR_LOADING_ATTACHMENTS}',
+		NEW_FORM_TOKEN: '{LA_QR_LOADING_NEW_FORM_TOKEN}',
+		NEW_POSTS: '{LA_QR_LOADING_NEW_POSTS}',
+		PREVIEW: '{LA_QR_LOADING_PREVIEW}',
+		SUBMITTED: '{LA_QR_LOADING_SUBMITTED}',
+		SUBMITTING: '{LA_QR_LOADING_SUBMITTING}',
+		WAIT: '{LA_QR_LOADING_WAIT}'
+	},
+	NO_FULL_QUOTE: '{LA_QR_NO_FULL_QUOTE}',
+	POST_REVIEW: '{LA_POST_REVIEW_EXPLAIN}',
+	PREVIEW_CLOSE: '{LA_QR_PREVIEW_CLOSE}',
+	PROFILE: '{LA_QR_PROFILE}',
+	QUICKNICK: '{LA_QR_QUICKNICK}',
+	QUICKNICK_TITLE: '{LA_QR_QUICKNICK_TITLE}',
+	QUICKQUOTE_TEXT: '{LA_QR_QUICKQUOTE}',
+	QUICKQUOTE_TITLE: '{LA_QR_QUICKQUOTE_TITLE}',
+	QUICKREPLY: '{LA_QUICKREPLY}',
+	REPLY_IN_PM: '{LA_QR_REPLY_IN_PM}',
+	REPLY_WITH_QUOTE: '{LA_REPLY_WITH_QUOTE}',
+	TYPE_REPLY: '{LA_QR_TYPE_REPLY}',
+	WARN_BEFORE_UNLOAD: '{LA_QR_WARN_BEFORE_UNLOAD}',
+	WROTE: '{LA_WROTE}'
+};
+<!-- ENDIF -->
+<!-- IF S_QR_SHOW_BUTTON_TRANSLIT -->
+
+// Language arrays for translit feature.
+quickreply.translit = {
+	langFrom: '{LA_QR_TRANSLIT_FROM}'.split(','),
+	langTo: '{LA_QR_TRANSLIT_TO}'.split(','),
+	langFromCaps: '{LA_QR_TRANSLIT_FROM_CAPS}'.split(','),
+	langToCaps: '{LA_QR_TRANSLIT_TO_CAPS}'.split(',')
+};
+<!-- ENDIF -->
+
+// Special features for QuickReply - settings.
+quickreply.special = {
+	hideSubject: <!-- IF QR_HIDE_POSTS_SUBJECT -->true<!-- ELSE -->false<!-- ENDIF -->
+};
+
+// Special features for QuickReply - functions.
+quickreply.special.functions = {};
+//]]>
+</script>
+<!-- IF S_QUICK_REPLY -->
+<!-- INCLUDEJS @boardtools_quickreply/quickreply_style.js -->
+<!-- INCLUDEJS @boardtools_quickreply/quickreply_core.js -->
+<!-- INCLUDEJS @boardtools_quickreply/quickreply_plugins.js -->
+<!-- IF S_QR_SHOW_BUTTON_TRANSLIT --><!-- INCLUDEJS @boardtools_quickreply/translit.js --><!-- ENDIF -->
+<!-- ENDIF -->
+<!-- INCLUDEJS @boardtools_quickreply/quickreply_special.js -->

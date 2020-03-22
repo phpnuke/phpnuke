@@ -1,0 +1,45 @@
+<script type="text/javascript">
+phpbb.plupload.updateBbcode = function(action, index) {
+	var editor = CKEDITOR.instances[Object.keys(CKEDITOR.instances)[0]],
+		text = editor.getData(),
+		removal = (action === 'removal');
+
+	// Return if the bbcode isn't used at all.
+	if (text.indexOf('[attachment=') === -1) {
+		return;
+	}
+
+	function runUpdate(i) {
+		var regex = new RegExp('\\[attachment=' + i + '\\](.*?)\\[\\/attachment\\]', 'g');
+		text = text.replace(regex, function updateBbcode(_, fileName) {
+			// Remove the bbcode if the file was removed.
+			if (removal && index === i) {
+				return '';
+			}
+			var newIndex = i + ((removal) ? -1 : 1);
+			return '[attachment=' + newIndex + ']' + fileName + '[/attachment]';
+		});
+	}
+
+	// Loop forwards when removing and backwards when adding ensures we don't
+	// corrupt the bbcode index.
+	var i;
+	if (removal) {
+		for (i = index; i < phpbb.plupload.ids.length; i++) {
+			runUpdate(i);
+		}
+	} else {
+		for (i = phpbb.plupload.ids.length - 1; i >= index; i--) {
+			runUpdate(i);
+		}
+	}
+
+	if (editor.mode == 'source') {
+		editor.setData( '', function() { this.updateElement(); } );
+		MyBBEditor.insertText(text,'',editor.name+'_2');
+	}
+	else {
+		editor.setData(text);
+	}
+};
+</script>

@@ -1,0 +1,12 @@
+<!-- IF S_QR_QUICKQUOTE_ENABLE or S_QR_FULL_QUOTE and S_QR_FULL_QUOTE_ALLOWED -->
+<pre id="qr_time{postrow.POST_ID}" style="display: none;">{postrow.QR_POST_TIME}</pre>
+<!-- ENDIF -->
+<pre id="qr_author_p{postrow.POST_ID}" style="display: none;" data-url="{postrow.U_POST_AUTHOR}">{postrow.POST_AUTHOR_FULL}</pre>
+<!-- IF S_QR_FULL_QUOTE and postrow.DECODED_MESSAGE != '' -->
+<pre id="decoded_p{postrow.POST_ID}" style="display: none;">{postrow.DECODED_MESSAGE}</pre>
+<!-- ENDIF -->
+</div><!-- /.post-container -->
+<!-- IF postrow.S_LAST_ROW and not S_QUICKREPLY_REQUEST -->
+</div>
+<div id="qr_temp_container" style="display: none;"></div>
+<!-- ENDIF -->

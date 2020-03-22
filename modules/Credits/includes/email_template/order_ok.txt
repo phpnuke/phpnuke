@@ -1,0 +1,28 @@
+<html dir="{{_DIRECTION}}">
+	<head>
+		<meta http-equiv='content-type' content='text/html; charset=utf-8'>
+	</head>
+	<body>
+	<span dir='rtl'>
+		<div style="direction:{{_DIRECTION}};text-align:{{_TEXTALIGN1}};">
+			******************<br />
+			Hi, {{USERNAME}}!<br />
+			******************<br />
+			<br />
+			Your order on {{SITENAME}} has been paid successfully.
+			transaction id : {{TID}}<br />
+			order id : {{ORDER_ID}}<br />
+			order part : {{ORDER_PART}}<br />
+			order title : <a href="{{ORDER_LINK}}">{{ORDER_TITLE}}</a><br />
+			amount : {{AMOUNT}}<br />
+			update time : {{UPDATE_TIME}}<br />
+			<br />
+			If you have any questions, feel free to contact our team ( {{FEEDBACK_URL}} ). (We're lightning quick at replying.)<br />
+			<br />
+			Thanks,<br />
+			<a href="{{NUKEURL}}">{{SITENAME}}</a><br />
+
+			© 2020 .All rights reserved.
+		</div>
+	</body>
+</html>

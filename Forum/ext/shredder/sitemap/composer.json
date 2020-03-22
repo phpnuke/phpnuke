@@ -1,0 +1,42 @@
+{
+    "name": "shredder/sitemap",
+    "type": "phpbb-extension",
+    "description": "phpBB SEO Sitemap for phpBB 3.1",
+    "homepage": "http://www.phpbb-work.ru/",
+    "keywords": [
+        "phpbb-work",
+        "extension",
+        "seo",
+        "Sitemap"
+    ],
+    "version": "1.1.1",
+    "time": "2015-01-10",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Shredder",
+            "homepage": "http://www.phpbb-work.ru/",
+            "role": "Developer"
+        },
+        {
+            "name": "ostridm",
+            "homepage": "http://strkv.ru",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "phpbb/phpbb": ">=3.1.0"
+    },
+    "extra": {
+        "display-name": "phpBB3 SEO Sitemap",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.1.0"
+        },
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/seo_sitemap",
+            "filename": "version_check"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+services:
+    phpbb.boardannouncements.listener:
+        class: phpbb\boardannouncements\event\listener
+        arguments:
+            - '@cache.driver'
+            - '@config'
+            - '@config_text'
+            - '@controller.helper'
+            - '@request'
+            - '@template'
+            - '@user'
+        tags:
+            - { name: event.listener }
+
+    phpbb.boardannouncements.controller:
+        class: phpbb\boardannouncements\controller\controller
+        arguments:
+            - '@config'
+            - '@config_text'
+            - '@dbal.conn'
+            - '@request'
+            - '@user'

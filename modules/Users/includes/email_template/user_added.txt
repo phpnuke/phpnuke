@@ -1,0 +1,16 @@
+<div style="direction:{{_DIRECTION}};text-align:{{_TEXTALIGN1}};">
+	******************<br />
+	Hi, {{USER_REALNAME}}!<br />
+	******************<br />
+	<br />
+	Your user account [ {{USERNAME}} ] in {{SITENAME}} has been suspended as {{USER_SUSPEND_DATE}};<br />
+	reason : {{USER_SUSPEND_REASON}}<br />
+	suspend expired in : {{USER_SUSPEND_EXPIRE}}<br />
+	<br />
+	If you have any questions, feel free to contact our team ( {{FEEDBACK_URL}} ). (We're lightning quick at replying.)<br />
+	<br />
+	Thanks,<br />
+	<a href="{{NUKEURL}}">{{SITENAME}}</a><br />
+
+	© 2019 .All rights reserved.
+</div>

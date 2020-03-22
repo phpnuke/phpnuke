@@ -1,0 +1,13 @@
+<div class="send-stats-tile">
+    <h2 class="viglink-header-h2"><span class="viglink-header"></span></h2>
+    <p>{{ lang('ACP_VIGLINK_SETTINGS_EXPLAIN') }}<br /><br />{{ ACP_VIGLINK_SETTINGS_CHANGE }}</p>
+    <dl class="send-stats-settings">
+        <dt>
+            <input name="enable-viglink" id="enable-viglink" type="checkbox" {% if S_ENABLE_VIGLINK == 1 %}checked="checked"{% endif %}/>
+            <label for="enable-viglink"></label>
+        </dt>
+        <dd>{{ lang('ENABLE') }}</dd>
+    </dl>
+</div>
+
+{% INCLUDECSS '@phpbb_viglink/viglink.css' %}

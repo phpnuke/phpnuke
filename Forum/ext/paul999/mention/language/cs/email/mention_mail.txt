@@ -1,0 +1,10 @@
+Subject: Byli jste zmíněni
+
+Dobrý den,
+
+právě jste byli zmíněni od "{USERNAME}" v "{TOPIC_TITLE}" na "{SITENAME}".
+
+Pokud chcete zobrazit příspěvek, kde jste byli zmíněni, můžete použít následující odkaz:
+{U_LINK_TO_TOPIC}
+
+{EMAIL_SIG}

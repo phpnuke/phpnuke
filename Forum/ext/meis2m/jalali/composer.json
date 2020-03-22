@@ -1,0 +1,34 @@
+{
+	"name": "meis2m/jalali",
+	"type": "phpbb-extension",
+	"description": "Shamsi Date for phpBB",
+	"homepage": "http://www.php-bb.ir",
+	"version": "1.2.0",
+	"time": "2017-07-26",
+	"license": "GPL-3.0",
+	"authors": [
+		{
+			"name": "Meis2M",
+			"email": "meis2m@yahoo.com",
+			"homepage": "https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=1236845",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.3.3"
+	},
+        "require-dev": {
+                "phpbb/epv": "dev-master"
+        },
+	"extra": {
+		"display-name": "Shamsi Datetime for phpBB تاریخ شمسی",
+		"soft-require": {
+			"phpbb/phpbb": "3.1.*@dev"
+		},
+                "version-check": {
+                "host": "version.php-bb.ir",
+                "directory": "/",
+                "filename": "shamsi-date.json"
+            }
+	}
+}

@@ -1,0 +1,47 @@
+<!-- IF S_BOARD_ANNOUNCEMENTS -->
+
+<!-- IF not $INCLUDED_COLPICKJS -->
+	<!-- INCLUDEJS @phpbb_boardannouncements/colpick.js -->
+	<!-- DEFINE $INCLUDED_COLPICKJS = true -->
+<!-- ENDIF -->
+
+<!-- IF not $INCLUDED_DATETIMEPICKERJS -->
+	<!-- INCLUDEJS @phpbb_boardannouncements/datetimepicker/jquery.datetimepicker.full.min.js -->
+	<!-- DEFINE $INCLUDED_DATETIMEPICKERJS = true -->
+<!-- ENDIF -->
+
+<script>
+jQuery(function($) {
+	var bgcolor = '{BOARD_ANNOUNCEMENTS_BGCOLOR}';
+	$('#board_announcements_bgcolor').colpick({
+		layout: 'hex',
+		submit: 0,
+		onBeforeShow: function() {
+			if (bgcolor !== '') {
+				$(this).colpickSetColor(bgcolor);
+				bgcolor = '';
+			}
+		},
+		onChange: function(hsb, hex, rgb, el, bySetColor) {
+			$(el).css({
+				'border-right-color': '#' + hex,
+				'border-right-width': '20px',
+				'border-right-type': 'solid'
+			});
+			if (!bySetColor) {
+				$(el).val(hex);
+			}
+		}
+	}).keyup(function() {
+		$(this).colpickSetColor(this.value || 'ffffff');
+	});
+	$('#board_announcements_expiry').datetimepicker({
+		format:'{{ PICKER_DATE_FORMAT|e('js') }}',
+		validateOnBlur: false,
+		minDate: 0
+	});
+	$.datetimepicker.setLocale('{S_USER_LANG}')
+});
+</script>
+
+<!-- ENDIF -->

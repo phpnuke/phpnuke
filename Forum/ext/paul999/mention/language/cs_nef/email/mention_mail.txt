@@ -1,0 +1,10 @@
+Subject: Byl jsi zmíněn
+
+Ahoj,
+
+právě jsi byl zmíněn od "{USERNAME}" v "{TOPIC_TITLE}" ve fóru "{SITENAME}".
+
+Pro zobrazení příspěvku, kde jsi byl zmíněn, klikni na následující odkaz:
+{U_LINK_TO_TOPIC}
+
+{EMAIL_SIG}

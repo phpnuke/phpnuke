@@ -1,0 +1,1 @@
+jpg,JPG,png,PNG,gif,GIF,jpeg,JPEG,csv,CSV,avi,AVI,mp3,MP3,wma,WMA,mov,MOV,flv,FLV,ogg,OGG,bz2,BZ2,wmv,WMV,wav,WAV,rm,RM,tif,TIF,bmp,BMP,swf,SWF,zip,ZIP,rar,RAR,gzip,GZIP,mpg,MPG,mpeg,MPEG,mpeg-1,MPEG-1,mpeg-2,MPEG-2,mpeg-4,MPEG-4,aac,AAC,tga,TGA,3gp,3GP,mp4,MP4,asf,ASF

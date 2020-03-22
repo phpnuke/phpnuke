@@ -1,0 +1,46 @@
+{
+    "name": "phpbbseo/usu",
+    "type": "phpbb-extension",
+    "description": "This Extension will URL rewrite phpBB URLs in various manners, injecting, or not, forums and topic titles in their URLS, each URL being rewritten once, no matter the number of links using it on the page.",
+    "homepage": "http://www.phpbb-seo.org",
+    "version": "2.0.0-b2",
+	"keywords": ["phpbbSEO", "extension", "seo", "Friendly User"],
+    "time": "2017-12-20",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+ 			"name": "Meis@M",
+			"email": "info@phpbb-seo.org",
+			"homepage": "http://www.phpbb-seo.org/",
+			"role": "Lead Developer"
+        },
+        {
+			"name": "dcz",
+            "role": "Previous Developer"
+        },
+        {
+			"name": "Carlo",
+			"email": "carlo@phpbbitalia.net",
+			"homepage": "http://www.phpbbitalia.net/",
+            "role": "Previous Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "composer/installers": "~1.0"
+    },
+    "require-dev": {
+        "phpbb/epv": "dev-master"
+    },
+    "extra": {
+        "display-name": "Ultimate phpBB SEO Friendly URL",
+        "soft-require": {
+			"phpbb/phpbb": ">=3.1.0-RC2"
+        },
+		"version-check": {
+			"host": "version.phpbb-seo.org",
+			"directory": "/",
+			"filename": "usu.json"
+		}
+    }
+}

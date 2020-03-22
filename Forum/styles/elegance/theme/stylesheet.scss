@@ -1,0 +1,35 @@
+//
+//	stylesheet.css replacement
+//
+//	This file requires SASS compiler.
+//	You can find instructions here: http://www.artodia.com/phpbb-31-tutorials/compile-theme/
+//
+//	If you have any questions please visit support forum at:
+//		http://www.artodia.com/forums/
+//
+//	Set your custom configuration variables in _custom_config.scss
+//	Add your custom code to _custom.scss
+//	
+//	After editing any .scss file you must recompile stylesheet.
+//
+/*!
+	DO NOT EDIT stylesheet.css!
+
+	Edit .scss files instead. See http://www.artodia.com/phpbb-31-tutorials/compile-theme/
+	If you have any questions, please ask on support forum at http://www.artodia.com/forums/
+*/
+@import "custom_config";
+@import "style_config";
+@import "common/common";
+@import "common/links";
+@import "common/content";
+@import "common/buttons";
+@import "common/cp";
+@import "common/forms";
+@import "common/imageset";
+@import "common/responsive";
+@import "colours";
+@import "custom";
+@import "common/icons";
+@import "common/normalize";
+@import "common/utilities";

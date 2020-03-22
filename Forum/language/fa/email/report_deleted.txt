@@ -1,0 +1,7 @@
+Subject: گزارش حذف شد - "{POST_SUBJECT}"
+
+سلام {USERNAME},
+
+این اطلاعیه را دریافت می کنید زیرا گزارش شما در پست "{POST_SUBJECT}" در موضوع "{TOPIC_TITLE}" در وبسایت "{SITENAME}" توسط مدیر و یا مدیر انجمن حذف شده است
+
+{EMAIL_SIG}

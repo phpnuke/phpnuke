@@ -1,0 +1,364 @@
+#uploadto{
+	display:block;
+	width:180px;
+	min-height:52px;
+	background-image:-webkit-linear-gradient(top, #4da7f7, #0e74cc);
+    background-image:-moz-linear-gradient(top, #4da7f7, #0e74cc);
+    background-image:linear-gradient(top, #4da7f7, #0e74cc);
+	border:1px solid #0ecc9d;
+	border-radius:8px;
+	margin:0 auto;
+	padding:8px;
+	text-align:center;
+	color:#fff;
+	font-size:16px;
+	font-weight:bold;
+	line-height:25px;
+	margin-bottom:10px;
+}
+
+#upload_path{
+	direction:ltr;
+	text-align:left;
+	font-size:14px;
+	font-family:Arial;
+}
+
+#media_menu
+{
+	direction:ltr;
+	width: 210px;
+	margin: 0 auto;
+	height: 400px;
+	overflow: auto;
+}
+#media_menu UL.filetree
+{
+	font-family: Verdana, sans-serif;
+	font-size: 14px;
+	line-height: 33px;
+	padding: 0px;
+	margin: 0px;
+}
+#media_menu UL.filetree LI
+{
+	list-style: none;
+	padding: 0px 0px 0px 20px;
+	margin: 0px 0px 0px 10px;
+	white-space: nowrap;
+}
+#media_menu UL.filetree A
+{
+	color: #333;
+	text-decoration: none;
+	display: block;
+	padding: 0px 2px 0px 5px;
+	margin-left: 15px;
+}
+
+#media_menu UL.filetree A:hover
+{
+	color: #c20808;
+}
+/*folder styles*/
+#media_menu .filetree LI.folder
+{
+	background: url(../../../images/file_types/folder.png) no-repeat left top;
+}
+#media_menu .filetree LI.expanded
+{
+	background: url(../../../images/file_types/folder_open.png) no-repeat left top;
+}
+#media_menu .filetree LI.file
+{
+	background: url(../../../images/file_types/file.png) no-repeat left top;
+}
+#media_menu .filetree LI.wait
+{
+	background: url(../../../images/file_types/spinner.gif) no-repeat left top;
+}
+/*extensions and mime types*/
+.ext_3gp
+{
+	background: url(../../../images/file_types/film.png) no-repeat left top;
+}
+.ext_afp
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_afpa
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_asp
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_aspx
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_avi
+{
+	background: url(../../../images/file_types/film.png) no-repeat left top;
+}
+.ext_bat
+{
+	background: url(../../../images/file_types/application.png) no-repeat left top;
+}
+.ext_bmp
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_c
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_cfm
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_cgi
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_com
+{
+	background: url(../../../images/file_types/application.png) no-repeat left top;
+}
+.ext_cpp
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_css
+{
+	background: url(../../../images/file_types/css.png) no-repeat left top;
+}
+.ext_doc
+{
+	background: url(../../../images/file_types/doc.png) no-repeat left top;
+}
+.ext_exe
+{
+	background: url(../../../images/file_types/application.png) no-repeat left top;
+}
+.ext_gif
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_fla
+{
+	background: url(../../../images/file_types/flash.png) no-repeat left top;
+}
+.ext_h
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_htm
+{
+	background: url(../../../images/file_types/html.png) no-repeat left top;
+}
+.ext_html
+{
+	background: url(../../../images/file_types/html.png) no-repeat left top;
+}
+.ext_jar
+{
+	background: url(../../../images/file_types/java.png) no-repeat left top;
+}
+.ext_jpg
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_jpeg
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_js
+{
+	background: url(../../../images/file_types/script.png) no-repeat left top;
+}
+.ext_lasso
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_log
+{
+	background: url(../../../images/file_types/txt.png) no-repeat left top;
+}
+.ext_m4p
+{
+	background: url(../../../images/file_types/music.png) no-repeat left top;
+}
+.ext_mov
+{
+	background: url(../../../images/file_types/film.png) no-repeat left top;
+}
+.ext_mp3
+{
+	background: url(../../../images/file_types/music.png) no-repeat left top;
+}
+.ext_mp4
+{
+	background: url(../../../images/file_types/film.png) no-repeat left top;
+}
+.ext_mpg
+{
+	background: url(../../../images/file_types/film.png) no-repeat left top;
+}
+.ext_mpeg
+{
+	background: url(../../../images/file_types/film.png) no-repeat left top;
+}
+.ext_ogg
+{
+	background: url(../../../images/file_types/music.png) no-repeat left top;
+}
+.ext_pcx
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_pdf
+{
+	background: url(../../../images/file_types/pdf.png) no-repeat left top;
+}
+.ext_php
+{
+	background: url(../../../images/file_types/php.png) no-repeat left top;
+}
+.ext_png
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_ppt
+{
+	background: url(../../../images/file_types/ppt.png) no-repeat left top;
+}
+.ext_psd
+{
+	background: url(../../../images/file_types/psd.png) no-repeat left top;
+}
+.ext_pl
+{
+	background: url(../../../images/file_types/script.png) no-repeat left top;
+}
+.ext_py
+{
+	background: url(../../../images/file_types/script.png) no-repeat left top;
+}
+.ext_rb
+{
+	background: url(../../../images/file_types/ruby.png) no-repeat left top;
+}
+.ext_rbx
+{
+	background: url(../../../images/file_types/ruby.png) no-repeat left top;
+}
+.ext_rhtml
+{
+	background: url(../../../images/file_types/ruby.png) no-repeat left top;
+}
+.ext_rpm
+{
+	background: url(../../../images/file_types/linux.png) no-repeat left top;
+}
+.ext_ruby
+{
+	background: url(../../../images/file_types/ruby.png) no-repeat left top;
+}
+.ext_sql
+{
+	background: url(../../../images/file_types/db.png) no-repeat left top;
+}
+.ext_swf
+{
+	background: url(../../../images/file_types/flash.png) no-repeat left top;
+}
+.ext_tif
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_tiff
+{
+	background: url(../../../images/file_types/picture.png) no-repeat left top;
+}
+.ext_txt
+{
+	background: url(../../../images/file_types/txt.png) no-repeat left top;
+}
+.ext_vb
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_wav
+{
+	background: url(../../../images/file_types/music.png) no-repeat left top;
+}
+.ext_wmv
+{
+	background: url(../../../images/file_types/film.png) no-repeat left top;
+}
+.ext_xls
+{
+	background: url(../../../images/file_types/xls.png) no-repeat left top;
+}
+.ext_xml
+{
+	background: url(../../../images/file_types/code.png) no-repeat left top;
+}
+.ext_zip
+{
+	background: url(../../../images/file_types/zip.png) no-repeat left top;
+}
+#media_menu .filetree UL
+{
+	border-left: 1px solid #D9DADB;
+	padding-left: 10px;
+}
+#media_menu .filetree LI UL LI:before
+{
+	margin-left: -40px;
+	content: "\2014";
+	position: absolute;
+}
+#media_menu .filetree LI UL LI
+{
+	position: relative;
+}
+.media_browser{
+	cursor:pointer;
+}
+#media_messages{
+	text-align:center;
+	font-size:13px;
+	font-weight:bold;
+}
+
+.media-preview{
+	width:920px;
+	overflow:hidden;
+	padding:20px;
+}
+
+.media-preview-metadata{
+	float:right;
+	width:500px;
+}
+.media-preview-metadata table td{
+	padding:8px 0;
+}
+.media-preview-metadata input{
+	padding:8px;
+	width:95%;
+	direction:ltr;
+	background:#eee;
+	border:1px solid #aaa;
+}
+
+.media-preview-player{
+	float:left;
+	width:400px;
+	min-height:250px;
+	text-align:center;
+	overflow:hidden;
+}

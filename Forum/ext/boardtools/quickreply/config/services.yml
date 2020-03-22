@@ -1,0 +1,118 @@
+services:
+    boardtools.quickreply.listener:
+        class: boardtools\quickreply\event\listener
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@boardtools.quickreply.listener_helper'
+        tags:
+            - { name: event.listener }
+
+    boardtools.quickreply.listener_ajax:
+        class: boardtools\quickreply\event\listener_ajax
+        arguments:
+            - '@config'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@boardtools.quickreply.ajax_helper'
+            - '@boardtools.quickreply.listener_helper'
+        tags:
+            - { name: event.listener }
+
+    boardtools.quickreply.listener_cp:
+        class: boardtools\quickreply\event\listener_cp
+        arguments:
+            - '@template'
+            - '@user'
+            - '@boardtools.quickreply.cp_helper'
+        tags:
+            - { name: event.listener }
+
+    boardtools.quickreply.ajax_helper:
+        class: boardtools\quickreply\functions\ajax_helper
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@template'
+            - '@user'
+            - '@dbal.conn'
+            - '@content.visibility'
+            - '@request'
+            - '@template_context'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '@boardtools.quickreply.ajax_preview_helper'
+
+    boardtools.quickreply.ajax_preview_helper:
+        class: boardtools\quickreply\functions\ajax_preview_helper
+        arguments:
+            - '@user'
+            - '@request'
+
+    boardtools.quickreply.captcha_helper:
+        class: boardtools\quickreply\functions\captcha_helper
+        arguments:
+            - '@config'
+            - '@template'
+            - '@request'
+            - '@captcha.factory'
+
+    boardtools.quickreply.cp_helper:
+        class: boardtools\quickreply\functions\cp_helper
+        arguments:
+            - '@config'
+            - '@request'
+
+    boardtools.quickreply.form_helper:
+        class: boardtools\quickreply\functions\form_helper
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@template'
+            - '@user'
+            - '@cache'
+            - '@plupload'
+            - '@mimetype.guesser'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    boardtools.quickreply.listener_helper:
+        class: boardtools\quickreply\functions\listener_helper
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@boardtools.quickreply.captcha_helper'
+            - '@boardtools.quickreply.form_helper'
+            - '@boardtools.quickreply.plugins_helper'
+            - '@boardtools.quickreply.notifications_helper'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    boardtools.quickreply.notifications_helper:
+        class: boardtools\quickreply\functions\notifications_helper
+        arguments:
+            - '@auth'
+            - '@user'
+            - '@notification_manager'
+
+    boardtools.quickreply.plugins_helper:
+        class: boardtools\quickreply\functions\plugins_helper
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@user'
+            - '@ext.manager'
+
+    boardtools.quickreply.notification.type.quicknick:
+        class: boardtools\quickreply\notification\quicknick
+        shared: false # service MUST not be shared for this to work!
+        parent: notification.type.quote
+        tags:
+            - { name: notification.type }

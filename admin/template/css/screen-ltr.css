@@ -1,0 +1,293 @@
+body{
+	font-family: Arial, verdana;
+}
+
+input, select, textarea {
+	font-family: verdana, Arial;
+}
+
+.font11	{
+	font-size: 11px;
+}
+
+h1{
+	font-family: verdana;
+}
+
+#top-search	{
+	float: left;
+	margin: 46px 0 0 20px;
+}
+
+.top-search-inp	{
+	padding: 6px 6px 0 10px;
+}
+
+#content	{
+	font-family: verdana, Arial, Helvetica, sans-serif;
+}
+
+#content-inner	{
+	font-family: verdana, Arial, Helvetica, sans-serif;
+}
+
+#page-heading	{
+	margin: 0 20px 15px 0;
+}
+
+.table-icone {
+	float: left;
+	margin: 0 0 0 8px;
+}
+
+#tooltip	{
+	font-family: verdana, Arial;
+	text-align: left;
+}
+
+#tooltip h6, #tooltip div	{
+	font-family: verdana, Arial;
+}
+
+.product-table	th	{
+	text-align: center;
+}
+
+.table-header-check	{
+	padding: 0px 10px 0 0;
+}
+
+.table-header-options a,
+ .table-header-repeat a	{
+	font-family: verdana;
+	padding: 0 0 0 10px;
+}
+
+ul.greyarrow li	{
+	padding: 0 12px 0 0;
+}
+	
+/* FORM ------------------------------------------------------- */	
+.form-submit, .form-submit-uplaod, .form-reset, .form-exit, .form-toggle {
+	margin: 0 0 0 4px;
+}
+
+.form-textarea	{
+	font-family: verdana, Arial, Helvetica, sans-serif;
+}
+
+.id-form th	{
+	text-align: left;
+}
+
+.styledselect-day ,
+.styledselect-month ,
+.styledselect-select ,
+.styledselect-year	{
+	margin-left: 3px;
+}
+
+#step-holder {
+	font-family: verdana;
+}
+
+.bubble-right {
+	float:left;
+	margin-left: 5px;
+	background: url(../images/forms/ltr-bubble-left.gif) right no-repeat;
+}
+
+.bubble-left {
+	float:left;
+	background: url(../images/forms/ltr-bubble-right.gif) no-repeat;
+}
+
+.bubble-inner {
+	float:left;
+}
+ 
+/*  NAVIGATION ----------------------------------------------- */
+
+a#logout	{
+	margin: 10px 5px 0 0;
+}
+
+/* ================================================================ 
+This copyright notice must be untouched at all times. The original version of this stylesheet and the associated (x)html is available at http://www.cssplay.co.uk/menus/pro_dropline.html
+Copyright (c) 2005-2007 Stu Nicholls. All rights reserved. This stylesheet and the associated (x)html may be modified in any way to fit your requirements.
+=================================================================== */
+
+.nav	{
+	float: left;
+	font-family: verdana;
+}
+.nav-divider	{
+	float: left;
+}
+.nav-divider2	{
+	float: right;
+}
+
+.nav .select,
+.nav .current	{
+	float: left;
+}
+.nav li	{
+	float: left;
+}
+.nav .select a	{
+	float: left;
+	height: 37px;
+	padding: 0 20px 0 10px;
+}
+.nav .current a	{
+	float: left;
+	padding: 0 10px 0 0;
+}
+.nav .current a b	{
+	padding: 0 10px 0 20px;
+}
+
+.nav .select_sub	{
+	margin: 0 0 0 10px;
+}
+
+/* IE6 only */
+.nav .select :hover .select_sub, 
+.nav .current .show	{
+	left: 0;
+	text-align: left;
+}
+
+.nav .select :hover .sub li a, 
+.nav .current .show .sub li a	{
+	float: right;
+} 
+  
+/*  STYLED SELECTBOXES style 1 --------------------------------- */	
+
+.styledselect {
+	margin-left: 6px;
+}
+
+div.selectbox-wrapper	{
+	text-align: right;
+}
+
+div.selectbox-wrapper ul li	{
+	padding: 6px 10px 6px 2px;
+}
+
+.selectbox_styled	{
+	border-right: none;
+	font-family: verdana, Arial;
+	padding: 6px 6px 0 0;
+	text-align: right;
+}
+
+
+/* STYLED CHECKBOXES -------------------------------------------- */	
+span.ui-checkbox{
+	float: right;
+}
+
+/* STYLED RADIOS -------------------------------------------- */	
+span.ui-radio	{
+	float: left;
+}
+
+/*  LOGIN -------------------------------------------------------------------------------- */	
+
+#login-inner	{
+	font-family: verdana;	
+}
+
+#login-cod	{
+	float:right;
+	margin:75px 20px 0 0;
+}
+
+#login-inner label	{
+	font-family: verdana;
+	padding-right: 10px;
+}
+
+#login-inner th	{
+	text-align: left;
+}
+
+a.forgot-pwd	{
+	font-family: verdana;
+	left: 40px;
+}
+
+#forgotbox-text	{
+	font-family: verdana;
+}
+
+#forgot-inner	{
+	font-family: verdana;
+}
+
+#forgot-inner label	{
+	font-family: verdana;
+	padding-right: 10px;
+}
+
+#forgot-inner th	{
+	text-align: right;
+}
+
+a.back-login	{
+	font-family: verdana;
+	padding: 0 10px 0 0;
+	left: 40px;
+}
+
+.blocks-column-full ul > li{
+	float:left;
+}
+
+
+.blocks-box-tools{
+	float:right;
+}
+
+.blocks-tools{
+	float:right;
+	margin:15px 10px 0 0;
+}
+
+.blocks-sortable-item-inbox {
+	text-align: left;
+	padding-left:10px;
+}
+
+.loading{
+	padding-left:20px;
+	background-position: left;
+}
+
+#blocks-help ul li{
+	float:left;
+	margin-left:30px;
+}
+
+#blocks-help ul li .color-box{
+	float:left;
+}
+
+#blocks-help ul li .help-text{
+	float:left;
+	margin-left:5px;
+}
+
+.message-alert .message-text	{
+	float:left;
+}
+.message-alert .message-close {
+	float:right;
+}
+
+.nukelogo{float:left;margin:10px 0px 13px 0px;}
+.top-counters{float:right;margin:10px 95px 10px 0px;}

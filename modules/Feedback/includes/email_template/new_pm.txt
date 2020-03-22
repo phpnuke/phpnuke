@@ -1,0 +1,22 @@
+<html dir="{{_DIRECTION}}">
+	<head>
+		<meta http-equiv='content-type' content='text/html; charset=utf-8'>
+	</head>
+	<body>
+	<span dir='rtl'>
+		<div style="direction:{{_DIRECTION}};text-align:{{_TEXTALIGN1}};">
+			A new  message has been sent by the {{SENDER_NAME}}<br />
+			sender email : {{SENDER_EMAIL}}<br />
+			to : {{DNAME}} {{$dresponsibility}}
+			message:<br />
+			{{MESSAGE}}
+			<br />
+			If you have any questions, feel free to contact our team ( {{FEEDBACK_URL}} ). (We're lightning quick at replying.)<br />
+			<br />
+			Thanks,<br />
+			<a href="{{NUKEURL}}">{{SITENAME}}</a><br />
+
+			© 2020 .All rights reserved.
+		</div>
+	</body>
+</html>

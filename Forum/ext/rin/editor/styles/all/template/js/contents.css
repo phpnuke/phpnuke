@@ -1,0 +1,173 @@
+/*
+Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
+*/
+
+body
+{
+	/* Font */
+	font-family: "Lucida Grande","Trebuchet MS",Verdana,Helvetica,Arial,sans-serif;
+
+	font-size: 13px;
+
+	/* Text color */
+	color: #000;
+
+	/* Remove the background color to make it transparent */
+	background-color: #fff;
+
+	margin: 10px;
+}
+
+.cke_editable
+{
+	font-size: 14px;
+	line-height: 1.4;
+}
+
+p {
+	margin: 0px;
+}
+
+blockquote {
+	background: transparent none 6px 8px no-repeat;
+	border: 1px solid transparent;
+	font-size: 0.95em;
+	margin: 1em 1px 1em 25px;
+	overflow: hidden;
+	padding: 5px;
+	background-color: #EBEADD;
+	background-image: url("./icons/quote.gif");
+	border-color: #DBDBCE;
+}
+
+blockquote:before {
+	font-style: normal;
+	font-weight: bold;
+	content: attr(data-cite);
+	display: block;
+	margin-left: 20px;
+	font-size: 0.9em;
+}
+
+blockquote:before:-moz-only-whitespace {
+	display: none;
+}
+
+blockquote[data-cite='codeblock']:before, blockquote[data-cite='phpcodeblock']:before {
+	text-transform: uppercase;
+	font-weight: bold;
+	content: 'Code:';
+	display: block;
+	border-bottom: 1px solid transparent;
+	border-bottom-color: #CCCCCC;
+	color: #000 !important;
+	margin-bottom: 3px;
+	margin-left: 0px !important;
+	font-size: 1em;
+}
+
+blockquote[data-cite='phpcodeblock']:before {
+	content: 'PHP Code:' !important;
+	color: #333 !important;
+}
+
+blockquote[data-cite='codeblock'], blockquote[data-cite='phpcodeblock'] {
+	position: relative;
+	background-color: #FFFFFF !important;
+	margin: 1em 0 1.2em 0;
+	border: 1px solid #C9D2D8;
+	display: block;
+	color: #2E8B57;
+	overflow: auto;
+	font: 0.9em Monaco, "Andale Mono","Courier New", Courier, monospace;
+	line-height: 1.3em;
+	background-image: none !important;
+}
+
+blockquote[data-cite='phpcodeblock'] {
+	color: #0000BB;
+}
+
+a
+{
+	color: #0782C1;
+}
+
+ol,ul,dl
+{
+	/* IE7: reset rtl list margin. (#7334) */
+	*margin-right: 0px;
+	/* preserved spaces for list items with text direction other than the list. (#6249,#8049)*/
+	padding: 0 40px;
+}
+
+h1,h2,h3,h4,h5,h6
+{
+	font-weight: normal;
+	line-height: 1.2;
+}
+
+hr
+{
+	border: 0px;
+	border-top: 1px solid #ccc;
+}
+
+img.right
+{
+	border: 1px solid #ccc;
+	float: right;
+	margin-left: 15px;
+	padding: 5px;
+}
+
+img.left
+{
+	border: 1px solid #ccc;
+	float: left;
+	margin-right: 15px;
+	padding: 5px;
+}
+
+pre
+{
+	white-space: pre-wrap; /* CSS 2.1 */
+	word-wrap: break-word; /* IE7 */
+	-moz-tab-size: 4;
+	tab-size: 4;
+}
+
+.marker
+{
+	background-color: Yellow;
+}
+
+span[lang]
+{
+	font-style: italic;
+}
+
+figure
+{
+	text-align: center;
+	border: solid 1px #ccc;
+	border-radius: 2px;
+	background: rgba(0,0,0,0.05);
+	padding: 10px;
+	margin: 10px 20px;
+	display: inline-block;
+}
+
+figure > figcaption
+{
+	text-align: center;
+	display: block; /* For IE8 */
+}
+
+a > img {
+	padding: 1px;
+	margin: 1px;
+	border: none;
+	outline: 1px solid #0782C1;
+}

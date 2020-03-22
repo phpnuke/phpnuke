@@ -1,0 +1,136 @@
+<IfModule mod_rewrite.c>
+	 # You may need to un-comment the following lines
+	 # Options +FollowSymlinks
+	 # To make sure that rewritten dir or file (/|.html) will not load dir.php in case it exist
+	 # Options -MultiViews
+	 # REMEBER YOU ONLY NEED TO STARD MOD REWRITE ONCE
+	 RewriteEngine On
+
+	 # Uncomment the statement below if you want to make use of
+	 # HTTP authentication and it does not already work.
+	 # This could be required if you are for example using PHP via Apache CGI.
+	 # RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+
+	 # REWRITE BASE
+	 RewriteBase /Forum/
+
+	 # HERE IS A GOOD PLACE TO FORCE CANONICAL DOMAIN
+	 # Define fully qualified ssl aware protocol
+	 # RewriteCond %{SERVER_PORT}s ^(443(s)|[0-9]+s)$
+	 # RewriteRule ^.*$ - [env=HttpFullProto:http%2://]
+	 # RewriteCond %{HTTP_HOST} !^www\.phpnuke\.ir$ [NC]
+	 # RewriteRule ^(.*)$ %{ENV:HttpFullProto}www.phpnuke.ir/$1 [QSA,L,R=301]
+
+	 # DO NOT GO FURTHER IF THE REQUESTED FILE / DIR DOES EXISTS
+	 RewriteCond %{REQUEST_FILENAME} -f [OR]
+	 RewriteCond %{REQUEST_FILENAME} -d
+	 RewriteRule . - [L]
+	 # FORUM INDEX REWRITERULE WOULD STAND HERE IF USED. "forum" REQUIRES TO BE SET AS FORUM INDEX
+	 # RewriteRule ^forum\.html$ index.php [QSA,L,NC]
+	 # FORUM ALL MODES
+	 RewriteRule ^(forum|[a-z0-9_-]*-f)([0-9]+)/?(page([0-9]+)\.html)?$ viewforum.php?f=$2&start=$4 [QSA,L,NC]
+	 # TOPIC WITH VIRTUAL FOLDER ALL MODES
+	 RewriteRule ^(forum|[a-z0-9_-]*-f)([0-9]+)/(topic|[a-z0-9_-]*-t)([0-9]+)(-([0-9]+))?\.html$ viewtopic.php?f=$2&t=$4&start=$6 [QSA,L,NC]
+	 # TOPIC WITHOUT FORUM ID & DELIM ALL MODES
+	 RewriteRule ^([a-z0-9_-]*)/?(topic|[a-z0-9_-]*-t)([0-9]+)(-([0-9]+))?\.html$ viewtopic.php?forum_uri=$1&t=$3&start=$5 [QSA,L,NC]
+	 # PROFILES THROUGH USERNAME
+	 RewriteRule ^member/([^/]+)/?$ memberlist.php?mode=viewprofile&un=$1 [QSA,L,NC]
+	 # USER MESSAGES THROUGH USERNAME
+	 RewriteRule ^member/([^/]+)/(topics|posts)/?(page([0-9]+)\.html)?$ search.php?author=$1&sr=$2&start=$4 [QSA,L,NC]
+	 # GROUPS ALL MODES
+	 RewriteRule ^(group|[a-z0-9_-]*-g)([0-9]+)(-([0-9]+))?\.html$ memberlist.php?mode=group&g=$2&start=$4 [QSA,L,NC]
+	 # POSTS
+	 RewriteRule ^post([0-9]+)\.html$ viewtopic.php?p=$1 [QSA,L,NC]
+	 # ACTIVE TOPICS
+	 RewriteRule ^active-topics(-([0-9]+))?\.html$ search.php?search_id=active_topics&start=$2&sr=topics [QSA,L,NC]
+	 # UNANSWERED TOPICS
+	 RewriteRule ^unanswered(-([0-9]+))?\.html$ search.php?search_id=unanswered&start=$2&sr=topics [QSA,L,NC]
+	 # NEW POSTS
+	 RewriteRule ^newposts(-([0-9]+))?\.html$ search.php?search_id=newposts&start=$2&sr=topics [QSA,L,NC]
+	 # UNREAD POSTS
+	 RewriteRule ^unreadposts(-([0-9]+))?\.html$ search.php?search_id=unreadposts&start=$2 [QSA,L,NC]
+	 # THE TEAM
+	 RewriteRule ^the-team\.html$ memberlist.php?mode=team [QSA,L,NC]
+	 # HERE IS A GOOD PLACE TO ADD OTHER PHPBB RELATED REWRITERULES
+	 
+	 # FORUM WITHOUT ID & DELIM ALL MODES
+	 # THESE LINES MUST BE LOCATED AT THE END OF YOUR HTACCESS TO WORK PROPERLY
+	 RewriteCond %{REQUEST_FILENAME} !-f
+	 RewriteCond %{REQUEST_FILENAME} !-d
+	 RewriteRule ^([a-z0-9_-]+)/?(page([0-9]+)\.html)?$ viewforum.php?forum_uri=$1&start=$3 [QSA,L,NC]
+	 # FIX RELATIVE PATHS : FILES
+	 RewriteRule ^(style\.php|ucp\.php|mcp\.php|faq\.php|posting\.php|download/file\.php|report\.php|adm/index\.php|cron\.php)$ $1 [QSA,L,NC,R=301]
+	 # FIX RELATIVE PATHS : IMAGES
+	 RewriteRule ^(styles/.*|images/.*|assets/.*|ext/.*)$ $1 [QSA,L,NC,R=301]
+	 #
+	 # The following 3 lines will rewrite URLs passed through the front controller
+	 # to not require app.php in the actual URL. In other words, a controller is
+	 # by default accessed at /app.php/my/controller, but can also be accessed at
+	 # /my/controller
+	 #
+	 RewriteCond %{REQUEST_FILENAME} !-f
+	 RewriteCond %{REQUEST_FILENAME} !-d
+	 RewriteRule ^(.*)$ app.php [QSA,L]
+
+	#
+	# If symbolic links are not already being followed,
+	# uncomment the line below.
+	# http://anothersysadmin.wordpress.com/2008/06/10/mod_rewrite-forbidden-403-with-apache-228/
+	#
+	#Options +FollowSymLinks
+</IfModule>
+
+# Apache content negotation tries to interpret non-existent paths as files if
+# MultiViews is enabled. This will however cause issues with paths containg
+# dots, e.g. for the cron tasks
+<IfModule mod_negotiation.c>
+	Options -MultiViews
+</IfModule>
+
+# With Apache 2.4 the "Order, Deny" syntax has been deprecated and moved from
+# module mod_authz_host to a new module called mod_access_compat (which may be
+# disabled) and a new "Require" syntax has been introduced to mod_authz_host.
+# We could just conditionally provide both versions, but unfortunately Apache
+# does not explicitly tell us its version if the module mod_version is not
+# available. In this case, we check for the availability of module
+# mod_authz_core (which should be on 2.4 or higher only) as a best guess.
+<IfModule mod_version.c>
+	 <IfVersion < 2.4>
+		  <Files "config.php">
+			   Order Allow,Deny
+			   Deny from All
+		  </Files>
+		  <Files "common.php">
+			   Order Allow,Deny
+			   Deny from All
+		  </Files>
+	 </IfVersion>
+	 <IfVersion >= 2.4>
+		  <Files "config.php">
+			   Require all denied
+		  </Files>
+		  <Files "common.php">
+			   Require all denied
+		  </Files>
+	 </IfVersion>
+</IfModule>
+<IfModule !mod_version.c>
+	 <IfModule !mod_authz_core.c>
+		  <Files "config.php">
+			   Order Allow,Deny
+			   Deny from All
+		  </Files>
+		  <Files "common.php">
+			   Order Allow,Deny
+			   Deny from All
+		  </Files>
+	 </IfModule>
+	 <IfModule mod_authz_core.c>
+		  <Files "config.php">
+			   Require all denied
+		  </Files>
+		  <Files "common.php">
+			   Require all denied
+		  </Files>
+	 </IfModule>
+</IfModule>

@@ -1,0 +1,24 @@
+<div style="direction:{{_DIRECTION}};text-align:{{_TEXTALIGN1}};">
+	******************<br />
+	Hi, {{USER_REALNAME}}!<br />
+	******************<br />
+	<br />			
+	Thanks for signing up!<br />
+	Your account has been activated, you can login with the following username.<br />
+	------------------------<br />
+	Username: {{USERNAME}}<br />
+	------------------------<br />
+	 <br />
+	Please click this link to activate your account:<br />
+	<a href="{{LOGIN_URL}}">{{_LOGIN}}</a><br />
+	<br />
+	If you’re having trouble with the button above, copy and paste the URL below into your web browser.<br />
+	{{LOGIN_URL}}<br />
+	<br />
+	If you have any questions, feel free to contact our team ( {{FEEDBACK_URL}} ). (We're lightning quick at replying.)<br />
+	<br />
+	Thanks,<br />
+	<a href="{{NUKEURL}}">{{SITENAME}}</a><br />
+
+	© 2019 .All rights reserved.
+</div>

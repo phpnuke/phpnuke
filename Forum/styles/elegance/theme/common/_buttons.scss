@@ -1,0 +1,306 @@
+// Button Styles
+// ----------------------------------------
+
+$button-inner-height:	$button-line-height + $button-top-padding * 2;
+$button-outer-height:	$button-inner-height + $button-border-width * 2;
+
+.button {
+	display: inline-block;
+	padding: $button-top-padding $button-side-padding;
+	font-size: $button-font-size;
+	font-weight: 600;
+	font-family: sans, "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;		
+	line-height: $button-line-height;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	    touch-action: manipulation;
+	cursor: pointer;
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+	        user-select: none;
+	border: $button-border-width solid transparent;
+	border-radius: $big-button-border-radius;
+
+	& > strong {
+		font-weight: 600;
+	}
+}
+
+.button:focus,
+.button:hover {
+ 	text-decoration: none;
+ 	outline: none;
+}
+
+.caret {
+	border-left: 1px solid;
+	position: relative;
+	right: -6px;
+}
+
+.caret i {
+	vertical-align: top;
+}
+
+/* Posting page styles
+----------------------------------------*/
+.button-search,
+.button-search-end  {
+	float: left;
+	border-radius: 0;
+	margin: 0;
+	padding: 2px 5px;
+}
+
+.button-search-end {
+	border-left-width: 0;
+	border-radius: 0 4px 4px 0;
+}
+
+.search-header .button-search,
+.search-header .button-search-end {
+	border-top-width: 0;
+	border-bottom-width: 0;
+	padding: 3px 5px;
+}
+
+.search-header .button-search-end {
+	border-right-width: 0;
+}
+
+.button-icon-only {
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+// Poster contact icons
+// ----------------------------------------
+.contact-icons.dropdown-contents {
+	min-width: 0;
+	padding: 0;
+	font-size: 0;
+}
+
+.contact-icon {
+	position: relative;
+	display: block;
+	height: 16px;
+	width: 16px;
+	&:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		text-align: center;
+		font-family: FontAwesome;
+		font-size: 14px;
+		line-height: 16px;
+		vertical-align: baseline;
+		font-weight: normal;
+		font-style: normal;
+		text-transform: none;
+		text-indent: 0;
+		pointer-events: none;
+	}
+}
+.contact-icons a {
+	border-bottom: 1px dotted;
+	border-right: 1px dotted;
+	display: block;
+	float: left;
+	padding: 8px;
+}
+
+%contact-icon-gi {
+	font-family: 'Glyphicons Regular', 'Glyphicons';
+}
+
+.contact-icons .last-cell {
+	border-right: none;
+}
+
+.contact-icons div:last-child a {
+	border-bottom: none;
+}
+
+.contact-icons div {
+	clear: left;
+}
+
+// Profile icons
+.pm-icon:after {
+	content: '\f086';	// fa-comments
+}
+.email-icon:after {
+	content: '\f0e0';	// fa-envelope
+}
+.jabber-icon:after {
+	content: '\f0eb';	// fa-lightbulb-o
+	font-size: 16px;
+}
+.phpbb_icq-icon:after {
+	content: '\f013';	// fa-cog
+}
+.phpbb_wlm-icon:after {
+	content: '\f007';	// fa-user
+}
+.phpbb_aol-icon:after {
+	content: '\f2bb';	// fa-address-card
+}
+.phpbb_website-icon:after {
+	content: '\f08e';	// fa-external-link
+}
+.phpbb_youtube-icon:after {
+	content: '\f16a';	// fa-youtube-play
+}
+.phpbb_facebook-icon:after {
+	content: '\f230';	// fa-facebook-official
+}
+.phpbb_googleplus-icon:after {
+	content: '\f0d5';	// fa-google-plus
+}
+.phpbb_skype-icon:after {
+	content: '\f17e';	// fa-skype
+}
+.phpbb_twitter-icon:after {
+	content: '\f099';	// fa-twitter
+}
+.phpbb_yahoo-icon:after {
+	content: '\f19e';	// fa-yahoo
+}
+
+
+// Post control buttons
+// ---------------------------------------------
+.post-buttons {
+	float: right;
+	list-style: none;
+	margin-top: 2px;
+	.rtl & {
+		float: left;
+	}
+}
+
+.has-profile .post-buttons {
+	float: none;
+	position: absolute;
+	margin: 0;
+	top: 5px;
+
+	@if $profile-side == left {
+		right: 0;
+		.rtl & {
+			left: 0;
+		}
+	}
+	@else {
+		right: $post-margin;
+		.rtl & {
+			left: $post-margin;
+		}
+	}
+
+	.rtl & {
+		right: auto;
+	}
+}
+
+.post-buttons > li {
+	float: left;
+	margin-right: 3px;
+}
+
+.post-buttons .button, .format-buttons .button {
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+
+.hastouch .post-buttons {
+	margin-right: 10px;
+}
+
+.post-buttons .button span {
+	font-size: 0;
+}
+
+// Responsive buttons in post body
+.post-buttons .dropdown {
+	top: 20px;
+}
+
+$post-dropdown-glyphs-font-size:	floor($dropdown-content-font-size / 2) * 2;
+
+.post-buttons .dropdown a {
+	display: block;
+	font-size: $dropdown-content-font-size;
+	line-height: $dropdown-content-line-height;
+	text-align: left;
+	margin-left: 18px;
+	position: relative;
+	&:before {
+		position: absolute;
+		left: -16px;
+		top: 50%;
+		height: $post-dropdown-glyphs-font-size;
+		line-height: $post-dropdown-glyphs-font-size + 2px;
+		margin: -#{$post-dropdown-glyphs-font-size / 2} 0 0;
+		pointer-events: none;
+	}
+	&:hover:before {
+		color: inherit;
+	}
+	.rtl & {
+		text-align: right;
+	}
+}
+
+.hasjs .postbody .post-buttons {
+	max-width: 40%;
+}
+
+// Browser-specific tweaks
+button::-moz-focus-inner {
+	padding: 0;
+	border: 0
+}
+
+
+/* Deprecated as of version 3.2
+-------------------------------------------------*/
+.small-icon {
+	background-position: 0 50%;
+	background-repeat: no-repeat;
+	background-image: none;
+}
+
+.dropdown .small-icon {
+	background-position: 5px 50%;
+	padding: 5px;
+}
+
+.small-icon > a {
+	padding: 0 0 0 18px;
+}
+
+ul.linklist.bulletin > li.small-icon:before {
+	display: none;
+}
+
+.dropdown .small-icon > a {
+	display: block;
+}
+
+.rtl .small-icon {
+	background-position: 100% 50%;
+}
+
+.rtl .small-icon > a {
+	padding-left: 0;
+	padding-right: 19px;
+}

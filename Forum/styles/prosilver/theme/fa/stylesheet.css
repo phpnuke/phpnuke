@@ -1,0 +1,133 @@
+/* Online image */
+.online { background-image: url("./icon_user_online.gif"); }
+
+body {
+	font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif;
+}
+
+h1 {
+	/* Forum name */
+	font-family: Tahoma, "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+h2 {
+	/* Forum header titles */
+	font-family: Tahoma, "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+h2.solo {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+h3 {
+	/* Sub-headers (also used as post headers, but defined later) */
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+h4 {
+	/* Forum and topic list titles */
+	font-family: Tahoma, "Trebuchet MS", Verdana, Helvetica, Arial, Sans-serif;
+}
+
+.button {
+	font-family: Tahoma, "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;
+}
+
+a.forumtitle {
+	font-family: Tahoma, "Trebuchet MS", Helvetica, Arial, Sans-serif;
+}
+
+
+a.topictitle {
+	font-family: Tahoma, "Trebuchet MS", Helvetica, Arial, Sans-serif;
+}
+
+.notification_list p.notifications_title {
+	font-family: Tahoma, "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+.dropdown-extended .header {
+	font-family: Tahoma, Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.pagination li.active span {
+	font-family: Tahoma, "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;
+}
+
+.postbody h3 {
+	/* Postbody requires a different h3 format - so change it here */
+	font-family: Tahoma, "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+li.header dt, li.header dd {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+fieldset.polls dd div {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+fieldset.polls {
+	font-family: Tahoma, "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+dl.thumbnail dd {
+	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+}
+
+.attachbox dt {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+.notice {
+	font-family: Tahoma, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+p.author {
+	font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif;
+}
+
+dl.faq {
+	font-family: Tahoma, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.content p {
+	font-family: Tahoma, "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.content {
+	font-family: Tahoma, "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.postbody h3 {
+	/* Postbody requires a different h3 format - so change it here */
+	font-family: Tahoma, "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+fieldset {
+	font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif;
+}
+
+input {
+	font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif;
+}
+
+select {
+	font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif;
+}
+
+select optgroup option {
+	font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif;
+}
+
+textarea {
+	font-family: Tahoma, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.message-box textarea {
+	font-family: Tahoma,"Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+a.button1, input.button1, input.button3, a.button2, input.button2 {
+	font-family: Tahoma,"Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}

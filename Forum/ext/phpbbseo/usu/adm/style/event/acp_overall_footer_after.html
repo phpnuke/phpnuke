@@ -1,0 +1,53 @@
+<!--
+/**
+*
+* @package Ultimate phpBB SEO Friendly URL
+* @version $Id: acp_overall_footer_after.html 423 2017-12-16 11:55:34Z  $
+* @copyright (c) 2017 www.phpbb-seo.org
+* @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+*
+*/
+-->
+<!-- IF S_SEO_HTACCESS -->
+<script type="text/javascript">
+// <![CDATA[
+$(document).ready(function() {
+	var seo_rewrite_engines = {SEO_REWRITE_ENGINES};
+	$(seo_rewrite_engines).each(function(i) {
+		var engine = seo_rewrite_engines[i];
+		if (!engine) {
+			return true;
+		}
+		if ($("#" + engine + "_toggle").length) {
+			$("#" + engine + "_toggle").on('click', function() {
+				var $this = $("#" + engine + "_code");
+				if ($this.is(":visible")) {
+					$this.hide(300);
+				} else {
+					$this.show(300);
+				}
+			}).css({cursor:"pointer"});
+			$("#" + engine + "_select").on('click', function() {
+				var
+					doc = document,
+					text = doc.getElementById(engine + "_code_select"),
+					range,
+					selection;
+				if (doc.body.createTextRange) { //ms
+					range = doc.body.createTextRange();
+					range.moveToElementText(text);
+					range.select();
+				} else if (window.getSelection) { //all others
+					selection = window.getSelection();
+					range = doc.createRange();
+					range.selectNodeContents(text);
+					selection.removeAllRanges();
+					selection.addRange(range);
+				}
+			}).css({cursor:'pointer'});
+		}
+	});
+});
+// ]]>
+</script>
+<!-- ENDIF -->

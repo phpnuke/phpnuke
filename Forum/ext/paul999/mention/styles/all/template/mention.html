@@ -1,0 +1,18 @@
+<!-- IF UA_AJAX_MENTION_URL -->
+<!-- IF not $INCLUDED_XREGEXP -->
+<!-- INCLUDEJS @paul999_mention/js/utils/xregexp.js -->
+<!-- DEFINE $INCLUDED_XREGEXP = true -->
+<!-- ENDIF -->
+<!-- IF not $INCLUDED_ICHORDCARETJS -->
+<!-- INCLUDEJS @paul999_mention/js/utils/jquery.caret.min.js -->
+<!-- DEFINE $INCLUDED_ICHORDCARETJS = true -->
+<!-- ENDIF -->
+<!-- IF not $INCLUDED_ICHORDATJS -->
+<!-- INCLUDEJS @paul999_mention/js/utils/jquery.atwho.min.js -->
+<!-- DEFINE $INCLUDED_ICHORDATJS = true -->
+<!-- ENDIF -->
+<script>
+    var U_AJAX_MENTION_URL = '{UA_AJAX_MENTION_URL}';
+</script>
+<!-- INCLUDEJS @paul999_mention/js/mention.js -->
+<!-- ENDIF -->

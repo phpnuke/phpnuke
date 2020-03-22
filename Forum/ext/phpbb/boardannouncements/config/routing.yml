@@ -1,0 +1,3 @@
+phpbb_boardannouncements_controller:
+    path: /boardannouncements/close
+    defaults: { _controller: phpbb.boardannouncements.controller:close_announcement }

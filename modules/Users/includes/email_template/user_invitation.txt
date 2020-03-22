@@ -1,0 +1,16 @@
+<div style="direction:{{_DIRECTION}};text-align:{{_TEXTALIGN1}};">
+	******************<br />
+	Hi!<br />
+	******************<br />
+	<br />
+	
+	The user account [ {{USERNAME}} ] invited you for sign up in {{SITENAME}}<br />
+	the invitation code : <b>{{INVITATION_CODE}}</b><br />
+	<br />
+	If you have any questions, feel free to contact our team ( {{FEEDBACK_URL}} ). (We're lightning quick at replying.)<br />
+	<br />
+	Thanks,<br />
+	<a href="{{NUKEURL}}">{{SITENAME}}</a><br />
+
+	© 2019 .All rights reserved.
+</div>

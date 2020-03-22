@@ -1,0 +1,278 @@
+// Icon images
+// ----------------------------------------
+%icon-image {
+	position: relative;
+	background-image: none;
+	&:after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 0;
+		height: 14px;
+		margin-top: -7px;
+		text-align: center;
+		font-size: 12px;
+		line-height: 14px;
+		vertical-align: baseline;
+		font-weight: normal;
+		font-style: normal;
+		text-transform: none;
+		text-indent: 0;
+		pointer-events: none;
+	}
+	&.small-icon:after {
+		width: 18px;
+		text-align: center;
+	}
+}
+
+%icon-image-fa {
+	@extend %icon-image;
+	&:after {
+		font-family: FontAwesome;
+	}
+}
+
+%icon-search-old {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f002';	// fa-search
+	}
+}
+
+%icon-search-new {
+	@extend %icon-search-old;
+}
+
+%icon-search-misc {
+	@extend %icon-search-old;
+}
+
+.icon-acp {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f085';	// fa-cogs
+	}
+}
+.icon-bookmark {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f02e';	// fa-bookmark
+		margin-left: -1px;
+		margin-right: -1px;
+	}
+}
+.icon-bump {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f079';	// fa-retweet
+	}
+}
+.icon-contact {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f0e0';	// fa-envelope
+	}
+}
+.icon-delete-cookies {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f014';	// fa-trash-o
+	}
+}
+.icon-download {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f019';	// fa-download
+	}
+}
+.icon-faq {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f059';	// fa-question-circle
+	}
+}
+.icon-home {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f015';	// fa-home
+	}
+	&.breadcrumbs:after {
+		text-align: left;
+	}
+}
+.icon-logout {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f08b';	// fa-sign-out
+	}
+}
+.icon-login {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f090';	// fa-sign-in
+	}
+}
+.icon-mark {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f046';	// fa-check-square-o
+	}
+}
+.icon-mcp {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f0e3';	// fa-gavel
+	}
+}
+.icon-members {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f007';	// fa-user
+	}
+	&:before {
+		@extend .icon-members:after;
+		display: block;
+		font-size: 10px;
+		padding: 0;
+		padding-left: 4px;
+		padding-top: 1px;
+		opacity: .7;
+	}
+}
+ul.linklist.bulletin > li.small-icon.icon-members:before { 
+	@extend .icon-members:before; 
+}
+.icon-notification {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f0a2';	// fa-bell-o
+	}
+	&.non-zero:after {
+		content: '\f0f3';	// fa-bell
+	}
+}
+.icon-pages {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f0c5';	// fa-copy
+	}
+}
+.icon-pm {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f003';	// fa-envelope-o
+	}
+	&.non-zero:after {
+		content: '\f0e0';	// fa-envelope
+	}
+}
+.icon-print {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f02f';	// fa-print
+	}
+}
+.icon-profile {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f007';	// fa-user
+	}
+}
+.icon-register{
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f234';	// fa-user-plus
+	}
+}
+.icon-search				{ @extend %icon-search-old; }
+.icon-search-active			{ @extend %icon-search-old; }
+.icon-search-advanced		{ @extend %icon-search-old; }
+.icon-search-new			{ @extend %icon-search-new; }
+.icon-search-self			{ @extend %icon-search-misc; }
+.icon-search-unanswered		{ @extend %icon-search-new; }
+.icon-search-unread			{ @extend %icon-search-new; }
+.icon-sendemail {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f003';	// fa-envelope-o
+	}
+}
+.icon-subscribe {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f05d';	// fa-check-circle-o
+	}
+}
+.icon-team {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f007';	// fa-user
+	}
+	&:before {
+		@extend .icon-team:after;
+		display: block;
+		font-size: 10px;
+		padding: 0;
+		white-space: nowrap;
+		padding-top: 1px;
+		opacity: .7;
+		content: '\f007\f007';	// fa-user fa-user
+	}
+}
+ul.linklist.bulletin > li.small-icon.icon-team:before { @extend .icon-team:before; }
+.icon-ucp {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f0ad';	// fa-wrench
+	}
+}
+.icon-unsubscribe {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f05c';	// times-circle-o
+	}
+}
+.icon-new-posts {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f086';	// fa-comments
+	}
+}
+.icon-forums {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f075';	// fa-comment
+	}
+}
+.icon-chat {
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f086';	// fa-comments
+	}
+}
+.icon-time {
+	@extend %icon-image-fa;
+	&:after {
+		// content: '\E055';	// glyphicons-clock
+		content: '\f017';	// fa-clock-o
+	}
+}
+
+
+// Thanks for posts mod
+.icon-thanks {
+	background-image: none !important;
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f087';	// fa-thumbs-o-up
+	}
+}
+
+.icon-thanks_toplist {
+	background-image: none !important;
+	@extend %icon-image-fa;
+	&:after {
+		content: '\f005';	// fa-star
+	}
+}

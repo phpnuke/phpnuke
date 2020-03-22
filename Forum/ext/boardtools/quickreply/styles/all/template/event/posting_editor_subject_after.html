@@ -1,0 +1,22 @@
+<!-- IF S_IN_POSTING -->
+<script type="text/javascript">
+// <![CDATA[
+var quickreply = {};
+
+// Posting related variables for QuickReply.
+quickreply.posting = {
+	language: {
+		ERROR: '{LA_ERROR}',
+		NO_FULL_QUOTE: '{LA_QR_NO_FULL_QUOTE}'
+	},
+	settings: {
+		fullQuoteAllowed: <!-- IF S_QR_FULL_QUOTE_ALLOWED -->true<!-- ELSE -->false<!-- ENDIF -->,
+		hideSubjectBox: <!-- IF QR_HIDE_SUBJECT_BOX -->true<!-- ELSE -->false<!-- ENDIF -->,
+		lastQuote: <!-- IF S_QR_LAST_QUOTE -->true<!-- ELSE -->false<!-- ENDIF -->,
+		unchangedSubject: <!-- IF S_QR_NOT_CHANGE_SUBJECT -->true<!-- ELSE -->false<!-- ENDIF -->
+	}
+};
+// ]]>
+</script>
+<!-- INCLUDEJS @boardtools_quickreply/quickreply_posting.js -->
+<!-- ENDIF -->

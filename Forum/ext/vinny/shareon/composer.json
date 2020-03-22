@@ -1,0 +1,35 @@
+{
+    "name": "vinny/shareon",
+    "type": "phpbb-extension",
+    "description": "Share On allows users to share the topics and posts on social networks",
+    "homepage": "https://github.com/vinny/share-on/",
+    "version": "2.0.1",
+    "time": "2017-04-10",
+    "keywords": ["phpbb", "extension", "share", "social"],
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "_Vinny_",
+            "homepage": "https://github.com/vinny",
+            "role": "Developer"
+        }
+    ],
+	"require": {
+		"php": ">=5.3.3",
+		"phpbb/phpbb": ">=3.1.0,<3.3"
+	},
+	"require-dev": {
+		"phpbb/epv": "dev-master"
+	},
+	"extra": {
+		"display-name": "Share On",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.1.0,<3.3"
+		},
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/shareon",
+            "filename": "version_check"
+        }
+	}
+}

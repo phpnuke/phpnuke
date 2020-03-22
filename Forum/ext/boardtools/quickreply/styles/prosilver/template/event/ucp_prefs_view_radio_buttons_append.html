@@ -1,0 +1,46 @@
+<dl>
+	<dt><label for="ajax_pagination1">{L_QR_ENABLE_AJAX_PAGINATION}{L_COLON}</label></dt>
+	<dd>
+		<label for="ajax_pagination1"><input type="radio" name="ajax_pagination" id="ajax_pagination1" value="1"<!-- IF S_ENABLE_AJAX_PAGINATION --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label for="ajax_pagination0"><input type="radio" name="ajax_pagination" id="ajax_pagination0" value="0"<!-- IF not S_ENABLE_AJAX_PAGINATION --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+	</dd>
+</dl>
+<dl>
+	<dt><label for="qr_enable_scroll1">{L_QR_ENABLE_SCROLL}{L_COLON}</label></dt>
+	<dd>
+		<label for="qr_enable_scroll1"><input type="radio" name="qr_enable_scroll" id="qr_enable_scroll1" value="1"<!-- IF S_QR_ENABLE_SCROLL --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label for="qr_enable_scroll0"><input type="radio" name="qr_enable_scroll" id="qr_enable_scroll0" value="0"<!-- IF not S_QR_ENABLE_SCROLL --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+	</dd>
+</dl>
+<!-- IF S_QR_ALLOW_SOFT_SCROLL -->
+<dl>
+	<dt><label for="qr_soft_scroll1">{L_QR_ENABLE_SOFT_SCROLL}{L_COLON}</label></dt>
+	<dd>
+		<label for="qr_soft_scroll1"><input type="radio" name="qr_soft_scroll" id="qr_soft_scroll1" value="1"<!-- IF S_QR_SOFT_SCROLL --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label for="qr_soft_scroll0"><input type="radio" name="qr_soft_scroll" id="qr_soft_scroll0" value="0"<!-- IF not S_QR_SOFT_SCROLL --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+	</dd>
+</dl>
+<!-- ENDIF -->
+<dl>
+	<dt><label for="qr_enable_warning1">{L_QR_ENABLE_WARNING}{L_COLON}</label></dt>
+	<dd>
+		<label for="qr_enable_warning1"><input type="radio" name="qr_enable_warning" id="qr_enable_warning1" value="1"<!-- IF S_QR_ENABLE_WARNING --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label for="qr_enable_warning0"><input type="radio" name="qr_enable_warning" id="qr_enable_warning0" value="0"<!-- IF not S_QR_ENABLE_WARNING --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+	</dd>
+</dl>
+<dl>
+	<dt><label for="qr_fix_empty_form1">{L_QR_FIX_EMPTY_FORM}{L_COLON}</label></dt>
+	<dd>
+		<label for="qr_fix_empty_form1"><input type="radio" name="qr_fix_empty_form" id="qr_fix_empty_form1" value="1"<!-- IF S_QR_FIX_EMPTY_FORM --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label for="qr_fix_empty_form0"><input type="radio" name="qr_fix_empty_form" id="qr_fix_empty_form0" value="0"<!-- IF not S_QR_FIX_EMPTY_FORM --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+	</dd>
+</dl>
+<!-- IF S_QUICKNICK_CHANGE_TYPE -->
+<dl>
+	<dt><label for="qr_quicknick_string1">{L_QR_CHANGE_QUICKNICK_STRING}{L_COLON}</label></dt>
+	<dd>
+		<label for="qr_quicknick_string1"><input type="radio" name="qr_quicknick_string" id="qr_quicknick_string1" value="1"<!-- IF S_QR_QUICKNICK_USERTYPE --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label for="qr_quicknick_string0"><input type="radio" name="qr_quicknick_string" id="qr_quicknick_string0" value="0"<!-- IF not S_QR_QUICKNICK_USERTYPE --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+	</dd>
+</dl>
+<!-- ENDIF -->
