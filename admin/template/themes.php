@@ -106,8 +106,6 @@ $contents .= "<!DOCTYPE html>
 	}
 	$contents .="
 	<link rel=\"stylesheet\" href=\"includes/Ajax/jquery/jquery-ui.theme.min.css\" type=\"text/css\" />
-	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/font-awesome.min.css\">
-	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/font-IRANSansWeb.css\">
 </head>
 <body> 
 
@@ -196,8 +194,8 @@ $contents .="<!DOCTYPE html>
 	$contents .= "<link rel=\"shortcut icon\" href=\"themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\" type=\"image/x-icon\">\n";
 	}
 	$contents .="<link rel=\"stylesheet\" href=\"admin/template/css/login.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
-	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/font-awesome.min.css\">
-	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/font-IRANSansWeb.css\">
+	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/fontawesome/style.css\">
+	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/vazir/style.css\">
 	<script src=\"includes/Ajax/jquery/jquery.min.js\" type=\"text/javascript\"></script>";
 	if(_DIRECTION == "ltr")
 	{
@@ -233,8 +231,6 @@ $contents .="<!DOCTYPE html>
 	this option not available now
 	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1\" />
 	-->
-	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/font-awesome.min.css\">
-	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/font-IRANSansWeb.css\">
 	<link rel=\"stylesheet\" href=\"admin/template/css/screen.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
 	<script src=\"includes/Ajax/jquery/jquery.min.js\" type=\"text/javascript\"></script>
 	<script src=\"includes/Ajax/jquery/jquery-migrate-1.4.1.min.js\"></script>

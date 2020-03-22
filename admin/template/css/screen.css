@@ -1,7 +1,9 @@
+@import url("../../../includes/fonts/vazir/style.css");
+@import url("../../../includes/fonts/fontawesome/style.css");
 *{
 	margin: 0;
 	padding: 0;
-	font-family: IRANSans, Tahoma, Arial;
+	font-family: Vazir, Tahoma, Arial;
 }
 html, body{
 	height: 100%;
@@ -149,16 +151,16 @@ header nav ul li a:hover {color:#fff;text-shadow: 1px 1px 0 #111;transition: all
 #main-menu .botnav{margin-right: 50px;}
 
 #main-menu .rightnav ul{list-style-type:none;padding-top:0;}
-#main-menu .rightnav li{float:right;position:relative;text-align:center}
+#main-menu .rightnav li{float:right;position:relative;text-align:center;padding:3px;}
 #main-menu .rightnav li ul{background:#333;margin-right:25px;}
-#main-menu .rightnav li ul li{width: 150px;}
+#main-menu .rightnav li ul li{width: 180px;padding:0px;}
 #main-menu .rightnav li ul ul{margin-top:-10px;}
 #main-menu .rightnav li ul a{text-align:right;border:0;border-bottom:#666 1px solid}
 #main-menu .rightnav li:hover ul ul{display:none}
 #main-menu .rightnav li li:hover ul{display:block;position:absolute;top:10px;right:125px;z-index:1000}
 #main-menu .rightnav ul.sub-menu{display:none;position:absolute;top:30px;margin-right:0;padding:0;z-index:999}
 #main-menu .rightnav ul.sub-menu li{text-align:right}
-#main-menu .rightnav li:hover ul.sub-menu{display:block;border:1px solid #666}
+#main-menu .rightnav li:hover ul.sub-menu{display:block;}
 #main-menu .rightnav li.admin_link{position:absolute;left:180px;}
 #main-menu .rightnav li.logout_link{position:absolute;left:70px;}
 
