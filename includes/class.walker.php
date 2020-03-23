@@ -209,7 +209,7 @@ class Walker_nav_menus extends Walker
 	public function start_lvl(&$output, $depth = 0, $args = array())
 	{
 		$indent = str_repeat("\t", $depth);
-		$output .= "\n$indent\t<".$args->list_type." class=\"".$args->list_calss."\">\n";
+		$output .= "\n$indent\t<".$args->list_type." class=\"".((isset($args->list_class) && $args->list_class != '') ? $args->list_class:"")."\">\n";
 	}
 		
 	public function end_lvl(&$output, $depth = 0, $args = array())

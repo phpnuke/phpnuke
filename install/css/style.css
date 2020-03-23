@@ -1,5 +1,3 @@
-@import url("../../includes/fonts/vazir/style.css");
-@import url("../../includes/fonts/fontawesome/style.css");
 h1,h2,h3{font-family:Vazir,'tahoma' !important;}
 body{background:#e9e9e9;color:#666;font-family:Vazir,'tahoma';font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .logo{background:url('../logo.png')no-repeat top;width: 70px;height: 69px;float: right;position: absolute;top: 5px;right: 40px;}

@@ -152,6 +152,8 @@ function upgrade_header($step = 1, $progress = 0)
 	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
 	<link href=\"includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\">
 	<link href=\"includes/Ajax/jquery/bootstrap/css/bootstrap-rtl.css\" rel=\"stylesheet\">
+	<link href=\"includes/fonts/vazir/style.css\" rel=\"stylesheet\">
+	<link href=\"includes/fonts/fontawesome/style.css\" rel=\"stylesheet\">
 	<link href=\"$install_folder/bootstrap/bootstrap-wizard.css\" rel=\"stylesheet\">
 	<link href=\"$install_folder/chosen/chosen.css\" rel=\"stylesheet\">
 	<script src=\"$install_folder/js/pwdwidget.js\" type=\"text/javascript\"></script>
@@ -771,6 +773,8 @@ function step_install()
 	$install_options = $cache->retrieve('install_options');
 	$install_options = phpnuke_unserialize($install_options);
 	$install_options['admininfo'] = $install_fields;
+	
+	$install_options['admininfo']['old_site_link'] = ($install_options['mode'] == 'install') ? "":((isset($install_fields['old_site_link']) && !empty($install_fields['old_site_link'])) ? $install_fields['old_site_link']:"");
 	
 	if($install_options['admininfo']['admin_filename'] != '' && $install_options['admininfo']['admin_filename'] != 'admin' && file_exists("admin.php") && !file_exists($install_options['admininfo']['admin_filename'].".php"))
 	{

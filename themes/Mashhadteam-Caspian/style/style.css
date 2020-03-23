@@ -1,7 +1,3 @@
-@import url("../../../includes/fonts/vazir/style.css");
-@import url("../../../includes/fonts/fontawesome/style.css");
-@import url("../../../includes/Ajax/jquery/jquery-ui.min.css");
-@import url("bootstrap-social.css");
 *{font-family:Vazir,Tahoma;font-size:13px !important;}
 .clear, .Clear{clear: both;}
 p{line-height: 21px;}

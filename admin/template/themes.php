@@ -80,7 +80,8 @@ $contents .= "<!DOCTYPE html>
 	if (file_exists("themes/".$nuke_configs['ThemeSel']."/images/favicon.ico")) {
 	$contents .= "<link rel=\"shortcut icon\" href=\"themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\" type=\"image/x-icon\">\n";
 	}
-	$contents .="
+	$contents .="<link rel=\"stylesheet\" href=\"includes/fonts/vazir/style.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
+	<link rel=\"stylesheet\" href=\"includes/fonts/fontawesome/style.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
 	<link rel=\"stylesheet\" href=\"admin/template/css/screen.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
 	<script src=\"includes/Ajax/jquery/jquery.min.js\" type=\"text/javascript\"></script>
 	<script type=\"text/javascript\" src=\"includes/Ajax/jquery/jquery-ui.min.js\"></script>
@@ -231,6 +232,8 @@ $contents .="<!DOCTYPE html>
 	this option not available now
 	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1\" />
 	-->
+	<link rel=\"stylesheet\" href=\"includes/fonts/vazir/style.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
+	<link rel=\"stylesheet\" href=\"includes/fonts/fontawesome/style.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
 	<link rel=\"stylesheet\" href=\"admin/template/css/screen.css\" type=\"text/css\" media=\"screen\" title=\"default\" />
 	<script src=\"includes/Ajax/jquery/jquery.min.js\" type=\"text/javascript\"></script>
 	<script src=\"includes/Ajax/jquery/jquery-migrate-1.4.1.min.js\"></script>

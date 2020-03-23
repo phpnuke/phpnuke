@@ -527,7 +527,8 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 		// get posts scores
 	}
 	unset($result);
-		
+	
+	$article_info['total_rows'] = 0;
 	foreach ($rows as $key => $row)
 	{
 		$article_info[$key] = $row;
