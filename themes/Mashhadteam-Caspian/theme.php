@@ -365,7 +365,7 @@ function blocks_box_theme($title, $content, $themeblock)
 {
 	global $db, $prefix, $align, $nuke_configs;
 	$contents = '';
-	if($themeblock == "")
+	if($themeblock == "" || ($themeblock != '' && !file_exists("themes/".$nuke_configs['ThemeSel']."/blocks/themes/$themeblock")))
 	{
 		$contents = "
 		<aside>

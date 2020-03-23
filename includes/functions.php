@@ -125,9 +125,6 @@ function cache_system($mode = "", $extra_code=array())
 	$args = array_slice(func_get_args(), 2);
 	$exept_caches = (isset($args[0])) ? $args[0]:array();
 	$new_cache = false;
-	
-	if($mode != '' && $mode != 'all' && $cache->isCached($mode))
-		$cache->erase($mode);
 		
 	if(isset($extra_code) && !empty($extra_code))
 	{
@@ -677,6 +674,10 @@ function cache_system($mode = "", $extra_code=array())
 						$cache->store($cache_system_name, $this_cacheData);
 						/*file_put_contents("cache/cache_".$cache_system_name.".php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$this_cacheData);*/
 					}
+				}
+				elseif($cache->isCached($cache_system_name) && in_array($mode, array("$cache_system_name",'all')) && !in_array("$cache_system_name", $exept_caches))
+				{
+					$cache->erase($cache_system_name);
 				}
 			}
 		}
