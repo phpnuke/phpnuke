@@ -160,7 +160,6 @@ function upgrade_header($step = 1, $progress = 0)
 		.wizard-modal p{margin:0 0 10px;padding:0}#wizard-ns-detail-servers,.wizard-additional-servers{font-size:12px;margin-top:10px;margin-left:15px}#wizard-ns-detail-servers > li, .wizard-additional-servers li{line-height:20px;list-style-type:none}#wizard-ns-detail-servers>li>img{padding-right:5px}.wizard-modal .chzn-container .chzn-results{max-height:150px}.wizard-addl-subsection{margin-bottom:40px}.create-server-agent-key{margin-left:15px;width:90%}
 	</style>
 	<!--[if lt IE 9]> <script src=\"$install_folder/js/html5shiv-3.7.0.js\"></script> <script src=\"$install_folder/js/respond-1.3.0.min.js\"></script> <![endif]-->
-	<link rel=\"stylesheet prefetch\" href=\"includes/fonts/font-awesome.min.css\">
 	<link rel=\"stylesheet\" href=\"$install_folder/css/style.css\">
 	<script src=\"includes/Ajax/jquery/jquery.min.js\" type=\"text/javascript\"></script>
 </head>

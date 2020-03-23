@@ -1,6 +1,7 @@
-@font-face{font-family:sans;font-style:normal;font-weight:400;src:url(../../includes/fonts/IRANSansWeb.eot);src:url(../../includes/fonts/IRANSansWeb.eot?#iefix) format("embedded-opentype"),url(../../includes/fonts/IRANSansWeb.woff2) format("woff2"),url(../../includes/fonts/IRANSansWeb.woff) format("woff"),url(../../includes/fonts/IRANSansWeb.ttf) format("truetype")} 
-h1,h2,h3{font-family:'sans','tahoma' !important;}
-body{background:#e9e9e9;color:#666;font-family:'sans','tahoma';font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+@import url("../../includes/fonts/vazir/style.css");
+@import url("../../includes/fonts/fontawesome/style.css");
+h1,h2,h3{font-family:Vazir,'tahoma' !important;}
+body{background:#e9e9e9;color:#666;font-family:Vazir,'tahoma';font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .logo{background:url('../logo.png')no-repeat top;width: 70px;height: 69px;float: right;position: absolute;top: 5px;right: 40px;}
 .pen-title{padding:50px 0;text-align:center;letter-spacing:2px}
 .pen-title h1{margin:0 0 20px;font-size:20px;font-weight:300}
