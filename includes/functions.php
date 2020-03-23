@@ -633,7 +633,7 @@ function cache_system($mode = "", $extra_code=array())
 		{
 			foreach($cache_systems as $cache_system_name => $cache_system)
 			{
-				if($cache_system_name != "" && $cache_system['main_id'] != "" && $cache_system['table'] != "")
+				if($cache_system_name != "" && isset($cache_system['main_id']) && $cache_system['main_id'] != "" && isset($cache_system['table']) && $cache_system['table'] != "")
 				{
 					if((!$cache->isCached($cache_system_name) OR in_array($mode, array("$cache_system_name",'all'))) && !in_array("$cache_system_name", $exept_caches))
 					{
@@ -5511,12 +5511,13 @@ function update_points($id,$uid=false)
 	
 	$id = intval($id);
 	$points = intval($nuke_points_groups_cacheData[$id]['points']);
-	
+	$users_table_exists = false;
     if (is_user() && !$uid)
 	{
         $username = trim($userinfo['username']);
 		$users_table_exists = users_table_exists();
 	}
+	
 	if($points > 0 && $users_table_exists)
 	{
 		$col_result = $db->query("SHOW COLUMNS FROM ".$users_system->users_table." LIKE '".$users_system->user_fields['user_points']."'");

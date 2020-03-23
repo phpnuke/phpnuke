@@ -34,7 +34,7 @@ function _theme_header($meta_tags = array(), $custom_theme_setup = array(), $rep
 	
 	$contents = '';
 	$contents .= "<!DOCTYPE html>\n";
-	$contents .= "<html lang=\"".$local[0]."\">\n";
+	$contents .= "<html lang=\"".$local[0]."\" dir=\""._DIRECTION."\">\n";
 	$contents .= "	<head>";
 	
 	include("themes/".$nuke_configs['ThemeSel']."/meta.php");

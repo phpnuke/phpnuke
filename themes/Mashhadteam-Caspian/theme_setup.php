@@ -13,7 +13,7 @@ $theme_setup = array(
 		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/vazir/style.css\" />",
 		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/fontawesome/style.css\" />",
 		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.css\" />",
-		"<link href=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/style/bootstrap-social.css\" rel=\"stylesheet\" id=\"colour-scheme\">",
+		"<link href=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/style/bootstrap-social.css\" rel=\"stylesheet\">",
 		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/style/style.css\" />",
 		"<link href=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/style/green.css\" rel=\"stylesheet\" id=\"colour-scheme\">",
 	),
