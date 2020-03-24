@@ -20,7 +20,7 @@ if (stristr(htmlentities($_SERVER['PHP_SELF']), "mainfile.php"))
 }
 
 define('NUKE_FILE', true);
-
+define('_START_TIME', microtime(true));
 // Error reporting, to be set in config.php
 error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT);
 
