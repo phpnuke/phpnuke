@@ -255,7 +255,7 @@ function themefooter($custom_theme_setup = array(), $replace = false)
 		</div>
 		<div class=\"GSCopyright\">
 			<div class=\"container\">
-				<span>©</span> "._ALLRIGHT_RESERVED." <i class=\"fa fa-code\"></i> "._DESIGN_AND_DEV." : <a href=\"http://www.GreenSkin.ir\" title=\""._GREENSKIN_DESIGN."\">"._GREEENSKIN."</a> | "._HONESTLY_POWERED_BY." <a href=\"http://www.phpnuke.ir/\">"._PHPNUKE_MT_EDITION."</a>
+				<span>©</span> "._ALLRIGHT_RESERVED." <i class=\"fa fa-code\"></i> "._DESIGN_AND_DEV." : <a href=\"http://www.GreenSkin.ir\" title=\""._GREENSKIN_DESIGN."\">"._GREEENSKIN."</a> | "._HONESTLY_POWERED_BY." <a href=\"http://www.phpnuke.ir/\">"._PHPNUKE_MT_EDITION."</a> <span>زمان بارگزاری : ".number_format((microtime(true)-_START_TIME), 2)." "._SECOND."</span>
 			</div>
 		</div>
 	</footer>";
