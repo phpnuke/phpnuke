@@ -2,12 +2,6 @@
 -- phpMyAdmin SQL Dump
 -- https://www.phpmyadmin.net/
 
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
-SET time_zone = "+00:00";
-
 -- --------------------------------------------------------
 
 --
@@ -49,19 +43,19 @@ INSERT INTO `{NUKEPREFIX}admins_menu` (`amid`, `atitle`, `admins`) VALUES
 --
 
 CREATE TABLE `{NUKEPREFIX}authors` (
-  `aid` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `realname` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `aid` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `realname` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `phone` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `rule` text COLLATE utf8mb4_unicode_ci,
-  `pwd` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `pwd` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `counter` int(11) NOT NULL DEFAULT '0',
   `radminsuper` tinyint(1) NOT NULL DEFAULT '1',
-  `admlanguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `admlanguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `aadminsuper` int(1) NOT NULL DEFAULT '0',
-  `password_reset` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password_reset` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`aid`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -74,9 +68,9 @@ CREATE TABLE `{NUKEPREFIX}authors` (
 
 CREATE TABLE `{NUKEPREFIX}banned_ip` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ip_address` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `ip_address` (`ip_address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -89,12 +83,12 @@ CREATE TABLE `{NUKEPREFIX}banned_ip` (
 
 CREATE TABLE `{NUKEPREFIX}blocks` (
   `bid` int(10) NOT NULL AUTO_INCREMENT,
-  `title` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `content` text COLLATE utf8mb4_unicode_ci,
-  `url` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `refresh` int(11) NOT NULL DEFAULT '0',
   `last_refresh` int(11) NOT NULL DEFAULT '0',
-  `blockfile` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `blockfile` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`bid`),
   KEY `title` (`title`),
   KEY `blockfile` (`blockfile`(191))
@@ -107,11 +101,11 @@ CREATE TABLE `{NUKEPREFIX}blocks` (
 --
 
 CREATE TABLE `{NUKEPREFIX}blocks_boxes` (
-  `box_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `box_blocks` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `box_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `box_blocks` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `box_blocks_data` text COLLATE utf8mb4_unicode_ci,
   `box_status` int(11) NOT NULL DEFAULT '0',
-  `box_theme_location` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `box_theme_location` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `box_theme_priority` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`box_id`),
   KEY `box_theme_location` (`box_theme_location`)
@@ -136,7 +130,7 @@ INSERT INTO `{NUKEPREFIX}blocks_boxes` (`box_id`, `box_blocks`, `box_blocks_data
 
 CREATE TABLE `{NUKEPREFIX}blocks_themes` (
   `sideid` int(10) NOT NULL AUTO_INCREMENT,
-  `sidename` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sidename` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`sideid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -191,10 +185,10 @@ INSERT INTO `{NUKEPREFIX}bookmarksite` (`bid`, `title`, `iconpath`, `active`, `u
 CREATE TABLE `{NUKEPREFIX}categories` (
   `catid` int(10) NOT NULL AUTO_INCREMENT,
   `type` tinyint(1) NOT NULL DEFAULT '0',
-  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `catname` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `catimage` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cattext` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `catname` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `catimage` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `cattext` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `catdesc` text COLLATE utf8mb4_unicode_ci,
   `parent_id` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`catid`),
@@ -211,20 +205,20 @@ CREATE TABLE `{NUKEPREFIX}comments` (
   `cid` int(11) NOT NULL AUTO_INCREMENT,
   `pid` int(11) NOT NULL DEFAULT '0',
   `main_parent` int(11) NOT NULL DEFAULT '0',
-  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `post_id` int(11) NOT NULL DEFAULT '0',
-  `post_title` varchar(600) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `username` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `url` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_title` varchar(600) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `username` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `email` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `url` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ip` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `comment` text COLLATE utf8mb4_unicode_ci,
   `ratings` int(11) NOT NULL DEFAULT '0',
   `score` tinyint(4) NOT NULL DEFAULT '0',
   `reason` text COLLATE utf8mb4_unicode_ci,
-  `last_moderation` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_moderation` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `status` int(1) NOT NULL DEFAULT '0',
   `reported` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`cid`),
@@ -244,7 +238,7 @@ CREATE TABLE `{NUKEPREFIX}comments` (
 
 CREATE TABLE `{NUKEPREFIX}config` (
   `config_id` int(11) NOT NULL AUTO_INCREMENT,
-  `config_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `config_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `config_value` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`config_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -421,15 +415,15 @@ http://ping.feedburner.com'),
 
 CREATE TABLE `{NUKEPREFIX}feedbacks` (
   `fid` int(10) NOT NULL AUTO_INCREMENT,
-  `sender_name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sender_email` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `subject` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sender_name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `sender_email` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `subject` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `message` text COLLATE utf8mb4_unicode_ci,
   `custom_fields` text COLLATE utf8mb4_unicode_ci,
   `responsibility` int(10) NOT NULL DEFAULT '0',
   `replys` text COLLATE utf8mb4_unicode_ci,
-  `added_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `added_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`fid`),
   KEY `ip` (`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -443,10 +437,10 @@ CREATE TABLE `{NUKEPREFIX}feedbacks` (
 CREATE TABLE `{NUKEPREFIX}groups` (
   `group_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT,
   `group_type` tinyint(4) NOT NULL DEFAULT '1',
-  `group_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `group_lang_titles` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `group_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `group_lang_titles` text COLLATE utf8mb4_unicode_ci,
   `group_options` int(11) UNSIGNED NOT NULL DEFAULT '7',
-  `group_colour` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `group_colour` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
    PRIMARY KEY (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -459,8 +453,8 @@ CREATE TABLE `{NUKEPREFIX}groups` (
 
 CREATE TABLE `{NUKEPREFIX}headlines` (
   `hid` int(11) NOT NULL AUTO_INCREMENT,
-  `sitename` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `headlinesurl` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sitename` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `headlinesurl` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`hid`),
   KEY `hid` (`hid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -473,8 +467,8 @@ CREATE TABLE `{NUKEPREFIX}headlines` (
 
 CREATE TABLE `{NUKEPREFIX}languages` (
   `lid` int(11) NOT NULL AUTO_INCREMENT,
-  `main_word` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `equals` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `main_word` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `equals` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`lid`),
   KEY `main_word` (`main_word`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -488,10 +482,10 @@ CREATE TABLE `{NUKEPREFIX}languages` (
 CREATE TABLE `{NUKEPREFIX}log` (
   `lid` int(11) NOT NULL AUTO_INCREMENT,
   `log_type` tinyint(1) NOT NULL DEFAULT '1',
-  `log_by` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `log_time` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `log_ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `log_message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `log_by` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `log_time` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `log_ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `log_message` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`lid`),
   KEY `log_type` (`log_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -504,11 +498,11 @@ CREATE TABLE `{NUKEPREFIX}log` (
 
 CREATE TABLE `{NUKEPREFIX}modules` (
   `mid` int(10) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `lang_titles` text COLLATE utf8mb4_unicode_ci,
   `active` int(1) NOT NULL DEFAULT '0',
-  `mod_permissions` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `admins` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mod_permissions` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `admins` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `all_blocks` int(1) NOT NULL DEFAULT '0',
   `main_module` int(1) NOT NULL DEFAULT '0',
   `in_menu` int(1) NOT NULL DEFAULT '0',
@@ -528,10 +522,10 @@ CREATE TABLE `{NUKEPREFIX}modules` (
 
 CREATE TABLE `{NUKEPREFIX}mtsn` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server` char(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip` char(15) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `server` char(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ip` char(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `time` int(12) NOT NULL DEFAULT '0',
-  `method` char(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `method` char(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -543,12 +537,12 @@ CREATE TABLE `{NUKEPREFIX}mtsn` (
 
 CREATE TABLE `{NUKEPREFIX}mtsn_ipban` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `blocker` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ipaddress` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `blocker` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ipaddress` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `reason` text COLLATE utf8mb4_unicode_ci,
   `time` int(12) NOT NULL DEFAULT '0',
   `status` tinyint(4) NOT NULL DEFAULT '0',
-  `expire` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expire` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ipaddress` (`ipaddress`),
   KEY `blocker` (`blocker`(191)),
@@ -564,11 +558,11 @@ CREATE TABLE `{NUKEPREFIX}mtsn_ipban` (
 
 CREATE TABLE `{NUKEPREFIX}nav_menus` (
   `nav_id` int(11) NOT NULL AUTO_INCREMENT,
-  `nav_title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nav_title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `lang_nav_title` text COLLATE utf8mb4_unicode_ci,
-  `nav_location` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nav_location` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `status` int(11) NOT NULL DEFAULT '0',
-  `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`nav_id`),
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -586,11 +580,11 @@ CREATE TABLE `{NUKEPREFIX}nav_menus_data` (
   `nav_id` int(11) NOT NULL DEFAULT '0',
   `pid` int(11) NOT NULL DEFAULT '0',
   `weight` int(11) NOT NULL DEFAULT '1',
-  `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `url` text COLLATE utf8mb4_unicode_ci,
   `attributes` text COLLATE utf8mb4_unicode_ci,
-  `type` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `part_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`nid`),
   KEY `status` (`status`),
@@ -611,7 +605,7 @@ CREATE TABLE `{NUKEPREFIX}nav_menus_data` (
 CREATE TABLE `{NUKEPREFIX}points_groups` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `type` int(1) NOT NULL DEFAULT '0',
-  `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `description` text COLLATE utf8mb4_unicode_ci,
   `points` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
@@ -654,24 +648,24 @@ INSERT INTO `{NUKEPREFIX}points_groups` (`id`, `type`, `title`, `description`, `
 
 CREATE TABLE `{NUKEPREFIX}posts` (
   `sid` int(11) NOT NULL AUTO_INCREMENT,
-  `status` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `post_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'article',
-  `aid` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title_lead` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title_color` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `aid` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `title` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `title_lead` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `title_color` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `hometext` text COLLATE utf8mb4_unicode_ci,
   `bodytext` text COLLATE utf8mb4_unicode_ci,
-  `post_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `comments` int(11) DEFAULT '0',
   `counter` mediumint(8) UNSIGNED DEFAULT '0',
-  `cat` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `informant` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tags` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cat` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `informant` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `tags` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ihome` int(1) NOT NULL DEFAULT '0',
-  `alanguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `alanguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `allow_comment` int(1) NOT NULL DEFAULT '0',
   `position` int(2) NOT NULL DEFAULT '1',
   `post_pass` text COLLATE utf8mb4_unicode_ci,
@@ -681,7 +675,7 @@ CREATE TABLE `{NUKEPREFIX}posts` (
   `score` int(11) NOT NULL DEFAULT '0',
   `ratings` int(11) NOT NULL DEFAULT '0',
   `micro_data` text COLLATE utf8mb4_unicode_ci,
-  `download` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `download` longtext COLLATE utf8mb4_unicode_ci,
   `imported_id` int(2) NOT NULL DEFAULT '0',
   PRIMARY KEY (`sid`),
   KEY `title` (`title`(191)),
@@ -706,8 +700,8 @@ CREATE TABLE `{NUKEPREFIX}posts` (
 CREATE TABLE `{NUKEPREFIX}postsmeta` (
   `mid` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `post_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-  `meta_part` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `meta_key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `meta_part` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `meta_key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `meta_value` longtext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`mid`),
   KEY `post_id` (`post_id`),
@@ -725,8 +719,8 @@ CREATE TABLE `{NUKEPREFIX}referrer` (
   `rid` int(11) NOT NULL AUTO_INCREMENT,
   `url` text COLLATE utf8mb4_unicode_ci,
   `path` text COLLATE utf8mb4_unicode_ci,
-  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`rid`),
   KEY `ip` (`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -741,13 +735,13 @@ CREATE TABLE `{NUKEPREFIX}reports` (
   `rid` int(11) NOT NULL AUTO_INCREMENT,
   `post_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
-  `post_title` varchar(750) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_title` varchar(750) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `post_link` text COLLATE utf8mb4_unicode_ci,
-  `subject` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `message` text COLLATE utf8mb4_unicode_ci,
-  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ip` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ip` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`rid`),
   KEY `post_id` (`post_id`),
   KEY `user_id` (`user_id`)
@@ -763,9 +757,9 @@ CREATE TABLE `{NUKEPREFIX}scores` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `votetype` int(11) NOT NULL DEFAULT '1',
   `post_id` int(11) NOT NULL DEFAULT '0',
-  `db_table` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `rating_ip` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `vote_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `db_table` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `rating_ip` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `vote_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `score` tinyint(1) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   `gust` tinyint(4) NOT NULL DEFAULT '0',
@@ -784,12 +778,12 @@ CREATE TABLE `{NUKEPREFIX}scores` (
 --
 
 CREATE TABLE `{NUKEPREFIX}sessions` (
-  `session_id` varchar(100) COLLATE utf8_bin NOT NULL,
+  `session_id` varchar(100) COLLATE utf8_bin NOT NULL DEFAULT '',
   `session_user_id` mediumint(8) UNSIGNED NOT NULL DEFAULT '0',
   `session_time` int(11) UNSIGNED NOT NULL DEFAULT '0',
-  `session_ip` varchar(40) COLLATE utf8_bin NOT NULL,
-  `session_browser` varchar(150) COLLATE utf8_bin NOT NULL,
-  `session_page` varchar(255) COLLATE utf8_bin NOT NULL,
+  `session_ip` varchar(40) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `session_browser` varchar(150) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `session_page` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`session_id`),
   KEY `session_time` (`session_time`),
   KEY `session_user_id` (`session_user_id`),
@@ -807,8 +801,8 @@ CREATE TABLE `{NUKEPREFIX}statistics` (
   `year` int(11) NOT NULL DEFAULT '0',
   `month` int(11) NOT NULL DEFAULT '0',
   `day` int(11) NOT NULL DEFAULT '0',
-  `hourly_info` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `visitor_ips` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hourly_info` text COLLATE utf8mb4_unicode_ci,
+  `visitor_ips` longtext COLLATE utf8mb4_unicode_ci,
   `visitors` int(11) NOT NULL DEFAULT '0',
   `hits` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
@@ -824,8 +818,8 @@ CREATE TABLE `{NUKEPREFIX}statistics` (
 --
 
 CREATE TABLE `{NUKEPREFIX}statistics_counter` (
-  `type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `var` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `var` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `count` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -882,18 +876,18 @@ INSERT INTO `{NUKEPREFIX}statistics_counter` (`type`, `var`, `count`) VALUES
 CREATE TABLE `{NUKEPREFIX}surveys` (
   `pollID` int(11) NOT NULL AUTO_INCREMENT,
   `status` tinyint(1) NOT NULL DEFAULT '0',
-  `aid` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `aid` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `canVote` tinyint(1) NOT NULL DEFAULT '0',
   `main_survey` tinyint(1) NOT NULL DEFAULT '0',
-  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `post_id` int(10) NOT NULL DEFAULT '0',
-  `pollTitle` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `pollUrl` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `pollTitle` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `pollUrl` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `description` text COLLATE utf8mb4_unicode_ci,
-  `planguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `planguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `voters` int(11) NOT NULL DEFAULT '0',
-  `start_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `end_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `start_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `end_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `to_main` tinyint(1) NOT NULL DEFAULT '0',
   `allow_comment` tinyint(1) NOT NULL DEFAULT '0',
   `comments` int(11) DEFAULT '0',
@@ -920,8 +914,8 @@ CREATE TABLE `{NUKEPREFIX}surveys` (
 
 CREATE TABLE `{NUKEPREFIX}surveys_check` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `time` varchar(14) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `time` varchar(14) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `pollID` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -934,7 +928,7 @@ CREATE TABLE `{NUKEPREFIX}surveys_check` (
 
 CREATE TABLE `{NUKEPREFIX}tags` (
   `tag_id` int(11) NOT NULL AUTO_INCREMENT,
-  `tag` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tag` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `counter` int(20) NOT NULL DEFAULT '0',
   `visits` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`tag_id`),
@@ -949,7 +943,7 @@ CREATE TABLE `{NUKEPREFIX}tags` (
 
 CREATE TABLE `{NUKEPREFIX}transactions` (
   `tid` int(11) NOT NULL AUTO_INCREMENT,
-  `aid` varchar(200) NOT NULL,
+  `aid` varchar(200) NOT NULL DEFAULT '',
   `user_id` int(11) NOT NULL DEFAULT '0',
   `rel_user_id` int(11) NOT NULL DEFAULT '0',
   `factor_number` int(11) NOT NULL DEFAULT '0',
@@ -957,15 +951,15 @@ CREATE TABLE `{NUKEPREFIX}transactions` (
   `update_time` int(11) NOT NULL DEFAULT '0',
   `status` int(11) NOT NULL DEFAULT '0',
   `type` int(11) NOT NULL DEFAULT '0',
-  `gateway` varchar(20) NOT NULL,
+  `gateway` varchar(20) NOT NULL DEFAULT '',
   `data` text NOT NULL,
   `fish_image` longblob NOT NULL,
   `amount` bigint(20) NOT NULL DEFAULT '0',
-  `title` varchar(250) NOT NULL,
+  `title` varchar(250) NOT NULL DEFAULT '',
   `description` text NOT NULL,
-  `order_part` varchar(20) NOT NULL,
+  `order_part` varchar(20) NOT NULL DEFAULT '',
   `order_id` mediumint(9) NOT NULL DEFAULT '0',
-  `order_link` varchar(500) NOT NULL,
+  `order_link` varchar(500) NOT NULL DEFAULT '',
   `order_data` text NOT NULL,
   PRIMARY KEY (`tid`),
   KEY `user_id` (`user_id`),
@@ -987,37 +981,37 @@ CREATE TABLE `{NUKEPREFIX}transactions` (
 CREATE TABLE `{NUKEPREFIX}users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `group_id` int(11) NOT NULL DEFAULT '2',
-  `user_groups` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_groups` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_status` int(10) NOT NULL DEFAULT '1',
-  `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_password` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password_reset` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_ip` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_regdate` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_birthday` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_realname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_password` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `password_reset` text COLLATE utf8mb4_unicode_ci,
+  `user_ip` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_regdate` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_birthday` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_realname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_lastvisit` int(11) UNSIGNED NOT NULL DEFAULT '0',
-  `user_lastpage` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_lastpage` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_login_attempts` tinyint(4) NOT NULL DEFAULT '0',
-  `user_login_block_expire` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_login_block_expire` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_inactive_reason` tinyint(2) NOT NULL DEFAULT '0',
   `user_inactive_time` int(11) UNSIGNED NOT NULL DEFAULT '0',
-  `user_lang` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_lang` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_allow_viewonline` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
-  `user_avatar` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_avatar` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_avatar_type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
-  `user_sig` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_address` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_phone` VARCHAR(25) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_website` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_interests` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_femail` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_sig` mediumtext COLLATE utf8mb4_unicode_ci,
+  `user_address` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_phone` VARCHAR(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_website` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_interests` text COLLATE utf8mb4_unicode_ci,
+  `user_femail` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_newsletter` int(1) NOT NULL DEFAULT '0',
   `user_points` int(10) DEFAULT '0',
   `check_num` int(11) NOT NULL DEFAULT '0',
-  `user_gender` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_about` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_gender` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_about` text COLLATE utf8mb4_unicode_ci,
   `user_credit` bigint(20) NOT NULL DEFAULT '0',
   `user_referrer` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`),
@@ -1034,10 +1028,10 @@ CREATE TABLE `{NUKEPREFIX}users` (
 
 CREATE TABLE `{NUKEPREFIX}users_fields` (
   `fid` int(10) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `display` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `display` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `size` int(3) NOT NULL DEFAULT '0',
   `need` int(1) NOT NULL DEFAULT '1',
   `pos` int(3) NOT NULL DEFAULT '0',
@@ -1055,7 +1049,7 @@ CREATE TABLE `{NUKEPREFIX}users_fields_values` (
   `vid` int(10) NOT NULL AUTO_INCREMENT,
   `uid` int(10) NOT NULL DEFAULT '0',
   `fid` int(10) NOT NULL DEFAULT '0',
-  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`vid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1068,8 +1062,8 @@ CREATE TABLE `{NUKEPREFIX}users_fields_values` (
 CREATE TABLE `{NUKEPREFIX}users_invites` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `rid` int(11) NOT NULL DEFAULT '0',
-  `code` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `email` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

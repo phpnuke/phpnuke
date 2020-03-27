@@ -3014,8 +3014,8 @@ function upgrade_final()
 		array(4, 'Feedback', 'a:2:{s:7:"english";s:10:"Contact Us";s:5:"farsi";s:18:"تماس با ما";}', 1, '0', '', 1, 0, 1, 'a:1:{s:5:"index";s:10:"right|||||";}'),
 		array(6, 'Statistics', 'a:2:{s:7:"english";s:10:"Statistics";s:5:"farsi";s:21:"آمار بازدید";}', 1, '0', '', 1, 0, 1, 'a:2:{s:5:"index";s:10:"right|||||";s:8:"advanced";s:10:"right|||||";}'),
 		array(8, 'Feed', 'a:2:{s:7:"english";s:4:"feed";s:5:"farsi";s:14:"خبرخوان";}', 1, '0', '', 0, 0, 0, ''),
-		array(9, 'Users', 'a:2:{s:7:"english";s:5:"users";s:5:"farsi";s:23:"سیستم کاربری";}', 0, '0', '', 1, NULL, 0, 'a:3:{s:12:"login_signup";s:10:"right|||||";s:4:"edit";s:10:"right|||||";s:7:"profile";s:10:"right|||||";}'),
-		array(10, 'Credits', 'a:2:{s:7:"english";s:14:"credits system";s:5:"farsi";s:27:"سیستم اعتبارات";}', 1, '0', '', 1, NULL, 1, 'a:2:{s:4:"list";s:10:"right|||||";s:4:"form";s:10:"right|||||";}')
+		array(9, 'Users', 'a:2:{s:7:"english";s:5:"users";s:5:"farsi";s:23:"سیستم کاربری";}', 0, '0', '', 1, 0, 0, 'a:3:{s:12:"login_signup";s:10:"right|||||";s:4:"edit";s:10:"right|||||";s:7:"profile";s:10:"right|||||";}'),
+		array(10, 'Credits', 'a:2:{s:7:"english";s:14:"credits system";s:5:"farsi";s:27:"سیستم اعتبارات";}', 1, '0', '', 1, 0, 1, 'a:2:{s:4:"list";s:10:"right|||||";s:4:"form";s:10:"right|||||";}')
 	);
 	
 	$db->table(MODULES_TABLE)
