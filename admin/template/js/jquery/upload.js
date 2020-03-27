@@ -102,22 +102,13 @@ $(function(){
 			
 			var url = location.href;
 			var CKEditorFuncNum = url.match(/CKEditorFuncNum=([0-9]+)/) ? url.match(/CKEditorFuncNum=([0-9]+)/)[1] : null;
-			var CKEditorHtml5tag = url.match(/CKEditorHtml5tag=([video|audio]+)/) ? url.match(/CKEditorHtml5tag=([video|audio]+)/)[1] : 'image';
 			
-			var medias_all = document.getElementById("upload").querySelectorAll('div.preview-image');
-			var nr_medias_all = medias_all.length;
-
-			if(nr_medias_all > 0) {
-				for(var i=0; i<nr_medias_all; i++)
-				{
-					medias_all[i].addEventListener('click', function(e)
-					{
-						if(CKEditorFuncNum !== null) window.opener.CKEDITOR.tools.callFunction(CKEditorFuncNum, $(this).data('url'));
+			$("#upload .preview-image").each(function(index, value){
+				$(this).bind('click', function(){
+					if(CKEditorFuncNum !== null) window.opener.CKEDITOR.tools.callFunction(CKEditorFuncNum, $(this).data('url'));
 						window.close();
-					},
-					false);
-				}
-			}
+				});
+			});
 
 			setTimeout(function(){
 				//data.context.fadeOut('slow');

@@ -55,29 +55,13 @@ else
 	}
 	define("NUKE_FILE", true);
 	define("_NOWTIME", time());
-	if($phpver >= '5.4.0')
+	$methods = array("_GET","_POST","_REQUEST","_FILES");
+	foreach($methods as $method)
 	{
-		$methods = array("_GET","_POST","_REQUEST","_FILES");
-		foreach($methods as $method)
-		{
-			unset($var_requests);
-			eval('$var_requests = $'.$method.';');
-			if(isset($var_requests) && !empty($var_requests))
-			{
-				foreach($var_requests as $method_key => $method_val)
-				{
-					$$method_key = $method_val;
-				}
-			}
-		}
+		if(isset($$method))
+			extract($$method);
 	}
-	else
-	{
-		if (!ini_get('register_globals'))
-		{
-			@import_request_variables("GPC", "");
-		}
-	}
+	
 	require_once("config.php");
 	require_once("includes/functions.php");
 	require_once("includes/class.sessions.php");
@@ -117,6 +101,22 @@ if($cache->isCached('install_options'))
 		}
 		define("NEW_DB", $install_options['db_info']['db_name']);
 	}
+}
+
+function steps_error($message, $step, $percent)
+{
+	upgrade_header($step, $percent);
+	echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
+		<div class=\"wizard-card\" data-cardname=\"group\">
+			<h3>خطا</h3>
+			<div class=\"wizard-input-section\">
+				$message
+			</div>
+			<div class=\"text-center\"><a href=\"install.php\"><button class=\"btn btn-default\">بازگشت به مرحله اول</button></a></div>
+		</div>
+	</div>";
+	upgrade_footer();
+	die();
 }
 
 function upgrade_header($step = 1, $progress = 0)
@@ -238,7 +238,7 @@ function upgrade_start()
 					<br>1 - رعايت کپي رايت ؛ احترام به ناشر و قدرداني از زحمات دوستاني است که ما را در تهيه اين محصول ياري نموده اند.
 					<br>2 - مسؤليت هر گونه استفاده از سيستم بر خلاف قوانين مدني کشور به عهده خود شخص بوده و سايت مرجع پذيراي هيچ گونه مسؤليتي نميباشد.<br />
 					<span><a href=\"http://www.phpnuke.ir/Forum/viewtopic.php?f=1&t=20\" target=\"_blank\">مطالعه ساير قوانين </a></span>&nbsp;&nbsp;&nbsp;<span style=\"cursor:pointer\" onclick=\"showHelp()\">مطالعه راهنماي نصب</span><br /><br />
-					<div class=\"text-center\"><a href=\"install.php?step=db&mode=install\" class=\"btn btn-primary\">نصب نيوک</a> &nbsp; <a href=\"install.php?step=db&mode=upgrade\" class=\"btn btn-primary\">بروزرساني نيوک</a></div>
+					<div class=\"text-center\"><div class=\"col-xs-6\"><form action=\"install.php?step=db&mode=install\" method=\"post\"><button type=\"submit\" class=\"btn btn-primary\">نصب نيوک</button></form></div><div class=\"col-xs-6\"><form action=\"install.php?step=db&mode=upgrade\" method=\"post\"><button type=\"submit\" class=\"btn btn-primary\">بروزرساني نيوک</button></form></div></div>
 				</div>
 			</div>
 		</div>
@@ -371,17 +371,7 @@ function step_server_check()
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(3, 40);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 3, 40);
 	}
 	
 	$import_db = Database::connect($db_fields['db_server_name'], $db_fields['db_username'] , $db_fields['db_password'], $db_fields['db_name'], $pn_dbtype, $pn_dbfetch, $pn_dbcharset, true);
@@ -568,17 +558,15 @@ function step_server_check()
 				</div>
 			</div>
 		</div>
-		<div class=\"wizard-footer\">
+		<form action=\"install.php?step=siteinfo\" method=\"post\"><div class=\"wizard-footer\">
 			<div class=\"wizard-buttons-container\">
 				<div class=\"btn-group-single pull-left\">
 					<a href=\"javascript:history.go(-1)\"><button class=\"btn wizard-back\" type=\"button\">قبلی</button></a>";
-					if($showerror == 1)
-						echo"<button class=\"btn wizard-next btn-primary disabled\" type=\"button\">بعدی</button>";
-					else
-						echo"<a href=\"install.php?step=siteinfo\"><button class=\"btn wizard-next btn-primary\" type=\"button\">بعدی</button></a>";
+					if($showerror == 0)
+						echo" &nbsp; <button type=\"submit\" class=\"btn wizard-next btn-primary\">بعدی</button>";
 				echo"</div>
 			</div>
-		</div>";
+		</div></form>";
 	upgrade_footer();
 }
 
@@ -588,17 +576,7 @@ function step_siteinfo()
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(4, 60);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 4, 60);
 	}
 	
 	$install_options = $cache->retrieve('install_options');
@@ -644,17 +622,7 @@ function step_admin_info()
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(5, 80);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 5, 80);
 	}
 	
 	$install_options = $cache->retrieve('install_options');
@@ -757,17 +725,7 @@ function step_install()
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	$install_options = $cache->retrieve('install_options');
@@ -838,7 +796,7 @@ function step_install()
 	$DB_obj->db_connection_charset = $pn_dbcharset;
 	
 	$result = $DB_obj->read_sql_url($filename, 1, 0, ";", 0, $install_options['db_info']['db_prefix']."_");
-
+	
 	upgrade_header(6, (($install_options['mode'] == 'install') ? 100:90));
 
 	echo"
@@ -889,7 +847,7 @@ function step_install()
 					else
 					{
 					echo"
-					<a class=\"btn btn-default\" href=\"install.php?op=first\">ادامه بروزرسانی</a>";
+					<form action=\"install.php?op=first\" method=\"post\"><button class=\"btn btn-default\">ادامه بروزرسانی</button></form>";
 					}
 				echo"</p>
 				</div>
@@ -1308,184 +1266,12 @@ function upgrade_first()
 			$db->table(CATEGORIES_TABLE)->multiinsert(array("catid","type","module","catname","catimage","cattext","parent_id"),$insert_query);
 	}
 	
-	// update nuke_config
-
-	// add configs data
-	$install_options['siteinfo']['nukeurl'] = (isset($install_options['siteinfo']['nukeurl'])) ? $install_options['siteinfo']['nukeurl']:$Req_URL;
-	$install_options['siteinfo']['sitename'] = (isset($install_options['siteinfo']['sitename'])) ? $install_options['siteinfo']['sitename']:"PhpNuke 8.4.2";
-	$install_options['db_info']['db_forumcms'] = (isset($install_options['db_info']['db_forumcms'])) ? $install_options['db_info']['db_forumcms']:"";
-	$install_options['db_info']['db_forumprefix'] = (isset($install_options['db_info']['db_forumprefix'])) ? $install_options['db_info']['db_forumprefix']:"";
-	$install_options['db_info']['db_forumname'] = (isset($install_options['db_info']['db_forumname'])) ? $install_options['db_info']['db_forumname']:"";
-	$install_options['db_info']['db_forumpath'] = (isset($install_options['db_info']['db_forumpath'])) ? $install_options['db_info']['db_forumpath']:"";
-	
-	$configs_data = array(
-		array('sitename', $install_options['siteinfo']['sitename']),
-		array('nukeurl', $install_options['siteinfo']['nukeurl']),
-		array('site_logo', ''),
-		array('site_description', 'شرح مختصری در مورد سایت'),
-		array('slogan', ''),
-		array('startdate', ''),
-		array('adminmail', ''),
-		array('adminmail_name', 'مدیریت سایت'),
-		array('anonpost', '1'),
-		array('Default_Theme', 'Mashhadteam-Caspian'),
-		array('overwrite_theme', '0'),
-		array('footer_message', ''),
-		array('commentlimit', '40960'),
-		array('anonymous', 'ميهمان'),
-		array('minpass', '5'),
-		array('broadcast_msg', '1'),
-		array('my_headlines', '1'),
-		array('top', '0'),
-		array('home_pagination', '20'),
-		array('user_pagination', '0'),
-		array('oldnum', '20'),
-		array('banners', '1'),
-		array('backend_title', ''),
-		array('backend_language', 'en-us'),
-		array('language', 'farsi'),
-		array('locale', 'fa_IR'),
-		array('multilingual', '1'),
-		array('useflags', '0'),
-		array('notify', '0'),
-		array('notify_subject', 'خبر جدید ارسال شده است'),
-		array('notify_message', 'خبر جدیدی در سایت به منظور تائید مدیر ارسال شده است.'),
-		array('notify_from', 'webmaster'),
-		array('moderate', '0'),
-		array('admingraphic', '1'),
-		array('httpref', '1'),
-		array('httprefmax', '1000'),
-		array('httprefmode', '1'),
-		array('copyright', 'VUVkU2NHUnBRbkJhUkRCcFZGWlJkRkV5T1hkbFdFcHdXakpvTUVscU5WRlRSa0YwVkc1V2NscFRRbEZqYlRseFdsZE9NRWxGU2pWSlJIaG9TVWRvZVZwWFdUbEpiV2d3WkVoQk5reDVPVE5rTTJOMVkwZG9kMkp1Vm5KYVV6VndZMmxKWjJSSFJubGFNbFl3VUZOS1psbHRlR2hpYlhOcFNVaEtiR0pFTUdsWk1qbDNaVmhLY0ZveWFEQkphalZSVTBaQ1QyUlhkR3hNYld4NVVFTTVhRkJxZDNaYVIyd3lVR2M5UFE9PQ=='),
-		array('Version_Num', '8.4.2'),
-		array('nuke_editor', '1'),
-		array('display_errors', '0'),
-		array('gtset', '1'),
-		array('userurl', '1'),
-		array('align', 'rtl'),
-		array('show_links', '1'),
-		array('datetype', '1'),
-		array('show_effect', '1'),
-		array('votetype', '3'),
-		array('mobile_mode', '0'),
-		array('filemaneger_pass', ''),
-		array('sitecookies', '/'),
-		array('site_meta_tags', ''),
-		array('site_keywords', 'کلمات,کلیدی,سایت'),
-		array('suspend_site', '0'),
-		array('suspend_start', ''),
-		array('suspend_expire', ''),
-		array('suspend_template', '<!DOCTYPE html>
-		<html xmlns=\"http://www.w3.org/1999/xhtml\">
-			<head>
-				<title>{SITENAME}</title>
-			</head>
-			<body>
-				<h1>Not Found</h1>
-				The requested URL /404.shtml was not found on this server.
-				<hr>
-				<i>{NUKEURL}</i>
-			</body>
-		</html>'),
-		array('upload_allowed_info', ''),
-		array('upload_pagesitems', '5'),
-		array('pagination_number', '1'),
-		array('comments', 'a:12:{s:5:\"allow\";s:1:\"1\";s:9:\"anonymous\";s:1:\"1\";s:12:\"confirm_need\";s:1:\"1\";s:5:\"limit\";s:1:\"0\";s:6:\"editor\";s:1:\"2\";s:6:\"inputs\";a:4:{s:8:\"name_act\";s:1:\"1\";s:9:\"email_act\";s:1:\"1\";s:9:\"email_req\";s:1:\"1\";s:7:\"url_act\";s:1:\"1\";}s:6:\"notify\";a:2:{s:5:\"email\";s:1:\"1\";s:3:\"sms\";s:1:\"1\";}s:8:\"order_by\";s:1:\"1\";s:12:\"allow_rating\";s:1:\"1\";s:15:\"allow_reporting\";s:1:\"1\";s:13:\"item_per_page\";s:2:\"20\";s:5:\"depth\";s:1:\"2\";}'),
-		array('max_log_numbers', '500'),
-		array('smtp_email_server', ''),
-		array('smtp_email_user', ''),
-		array('smtp_email_pass', ''),
-		array('smtp_secure', ''),
-		array('smtp_port', '0'),
-		array('smtp_debug', '0'),
-		array('is_html_mail', '1'),
-		array('allow_attachement_mail', '1'),
-		array('mtsn_text_file', '1'),
-		array('mtsn_status', '1'),
-		array('mtsn_show_alarm', '1'),
-		array('mtsn_send_mail', '1'),
-		array('mtsn_admin_mail', 'attack@sitename.com'),
-		array('mtsn_string_filter', '1'),
-		array('mtsn_html_filter', '1'),
-		array('mtsn_injection_filter', '1'),
-		array('mtsn_block_ip', '0'),
-		array('mtsn_version', '4.3.0'),
-		array('mtsn_ddos_filter', '0'),
-		array('mtsn_CensorMode', '0'),
-		array('mtsn_CensorWords', 'سکس'),
-		array('mtsn_CensorReplace', '*****'),
-		array('mtsn_login_attempts', '1'),
-		array('mtsn_login_attempts_time', '3600'),
-		array('mtsn_requests_mintime', '5'),
-		array('mtsn_requests_pages', '7'),
-		array('seccode_type', '2'),
-		array('google_recaptcha_sitekey', ''),
-		array('google_recaptcha_secretkey', ''),
-		array('mtsn_gfx_chk', 'admin_login,user_login,comments,send_post,feedback,user_sign_up'),
-		array('gverify', ''),
-		array('alexverify', ''),
-		array('yverify', ''),
-		array('gcse', ''),
-		array('ganalytic', ''),
-		array('ping_sites', 'http://rpc.pingomatic.com
-		http://rpc.twingly.com
-		http://rpc.weblogs.com/RPC2
-		http://ping.blo.gs/
-		http://ping.feedburner.com'),
-		array('meta_Tags', ''),
-		array('active_pings', '1'),
-		array('last_ping_time', ''),
-		array('ping_options', 'a:3:{s:12:\"limit_number\";s:1:\"1\";s:10:\"limit_time\";s:1:\"3\";s:10:\"limit_ping\";i:1;}'),
-		array('future_pings', ''),
-		array('future_ping_time', ''),
-		array('ping_num', '0'),
-		array('have_forum', $install_options['db_info']['db_have_forum']),
-		array('forum_path', $install_options['db_info']['db_forumpath']),
-		array('forum_system', $install_options['db_info']['db_forumcms']),
-		array('forum_prefix', $install_options['db_info']['db_forumprefix']."_"),
-		array('forum_db', $install_options['db_info']['db_forumname']),
-		array('mtsn_search_skipwords', 'است,این'),
-		"feedbacks" => array('feedbacks', 'a:13:{s:10:\"letreceive\";s:1:\"1\";s:5:\"delay\";s:3:\"600\";s:6:\"notify\";a:1:{s:3:\"sms\";s:1:\"1\";}s:11:\"description\";s:77:\"<p>به سیستم مدیریت محتوای نیوک خوش آمدید</p>
-		\";s:5:\"phone\";s:0:\"\";s:6:\"mobile\";s:0:\"\";s:3:\"fax\";s:0:\"\";s:7:\"address\";s:0:\"\";s:16:\"meta_description\";s:86:\"بخش ارتباط با ما سیستم مدیریت محتوای نیوک فارسی\";s:13:\"meta_keywords\";a:3:{i:0;s:22:\"ارتباط با ما\";i:1;s:18:\"تماس با ما\";i:2;s:11:\"فید بک\";}s:10:\"map_active\";s:1:\"1\";s:10:\"google_api\";s:0:\"\";s:12:\"map_position\";s:35:\"36.28795445718431,59.61575198173523\";}'),
-		array('forum_GTlink_active', '0'),
-		array('forum_collation', $install_options['db_info']['db_forumunicode']),
-		array('website_index_theme', '0'),
-		array('session_last_gc', '1498217142'),
-		array('mtsn_captcha_charset', ''),
-		array('sessions_prefix', 'pnSession_'),
-		array('mtsn_block_ip_expire', '3600'),
-		array('session_timeout', '3600'),
-		array('forum_seo_post_link', 'post{P}.html#p{P}'),
-		array('forum_seo_topic_link', 'forum-f{F}/topic-t{T}.html'),
-		array('forum_seo_forum_link', 'forum-f{F}/'),
-		array('forum_seo_profile_link', 'member/{UN}/'),
-		array('forum_seo_pm_link', ''),
-		array('forum_seo_login_link', ''),
-		array('forum_seo_logout_link', ''),
-		array('forum_seo_ucp_link', ''),
-		array('forum_seo_register_link', ''),
-		array('forum_seo_passlost_link', ''),
-		array('timthumb_allowed', 'phpnuke.ir'),
-		array('lock_siteurl', ((isset($install_options['db_info']['nukeurl'])) ? 1:0)),
-		array('smilies', 'a:21:{i:0;a:4:{s:4:\"name\";s:10:\"icon_arrow\";s:4:\"code\";s:2:\";)\";s:3:\"url\";s:28:\"images/smiles/icon_arrow.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:1;a:4:{s:4:\"name\";s:13:\"icon_confused\";s:4:\"code\";s:2:\"|)\";s:3:\"url\";s:31:\"images/smiles/icon_confused.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:2;a:4:{s:4:\"name\";s:9:\"icon_cool\";s:4:\"code\";s:2:\":-\";s:3:\"url\";s:27:\"images/smiles/icon_cool.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:3;a:4:{s:4:\"name\";s:8:\"icon_cry\";s:4:\"code\";s:2:\":(\";s:3:\"url\";s:26:\"images/smiles/icon_cry.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:4;a:4:{s:4:\"name\";s:8:\"icon_eek\";s:4:\"code\";s:2:\":0\";s:3:\"url\";s:26:\"images/smiles/icon_eek.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:5;a:4:{s:4:\"name\";s:9:\"icon_evil\";s:4:\"code\";s:2:\":#\";s:3:\"url\";s:27:\"images/smiles/icon_evil.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:6;a:4:{s:4:\"name\";s:12:\"icon_exclaim\";s:4:\"code\";s:2:\"*)\";s:3:\"url\";s:30:\"images/smiles/icon_exclaim.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:7;a:4:{s:4:\"name\";s:9:\"icon_razz\";s:4:\"code\";s:2:\"^)\";s:3:\"url\";s:27:\"images/smiles/icon_razz.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:8;a:4:{s:4:\"name\";s:14:\"icon_surprised\";s:4:\"code\";s:3:\"+))\";s:3:\"url\";s:32:\"images/smiles/icon_surprised.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:9;a:4:{s:4:\"name\";s:10:\"icon_smile\";s:4:\"code\";s:2:\":}\";s:3:\"url\";s:28:\"images/smiles/icon_smile.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:10;a:4:{s:4:\"name\";s:8:\"icon_sad\";s:4:\"code\";s:3:\"|((\";s:3:\"url\";s:26:\"images/smiles/icon_sad.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:11;a:4:{s:4:\"name\";s:13:\"icon_rolleyes\";s:4:\"code\";s:2:\"@:\";s:3:\"url\";s:31:\"images/smiles/icon_rolleyes.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:12;a:4:{s:4:\"name\";s:12:\"icon_redface\";s:4:\"code\";s:3:\"(:)\";s:3:\"url\";s:30:\"images/smiles/icon_redface.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:13;a:4:{s:4:\"name\";s:13:\"icon_question\";s:4:\"code\";s:2:\":?\";s:3:\"url\";s:31:\"images/smiles/icon_question.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:14;a:4:{s:4:\"name\";s:5:\"heart\";s:4:\"code\";s:3:\")*(\";s:3:\"url\";s:23:\"images/smiles/heart.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:15;a:4:{s:4:\"name\";s:4:\"kiss\";s:4:\"code\";s:3:\"#%^\";s:3:\"url\";s:22:\"images/smiles/kiss.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:16;a:4:{s:4:\"name\";s:9:\"thumbs_up\";s:4:\"code\";s:3:\"@@#\";s:3:\"url\";s:27:\"images/smiles/thumbs_up.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:17;a:4:{s:4:\"name\";s:11:\"thumbs_down\";s:4:\"code\";s:4:\")))&\";s:3:\"url\";s:29:\"images/smiles/thumbs_down.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:18;a:4:{s:4:\"name\";s:16:\"embaressed_smile\";s:4:\"code\";s:3:\"^^*\";s:3:\"url\";s:34:\"images/smiles/embaressed_smile.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:19;a:4:{s:4:\"name\";s:13:\"regular_smile\";s:4:\"code\";s:2:\"!^\";s:3:\"url\";s:31:\"images/smiles/regular_smile.gif\";s:10:\"dimentions\";s:5:\"19*19\";}i:20;a:4:{s:4:\"name\";s:10:\"wink_smile\";s:4:\"code\";s:3:\"%&^\";s:3:\"url\";s:28:\"images/smiles/wink_smile.gif\";s:10:\"dimentions\";s:5:\"19*19\";}}'),
-		array('forum_last_number', ''),
-		array('nukecdnurl', ''),
-		array('users', 'a:32:{s:19:\"login_sign_up_theme\";s:1:\"1\";s:12:\"allowuserreg\";s:1:\"1\";s:5:\"coppa\";s:1:\"1\";s:3:\"tos\";s:1:\"1\";s:10:\"invitation\";s:1:\"0\";s:14:\"max_invitation\";s:1:\"5\";s:8:\"nick_max\";s:2:\"25\";s:8:\"nick_min\";s:1:\"3\";s:8:\"pass_max\";s:2:\"25\";s:8:\"pass_min\";s:1:\"3\";s:16:\"doublecheckemail\";s:1:\"1\";s:8:\"bad_mail\";s:0:\"\";s:12:\"bad_username\";s:0:\"\";s:8:\"bad_nick\";s:0:\"\";s:12:\"requireadmin\";s:1:\"1\";s:18:\"email_activatation\";s:1:\"1\";s:17:\"send_email_af_reg\";s:1:\"1\";s:11:\"sendaddmail\";s:1:\"1\";s:11:\"avatar_salt\";s:8:\"sdfsdwfs\";s:11:\"avatar_path\";s:30:\"modules/Users/includes/avatar/\";s:12:\"allow_avatar\";s:1:\"1\";s:19:\"allow_avatar_upload\";s:1:\"1\";s:19:\"allow_avatar_remote\";s:1:\"1\";s:14:\"allow_gravatar\";s:1:\"1\";s:15:\"allowmailchange\";s:1:\"1\";s:16:\"avatar_max_width\";s:3:\"180\";s:17:\"avatar_max_height\";s:3:\"180\";s:16:\"avatar_min_width\";s:2:\"40\";s:17:\"avatar_min_height\";s:2:\"40\";s:15:\"avatar_filesize\";s:6:\"102400\";s:5:\"mttos\";s:28:\"<p>قوانين سايت</p>\";s:6:\"notify\";a:2:{s:3:\"sms\";s:1:\"1\";s:5:\"email\";s:1:\"1\";}}'),
-		array('minify_src', '1'),
-		array('pn_credits', 'a:7:{s:10:\"min_amount\";s:5:\"10000\";s:10:\"max_amount\";s:9:\"500000000\";s:6:\"notify\";a:1:{s:3:\"sms\";s:1:\"1\";}s:18:\"credits_direct_msg\";s:0:\"\";s:16:\"credits_list_msg\";s:0:\"\";s:10:\"currencies\";a:5:{i:0;a:3:{s:4:\"code\";s:3:\"USD\";s:4:\"name\";s:21:\"دلار آمريکا\";s:12:\"rial_ex_rate\";s:0:\"\";}i:1;a:3:{s:4:\"code\";s:3:\"EUR\";s:4:\"name\";s:8:\"يورو\";s:12:\"rial_ex_rate\";s:0:\"\";}i:2;a:3:{s:4:\"code\";s:3:\"AED\";s:4:\"name\";s:21:\"درهم امارات\";s:12:\"rial_ex_rate\";s:0:\"\";}i:3;a:3:{s:4:\"code\";s:3:\"GBP\";s:4:\"name\";s:21:\"پوند انگليس\";s:12:\"rial_ex_rate\";s:0:\"\";}i:4;a:3:{s:4:\"code\";s:3:\"KWD\";s:4:\"name\";s:19:\"دينار کويت\";s:12:\"rial_ex_rate\";s:0:\"\";}}s:8:\"gateways\";a:0:{}}'),
-		array('sms', '0'),
-		array('pn_sms', 'a:5:{s:8:\"operator\";s:5:\"opsms\";s:8:\"username\";s:0:\"\";s:8:\"password\";s:0:\"\";s:14:\"default_number\";s:0:\"\";s:10:\"recipients\";s:0:\"\";}'),
-		array('csrf_token_time', '1800')
-	);
-	
-	$db->table($install_options['db_info']['db_prefix']."_config")
-		->multiinsert(array('config_name','config_value'), $configs_data);
-	
+	// update nuke_config	
 	$when_query = array();
 	$insert_query = array();
 	$params_index = array();
 	$query_IN = array();
-	$feedback_configs = $configs_data['feedbacks'];
+	$feedback_configs = $nuke_configs['feedbacks'];
 	$feedback_configs['depts'] = array();
 	
 	$db->query("set names 'latin1'");
@@ -1858,17 +1644,7 @@ function upgrade_comments($start = 0)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	$module = (isset($module) && $module != '' && $module != 'stories_comments') ? $module:"stories_comments";
@@ -1979,17 +1755,7 @@ function upgrade_feedbacks($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	$run_per_step = 500;
@@ -2069,17 +1835,7 @@ function upgrade_mtsn($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	// update nuke_mtsn
@@ -2120,17 +1876,7 @@ function upgrade_ipbans($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	$run_per_step = 2000;
 	// update nuke_mtsn_ipban
@@ -2170,17 +1916,7 @@ function upgrade_reports($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	$run_per_step = 500;
@@ -2222,17 +1958,7 @@ function upgrade_scores($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	$run_per_step = 5000;
@@ -2272,17 +1998,7 @@ function upgrade_statistics($start = 0)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 		
 	// update nuke_statistics
@@ -2405,17 +2121,7 @@ function upgrade_tags($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	$run_per_step = 1000;
@@ -2457,17 +2163,7 @@ function upgrade_articles($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}	
 	$run_per_step = 500;
 	// update nuke_articles
@@ -2600,17 +2296,7 @@ function upgrade_staticpages($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}	
 	$run_per_step = 500;
 	// update nuke_articles
@@ -2716,17 +2402,7 @@ function upgrade_forum()
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
 	$install_options = $cache->retrieve('install_options');
@@ -3037,17 +2713,7 @@ function upgrade_users($start)
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}	
 	
 	$old_users_table_name = "`".OLD_DB."`.`".OLD_DB_PREFIX."_users`";
@@ -3095,22 +2761,12 @@ function upgrade_final()
 	
 	if(!$cache->isCached('install_options'))
 	{
-		upgrade_header(7, 95);
-		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>اطلاعات پایگاه داده</h3>
-				<div class=\"wizard-input-section\">
-					اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است
-				</div>
-			</div>
-		</div>";
-		upgrade_footer();
-		die();
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 		
 	$install_options = $cache->retrieve("install_options");
 	$install_options = phpnuke_unserialize($install_options);
-				
+			
 	$pwd = phpnuke_hash_password($install_options['admininfo']['pwd']);
 	
 	if($install_options['mode'] == 'install')
@@ -3254,9 +2910,26 @@ function upgrade_final()
 			)
 		);
 		
+		$comments_blocks_data = array(
+			'9' => array(
+				'title' => 'comments',
+				'lang_titles' => '',
+				'blanguage' => '',
+				'weight' => 1,
+				'active' => 1,
+				'time' => _NOWTIME,
+				'permissions' => 0,
+				'publish' => 0,
+				'expire' => 0,
+				'action' => '',
+				'theme_block' => ''
+			)
+		);
+		
 		$left_blocks_data = addslashes(phpnuke_serialize($left_blocks_data));
 		$right_blocks_data = addslashes(phpnuke_serialize($right_blocks_data));
 		$topcenter_blocks_data = addslashes(phpnuke_serialize($topcenter_blocks_data));
+		$comments_blocks_data = addslashes(phpnuke_serialize($comments_blocks_data));
 		
 		$db->table(BLOCKS_BOXES_TABLE)
 			->where("box_id" , 'left')
@@ -3271,6 +2944,13 @@ function upgrade_final()
 				'box_blocks' => '3,6,10,8,12',
 				'box_blocks_data' => $right_blocks_data,
 			));
+			
+		$db->table(BLOCKS_BOXES_TABLE)
+			->where("box_id" , 'comments')
+			->update(array(
+				'box_blocks' => '9',
+				'box_blocks_data' => $comments_blocks_data,
+			));
 		if($install_options['db_info']['db_have_forum'] == 1)
 		{
 			$db->table(BLOCKS_BOXES_TABLE)
@@ -3280,6 +2960,7 @@ function upgrade_final()
 					'box_blocks_data' => $topcenter_blocks_data,
 				));
 		}	
+		
 		// add new uncategorized
 		$default_cat = array(
 			array(1,1,'Articles','uncategorized','a:2:{s:7:"english";s:13:"uncategorized";s:5:"farsi";s:19:"بدون موضوع";}')
@@ -3308,7 +2989,7 @@ function upgrade_final()
 			
 		// add new users data	
 		$users_data = array(	
-			array(1, 1, 1, 1, 'anonymous', 'مهمان', 'UNIX_TIMESTAMP(NOW())', 'index.html', 'UNIX_TIMESTAMP(NOW())')
+			array(1, 1, 1, 1, 'anonymous', 'مهمان', _NOWTIME, 'index.html', _NOWTIME)
 		);
 
 		$db->table(USERS_TABLE)
@@ -3358,10 +3039,10 @@ function upgrade_final()
 			"status" => 1,
 			"date" => '1496770474',
 		]);
-		
+	
 	$db->table(NAV_MENUS_DATA_TABLE)
 		->multiinsert(array('nid','status','nav_id','pid','weight','title','url','attributes','type','module','part_id'),$nav_menus_data);
-	
+		
 	if($install_options['mode'] == 'install')
 	{
 		// add new admin
@@ -3384,7 +3065,31 @@ function upgrade_final()
 			));
 	}
 	
-	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '8.4.2' WHERE config_name = 'Version_Num'");
+
+	// add configs data
+	$install_options['siteinfo']['nukeurl'] = (isset($install_options['siteinfo']['nukeurl'])) ? $install_options['siteinfo']['nukeurl']:$Req_URL;
+	$install_options['siteinfo']['sitename'] = (isset($install_options['siteinfo']['sitename'])) ? $install_options['siteinfo']['sitename']:"PhpNuke 8.4.2";
+	$install_options['db_info']['db_forumcms'] = (isset($install_options['db_info']['db_forumcms'])) ? $install_options['db_info']['db_forumcms']:"";
+	$install_options['db_info']['db_forumprefix'] = (isset($install_options['db_info']['db_forumprefix'])) ? $install_options['db_info']['db_forumprefix']:"";
+	$install_options['db_info']['db_forumname'] = (isset($install_options['db_info']['db_forumname'])) ? $install_options['db_info']['db_forumname']:"";
+	$install_options['db_info']['db_forumpath'] = (isset($install_options['db_info']['db_forumpath'])) ? $install_options['db_info']['db_forumpath']:"";
+	
+	$config_data = array(
+		"WHEN config_name = 'Version_Num' THEN '8.4.2'", 
+		"WHEN config_name = 'lock_siteurl' THEN '".((isset($install_options['db_info']['nukeurl'])) ? 1:0)."'", 
+		"WHEN config_name = 'nukeurl' THEN '".$install_options['siteinfo']['nukeurl']."'", 
+		"WHEN config_name = 'sitename' THEN '".$install_options['siteinfo']['sitename']."'", 
+		"WHEN config_name = 'forum_system' THEN '".$install_options['db_info']['db_forumcms']."'", 
+		"WHEN config_name = 'forum_prefix' THEN '".$install_options['db_info']['db_forumprefix']."'", 
+		"WHEN config_name = 'forum_db' THEN '".$install_options['db_info']['db_forumname']."'", 
+		"WHEN config_name = 'forum_path' THEN '".$install_options['db_info']['db_forumpath']."'", 
+		"WHEN config_name = 'forum_collation' THEN '".$install_options['db_info']['db_forumunicode']."'", 
+	);
+	
+	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = CASE
+		".implode("\n", $config_data)."
+	END
+	WHERE config_name IN ('Version_Num', 'lock_siteurl', 'nukeurl', 'sitename', 'forum_system', 'forum_prefix', 'forum_db', 'forum_path', 'forum_collation')");
 		
 	$rename_error = '';
 	$random_install_folder_name = "install".rand(1,1000);

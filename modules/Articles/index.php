@@ -285,9 +285,9 @@ function articles_home($category='', $tags='', $orderby = '')
 			$cats_link_deep = implode("/", category_link($module_name, $cat_title, $attrs));
 			
 			$contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename'].": $cats_link_deep</font><br><br>
-			<form action=\"index.php?modname=Search\" method=\"post\">
-			<input type=\"hidden\" name=\"cat\" value=\"$catid\">
-			"._SEARCHONTOPIC.": <input type=\"name\" name=\"query\" size=\"30\">&nbsp;&nbsp;
+			<form action=\"".LinkToGT("index.php?modname=Search")."\" method=\"post\">
+			<input type=\"hidden\" name=\"search_category\" value=\"$catid\">
+			"._SEARCHONTOPIC.": <input type=\"name\" name=\"search_query\" size=\"30\">&nbsp;&nbsp;
 			<input type=\"submit\" value=\""._SEARCH."\">
 			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 			</form>

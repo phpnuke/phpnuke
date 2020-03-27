@@ -228,8 +228,4 @@ class PingOptimizer
 	}
 }
 
-$PingOptimizer = new PingOptimizer();
-
-$PingOptimizer->phpnuke_FuturePing();
-
 ?>

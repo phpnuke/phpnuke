@@ -64,7 +64,7 @@ class users_system{
 	public function user_statistics()
 	{
 		
-		global $db, $nuke_configs, $block_global_contents, $HijriCalendar, $userinfo, $users_system, $currentpage ;
+		global $db, $nuke_configs, $block_global_contents, $HijriCalendar, $userinfo, $users_system, $currentpage, $cache;
 
 		$showpms = 1; //1 to Show Private Messages data - 0 is off
 		$showmost = 1; //1 to Show Mostonline data - 0 is off
@@ -272,7 +272,7 @@ class users_system{
 				(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_regdate > ? AND user_regdate < ?) as yesterday_register,
 				(SELECT user_id FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_user_id,
 				(SELECT username FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_username,
-				(SELECT g.group_colour FROM ".$this->users_table." as u LEFT JOIN ".$this->groups_table." AS g ON g.group_id = u.group_id WHERE u.user_type != '2' ORDER BY u.user_id DESC LIMIT 0,1) as last_user_colour,						
+				(SELECT g.group_colour FROM ".$this->users_table." as u LEFT JOIN ".$this->groups_table." AS g ON g.group_id = u.group_id ORDER BY u.user_id DESC LIMIT 0,1) as last_user_colour,						
 				(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_id > '1') as total_users,
 				(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as today_visits,
 				(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as yesterday_visits,
@@ -473,7 +473,7 @@ class users_system{
 			</p>
 			<form class=\"form-signin\" action=\"".LinkToGT("index.php?modname=Users&op=login")."\" method=\"post\" data-focus=\"username\">
 				<div class=\"form-group\">
-					<input type=\"text\" class=\"form-control\" id=\"username\" name=\"username\" placeholder=\""._USERNAME."\" required autofocus>
+					<input type=\"text\" class=\"form-control\" id=\"username\" name=\"username\" placeholder=\""._USERNAME."\" required>
 				</div>
 				<div class=\"form-group\">
 					<input type=\"password\" class=\"form-control\" id=\"password\" name=\"user_password\" required>

@@ -44,12 +44,14 @@ if (check_admin_permission($filename))
 
 	function media_browser($ckeditor='')
 	{
-		global $db, $pagetitle, $admin_file, $aid, $nuke_configs, $default_folder;
+		global $db, $pagetitle, $admin_file, $aid, $nuke_configs, $default_folder, $CKEditorFuncNum;
 
 		$pagetitle = _MULTIMEDIA;
 		$contents = '';
 		if($ckeditor != "")
 			define('IS_POPUP', true);
+		
+		$CKEditorFuncNum = isset($CKEditorFuncNum) ? $CKEditorFuncNum:0;
 		
 		if($ckeditor == ""){
 			$contents .= GraphicAdmin();
@@ -97,7 +99,7 @@ if (check_admin_permission($filename))
 						</table>
 					</div>
 				</td>
-				<td style=\"vertical-align:top;\"><a href=\"".$admin_file.".php?op=media_upload&upload_dir=$default_folder&ckeditor=$ckeditor".(($ckeditor != '') ? "&CKEditorFuncNum=0":"")."&csrf_token="._PN_CSRF_TOKEN."\" id=\"uploadto\">"._UPLOAD_IN."<br /><span id=\"upload_path\" dir=ltr>$default_folder</span></a><div id=\"media_menu\"></div></td>
+				<td style=\"vertical-align:top;\"><a href=\"".$admin_file.".php?op=media_upload&upload_dir=$default_folder&ckeditor=$ckeditor".(($ckeditor != '') ? "&CKEditorFuncNum=$CKEditorFuncNum":"")."&csrf_token="._PN_CSRF_TOKEN."\" id=\"uploadto\">"._UPLOAD_IN."<br /><span id=\"upload_path\" dir=ltr>$default_folder</span></a><div id=\"media_menu\"></div></td>
 			</tr>
 		</table>
 		<script>

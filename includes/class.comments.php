@@ -333,7 +333,7 @@ class phpnuke_comments
 			}
 			
 			elseif($is_user)
-				$content .="<input type=\"hidden\" name=\"comment_form_fields[url]\" value=\"".$userinfo['user_website']."\">";
+				$content .="<input type=\"hidden\" name=\"comment_form_fields[url]\" value=\"".((isset($userinfo['user_website']) && $userinfo['user_website'] != '') ? $userinfo['user_website']:"")."\">";
 			$content .="
 			<div class=\"form-group\">
 				<label for=\"comment_form_fields_message\" class=\"col-sm-2 control-label\">"._UCOMMENT."</label>
