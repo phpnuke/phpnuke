@@ -223,7 +223,7 @@ class csrfProtector
 					if($token_time < (_NOWTIME-$csrf_token_time))
 						self::failedValidationAction();
 					
-					//self::refreshToken();					
+					//self::refreshToken();
 					return true;
 				}
 			}

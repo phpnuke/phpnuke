@@ -116,11 +116,13 @@ function themeheader($meta_tags, $custom_theme_setup = array(), $replace = false
 						</div>
 						<div class=\"collapse navbar-collapse\" id=\"main-menu\">";
 								$contents .= pn_nav_menu(array(
+									'nav_php_class'	=> 'caspian_nav_menus',
 									'theme_location'	=> 'primary',
 									'container_class'	=> '',
 									'menu_id'			=> 'main-menu',
 									'menu_class'		=> 'nav navbar-nav',
-									'link_before'		=> '<a href="%1$s" target="%2$s">',
+									'list_class'		=> 'dropdown-menu',
+									'link_before'		=> '<a tabindex="-1" href="%1$s" target="%2$s" class="%3$s" data-toggle="%4$s">',
 									'link_after'		=> '</a>',
 								));
 							$contents .= "
@@ -383,7 +385,7 @@ function blocks_box_theme($title, $content, $themeblock)
 
 function article_index($article_info)
 {
-	global $nuke_configs;
+	global $nuke_configs, $admin_file;
 	
 	$article_info['comments'] = ($article_info['comments']==0) ? "0":$article_info['comments'];
 	
@@ -417,6 +419,7 @@ function article_index($article_info)
 				<li class=\"hidden-xs\"><i class=\"fa fa-calendar\"></i> ".$article_info['datetime']."</li>
 				<li><i class=\"fa fa-eye\"></i> ".$article_info['counter']."</li>
 				<li><i class=\"fa fa-comment\"></i> <a href=\"".$article_info['article_link']."#comments\">".$article_info['comments']."</a></li>
+				".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\"><i class=\"fa fa-remove\"></i></a></li>":"")."
 			</ul>
 			<span class=\"more\"><a href=\"".$article_info['article_link']."\">"._ARTICLE_MORE."</a></span>
 		</div>
@@ -426,7 +429,7 @@ function article_index($article_info)
 
 function article_more($article_info)
 {
-	global $nuke_configs;
+	global $nuke_configs, $admin_file;
 	
 	$tags = str_replace(" ","-",$article_info['tags']);
 	$tags = explode(",",$tags);
@@ -448,7 +451,7 @@ function article_more($article_info)
 	}
 	
 	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".$article_info['post_image']."&h=155&w=230&q=90")."\" width=\"230\" height=\"155\" />":"";
-
+	
 	$post_files = '';
 	if(!empty($article_info['download']))
 	{
@@ -485,7 +488,7 @@ function article_more($article_info)
 				<p class=\"GSJustify\">
 				".$article_info['hometext']."<br />
 				".$article_info['bodytext']."<br />
-				$post_files<br />
+				".$post_files."<br />
 				<div class=\"article-tags\">$htmltags</div></p>
 			</div>
 			<div class=\"meta\">
@@ -494,6 +497,7 @@ function article_more($article_info)
 					<li class=\"hidden-xs\"><i class=\"fa fa-calendar\"></i> ".$article_info['datetime']."</li>
 					<li><i class=\"fa fa-eye\"></i> ".$article_info['counter']."</li>
 					<li><i class=\"fa fa-comment\"></i> <a href=\"".$article_info['article_link']."#comments\">".$article_info['comments']."</a></li>
+					".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\"><i class=\"fa fa-remove\"></i></a></li>":"")."
 				</ul>
 			</div>
 		</article>";

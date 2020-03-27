@@ -319,4 +319,62 @@ function get_caspian_posts_media()
 	return array($all_medias, $poster, $first_audio, $first_video, $first_atitle, $first_vtitle);
 }
 
+class caspian_nav_menus extends Walker
+{
+
+	public function start_lvl(&$output, $depth = 0, $args = array())
+	{
+		$indent = str_repeat("\t", $depth);
+		$output .= "\n$indent\t<".$args->list_type." class=\"".((isset($args->list_class) && $args->list_class != '') ? $args->list_class:"")."\">\n";
+	}
+		
+	public function end_lvl(&$output, $depth = 0, $args = array())
+	{
+		$indent = str_repeat("\t", $depth);
+		$output .= "$indent\t</".$args->list_type.">\n";
+	}
+	
+	public function start_el(&$output, $element, $depth = 0, $args = array(), $id = 0)
+	{
+		$indent = ($depth) ? str_repeat("\t", $depth) : '';
+		
+		$classes	= empty($element->attributes->classes)	?'' : ' '.$element->attributes->classes;	
+		$styles		= empty($element->attributes->styles)	?'' : $element->attributes->styles;	
+		$xfn		= empty($element->attributes->xfn)		?'' : $element->attributes->xfn;	
+		$target		= empty($element->attributes->target)	?'' : $element->attributes->target;
+
+		$class_names = ' class="menu-item menu-item-'.$element->nid.''.filter($classes, "nohtml").''.(($this->has_children == 1 
+	&& $depth != 0) ? ' dropdown-submenu':'').''.(($depth == 0) ? ' main-item':'').'"';
+		$styles_codes = ($styles != '') ? ' style="'.$styles.'"':'';
+		$xfn_rels_codes = ($xfn != '') ? ' rel="'.$xfn.'"':'';
+		$idrel = ' id="menu-item-'.$element->nid.'"';		
+
+		$id				= $element->nid;
+		$title			= $element->title;
+		$type			= $element->type;
+		$part_id		= $element->part_id;
+		$module			= $element->module;
+		$url			= $element->url;
+		
+		if($type == 'categories' && $url == '' && $module != '')
+		{
+			$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($part_id, $args->nuke_categories[$module], "parent_id", "catname_url"))), "nohtml"), array("/"));
+			$cat_link = category_link($module, $cat_title, $attrs=array(), 3);
+			$url = end($cat_link);
+		}
+		
+		$output .= $indent . '<li'.$class_names.$styles_codes.$idrel.'>';
+		
+		$link_before = sprintf($args->link_before, $url, $target, (($this->has_children == 1) ? "dropdown-toggle":""), (($this->has_children == 1) ? "dropdown":""));
+		
+		$item_output = $args->before . $link_before . $title . $args->link_after . $args->after;
+		
+		$output .= $item_output;
+	}
+	
+	public function end_el(&$output, $element, $depth = 0, $args = array())
+	{
+		$output .= "</li>\n";
+	}
+}
 ?>
