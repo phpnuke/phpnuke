@@ -283,38 +283,32 @@ function get_caspian_posts_media()
 		$first_audio_sel = false;
 		$first_video_sel = false;
 		
-		foreach($post_media as $type => $files_data)
+		foreach($post_media as $file_data)
 		{
-			if(is_array($files_data) && !empty($files_data))
-			{
-				foreach($files_data as $file_data)
-				{
-					if(empty($file_data))
-						continue;
-						
-					$filename = $file_data[0];
-					$filelink = $file_data[1];
-					$filesize = $file_data[2];
-					$filedesc = $file_data[3];
-					$filetype = (isset($file_data[3]) && $file_data[3] != '') ? $file_data[3]:$type;
-					$media_name_arr = explode(".", $filelink);
-					$ext = end($media_name_arr);
-					$all_medias[$filelink] = array($filename, $filelink, $ext);
+			if(empty($file_data))
+				continue;
 				
-					if($type == 'audios' && !$first_audio_sel)
-					{
-						$first_audio = $filelink;
-						$first_atitle = $filename;
-						$first_audio_sel = true;
-					}
-					
-					if($type == 'videos' && !$first_video_sel)
-					{
-						$first_video = $filelink;
-						$first_vtitle = $filename;
-						$first_video_sel = true;
-					}
-				}
+			$filename = $file_data[0];
+			$filelink = $file_data[1];
+			$filesize = $file_data[2];
+			$filedesc = $file_data[3];
+			$filetype = (isset($file_data[3]) && $file_data[3] != '') ? $file_data[3]:'files';
+			$media_name_arr = explode(".", $filelink);
+			$ext = end($media_name_arr);
+			$all_medias[$filelink] = array($filename, $filelink, $ext);
+		
+			if($filetype == 'audios' && !$first_audio_sel)
+			{
+				$first_audio = $filelink;
+				$first_atitle = $filename;
+				$first_audio_sel = true;
+			}
+			
+			if($filetype == 'videos' && !$first_video_sel)
+			{
+				$first_video = $filelink;
+				$first_vtitle = $filename;
+				$first_video_sel = true;
 			}
 		}
 	}

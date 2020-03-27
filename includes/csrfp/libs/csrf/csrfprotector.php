@@ -223,9 +223,7 @@ class csrfProtector
 					if($token_time < (_NOWTIME-$csrf_token_time))
 						self::failedValidationAction();
 					
-					//self::refreshToken();
-					unset($csrfp_session[$token]);
-					$pn_Sessions->set(self::$config['CSRFP_TOKEN'], phpnuke_serialize($csrfp_session));
+					//self::refreshToken();					
 					return true;
 				}
 			}

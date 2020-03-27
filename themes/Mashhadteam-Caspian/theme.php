@@ -396,6 +396,9 @@ function article_index($article_info)
 			$cats_name[] = "<a href=\"".$cat_data['catlink']."\">".$cat_data['catname']."</a>";
 		}
 	}
+	
+	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".$article_info['post_image']."&h=155&w=230&q=90")."\" width=\"230\" height=\"155\" />":"";
+	
 	$content = "
 	<article>
 		<h2><i class=\"fa fa-th\"></i><a href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">".$article_info['title']."</a></h2>";
@@ -405,6 +408,7 @@ function article_index($article_info)
 		</div>";
 		}
 		$content .="<div class=\"GSContent\">
+			$post_imge
 			<p class=\"GSJustify\">".$article_info['hometext']."</p>
 		</div>
 		<div class=\"meta\">
@@ -443,6 +447,22 @@ function article_more($article_info)
 		}
 	}
 	
+	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".$article_info['post_image']."&h=155&w=230&q=90")."\" width=\"230\" height=\"155\" />":"";
+
+	$post_files = '';
+	if(!empty($article_info['download']))
+	{
+		$post_files .=""._ARTICLE_FILES."<br /><ul class=\"post-files\">";
+		foreach($article_info['download'] as $file)
+		{
+		/*	if($file[4] != 'files')
+				continue;*/
+				
+			$post_files .="<li class=\"post-file-item\"><i class=\"fa fa-file\"></i> <a href=\"".LinkToGT($file[1])."\" target=\"_blank\">".$file[0]."</a> <span class=\"post-file-size\">".formatBytes($file[2], 2 ,true)."</span> <span class=\"post-file-desc\">".(($file[3] != '') ? "(".$file[3].")":"")."</span></li>";
+		}
+		$post_files .="</ul>";
+	}
+	
 	if(($article_info['post_type'] != '' || $article_info['post_type'] != 'article') && file_exists("themes/".$nuke_configs['ThemeSel']."/".$article_info['post_type']."_more.php"))
 		include("themes/".$nuke_configs['ThemeSel']."/".$article_info['post_type']."_more.php");
 	elseif($article_info['post_type'] != 'article' && function_exists("".$article_info['post_type']."_more"))
@@ -461,7 +481,12 @@ function article_more($article_info)
 			</div>";
 			}
 			$content .="<div class=\"GSContent\">
-				<p class=\"GSJustify\">".$article_info['hometext']."<br />".$article_info['bodytext']."<br /><div class=\"article-tags\">$htmltags</div></p>
+				$post_imge
+				<p class=\"GSJustify\">
+				".$article_info['hometext']."<br />
+				".$article_info['bodytext']."<br />
+				$post_files<br />
+				<div class=\"article-tags\">$htmltags</div></p>
 			</div>
 			<div class=\"meta\">
 				<ul>

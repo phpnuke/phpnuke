@@ -527,8 +527,7 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 		// get posts scores
 	}
 	unset($result);
-	
-	$article_info['total_rows'] = 0;
+		
 	foreach ($rows as $key => $row)
 	{
 		$article_info[$key] = $row;
@@ -667,32 +666,26 @@ function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name
 		
 		if(isset($files) && !empty($files))
 		{
-			foreach($files as $type => $files_data)
+			foreach($files as $file_data)
 			{
-				if(is_array($files_data) && !empty($files_data))
-				{
-					foreach($files_data as $file_data)
-					{
-						if(empty($file_data))
-							continue;
-							
-						$filename = $file_data[0];
-						$filelink = $file_data[1];
-						$filesize = $file_data[2];
-						$filedesc = $file_data[3];
-						$filetype = (isset($file_data[3]) && $file_data[3] != '') ? $file_data[3]:$type;
-						$sel1 = ($filetype == "files") ? "selected":"";
-						$sel2 = ($filetype == "images") ? "selected":"";
-						$sel3 = ($filetype == "audios") ? "selected":"";
-						$sel4 = ($filetype == "videos") ? "selected":"";
-						$contents .= "
-						<div style=\"margin-bottom:3px;\">
-							<input placeholder=\""._FILENAME."\" type=\"text\" class=\"inp-form\" value=\"$filename\" name=\"".$form_field_name."[$type][$i][]\" />&nbsp;<input placeholder=\""._FILELINK."\" type=\"text\" class=\"inp-form-ltr\" value=\"$filelink\" name=\"".$form_field_name."[$type][$i][]\" size=\"40\" />&nbsp;&nbsp;<input placeholder=\""._FILESIZE."\" type=\"text\" class=\"inp-form\" value=\"$filesize\" name=\"".$form_field_name."[$type][$i][]\" size=\"8\" />&nbsp;&nbsp;<input placeholder=\""._FILEDESC."\" type=\"text\" class=\"inp-form\" value=\"$filedesc\" name=\"".$form_field_name."[$type][$i][]\" />&nbsp;&nbsp;"._FILETYPE." <select class=\"styledselect-select field_type_select\" name=\"".$form_field_name."[$type][$i][]\" style=\"width:120px;\"><option value=\"files\" $sel1>"._FILES."</option><option value=\"images\" $sel2>"._IMAGES."</option><option value=\"audios\" $sel3>"._AUDIOS."</option><option value=\"videos\" $sel4>"._VIDEOS."</option></select>&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
-						</div>";
-						$i++;
-					}	
-				}
-			}
+				if(empty($file_data))
+					continue;
+					
+				$filename = $file_data[0];
+				$filelink = $file_data[1];
+				$filesize = $file_data[2];
+				$filedesc = $file_data[3];
+				$filetype = (isset($file_data[3]) && $file_data[3] != '') ? $file_data[3]:'files';
+				$sel1 = ($filetype == "files") ? "selected":"";
+				$sel2 = ($filetype == "images") ? "selected":"";
+				$sel3 = ($filetype == "audios") ? "selected":"";
+				$sel4 = ($filetype == "videos") ? "selected":"";
+				$contents .= "
+				<div style=\"margin-bottom:3px;\">
+					<input placeholder=\""._FILENAME."\" type=\"text\" class=\"inp-form\" value=\"$filename\" name=\"".$form_field_name."[$i][]\" />&nbsp;<input placeholder=\""._FILELINK."\" type=\"text\" class=\"inp-form-ltr\" value=\"$filelink\" name=\"".$form_field_name."[$i][]\" size=\"40\" />&nbsp;&nbsp;<input placeholder=\""._FILESIZE."\" type=\"text\" class=\"inp-form\" value=\"$filesize\" name=\"".$form_field_name."[$i][]\" size=\"8\" />&nbsp;&nbsp;<input placeholder=\""._FILEDESC."\" type=\"text\" class=\"inp-form\" value=\"$filedesc\" name=\"".$form_field_name."[$i][]\" />&nbsp;&nbsp;"._FILETYPE." <select class=\"styledselect-select field_type_select\" name=\"".$form_field_name."[$i][]\" style=\"width:120px;\"><option value=\"files\" $sel1>"._FILES."</option><option value=\"images\" $sel2>"._IMAGES."</option><option value=\"audios\" $sel3>"._AUDIOS."</option><option value=\"videos\" $sel4>"._VIDEOS."</option></select>&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+				</div>";
+				$i++;
+			}	
 		}
 		$contents .= "
 		</div>
@@ -717,7 +710,7 @@ function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name
 				});
 			});
 			
-			var fields_name = '".$form_field_name."[{FIELD_TYPE}][{X}][]';
+			var fields_name = '".$form_field_name."[{X}][]';
 			
 			$(document).on('change','.field_type_select' ,function(e)
 			{

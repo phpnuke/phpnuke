@@ -72,6 +72,10 @@ article h3 i{font-size: 20px !important;position: absolute;padding: 8px;margin-t
 article .GScat{padding: 2px 5px;font-size: 10px;border-bottom: 1px solid #e0e0e0;margin: 0px;margin-top: -5px;color: #fff;}
 article .GScat a{color:#fff!important;}
 article .GScat a:hover{color:#eee!important;}
+article .post-files {clear:both;list-style:none;padding:0 !important;margin:5px !important;}
+article .post-files li{clear:both;}
+article .post-files li a{color:#620a85 !important;}
+article .post-files li a:hover{color:#256629 !important;}
 article .meta {background: #eee;border-top: 1px solid #e0e0e0;height: 30px;}
 article .meta ul{float: right;list-style: none;list-style-position: inside;padding: 0px !important;}
 article .meta ul li {float: right;font-size: 10px;font-weight: bold;padding:6px;}

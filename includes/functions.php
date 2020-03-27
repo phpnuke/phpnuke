@@ -5153,19 +5153,31 @@ function data_verification_parse($data)
 
 function get_form_token()
 {
-	global $pn_Sessions, $visitor_ip, $users_system;
+	global $pn_Sessions, $visitor_ip, $users_system, $nuke_configs;
 	
 	$token = (isset($users_system->session_id) && !defined("ADMIN_FILE")) ? $users_system->session_id:(csrfProtector::generateAuthToken());
 
 	$csrf_token = $pn_Sessions->get('csrf_token', false);
 
-	$csrf_token = phpnuke_unserialize($csrf_token);
+	$csrf_token = ($csrf_token != '') ? phpnuke_unserialize($csrf_token):array();
 
+	if(!empty($csrf_token))
+	{
+		foreach($csrf_token as $token_id => $token_data)
+		{
+			$token_time = $token_data['time'];
+		
+			$csrf_token_time = (isset($nuke_configs['csrf_token_time']) && $nuke_configs['csrf_token_time'] != '') ? $nuke_configs['csrf_token_time']:(30*60);
+			if($token_time < (_NOWTIME-$csrf_token_time))
+				unset($csrf_token[$token_id]);
+		}
+	}
+	
 	$csrf_token[$token] = array(
 		'time' => _NOWTIME,
 		'token'	=> $token,
 	);
-
+	
 	$pn_Sessions->set('csrf_token', phpnuke_serialize($csrf_token));
 	
 	return $token;
@@ -5517,7 +5529,6 @@ function update_points($id,$uid=false)
         $username = trim($userinfo['username']);
 		$users_table_exists = users_table_exists();
 	}
-	
 	if($points > 0 && $users_table_exists)
 	{
 		$col_result = $db->query("SHOW COLUMNS FROM ".$users_system->users_table." LIKE '".$users_system->user_fields['user_points']."'");
