@@ -209,8 +209,8 @@ if (check_admin_permission($module_name, false, true))
 						$operations[] = "<a href=\"".$admin_file.".php?op=mod_authors&user_id=$user_id\" title=\""._PROMOTEUSER."\" class=\"table-icon icon-3 info-tooltip\"></a>";
 					if($user_status != 0)
 						$operations[] = "<a href=\"#\" data-mode=\"suspend\" data-user-id=\"$user_id\" data-title=\""._SUSPENDUSER." $username\" title=\""._SUSPENDUSER."\" class=\"table-icon icon-13 info-tooltip operation\"></a>";
-					if($user_status == 2)
-						$operations[] = "<a href=\"#\" data-mode=\"approve\" data-user-id=\"$user_id\" data-title=\""._APPROVEUSER." $username\" title=\""._APPROVEUSER."\" class=\"table-icon icon-5 info-tooltip operation\"></a>";
+					if($user_status == 2 || $user_status == 3)
+						$operations[] = "<a href=\"".$admin_file.".php?op=users_admin&user_id=$user_id&mode=approve&csrf_token="._PN_CSRF_TOKEN."\" title=\""._APPROVEUSER."\" class=\"table-icon icon-5 info-tooltip\"></a>";
 					if($user_status == 3)
 						$operations[] = "<a href=\"#\" data-mode=\"resend_email\" data-user-id=\"$user_id\" data-title=\""._RESEND_EMAIL." $username\" title=\""._RESEND_EMAIL."\" class=\"table-icon icon-10 info-tooltip operation\"></a>";
 					$is_admin = is_an_admin($username) ? "("._IS_USER_ADMIN.")":"";
@@ -285,7 +285,7 @@ if (check_admin_permission($module_name, false, true))
 		include("footer.php");
 	}
 	
-	function users_admin($user_id=0, $mode="new", $submit, $users_fields=array())
+	function users_admin($user_id=0, $mode="new", $submit, $users_fields=array(), $uploadfile = array())
 	{
 		global $db, $aid, $ya_config, $pagetitle, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
@@ -556,7 +556,7 @@ if (check_admin_permission($module_name, false, true))
 				$users_fields = $validated_data;
 			else
 				$modify_errors[] = "<p align=\"center\">".$PnValidator->get_readable_errors(true,'gump-field','gump-error-message','<br />')."</p>";
-
+			
 			if(empty($modify_errors))
 			{
 				extract($users_fields);
@@ -576,13 +576,13 @@ if (check_admin_permission($module_name, false, true))
 				if($email_chenged && in_array($user_email, $bad_mail))
 					$modify_errors[] = _USER_BAD_EMAIL;
 				
-				if($email_chenged && _check_register_fields('user_email', $user_email, true, true))
+				if($email_chenged && _check_register_fields('user_email', $user_email, true, $mode))
 					$modify_errors[] = _USER_EMAIL_HAS_SELECTED;
 				
 				// username check
 				if($username_chenged && in_array($username, $bad_username))
 					$modify_errors[] = _USER_BAD_NAME;
-				if($username_chenged && _check_register_fields('username', $username, true, true))
+				if($username_chenged && _check_register_fields('username', $username, true, $mode))
 					$modify_errors[] = _USER_HAS_REGISTERED;
 				
 				if(strrpos($username,' ') > 0)
@@ -633,7 +633,7 @@ if (check_admin_permission($module_name, false, true))
 						switch($user_avatar_type)
 						{
 							case"upload":
-								if(!empty($_FILES['uploadfile']['name']) || ($avatar['uploadurl'] != '' && $userinfo['user_avatar'] != $avatar['uploadurl']))
+								if(($uploadfile['error'] == 0 && $uploadfile['name'] != '') || $avatar['uploadurl'] != '')
 									$avatar_must_changeed = true;									
 							break;
 							
@@ -758,20 +758,20 @@ if (check_admin_permission($module_name, false, true))
 				<tr>
 					<th>"._USERNAME."</th>
 					<td>
-						<input type=\"text\" size=\"40\" class=\"inp-form-ltr\" value=\"".$userinfo['username']."\" name=\"users_fields[username]\" ".data_verification_parse($ya_config['data_verification']['username'])."  />
+						<input type=\"text\" size=\"40\" class=\"inp-form-ltr\" value=\"".$userinfo['username']."\" name=\"users_fields[username]\" ".str_replace(array('{MODE}','{DEFAULT}'), array($mode, $userinfo['username']), data_verification_parse($ya_config['data_verification']['username']))."  />
 						".bubble_show(_YA_CHNGRISK)."
 					</td>
 				</tr>
 				<tr>
 					<th>"._USER_FAMILYNAME."</th>
 					<td>
-						<input type=\"text\" size=\"40\" class=\"inp-form\" name=\"users_fields[user_realname]\" value=\"".$userinfo['user_realname']."\" ".data_verification_parse($ya_config['data_verification']['user_realname'])." />
+						<input type=\"text\" size=\"40\" class=\"inp-form\" name=\"users_fields[user_realname]\" value=\"".$userinfo['user_realname']."\" ".str_replace(array('{MODE}','{DEFAULT}'), array($mode, $userinfo['user_realname']), data_verification_parse($ya_config['data_verification']['user_realname']))." />
 					</td>
 				</tr>
 				<tr>
 					<th>"._EMAIL."</th>
 					<td>
-						".(($ya_config['allowmailchange'] == 1) ? "<input type=\"text\" size=\"40\" class=\"inp-form-ltr\" name=\"users_fields[user_email]\" value=\"".$userinfo['user_email']."\" ".data_verification_parse($ya_config['data_verification']['user_email'])." />":"".$userinfo['user_email']."")."						
+						".(($ya_config['allowmailchange'] == 1) ? "<input type=\"text\" size=\"40\" class=\"inp-form-ltr\" name=\"users_fields[user_email]\" value=\"".$userinfo['user_email']."\" ".str_replace(array('{MODE}','{DEFAULT}'), array($mode, $userinfo['user_email']), data_verification_parse($ya_config['data_verification']['user_email']))." />":"".$userinfo['user_email']."")."						
 					</td>
 				</tr>";
 
@@ -1558,6 +1558,7 @@ if (check_admin_permission($module_name, false, true))
 		$rows = phpnuke_array_change_key($rows, "", "fid");
 		
 		// submit edited data
+		
 		if(isset($submit) && isset($users_fields) && !empty($users_fields))
 		{
 			$deleted_fields = $added_fields = array();
@@ -1632,8 +1633,11 @@ if (check_admin_permission($module_name, false, true))
 						<div class=\"input_fields_wrap\">";
 						if(intval($result->count()) > 0)
 						{
+							$key = 0;
 							foreach($rows as $row)
 							{
+								if($row['name'] == '' || $row['display'] == '')
+									continue;
 								$key = $row['fid'];
 								$text_sel = ($row['type'] == 'text') ? " selected":"";
 								$select_sel = ($row['type'] == 'select') ? " selected":"";
@@ -1727,6 +1731,7 @@ if (check_admin_permission($module_name, false, true))
 	$mode = (isset($mode)) ? filter($mode, "nohtml"):'new';
 	$users_fields = (isset($users_fields)) ? $users_fields:array();
 	$group_fields = (isset($group_fields)) ? $group_fields:array();
+	$uploadfile	= (isset($uploadfile)) ? $uploadfile:array();
 	$user_id = (isset($user_id)) ? intval($user_id):0;
 	$group_id = (isset($group_id)) ? intval($group_id):0;
 	
@@ -1738,7 +1743,7 @@ if (check_admin_permission($module_name, false, true))
 		break;
 		
 		case"users_admin":
-			users_admin($user_id, $mode, $submit, $users_fields);
+			users_admin($user_id, $mode, $submit, $users_fields, $uploadfile);
 		break;
 		
 		case"users_groups":

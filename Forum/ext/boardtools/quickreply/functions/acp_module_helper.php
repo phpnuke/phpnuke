@@ -2,7 +2,7 @@
 /**
  *
  * @package       QuickReply Reloaded
- * @copyright (c) 2014 - 2017 Tatiana5 and LavIgor
+ * @copyright (c) 2014 - 2019 Tatiana5 and LavIgor
  * @license       http://opensource.org/licenses/gpl-license.php GNU Public License
  *
  */
@@ -47,12 +47,21 @@ abstract class acp_module_helper
 	/** @var array */
 	public $new_config = array();
 
+	/** @var string */
+	public $ext_name = '';
+
+	/** @var string */
+	public $ext_langname = '';
+
 	public function main($id, $mode)
 	{
 		global $config, $template, $user, $request;
 
 		$this->config = $config;
-		$this->new_config = $config;
+		foreach ($config as $key => $value)
+		{
+			$this->new_config[$key] = $value;
+		}
 		$this->template = $template;
 		$this->user = $user;
 		$this->request = $request;
@@ -157,7 +166,11 @@ abstract class acp_module_helper
 	 */
 	protected function add_langs(&$display_vars_lang)
 	{
-		$this->user->add_lang_ext('boardtools/quickreply', 'quickreply');
+		if ($this->ext_name && $this->ext_langname)
+		{
+			$this->user->add_lang_ext($this->ext_name, $this->ext_langname);
+		}
+
 		if (isset($display_vars_lang))
 		{
 			$this->user->add_lang($display_vars_lang);

@@ -940,6 +940,8 @@ $pn_cache_type = "MySQL";
 $admin_file = "'.$install_options['admininfo']['admin_filename'].'";
 $pn_salt = \''.$pn_salt.'\';
 $old_site_link = "'.$install_options['admininfo']['old_site_link'].'";
+define("_MAX_CACHE_COUNTER_TIME", 3600);
+define("_MAX_CACHE_COUNTER_LINES", 1000);
 
 /*********************************************************************/
 /* You finished to configure the Database. Now you can change all    */
@@ -3069,6 +3071,7 @@ function upgrade_final()
 	// add configs data
 	$install_options['siteinfo']['nukeurl'] = (isset($install_options['siteinfo']['nukeurl'])) ? $install_options['siteinfo']['nukeurl']:$Req_URL;
 	$install_options['siteinfo']['sitename'] = (isset($install_options['siteinfo']['sitename'])) ? $install_options['siteinfo']['sitename']:"PhpNuke 8.4.2";
+	$install_options['db_info']['db_have_forum'] = (isset($install_options['db_info']['db_have_forum'])) ? $install_options['db_info']['db_have_forum']:0;
 	$install_options['db_info']['db_forumcms'] = (isset($install_options['db_info']['db_forumcms'])) ? $install_options['db_info']['db_forumcms']:"";
 	$install_options['db_info']['db_forumprefix'] = (isset($install_options['db_info']['db_forumprefix'])) ? $install_options['db_info']['db_forumprefix']:"";
 	$install_options['db_info']['db_forumname'] = (isset($install_options['db_info']['db_forumname'])) ? $install_options['db_info']['db_forumname']:"";
@@ -3079,8 +3082,9 @@ function upgrade_final()
 		"WHEN config_name = 'lock_siteurl' THEN '".((isset($install_options['db_info']['nukeurl'])) ? 1:0)."'", 
 		"WHEN config_name = 'nukeurl' THEN '".$install_options['siteinfo']['nukeurl']."'", 
 		"WHEN config_name = 'sitename' THEN '".$install_options['siteinfo']['sitename']."'", 
+		"WHEN config_name = 'have_forum' THEN '".$install_options['db_info']['db_have_forum']."'", 
 		"WHEN config_name = 'forum_system' THEN '".$install_options['db_info']['db_forumcms']."'", 
-		"WHEN config_name = 'forum_prefix' THEN '".$install_options['db_info']['db_forumprefix']."'", 
+		"WHEN config_name = 'forum_prefix' THEN '".$install_options['db_info']['db_forumprefix']."_'", 
 		"WHEN config_name = 'forum_db' THEN '".$install_options['db_info']['db_forumname']."'", 
 		"WHEN config_name = 'forum_path' THEN '".$install_options['db_info']['db_forumpath']."'", 
 		"WHEN config_name = 'forum_collation' THEN '".$install_options['db_info']['db_forumunicode']."'", 
@@ -3089,7 +3093,7 @@ function upgrade_final()
 	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = CASE
 		".implode("\n", $config_data)."
 	END
-	WHERE config_name IN ('Version_Num', 'lock_siteurl', 'nukeurl', 'sitename', 'forum_system', 'forum_prefix', 'forum_db', 'forum_path', 'forum_collation')");
+	WHERE config_name IN ('Version_Num', 'lock_siteurl', 'nukeurl', 'sitename', 'have_forum', 'forum_system', 'forum_prefix', 'forum_db', 'forum_path', 'forum_collation')");
 		
 	$rename_error = '';
 	$random_install_folder_name = "install".rand(1,1000);

@@ -1016,14 +1016,14 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 					<div class=\"col-xs-12 col-sm-6 col-md-6\">
 						<div class=\"form-group\">
 							<div class=\"input-group\">	<span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-user registration_form_icons\"></i></span> 
-								<input type=\"text\" name=\"users_fields[username]\" id=\"register_username\" class=\"form-control input input-lg text-left required\" placeholder=\""._USERNAME."\" ".data_verification_parse($ya_config['data_verification']['username'])." />
+								<input type=\"text\" name=\"users_fields[username]\" id=\"register_username\" class=\"form-control input input-lg text-left required\" placeholder=\""._USERNAME."\" ".str_replace(array('{MODE}','{DEFAULT}'), array('new', ''), data_verification_parse($ya_config['data_verification']['username']))." />
 							</div>
 						</div>
 					</div>
 					<div class=\"col-xs-12 col-sm-6 col-md-6\">
 						<div class=\"form-group\">
 							<div class=\"input-group\">	<span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-user registration_form_icons\"></i></span> 
-								<input type=\"text\" name=\"users_fields[user_realname]\" id=\"register_user_realname\" class=\"form-control input input-lg text-"._TEXTALIGN1."\" placeholder=\""._REALNAME."\" ".data_verification_parse($ya_config['data_verification']['user_realname'])." />
+								<input type=\"text\" name=\"users_fields[user_realname]\" id=\"register_user_realname\" class=\"form-control input input-lg text-"._TEXTALIGN1."\" placeholder=\""._REALNAME."\" ".str_replace(array('{MODE}','{DEFAULT}'), array('new', ''), data_verification_parse($ya_config['data_verification']['user_realname']))." />
 							</div>
 						</div>
 					</div>
@@ -1032,7 +1032,7 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 					<div class=\"col-xs-12 col-sm-$col_num col-md-$col_num\">
 						<div class=\"form-group\">
 							<div class=\"input-group\">	<span class=\"input-group-addon\"><i class=\"glyphicon glyphicon-envelope registration_form_icons\"></i></span> 
-								<input type=\"email\" name=\"users_fields[user_email]\" id=\"register_user_email\" class=\"form-control input input-lg text-left\" placeholder=\""._EMAIL."\" ".data_verification_parse($ya_config['data_verification']['user_email'])." />
+								<input type=\"email\" name=\"users_fields[user_email]\" id=\"register_user_email\" class=\"form-control input input-lg text-left\" placeholder=\""._EMAIL."\" ".str_replace(array('{MODE}','{DEFAULT}'), array('new', ''), data_verification_parse($ya_config['data_verification']['user_email']))." />
 							</div>
 						</div>
 					</div>";
@@ -1544,7 +1544,6 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 					}
 					
 					// Get or set the filtering rules
-					//asd($user_configs);
 					$PnValidator->validation_rules($validation_rules); 
 					$PnValidator->filter_rules($filter_rules);
 					
@@ -1559,6 +1558,7 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 						
 					if(empty($modify_errors))
 					{
+						unset($user_configs['username']);
 						extract($user_configs);
 
 						$pn_Sessions->destroy("userinfo");
@@ -1621,17 +1621,17 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 								switch($user_avatar_type)
 								{
 									case"upload":
-										if($user_data['user_avatar'] != $avatar['uploadurl'])
+										if(($uploadfile['error'] == 0 && $uploadfile['name'] != '') || $avatar['uploadurl'] != '')
 											$avatar_must_changeed = true;
 									break;
 									
 									case"remote":
-										if($user_data['user_avatar'] != $avatar['remotelink'])
+										if($avatar['remotelink'] != '' && $user_data['user_avatar'] != $avatar['remotelink'])
 											$avatar_must_changeed = true;
 									break;
 									
 									case"gravatar":
-										if($user_data['user_avatar'] != $avatar['gravatar_email'])
+										if($avatar['gravatar_email'] != '' && $user_data['user_avatar'] != $avatar['gravatar_email'])
 											$avatar_must_changeed = true;
 									break;
 								}
@@ -1749,7 +1749,7 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 								<div class=\"form-group\">
 									<label class=\"control-label col-sm-3\" for=\"user_realname\">"._USER_FAMILYNAME." :</label>
 									<div class=\"col-sm-9\"> 
-										<input type=\"text\" name=\"user_configs[user_realname]\" class=\"form-control\" id=\"user_realname\" value=\"".$user_data['user_realname']."\" ".data_verification_parse($ya_config['data_verification']['user_realname']).">
+										<input type=\"text\" name=\"user_configs[user_realname]\" class=\"form-control\" id=\"user_realname\" value=\"".$user_data['user_realname']."\" ".str_replace(array('{MODE}','{DEFAULT}'), array('edit', $user_data['user_realname']), data_verification_parse($ya_config['data_verification']['user_realname'])).">
 									</div>
 								</div>";
 								if ($ya_config['allowmailchange'] == 1)
@@ -1757,7 +1757,7 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 								$contents .= "<div class=\"form-group\">
 									<label class=\"control-label col-sm-3\" for=\"user_email\">"._EMAIL." :</label>
 									<div class=\"col-sm-9\"> 
-										<input type=\"email\" name=\"user_configs[user_email]\" class=\"form-control\" id=\"user_email\" value=\"".$user_data['user_email']."\"  ".data_verification_parse($ya_config['data_verification']['user_email'])." />
+										<input type=\"email\" name=\"user_configs[user_email]\" class=\"form-control\" id=\"user_email\" value=\"".$user_data['user_email']."\"  ".str_replace(array('{MODE}','{DEFAULT}'), array('edit', $user_data['user_email']), data_verification_parse($ya_config['data_verification']['user_email']))." />
 									</div>
 								</div>";
 								}
@@ -2026,20 +2026,19 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 	}
 
 	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
-	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.css\" rel=\"stylesheet\" type=\"text/css\">";
 	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/fileinput.min.css\" rel=\"stylesheet\" type=\"text/css\">";
 	
-	$default_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
-	$default_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
-	$default_js[] = "
+	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
+	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
+	$defer_js[] = "
 		<script>
 			var allowmailchange = ".(($ya_config['allowmailchange'] == 1) ? 'true':'false').";
 			var remote_url = '".LinkToGT("index.php?modname=$module_name&op=check_register_fields")."';
 			var pass_min = ".$ya_config['pass_min'].", pass_max = ".$ya_config['pass_max'].";
 		</script>";
-	$default_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
+	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
 	
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\" /></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\"></script>";
 	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
 	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
 	
@@ -2075,9 +2074,9 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 	include ("footer.php");
 }
 
-function check_register_fields($field = 'username', $value = '', $retuen_num = false, $default_check = false)
+function check_register_fields($field = 'username', $value = '', $retuen_num = false, $mode = 'new', $default_value = '')
 {
-	return _check_register_fields($field, $value, $retuen_num, $default_check);
+	return _check_register_fields($field, $value, $retuen_num, $mode, $default_value);
 }
 
 function get_user_avatar($avatar)
@@ -2164,7 +2163,6 @@ $username						= (isset($username)) ? filter($username, "nohtml"):"";
 $mode							= (isset($mode)) ? filter($mode, "nohtml"):"";
 $resend							= (isset($resend)) ? (bool) $resend:false;
 $retuen_num						= (isset($retuen_num)) ? (bool) $retuen_num:false;
-$default_check					= (isset($default_check)) ? (bool) $default_check:false;
 $credit_code					= (isset($credit_code)) ? filter($credit_code, "nohtml"):"";
 $reset_password_username		= (isset($reset_password_username)) ? filter($reset_password_username, "nohtml"):"";
 $reset_password_user_email		= (isset($reset_password_user_email)) ? filter($reset_password_user_email, "nohtml"):"";
@@ -2181,6 +2179,7 @@ $users_fields					= (isset($users_fields)) ? $users_fields:array();
 $user_configs					= (isset($user_configs)) ? $user_configs:array();
 $uploadfile						= (isset($uploadfile)) ? $uploadfile:array();
 $value							= (isset($value)) ? filter($value, "nohtml"):"";
+$default_value					= (isset($default_value)) ? filter($default_value, "nohtml"):"";
 $op								= (isset($op)) ? filter($op, "nohtml"):"";
 
 switch($op)
@@ -2206,7 +2205,7 @@ switch($op)
 	break;
 	
 	case"check_register_fields":
-		check_register_fields($field, $value, $retuen_num, $default_check);
+		check_register_fields($field, $value, $retuen_num, $mode, $default_value);
 	break;
 	
 	case"get_user_avatar":

@@ -8,7 +8,7 @@
 *
 */
 
-namespace gfksx\ThanksForPosts\notification;
+namespace gfksx\thanksforposts\notification;
 
 /**
 * Thanks for posts notifications class
@@ -113,7 +113,7 @@ class thanks extends \phpbb\notification\type\base
 	public function get_avatar()
 	{
 		$thankers = $this->get_data('thankers');
-		return ($thankers !== null && sizeof($thankers) == 1) ? $this->user_loader->get_avatar($thankers[0]['user_id']) : '';
+		return (sizeof($thankers) == 1) ? $this->user_loader->get_avatar($thankers[0]['user_id']) : '';
 	}
 
 	/**
@@ -204,7 +204,7 @@ class thanks extends \phpbb\notification\type\base
 	*/
 	public function get_email_template()
 	{
-		return '@gfksx_ThanksForPosts/user_thanks';
+		return '@gfksx_thanksforposts/user_thanks';
 	}
 
 	/**

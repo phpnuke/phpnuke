@@ -2,7 +2,7 @@
 /**
  *
  * @package       QuickReply Reloaded
- * @copyright (c) 2014 - 2017 Tatiana5 and LavIgor
+ * @copyright (c) 2014 - 2019 Tatiana5 and LavIgor
  * @license       http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
@@ -156,7 +156,7 @@ class listener implements EventSubscriberInterface
 
 			$this->helper->form_helper->prepare_qr_form($forum_id, $topic_id);
 
-			$this->helper->assign_template_variables_for_qr($forum_id);
+			$this->helper->assign_template_variables_for_qr($forum_id, $topic_id);
 
 			$add_re = ($this->config['qr_enable_re']) ? 'Re: ' : '';
 			$this->template->assign_var('SUBJECT', $this->request->variable('subject', $add_re . censor_text($topic_data['topic_title']), true));

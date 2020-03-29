@@ -6,6 +6,7 @@ services:
             - '@dbal.conn'
             - '@auth'
             - '@request'
+            - '@config'
 
     paul999.mention.listener:
         class: paul999\mention\event\main_listener

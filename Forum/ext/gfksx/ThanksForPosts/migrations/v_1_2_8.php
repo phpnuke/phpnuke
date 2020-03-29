@@ -8,19 +8,18 @@
 *
 */
 
-namespace gfksx\ThanksForPosts\migrations;
+namespace gfksx\thanksforposts\migrations;
 
 class v_1_2_8 extends \phpbb\db\migration\migration
 {
 	public function effectively_installed()
 	{
-		return (isset($this->config['thanks_for_posts_version']) && version_compare($this->config['thanks_for_posts_version'], '1.2.8', '>='))
-				|| (isset($this->config['thanks_mod_version']) && version_compare($this->config['thanks_mod_version'], '1.2.8', '>='));
+		return isset($this->config['thanks_top_number']);
 	}
 
 	static public function depends_on()
 	{
-			return array('\gfksx\ThanksForPosts\migrations\v_1_2_6');
+			return array('\gfksx\thanksforposts\migrations\v_1_2_6');
 	}
 
 	public function update_schema()
@@ -39,6 +38,13 @@ class v_1_2_8 extends \phpbb\db\migration\migration
 	public function revert_schema()
 	{
 		return array(
+			'drop_columns' => array(
+				$this->table_prefix . 'thanks' => array(
+					'topic_id',
+					'forum_id',
+					'thanks_time',
+				),
+			),
 		);
 	}
 
@@ -54,17 +60,10 @@ class v_1_2_8 extends \phpbb\db\migration\migration
 			array('config.add', array('thanks_number_digits', 2)),
 			array('config.add', array('thanks_number_row_reput', 5)),
 			array('config.add', array('thanks_reput_graphic', 1)),
-			array('config.add', array('thanks_reput_image', 'ext/gfksx/ThanksForPosts/images/rating/reput_star_gold.gif')),
-			array('config.add', array('thanks_reput_image_back', 'ext/gfksx/ThanksForPosts/images/rating/reput_star_back.gif')),
+			array('config.add', array('thanks_reput_image', 'ext/gfksx/thanksforposts/images/rating/reput_star_gold.gif')),
+			array('config.add', array('thanks_reput_image_back', 'ext/gfksx/thanksforposts/images/rating/reput_star_back.gif')),
 			array('config.add', array('thanks_time_view', 1)),
 			array('config.add', array('thanks_top_number', 0)),
-
-			// Current version
-			array('config.add', array('thanks_for_posts_version', '1.2.8')),
-			array('if', array(
-				(isset($this->config['thanks_for_posts_version']) && version_compare($this->config['thanks_for_posts_version'], '1.2.8', '<')),
-				array('config.update', array('thanks_for_posts_version', '1.2.8')),
-			)),
 
 			// Add permissions
 			array('permission.add', array('u_viewtoplist', true)),
@@ -86,6 +85,23 @@ class v_1_2_8 extends \phpbb\db\migration\migration
 			LEFT JOIN ' . POSTS_TABLE . ' p ON  t.post_id = p.post_id
 			SET t.forum_id = p.forum_id, t.topic_id = p.topic_id
 			WHERE t.post_id = p.post_id';
+
+		if ($this->db->get_sql_layer() == 'postgres')
+		{
+			$sql = 'UPDATE '. $thanks_table . ' t
+				SET forum_id = p.forum_id, topic_id = p.topic_id 
+				FROM ' . POSTS_TABLE . ' p
+				WHERE t.post_id = p.post_id';
+		}
+		else if ($this->db->get_sql_layer() == 'sqlite3')
+		{
+			$sql = 'UPDATE '. $thanks_table . '
+				SET
+					forum_id = (SELECT p.forum_id FROM ' . POSTS_TABLE . ' p, ' . $thanks_table . ' t WHERE t.post_id = p.post_id),
+					topic_id = (SELECT p.topic_id FROM ' . POSTS_TABLE . ' p, ' . $thanks_table . ' t WHERE t.post_id = p.post_id)
+				WHERE EXISTS (SELECT p.* FROM ' . POSTS_TABLE . ' p, ' . $thanks_table . ' t WHERE t.post_id = p.post_id)';
+		}
+
 		$this->db->sql_query($sql);
 	}
 }

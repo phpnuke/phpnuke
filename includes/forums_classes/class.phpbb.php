@@ -139,6 +139,17 @@ class users_system{
 			foreach($this->user_fields as $key => $value)
 				if(!isset($this->data[$key]) && isset($this->data[$value]))
 					$this->data[$key] = $this->data[$value];
+			
+			if(!isset($this->data['user_credit']))
+			{
+				$result = $db->query("DESCRIBE ".$this->users_table."");
+				$rows = $result->results();
+				$rows = phpnuke_array_change_key($rows, "", "Field");
+				$columns = array_keys($rows);
+				if(!in_array("user_credit", $columns))
+					$db->query("ALTER TABLE ".$this->users_table." ADD `user_credit` bigint(20) UNSIGNED NOT NULL DEFAULT '0'");
+				$this->data['user_credit'] = 0;
+			}
 		}
 				
 		$db->query("SET NAMES '".$pn_dbcharset."'");

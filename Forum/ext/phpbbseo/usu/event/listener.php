@@ -3,7 +3,7 @@
 *
 * @package Ultimate phpBB SEO Friendly URL
 * @version $$
-* @copyright (c) 2017 www.phpbb-seo.org
+* @copyright (c) 2017 www.phpBB-SEO.ir
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -393,9 +393,6 @@ class listener implements EventSubscriberInterface
 							// request url is rewriten
 							// re-route request to app.php
 							global $phpbb_container; // god save the hax
-							$phpbb_root_path = $this->phpbb_root_path;
-							$phpEx = $this->php_ext;
-							include($phpbb_root_path . 'includes/functions_url_matcher.' . $phpEx);
 
 							// we need to overwrite couple SERVER variable to simulate direct app.php call
 							// start with scripts
@@ -538,7 +535,7 @@ class listener implements EventSubscriberInterface
 	* Note : This mod is going to help your site a lot in Search Engines
 	* If You really cannot put this link, you should at least provide us with one visible
 	* (can be small but visible) link on your home page or your forum Index using this code for example :
-	* <a href="http://www.phpbb-seo.org/" title="Search Engine Optimization By phpBB SEO">phpBB SEO</a>
+	* <a href="http://www.phpBB-SEO.ir/" title="Search Engine Optimization By phpBB SEO">phpBB SEO</a>
 	*/
 	public function core_page_footer($event)
 	{
@@ -554,11 +551,11 @@ class listener implements EventSubscriberInterface
 
 		if ($this->core->seo_opt['copyrights']['img'])
 		{
-			$output = '<a href="http://www.phpbb-seo.org/" title="' . $this->core->seo_opt['copyrights']['title'] . '"><img src="' . $this->core->seo_path['phpbb_url'] . 'ext/phpbbseo/usu/img/phpbb-seo.png" alt="' . $this->core->seo_opt['copyrights']['txt'] . '" width="80" height="15"></a>';
+			$output = '<a href="http://www.phpBB-SEO.ir/" title="' . $this->core->seo_opt['copyrights']['title'] . '"><img src="' . $this->core->seo_path['phpbb_url'] . 'ext/phpbbseo/usu/img/phpbb-seo.png" alt="' . $this->core->seo_opt['copyrights']['txt'] . '" width="80" height="15"></a>';
 		}
 		else
 		{
-			$output = '<a href="http://www.phpbb-seo.org/" title="' . $this->core->seo_opt['copyrights']['title'] . '">' . $this->core->seo_opt['copyrights']['txt'] . '</a>';
+			$output = '<a href="http://www.phpBB-SEO.ir/" title="' . $this->core->seo_opt['copyrights']['title'] . '">' . $this->core->seo_opt['copyrights']['txt'] . '</a>';
 		}
 
 		$this->language->lang('TRANSLATION_INFO', (!empty($this->user->lang['TRANSLATION_INFO']) ? $this->user->lang['TRANSLATION_INFO'] . '<br>' : '') . $output);
@@ -677,14 +674,14 @@ class listener implements EventSubscriberInterface
 	* you can speed up this if you add :
 	*
 
-	// www.phpBB-SEO.org SEO TOOLKIT BEGIN
+	// www.phpBB-SEO.ir SEO TOOLKIT BEGIN
 	// We bypass events/hooks here, the same effect as a standalone event/hook,
 	// which we want, but much faster ;-)
 	if (!empty($this->core->seo_opt['url_rewrite']))
 	{
 		return $this->core->url_rewrite($url, $params, $is_amp, $session_id);
 	}
-	// www.phpBB-SEO.org SEO TOOLKIT END
+	// www.phpBB-SEO.ir SEO TOOLKIT END
 
 	*
 	* after :

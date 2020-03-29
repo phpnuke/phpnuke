@@ -1,4 +1,4 @@
-/* global quickreply, grecaptcha, insert_text, split_lines */
+/* global quickreply, grecaptcha, hljs, insert_text, split_lines */
 /* jshint -W040 */
 ;(function($, window, document) {
 	// do stuff here and use $, window and document safely
@@ -45,12 +45,49 @@
 			if (evt.type === 'touchstart') {
 				evt.pageX = evt.originalEvent.touches[0].pageX;
 				evt.pageY = evt.originalEvent.touches[0].pageY;
+			} else if (evt.type === 'selectionchange') {
+				return self._getSelectionCoords();
 			}
 
 			return {
 				x: evt.pageX || evt.clientX + document.documentElement.scrollLeft, // FF || IE
 				y: evt.pageY || evt.clientY + document.documentElement.scrollTop
 			};
+		};
+
+		/**
+		 * Returns an object containing the coordinates for the end of current text selection.
+		 * Original author: Tim Down (https://stackoverflow.com/a/6847328)
+		 *
+		 * @returns {{x: number, y: number}}
+		 */
+		self._getSelectionCoords = function() {
+			var sel = document.selection, range, rects, rect;
+			var x = 0, y = 0;
+
+			if (sel) {
+				if (sel.type !== "Control") {
+					range = sel.createRange();
+					range.collapse(false);
+					x = range.boundingLeft;
+					y = range.boundingBottom;
+				}
+			} else if (window.getSelection) {
+				sel = window.getSelection();
+				if (sel.rangeCount) {
+					range = sel.getRangeAt(sel.rangeCount - 1).cloneRange();
+					if (range.getClientRects) {
+						range.collapse(false);
+						rects = range.getClientRects();
+						if (rects.length > 0) {
+							rect = rects[rects.length - 1];
+							x = rect.left;
+							y = rect.bottom;
+						}
+					}
+				}
+			}
+			return { x: x ? x + $(document).scrollLeft() : 0, y: y ? y + $(document).scrollTop() : 0 };
 		};
 
 		/**
@@ -117,14 +154,15 @@
 		self._insertQuote = function() {
 			var postAuthor = $('#qr_author_p' + self._postID),
 				username = postAuthor.text(),
-				userID = postAuthor.attr('data-url').replace(/(.)*[?&]u=/, ''),
+				userID = postAuthor.attr('data-id'),
 				postTime = $('#qr_time' +  self._postID).text();
 
 			if (self._selection) {
 				quickreply.form.show();
 
 				if (quickreply.settings.allowBBCode) {
-					insert_text('[quote=' + username + ' post_id=' + self._postID + ' time=' + postTime + ' user_id=' + userID + ']' + self._selection + '[/quote]\r');
+					//insert_text('[quote=' + username + ' post_id=' + self._postID + ' time=' + postTime + ' user_id=' + userID + ']' + self._selection + '[/quote]\r');
+					insert_text(generateQuote(self._selection, {post_id: self._postID, time: postTime, user_id: userID, author: username}));
 				} else {
 					insert_text(username + ' ' + quickreply.language.WROTE + ':' + '\n');
 
@@ -172,6 +210,11 @@
 			}
 
 			var coordinates = self._getCoordinates(evt);
+			if (!coordinates.x && !coordinates.y) {
+				// Prevent possible positioning bugs (e.g. in IE8)
+				return;
+			}
+
 			// Which mouse button is pressed?
 			var key = evt.button || evt.which || null; // IE || FF || Unknown
 
@@ -179,11 +222,12 @@
 
 			setTimeout(function() { // Timeout prevents popup when clicking on selected text
 				self._getSelection();
+				self._removeDropdown();
 
 				if (self._selection && key <= 1) { // If text selected && right mouse button not pressed
-					self._removeDropdown();
-					self._setDropdown(quickreply.style.quickQuoteDropdown(coordinates.x, coordinates.y)
-						.mousedown(insertQuickQuote));
+					var $dropdown = quickreply.style.quickQuoteDropdown(coordinates.x, coordinates.y)
+						.mousedown(insertQuickQuote);
+					self._setDropdown($dropdown);
 				}
 			}, 0);
 		}
@@ -194,15 +238,26 @@
 		 * @param {event} evt jQuery Event object
 		 */
 		function handleQuickQuote(evt) {
-			addQuickQuote(evt, $(this));
+			var $content = $(this);
+			addQuickQuote(evt, $content);
 
 			if (!quickQuoteCancelEvent) {
-				quickreply.$.qrPosts.on('mousemove', '.content', addQuickQuote);
-
-				$(document.body).one('mouseup', function() {
-					quickreply.$.qrPosts.off('mousemove', '.content', addQuickQuote);
-					quickQuoteCancelEvent = false;
-				});
+				if ('onselectionchange' in document) {
+					$(document).on('selectionchange.quickreply', function (evt) {
+						addQuickQuote(evt, $content);
+					});
+					$(document.body).one('mouseup', function() {
+						$(document).off('selectionchange.quickreply');
+						quickQuoteCancelEvent = false;
+					});
+				} else {
+					// Fall back to mouse events for older browsers - this method has drawbacks on mobile devices
+					quickreply.$.qrPosts.on('mousemove', '.content', addQuickQuote);
+					$(document.body).one('mouseup', function() {
+						quickreply.$.qrPosts.off('mousemove', '.content', addQuickQuote);
+						quickQuoteCancelEvent = false;
+					});
+				}
 
 				quickQuoteCancelEvent = true;
 			}
@@ -213,10 +268,11 @@
 		 */
 		self.init = function() {
 			if ('ontouchstart' in window) {
-				quickreply.$.qrPosts.on('mousedown touchstart', '.content', handleQuickQuote);
+				quickreply.$.qrPosts.on('touchstart', '.content', handleQuickQuote);
 			}
 
-			quickreply.$.qrPosts.on('mouseup', '.content', addQuickQuote);
+			quickreply.$.qrPosts.on('mousedown', '.content', handleQuickQuote)
+				.on('mouseup', '.content', addQuickQuote);
 		};
 	}
 
@@ -546,4 +602,20 @@
 			});
 		});
 	}
+
+	/***********************/
+	/* highlight.js Plugin */
+	/***********************/
+	$(window).on('load', function() {
+		if (typeof hljs !== 'undefined' && hljs.highlightBlock) {
+			var qrHighlightCode = function(e, elements) {
+				elements.find('pre code').each(function(i, block) {
+					hljs.highlightBlock(block);
+				});
+			};
+
+			quickreply.$.qrPosts.on('qr_completed', qrHighlightCode);
+			quickreply.$.mainForm.on('ajax_submit_preview', qrHighlightCode);
+		}
+	});
 })(jQuery, window, document);

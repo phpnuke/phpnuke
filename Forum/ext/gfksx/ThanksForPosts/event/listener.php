@@ -8,7 +8,7 @@
 *
 */
 
-namespace gfksx\ThanksForPosts\event;
+namespace gfksx\thanksforposts\event;
 
 /**
 * Event listener
@@ -44,7 +44,7 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\request\request_interface */
 	protected $request;
 
-	/** @var phpbb\controller\helper */
+	/** @var \phpbb\controller\helper */
 	protected $controller_helper;
 
 	/** @var string phpbb_root_path */
@@ -53,7 +53,7 @@ class listener implements EventSubscriberInterface
 	/** @var string phpEx */
 	protected $php_ext;
 
-	/** @var gfksx\ThanksForPosts\core\helper */
+	/** @var \gfksx\thanksforposts\core\helper */
 	protected $helper;
 
 	/**
@@ -69,7 +69,6 @@ class listener implements EventSubscriberInterface
 	* @param string                               $phpbb_root_path       phpbb_root_path
 	* @param string                               $php_ext               phpEx
 	* @param rxu\PostsMerging\core\helper         $helper                The extension helper object
-	* @return \rxu\ThanksForPosts\event\listener
 	* @access public
 	*/
 	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\auth\auth $auth, \phpbb\template\template $template, \phpbb\user $user, \phpbb\cache\driver\driver_interface $cache, \phpbb\request\request_interface $request, \phpbb\controller\helper $controller_helper, $phpbb_root_path, $php_ext, $helper)
@@ -118,14 +117,14 @@ class listener implements EventSubscriberInterface
 		$thanks_list = '';
 		$ex_fid_ary = array_keys($this->auth->acl_getf('!f_read', true));
 		$ex_fid_ary = (sizeof($ex_fid_ary)) ? $ex_fid_ary : 0;
-		if (isset($this->config['thanks_top_number']) && $this->config['thanks_top_number'])
+		if ($this->config['thanks_top_number'])
 		{
 			$thanks_list = $this->helper->get_toplist_index($ex_fid_ary);
 		}
 		$this->template->assign_vars(array(
 			'THANKS_LIST'		=> ($thanks_list != '') ? $thanks_list : false,
-			'S_THANKS_LIST'		=> (isset($this->config['thanks_top_number']) && $thanks_list != '') ? true : false,
-			'L_TOP_THANKS_LIST'	=> isset($this->config['thanks_top_number']) ? sprintf($this->user->lang['REPUT_TOPLIST'], (int) $this->config['thanks_top_number']) : false,
+			'S_THANKS_LIST'		=> ($this->config['thanks_top_number'] && $thanks_list != '') ? true : false,
+			'L_TOP_THANKS_LIST'	=> $this->config['thanks_top_number'] ? sprintf($this->user->lang['REPUT_TOPLIST'], (int) $this->config['thanks_top_number']) : false,
 		));
 	}
 
@@ -137,12 +136,11 @@ class listener implements EventSubscriberInterface
 		$ex_fid_ary = array_keys($this->auth->acl_getf('!f_read', true));
 		$ex_fid_ary = (sizeof($ex_fid_ary)) ? $ex_fid_ary : false;
 
-		// $this->user->add_lang_ext('gfksx/ThanksForPosts', 'thanks_mod');
-		if (isset($_REQUEST['list_thanks']))
+		if ($this->request->is_set('list_thanks'))
 		{
 			$this->helper->clear_list_thanks($user_id, $this->request->variable('list_thanks', ''));
 		}
-		if (isset($this->config['thanks_for_posts_version']))
+		if ($this->config['thanks_profilelist_view'])
 		{
 			$this->helper->output_thanks_memberlist($user_id, $ex_fid_ary);
 		}
@@ -181,17 +179,17 @@ class listener implements EventSubscriberInterface
 		$forum_id = (int) $event['forum_id'];
 		$this->helper->array_all_thanks($post_list, $forum_id);
 
-		if (isset($_REQUEST['thanks']) && !isset($_REQUEST['rthanks']))
+		if ($this->request->is_set('thanks') && !$this->request->is_set('rthanks'))
 		{
 			$this->helper->insert_thanks($this->request->variable('thanks', 0), $this->user->data['user_id'], $forum_id);
 		}
 
-		if (isset($_REQUEST['rthanks']) && !isset($_REQUEST['thanks']))
+		if ($this->request->is_set('rthanks') && !$this->request->is_set('thanks'))
 		{
 			$this->helper->delete_thanks($this->request->variable('rthanks', 0), $forum_id);
 		}
 
-		if (isset($_REQUEST['list_thanks']))
+		if ($this->request->is_set('list_thanks'))
 		{
 			$this->helper->clear_list_thanks($this->request->variable('p', 0), $this->request->variable('list_thanks', ''));
 		}
@@ -229,11 +227,7 @@ class listener implements EventSubscriberInterface
 	{
 		$forum_row = $event['forum_row'];
 		$row = $event['row'];
-		$forum_row = array_merge($forum_row, array(
-			'S_THANKS_FORUM_REPUT_VIEW_COLUMN' => isset($this->config['thanks_forum_reput_view']) ? $this->config['thanks_forum_reput_view_column'] : false,
-			'THANKS_REPUT_GRAPHIC_WIDTH'=> isset($this->config['thanks_reput_level'])? (isset($this->config['thanks_reput_height']) ? sprintf('%dpx', $this->config['thanks_reput_level']*$this->config['thanks_reput_height']) : false) : false,
-		));
-		if (isset($this->config['thanks_forum_reput_view']) && $this->config['thanks_forum_reput_view'])
+		if ($this->config['thanks_forum_reput_view'])
 		{
 			$forum_row = array_merge($forum_row, $this->helper->get_thanks_forum_reput($row['forum_id']));
 		}
@@ -244,7 +238,7 @@ class listener implements EventSubscriberInterface
 	{
 		$lang_set_ext = $event['lang_set_ext'];
 		$lang_set_ext[] = array(
-			'ext_name' => 'gfksx/ThanksForPosts',
+			'ext_name' => 'gfksx/thanksforposts',
 			'lang_set' => 'thanks_mod',
 		);
 		$event['lang_set_ext'] = $lang_set_ext;
@@ -252,13 +246,13 @@ class listener implements EventSubscriberInterface
 
 	public function add_header_quicklinks($event)
 	{
-		$u_thankslist = $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('tslash' => ''));
-		$u_toplist = $this->controller_helper->route('gfksx_ThanksForPosts_toplist_controller', array('tslash' => ''));
+		$u_thankslist = $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('tslash' => ''));
+		$u_toplist = $this->controller_helper->route('gfksx_thanksforposts_toplist_controller', array('tslash' => ''));
 		$this->template->assign_vars(array(
 			'U_THANKS_LIST'		=> $u_thankslist,
 			'U_REPUT_TOPLIST'	=> $u_toplist,
 			'S_DISPLAY_THANKSLIST'	=> $this->auth->acl_get('u_viewthanks'),
-			'S_DISPLAY_TOPLIST'		=> $this->auth->acl_get('u_viewtoplist'),
+			'S_DISPLAY_TOPLIST'		=> $this->auth->acl_get('u_viewtoplist') && ($this->config['thanks_post_reput_view'] || $this->config['thanks_topic_reput_view'] || $this->config['thanks_forum_reput_view']),
 			'MINI_THANKS_IMG'		=> $this->user->img('icon_mini_thanks', $this->user->lang['GRATITUDES']),
 			'MINI_TOPLIST_IMG'		=> $this->user->img('icon_mini_toplist', $this->user->lang['TOPLIST']),
 		));

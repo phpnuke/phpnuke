@@ -202,35 +202,13 @@ function credit_edit($order_data = array())
 		include("modules/$module_name/includes/credits_form.php");
 	
 	$boxes_contents = show_modules_boxes($module_name, "form", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
-
-	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
-	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.css\" rel=\"stylesheet\" type=\"text/css\">";
-	
-	$default_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
-	$default_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
-
-	$default_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
-	
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\" /></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
-	
-	if($nuke_configs['multilingual'] == 1)
-	{
-		$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
-		if($nuke_configs['datetype'] == 1)
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
-		elseif($nuke_configs['datetype'] == 2)
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
-	}
-	
+		
 	$custom_theme_setup = array(
-		"default_css" => $default_css,
-		"default_js" => $default_js,
-		"defer_js" => $defer_js
+		"default_css" => ((isset($default_css) && !empty($default_css)) ? $default_css:""),
+		"default_js" => ((isset($default_js) && !empty($default_js)) ? $default_js:""),
+		"defer_js" => ((isset($defer_js) && !empty($defer_js)) ? $defer_js:"")
 	);
 	$custom_theme_setup_replace = false;
-	
 
 	$meta_tags = array(
 		"title" => $form_title,

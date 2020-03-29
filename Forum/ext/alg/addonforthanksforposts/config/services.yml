@@ -22,4 +22,4 @@ services:
             - '%tables.thanks%'
             - '%tables.users%'
             - '%tables.posts%'
-            - '@?gfksx.ThanksForPosts.helper'
+            - '@?gfksx.thanksforposts.helper'

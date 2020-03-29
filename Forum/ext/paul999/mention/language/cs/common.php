@@ -25,5 +25,5 @@ if (empty($lang) || !is_array($lang))
  */
 $lang = array_merge($lang, array(
 	'MENTION_MENTION_NOTIFICATION'	=> 'Byli jste zmíněni od %1$s<br />v “%2$s”',
-	'NOTIFICATION_TYPE_MENTION'     => 'Někdo mě zmínil'
+	'NOTIFICATION_TYPE_MENTION'     => 'Někdo mě zmínil',
 ));

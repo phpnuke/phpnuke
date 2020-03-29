@@ -2,7 +2,7 @@
 /**
  *
  * @package       QuickReply Reloaded
- * @copyright (c) 2014 - 2017 Tatiana5 and LavIgor
+ * @copyright (c) 2014 - 2019 Tatiana5 and LavIgor
  * @license       http://opensource.org/licenses/gpl-license.php GNU Public License
  *
  */
@@ -15,6 +15,8 @@ class quickreply_qn_module extends acp_module_helper
 {
 	public function main($id, $mode)
 	{
+		$this->ext_name ='boardtools/quickreply';
+		$this->ext_langname = 'quickreply';
 		$this->tpl_name = 'acp_quickreply';
 		$this->form_key = 'config_quickreply_qn';
 		add_form_key($this->form_key);

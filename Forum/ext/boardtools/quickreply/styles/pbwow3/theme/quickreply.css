@@ -1,0 +1,32 @@
+/* This file is style-specific and can be modified in other styles. */
+/* Styling for some features of QuickReply Reloaded. */
+.qr_dropdown a {
+	font-size: 11px !important;
+}
+
+.qr_quickquote {
+	cursor: pointer;
+}
+
+#qr_postform.qr_fixed_form .panel {
+	padding: 5px 10px;
+}
+
+#qr_postform.qr_fixed_form {
+	background: #111;
+}
+
+#qr_postform.qr_fixed_form #message-box {
+	padding-top: 0;
+	padding-right: 0;
+}
+
+#qr_loading_text {
+	text-shadow: none;
+}
+
+#qr_show_fixed_form {
+	color: #00C0FF;
+	background-color: #111;
+	border-color: #111;
+}

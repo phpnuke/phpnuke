@@ -116,27 +116,29 @@ function credit_get_gateways_list($html=false)
 	global $module_name, $pn_credits_config;
 	$create_options = array();
 	
-	$gateways_list = get_dir_list("modules/$module_name/includes/gateways", 'files', true);
+	$gateways_list = get_dir_list("modules/$module_name/includes/gateways", 'files', true, array('.',',,','.htaccess','index.html'));
 	$hav_gateway = false;
-	foreach($gateways_list as $gateway)
+	if(!empty($gateways_list))
 	{
-		unset($gateway_class);
-		include("modules/$module_name/includes/gateways/$gateway");
-		$func_name = str_replace(".php","",$gateway)."_gateway";
-		if(class_exists("$func_name"))
+		foreach($gateways_list as $gateway)
 		{
-			$gateway_class = new $func_name();
-			
-			if(isset($pn_credits_config['gateways'][$gateway_class->gateway_name]) && $pn_credits_config['gateways'][$gateway_class->gateway_name]['status'] == 1 && $html)
+			unset($gateway_class);
+			include("modules/$module_name/includes/gateways/$gateway");
+			$func_name = str_replace(".php","",$gateway)."_gateway";
+			if(class_exists("$func_name"))
 			{
-				$hav_gateway = true;
-				$create_options[$gateway_class->gateway_name] = array("title" => $gateway_class->gateway_title, "icon" => $gateway_class->gateway_icon);
+				$gateway_class = new $func_name();
+				
+				if(isset($pn_credits_config['gateways'][$gateway_class->gateway_name]) && $pn_credits_config['gateways'][$gateway_class->gateway_name]['status'] == 1 && $html)
+				{
+					$hav_gateway = true;
+					$create_options[$gateway_class->gateway_name] = array("title" => $gateway_class->gateway_title, "icon" => $gateway_class->gateway_icon);
+				}
+				else
+					$create_options[] = $gateway_class->gateway_name;
 			}
-			else
-				$create_options[] = $gateway_class->gateway_name;
 		}
 	}
-	
 	if($html && $hav_gateway)
 	{
 		$html = '';
@@ -633,7 +635,7 @@ function credits_settings()
 	
 	$create_options = array();
 	
-	$gateways_list = get_dir_list("modules/Credits/includes/gateways", 'files', true);
+	$gateways_list = get_dir_list("modules/Credits/includes/gateways", 'files', true, array('.',',,','.htaccess','index.html'));
 	foreach($gateways_list as $gateway)
 	{
 		unset($gateway_class);

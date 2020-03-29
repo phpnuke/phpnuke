@@ -2,14 +2,14 @@
     "name": "alg/addonforthanksforposts",
     "type": "phpbb-extension",
     "description": "Adds ajax functionality to main extension to update result of set/delete likes without reloading the page",
-    "homepage": "https://github.com/alg5/addonforthanksforposts/tree/dev_3.2.x",
-    "version": "3.0.4",
-    "time": "2017-06-11",
+    "homepage": "https://github.com/alg5/addonforthanksforposts",
+    "version": "3.0.7",
+    "time": "2018-03-24",
     "license": "GPL-2.0",
     "authors": [
         {
-            "name": "Алг",
-            "homepage": "http://www.chugunok.net",
+            "name": "Alg",
+            "homepage": "http://www.phpbbguru.net",
             "role": "Developer"
         }
        

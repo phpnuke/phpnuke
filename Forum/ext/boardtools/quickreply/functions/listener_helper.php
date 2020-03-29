@@ -2,7 +2,7 @@
 /**
  *
  * @package       QuickReply Reloaded
- * @copyright (c) 2014 - 2017 Tatiana5 and LavIgor
+ * @copyright (c) 2014 - 2019 Tatiana5 and LavIgor
  * @license       http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
@@ -258,13 +258,14 @@ class listener_helper
 	 * Assign template variables if quick reply is enabled
 	 *
 	 * @param int $forum_id Forum ID
+	 * @param int $topic_id Topic ID
 	 */
-	public function assign_template_variables_for_qr($forum_id)
+	public function assign_template_variables_for_qr($forum_id, $topic_id)
 	{
 		$this->template_variables_for_qr($forum_id);
-		$this->template_variables += $this->form_helper->form_template_variables;
-		$this->template_variables += $this->plugins_helper->template_variables_for_plugins($forum_id);
-		$this->template_variables += $this->plugins_helper->template_variables_for_extensions();
+		$this->template_variables += $this->form_helper->form_template_variables
+			+ $this->plugins_helper->template_variables_for_plugins($forum_id)
+			+ $this->plugins_helper->template_variables_for_extensions($forum_id, $topic_id);
 
 		$this->template->assign_vars($this->template_variables);
 	}

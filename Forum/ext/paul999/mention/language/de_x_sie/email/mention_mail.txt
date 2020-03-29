@@ -2,7 +2,7 @@ Subject: Sie wurden erwähnt
 
 Hallo,
 
-Sie wurden von "{USERNAME}" in "{TOPIC_TITLE}" bei "{SITENAME}" erwähnt.
+Sie wurden von "{AUTHOR_NAME}" in "{TOPIC_TITLE}" bei "{SITENAME}" erwähnt.
 
 Um den Beitrag zu lesen, in welchem Sie erwähnt wurden, benutzen Sie den folgenden Verweis:
 

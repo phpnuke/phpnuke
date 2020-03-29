@@ -1,8 +1,8 @@
 ﻿﻿(function ($, document) { // Avoid conflicts with other libraries
     function add_ajax_thanks(e, elements) {
-       var btnsLike = elements.find('a').filter(function (index) {
+        var btnsLike = elements.find('a').filter(function (index) {
             return $(this).find('i.icon').is('[class*="thanks-icon"]');
-        });        
+        });
 //        console.log(btnsLike);
         $(btnsLike).on('click', function (e) {
             e.preventDefault();
@@ -17,11 +17,10 @@
             //console.log('action = ' + action);
             var post_block = $(this).parents('div.post');
             // console.log(post_block);
-           var post_id;
+            var post_id;
             if ($(post_block).attr("id") == 'post-article') {
                 post_id = $(post_block).prev().attr('id').replace(/p/g, '');
-            }
-            else {
+            } else {
                 post_id = $(post_block).attr('id').replace(/p/g, '');
             }
             var url = $('#lnk_thanks_post' + post_id).attr('href');
@@ -56,24 +55,24 @@
 
                 theme: 'defaultTheme',
                 buttons: [{
-                    addClass: 'btn btn-primary', text: LA_YES, onClick: function ($noty) {
-                        var path = U_ADDONFORTHANKSFORPOSTS_PATH + 'clear_thanks/' + poster_id + '/' + $("input[name='forum_id']").val() + '/' + $("input[name='topic_id']").val() + '/' + post_id;
-                        $.ajax({
-                            type: 'POST',
-                            dataType: 'json',
-                            url: path,
-                            success: function (data) {
-                                list_thanks_for_post_cleared(data);
-                            }
-                        });
-                        $noty.close();
-                    }
-                },
-				{
-				    addClass: 'btn btn-danger', text: LA_NO, onClick: function ($noty) {
-				        $noty.close();
-				    }
-				}]
+                        addClass: 'btn btn-primary', text: LA_YES, onClick: function ($noty) {
+                            var path = U_ADDONFORTHANKSFORPOSTS_PATH + 'clear_thanks/' + poster_id + '/' + $("input[name='forum_id']").val() + '/' + $("input[name='topic_id']").val() + '/' + post_id;
+                            $.ajax({
+                                type: 'POST',
+                                dataType: 'json',
+                                url: path,
+                                success: function (data) {
+                                    list_thanks_for_post_cleared(data);
+                                }
+                            });
+                            $noty.close();
+                        }
+                    },
+                    {
+                        addClass: 'btn btn-danger', text: LA_NO, onClick: function ($noty) {
+                            $noty.close();
+                        }
+                    }]
             });
         });
     }
@@ -84,9 +83,9 @@
     $('#qr_posts').on('qr_loaded', add_ajax_thanks);
 
     function togle_thanks(data) {
-       var btnsLike = $('a').filter(function (index) {
+        var btnsLike = $('a').filter(function (index) {
             return $(this).find('i.icon').is('[class*="thanks-icon"]');
-        });        
+        });
         //set all thanks button enabled
         $(btnsLike).removeClass("disabled");
 
@@ -100,11 +99,21 @@
 
         //update icon and tooltip
         if (data.IS_ALLOW_REMOVE_THANKS) {
+
             $("#lnk_thanks_post" + data.POST_ID).attr('title', data.THANK_ALT).attr('href', data.THANK_PATH.replace(/&amp;/g, '&'));
             $("#lnk_thanks_post" + data.POST_ID).find('i').removeClass("thanks-icon").removeClass("removethanks-icon").addClass(data.CLASS_ICON);
-        }
-        else
-            $("#lnk_thanks_post" + data.POST_ID).parent().hide();
+
+            //patch for quick links
+            $(".clone-first a#lnk_thanks_post" + data.POST_ID).attr('title', data.THANK_ALT).attr('href', data.THANK_PATH.replace(/&amp;/g, '&'));
+            $(".clone-first a#lnk_thanks_post" + data.POST_ID).find('span').html(data.THANK_ALT_SHORT);
+            $(".clone-first a#lnk_thanks_post" + data.POST_ID).find('i').removeClass("thanks-icon").removeClass("removethanks-icon").addClass(data.CLASS_ICON);
+         }
+         else
+         {
+            $("#lnk_thanks_post" + data.POST_ID).parent().hide();   
+            //patch for quick links
+            $(".clone-first a#lnk_thanks_post" + data.POST_ID).parent().hide();
+         }
         //update reput list
         if (data.THANKS && data.THANKS_POSTLIST_VIEW) {
             var updDiv = "<div class='notice'>";
@@ -126,8 +135,7 @@
             updDiv = updDiv + "</div >";
 
             $('#list_thanks' + data.POST_ID).html(updDiv);
-        }
-        else {
+        } else {
             $('#list_thanks' + data.POST_ID).html('');
         }
 
@@ -135,7 +143,7 @@
         if (data.S_THANKS_POST_REPUT_VIEW && data.POST_REPUT && !data.S_POST_ANONYMOUS && !data.S_IS_BOT) {
             var updDiv = '';
             updDiv = updDiv + "<div class='notice'>";
-            updDiv = updDiv + "<dl class='postbody'>";
+            updDiv = updDiv + "<dl class='postbody1'>";
             updDiv = updDiv + "<dt class='small'><strong>" + LA_REPUT + ":</strong>&nbsp;" + data.POST_REPUT + "</dt>";
             updDiv = updDiv + "<dd>";
             if (data.S_THANKS_REPUT_GRAPHIC) {
@@ -144,8 +152,7 @@
             }
             updDiv = updDiv + "</dd></dl></div>";
             $('#div_post_reput' + data.POST_ID).html(updDiv);
-        }
-        else {
+        } else {
             $('#div_post_reput' + data['POST_ID']).html('');
         }
         //update profile
@@ -178,8 +185,7 @@
                 var rcv = '';
                 if (data.POSTER_RECEIVE_COUNT == 0) {
                     $(this).html('');
-                }
-                else {
+                } else {
                     rcv = LA_RECEIVED + ": <a href='" + data.POSTER_RECEIVE_COUNT_LINK + "'>" + data.POSTER_RECEIVE_COUNT + "</a>";
                     $(this).html(rcv);
                 }
@@ -189,8 +195,7 @@
                 var give = '';
                 if (data.POSTER_GIVE_COUNT == 0) {
                     $(this).html('');
-                }
-                else {
+                } else {
                     give = LA_GIVEN + ": <a href='" + data.POSTER_GIVE_COUNT_LINK + "'>" + data.POSTER_GIVE_COUNT + "</a>";
                     $(this).html(give);
                 }
@@ -200,8 +205,10 @@
 
     //creates a new jQuery UI notification message
     function output_info_new(message, type, expire, is_reload) {
-        if (type == null) type = 'notification';
-        if (expire == null) expire = 4000;
+        if (type == null)
+            type = 'notification';
+        if (expire == null)
+            expire = 4000;
         var n = noty({
             text: message,
             type: type,
@@ -210,7 +217,8 @@
             theme: 'defaultTheme',
             callback: {
                 afterClose: function () {
-                    if (is_reload == null || is_reload == '' || is_reload != true) return;
+                    if (is_reload == null || is_reload == '' || is_reload != true)
+                        return;
                     window.location.reload();
                 }
             }
@@ -221,8 +229,7 @@
         var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(url);
         if (results == null) {
             return null;
-        }
-        else {
+        } else {
             return results[1] || 0;
         }
     }

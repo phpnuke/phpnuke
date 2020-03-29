@@ -25,11 +25,11 @@ class v_0_0_1 extends \phpbb\db\migration\migration
 	{
 		return array(
 			// Add configs
-			array('config.add', array('qr_bbcode', '0')),
+			array('config.add', array('qr_bbcode', '1')),
 			array('config.add', array('qr_comma', '1')),
 			array('config.add', array('qr_quicknick', '1')),
 			array('config.add', array('qr_quickquote', '1')),
-			array('config.add', array('qr_smilies', '0')),
+			array('config.add', array('qr_smilies', '1')),
 			array('config.add', array('qr_enable_re', '0')),
 			array('config.add', array('qr_ctrlenter', '1')),
 

@@ -29,9 +29,9 @@ function cache_caspian_data()
 		$caspian_configs = (isset($caspian_configs) && !empty($caspian_configs)) ? $caspian_configs:$theme_setup['caspian_configs'];
 		
 		$result = $db->query("
-		(SELECT 1 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'article' ORDER BY time DESC LIMIT 0, 5)
+		(SELECT 1 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'article' ORDER BY counter DESC LIMIT 0, 5)
 		union
-		(SELECT 2 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'article' ORDER BY rand() DESC LIMIT 0, 5)
+		(SELECT 2 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'article' ORDER BY comments DESC LIMIT 0, 5)
 		");
 		if(intval($db->count()) > 0)
 		{

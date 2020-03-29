@@ -19,7 +19,7 @@ class users_system{
 
 	public function __construct()
 	{
-		global $db, $nuke_configs;
+		global $db, $nuke_configs, $pn_dbcharset;
 		
 		// define default user fileds of phpnuke system
 		$this->user_fields['user_id']				= "user_id";
@@ -39,6 +39,7 @@ class users_system{
 		$this->user_fields['user_active']			= "user_status";
 		$this->user_fields['user_gender']			= "user_gender";
 		$this->user_fields['user_points']			= "user_points";
+		$this->user_fields['group_id']				= "group_id";
 		$this->user_fields['group_colour']			= "group_colour";
 		$this->user_fields['user_credit']			= "user_credit";
 		
@@ -46,6 +47,7 @@ class users_system{
 		$this->users_table							= USERS_TABLE;
 		$this->groups_table							= GROUPS_TABLE;
 		$this->profile_url 							= LinkToGT('index.php?modname=Users&op=userinfo&username=%2$s');
+		$this->collation							= $pn_dbcharset;
 		
 		$extra_cache_codes = $this->cache_system();
 		

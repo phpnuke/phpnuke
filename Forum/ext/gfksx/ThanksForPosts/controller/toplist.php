@@ -7,9 +7,7 @@
 *
 */
 
-namespace gfksx\ThanksForPosts\controller;
-
-use Symfony\Component\HttpFoundation\Response;
+namespace gfksx\thanksforposts\controller;
 
 class toplist
 {
@@ -28,6 +26,9 @@ class toplist
 	/** @var \phpbb\user */
 	protected $user;
 
+	/** @var \phpbb\language\language $language */
+	protected $language;
+
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
 
@@ -40,13 +41,13 @@ class toplist
 	/** @var \phpbb\pagination */
 	protected $pagination;
 
-	/** @var gfksx\ThanksForPosts\core\helper */
+	/** @var \gfksx\thanksforposts\core\helper */
 	protected $gfksx_helper;
 
 	/** @var \phpbb\request\request_interface */
 	protected $request;
 
-	/** @var phpbb\controller\helper */
+	/** @var \phpbb\controller\helper */
 	protected $controller_helper;
 
 	/** @var string THANKS_TABLE */
@@ -59,33 +60,34 @@ class toplist
 	protected $posts_table;
 
 	/**
-	* Constructor
-	*
-	* @param \phpbb\config\config                 $config                Config object
-	* @param \phpbb\db\driver\driver_interface    $db                    DBAL object
-	* @param \phpbb\auth\auth                     $auth                  Auth object
-	* @param \phpbb\template\template             $template              Template object
-	* @param \phpbb\user                          $user                  User object
-	* @param \phpbb\cache\driver\driver_interface $cache                 Cache driver object
-	* @param string                               $phpbb_root_path       phpbb_root_path
-	* @param string                               $php_ext               phpEx
-	* @param \phpbb\pagination                    $pagination            Pagination object
-	* @param \gfksx\ThanksForPosts\core\helper    $gfksx_helper          Helper object
-	* @param \phpbb\request\request_interface     $request               Request object
-	* @param \phpbb\controller\helper             $controller_helper     Controller helper object
-	* @param string                               $thanks_table          THANKS_TABLE
-	* @param string                               $users_table           USERS_TABLE
-	* @param string                               $posts_table           POSTS_TABLE
-	* @return gfksx\ThanksForPosts\controller\thankslist
-	* @access public
-	*/
-	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\auth\auth $auth, \phpbb\template\template $template, \phpbb\user $user, \phpbb\cache\driver\driver_interface $cache, $phpbb_root_path, $php_ext, \phpbb\pagination $pagination, \gfksx\ThanksForPosts\core\helper $gfksx_helper, \phpbb\request\request_interface $request, \phpbb\controller\helper $controller_helper, $thanks_table, $users_table, $posts_table)
+	 * Constructor
+	 *
+	 * @param \phpbb\config\config					$config				Config object
+	 * @param \phpbb\db\driver\driver_interface		$db					DBAL object
+	 * @param \phpbb\auth\auth						$auth				Auth object
+	 * @param \phpbb\template\template				$template			Template object
+	 * @param \phpbb\user							$user				User object
+	 * @param \phpbb\language\language				$language			Language object
+	 * @param \phpbb\cache\driver\driver_interface	$cache				Cache driver object
+	 * @param string								$phpbb_root_path	phpbb_root_path
+	 * @param string								$php_ext			phpEx
+	 * @param \phpbb\pagination						$pagination			Pagination object
+	 * @param \gfksx\thanksforposts\core\helper		$gfksx_helper		Helper object
+	 * @param \phpbb\request\request_interface		$request			Request object
+	 * @param \phpbb\controller\helper				$controller_helper	Controller helper object
+	 * @param string								$thanks_table		THANKS_TABLE
+	 * @param string								$users_table		USERS_TABLE
+	 * @param string								$posts_table		POSTS_TABLE
+	 * @access public
+	 */
+	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\auth\auth $auth, \phpbb\template\template $template, \phpbb\user $user, \phpbb\language\language $language, \phpbb\cache\driver\driver_interface $cache, $phpbb_root_path, $php_ext, \phpbb\pagination $pagination, \gfksx\thanksforposts\core\helper $gfksx_helper, \phpbb\request\request_interface $request, \phpbb\controller\helper $controller_helper, $thanks_table, $users_table, $posts_table)
 	{
 		$this->config = $config;
 		$this->db = $db;
 		$this->auth = $auth;
 		$this->template = $template;
 		$this->user = $user;
+		$this->language = $language;
 		$this->cache = $cache;
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->php_ext = $php_ext;
@@ -100,23 +102,19 @@ class toplist
 
 	public function main()
 	{
-		include_once($this->phpbb_root_path . 'includes/functions_display.' . $this->php_ext);
-		$this->user->add_lang(array('memberlist', 'groups', 'search'));
-		$this->user->add_lang_ext('gfksx/ThanksForPosts', 'thanks_mod');
+		$this->language->add_lang(['memberlist', 'groups', 'search']);
+		$this->language->add_lang('thanks_mod', 'gfksx/thanksforposts');
 
 		// Grab data
 		$mode = $this->request->variable('mode', '');
-		$end_row_rating = isset($this->config['thanks_number_row_reput']) ? $this->config['thanks_number_row_reput'] : false;
 		$full_post_rating = $full_topic_rating = $full_forum_rating = false;
 		$u_search_post = $u_search_topic = $u_search_forum = '';
-		$total_match_count = 0;
-		//$page_title = $this->user->lang['REPUT_TOPLIST'];
 		$topic_id = $this->request->variable('t', 0);
 		$return_chars = $this->request->variable('ch', ($topic_id) ? -1 : 300);
 		$words = array();
 		$ex_fid_ary = array_keys($this->auth->acl_getf('!f_read', true));
 		$ex_fid_ary = (sizeof($ex_fid_ary)) ? $ex_fid_ary : true;
-		$pagination_url = append_sid("{$this->phpbb_root_path}toplist",'mode=' . $mode);
+		$pagination_url = $this->controller_helper->route('gfksx_thanksforposts_toplist_controller', array('mode' => $mode, 'tslash' => ''));
 
 		if (!$this->auth->acl_gets('u_viewtoplist'))
 		{
@@ -167,14 +165,16 @@ class toplist
 				break;
 
 				default:
-				$page_title = $this->user->lang['REPUT_TOPLIST'];
 				$total_match_count = 0;
+				break;
 		}
-		$page_title = sprintf($this->user->lang['REPUT_TOPLIST'], $total_match_count);
+
+		$page_title = $this->user->lang('REPUT_TOPLIST', $total_match_count);
+
 		//post rating
 		if (!$full_forum_rating && !$full_topic_rating && $this->config['thanks_post_reput_view'])
 		{
-			$end = ($full_post_rating) ?  $this->config['topics_per_page'] : $end_row_rating;
+			$end = ($full_post_rating) ?  $this->config['topics_per_page'] : $this->config['thanks_number_row_reput'];
 
 			$sql_p_array['FROM']	= array($this->thanks_table => 't');
 			$sql_p_array['SELECT'] = 'u.user_id, u.username, u.user_colour, p.post_subject, p.post_id, p.post_time, p.poster_id, p.post_username, p.topic_id, p.forum_id, p.post_text, p.bbcode_uid, p.bbcode_bitfield, p.post_attachment';
@@ -187,13 +187,15 @@ class toplist
 				'FROM'	=> array($this->users_table => 'u'),
 				'ON'	=> 'p.poster_id = u.user_id'
 			);
-			$sql_p_array['GROUP_BY'] = 't.post_id';
+			$sql_p_array['GROUP_BY'] = 't.post_id, u.user_id, p.post_subject, p.post_id';
 			$sql_p_array['ORDER_BY'] = 'post_thanks DESC';
 			$sql_p_array['WHERE'] = $this->db->sql_in_set('t.forum_id', $ex_fid_ary, true);
 
 			$sql = $this->db->sql_build_query('SELECT',$sql_p_array);
 			$result = $this->db->sql_query_limit($sql, $end, $start);
-			$u_search_post = append_sid("{$this->phpbb_root_path}toplist", "mode=post");
+
+			$u_search_post = $this->controller_helper->route('gfksx_thanksforposts_toplist_controller', array('mode' => 'post', 'tslash' => ''));
+
 			if (!$row = $this->db->sql_fetchrow($result))
 			{
 				trigger_error('RATING_VIEW_TOPLIST_NO');
@@ -264,7 +266,7 @@ class toplist
 					$this->template->assign_block_vars('toppostrow', array(
 						'MESSAGE'					=> $this->auth->acl_get('f_read', $row['forum_id']) ? $row['post_text'] : ((!empty($row['forum_id'])) ? $this->user->lang['SORRY_AUTH_READ'] : $row['post_text']),
 						'POST_DATE'					=> !empty($row['post_time']) ? $this->user->format_date($row['post_time']) : '',
-						'MINI_POST_IMG'				=> $this->user->img('icon_post_target', 'POST'),
+						'MINI_POST_IMG'				=> phpbb_version_compare(PHPBB_VERSION, '3.2.0', '<') ? $this->user->img('icon_post_target', 'POST') : '',
 						'POST_ID'					=> $post_url,
 						'POST_SUBJECT'				=> $this->auth->acl_get('f_read', $row['forum_id']) ? $row['post_subject'] : ((!empty($row['forum_id'])) ? '' : $row['post_subject']),
 						'POST_AUTHOR'				=> get_username_string('full', $row['poster_id'], $row['username'], $row['user_colour'], $row['post_username']),
@@ -272,10 +274,10 @@ class toplist
 						'POST_THANKS'				=> $row['post_thanks'],
 						'S_THANKS_POST_REPUT_VIEW' 	=> isset($this->config['thanks_post_reput_view']) ? $this->config['thanks_post_reput_view'] : false,
 						'S_THANKS_REPUT_GRAPHIC' 	=> isset($this->config['thanks_reput_graphic']) ? $this->config['thanks_reput_graphic'] : false,
-						'THANKS_REPUT_HEIGHT'		=> sprintf('%dpx', $this->config['thanks_reput_height']),
-						'THANKS_REPUT_GRAPHIC_WIDTH' 	=> sprintf('%dpx', $this->config['thanks_reput_level']*$this->config['thanks_reput_height']),
-						'THANKS_REPUT_IMAGE' 		=> isset($this->config['thanks_reput_image']) ? $this->phpbb_root_path . $this->config['thanks_reput_image'] : '',
-						'THANKS_REPUT_IMAGE_BACK'	=> isset($this->config['thanks_reput_image_back']) ? $this->phpbb_root_path . $this->config['thanks_reput_image_back'] : '',
+						'THANKS_REPUT_HEIGHT'		=> (int) $this->config['thanks_reput_height'],
+						'THANKS_REPUT_GRAPHIC_WIDTH'=> (int) $this->config['thanks_reput_level']*$this->config['thanks_reput_height'],
+						'THANKS_REPUT_IMAGE' 		=> isset($this->config['thanks_reput_image']) ? generate_board_url() . '/' . $this->config['thanks_reput_image'] : '',
+						'THANKS_REPUT_IMAGE_BACK'	=> isset($this->config['thanks_reput_image_back']) ? generate_board_url() . '/' . $this->config['thanks_reput_image_back'] : '',
 					));
 				}
 				while ($row = $this->db->sql_fetchrow($result));
@@ -285,9 +287,9 @@ class toplist
 		//topic rating
 		if (!$full_forum_rating && !$full_post_rating && $this->config['thanks_topic_reput_view'])
 		{
-			$end = ($full_topic_rating) ?  $this->config['topics_per_page'] : $end_row_rating;
+			$end = ($full_topic_rating) ?  $this->config['topics_per_page'] : $this->config['thanks_number_row_reput'];
 
-			$sql_t_array['FROM']	= array($this->thanks_table => 'f');
+			$sql_t_array['FROM'] = array($this->thanks_table => 'f');
 			$sql_t_array['SELECT'] = 'u.user_id, u.username, u.user_colour, t.topic_title, t.topic_id, t.topic_time, t.topic_poster, t.topic_first_poster_name, t.topic_first_poster_colour, t.forum_id, t.topic_type, t.topic_status, t.poll_start';
 			$sql_t_array['SELECT'] .= ', f.topic_id, COUNT(*) AS topic_thanks';
 			$sql_t_array['LEFT_JOIN'][] = array(
@@ -298,13 +300,13 @@ class toplist
 				'FROM'	=> array($this->users_table => 'u'),
 				'ON'	=> 't.topic_poster = u.user_id'
 			);
-			$sql_t_array['GROUP_BY'] = 'f.topic_id';
+			$sql_t_array['GROUP_BY'] = 'f.topic_id, u.user_id, t.topic_title, t.topic_id';
 			$sql_t_array['ORDER_BY'] = 'topic_thanks DESC';
 			$sql_t_array['WHERE'] = $this->db->sql_in_set('f.forum_id', $ex_fid_ary, true);
 
 			$sql = $this->db->sql_build_query('SELECT',$sql_t_array);
 			$result = $this->db->sql_query_limit($sql, $end, $start);
-			$u_search_topic = append_sid("{$this->phpbb_root_path}toplist", "mode=topic");
+			$u_search_topic = $this->controller_helper->route('gfksx_thanksforposts_toplist_controller', array('mode' => 'topic', 'tslash' => ''));
 			if (!$row = $this->db->sql_fetchrow($result))
 			{
 				trigger_error('RATING_VIEW_TOPLIST_NO');
@@ -316,6 +318,10 @@ class toplist
 				{
 					// Get folder img, topic status/type related information
 					$folder_img = $folder_alt = $topic_type = '';
+					if (!function_exists('topic_status'))
+					{
+						include($this->phpbb_root_path . 'includes/functions_display.' . $this->php_ext);
+					}
 					topic_status($row, 0, false, $folder_img, $folder_alt, $topic_type);
 					$view_topic_url_params = 'f=' . (($row['forum_id']) ? $row['forum_id'] : '') . '&amp;t=' . $row['topic_id'];
 					$view_topic_url = append_sid("{$this->phpbb_root_path}viewtopic.$this->php_ext", $view_topic_url_params);
@@ -329,10 +335,10 @@ class toplist
 						'TOPIC_REPUT'				=> round($row['topic_thanks'] / ($max_topic_thanks / 100), $this->config['thanks_number_digits']) . '%',
 						'S_THANKS_TOPIC_REPUT_VIEW' => isset($this->config['thanks_topic_reput_view']) ? $this->config['thanks_topic_reput_view'] : false,
 						'S_THANKS_REPUT_GRAPHIC' 	=> isset($this->config['thanks_reput_graphic']) ? $this->config['thanks_reput_graphic'] : false,
-						'THANKS_REPUT_HEIGHT'		=> sprintf('%dpx', $this->config['thanks_reput_height']),
-						'THANKS_REPUT_GRAPHIC_WIDTH'=> sprintf('%dpx', $this->config['thanks_reput_level']*$this->config['thanks_reput_height']),
-						'THANKS_REPUT_IMAGE' 		=> (isset($this->config['thanks_reput_image'])) ? $this->phpbb_root_path . $this->config['thanks_reput_image'] : '',
-						'THANKS_REPUT_IMAGE_BACK'	=> (isset($this->config['thanks_reput_image_back'])) ? $this->phpbb_root_path . $this->config['thanks_reput_image_back'] : '',
+						'THANKS_REPUT_HEIGHT'		=> (int) $this->config['thanks_reput_height'],
+						'THANKS_REPUT_GRAPHIC_WIDTH'=> (int) $this->config['thanks_reput_level']*$this->config['thanks_reput_height'],
+						'THANKS_REPUT_IMAGE' 		=> (isset($this->config['thanks_reput_image'])) ? generate_board_url() . '/' . $this->config['thanks_reput_image'] : '',
+						'THANKS_REPUT_IMAGE_BACK'	=> (isset($this->config['thanks_reput_image_back'])) ? generate_board_url() . '/' . $this->config['thanks_reput_image_back'] : '',
 					));
 				}
 				while ($row = $this->db->sql_fetchrow($result));
@@ -342,22 +348,23 @@ class toplist
 		//forum rating
 		if (!$full_topic_rating && !$full_post_rating && $this->config['thanks_forum_reput_view'])
 		{
-			$end = ($full_forum_rating) ?  $this->config['topics_per_page'] : $end_row_rating;
+			$end = ($full_forum_rating) ?  $this->config['topics_per_page'] : $this->config['thanks_number_row_reput'];
 
-			$sql_f_array['FROM']	= array($this->thanks_table => 't');
+			$sql_f_array['FROM'] = array($this->thanks_table => 't');
 			$sql_f_array['SELECT'] = 'f.forum_name, f.forum_id';
 			$sql_f_array['SELECT'] .= ', t.forum_id, COUNT(*) AS forum_thanks';
 			$sql_f_array['LEFT_JOIN'][] = array(
 				'FROM'	=> array (FORUMS_TABLE => 'f'),
 				'ON'	=> 't.forum_id = f.forum_id',
 				);
-			$sql_f_array['GROUP_BY'] = 't.forum_id';
+			$sql_f_array['GROUP_BY'] = 't.forum_id, f.forum_name, f.forum_id';
 			$sql_f_array['ORDER_BY'] = 'forum_thanks DESC';
 			$sql_f_array['WHERE'] = $this->db->sql_in_set('t.forum_id', $ex_fid_ary, true);
 
 			$sql = $this->db->sql_build_query('SELECT',$sql_f_array);
 			$result = $this->db->sql_query_limit($sql, $end, $start);
-			$u_search_forum = append_sid("{$this->phpbb_root_path}toplist", "mode=forum");
+			$u_search_forum = $this->controller_helper->route('gfksx_thanksforposts_toplist_controller', array('mode' => 'forum', 'tslash' => ''));
+
 			if (!$row = $this->db->sql_fetchrow($result))
 			{
 				trigger_error('RATING_VIEW_TOPLIST_NO');
@@ -380,10 +387,10 @@ class toplist
 							'FORUM_REPUT'				=> round($row['forum_thanks'] / ($max_forum_thanks / 100), $this->config['thanks_number_digits']) . '%',
 							'S_THANKS_FORUM_REPUT_VIEW' => isset($this->config['thanks_forum_reput_view']) ? $this->config['thanks_forum_reput_view'] : false,
 							'S_THANKS_REPUT_GRAPHIC' 	=> isset($this->config['thanks_reput_graphic']) ? $this->config['thanks_reput_graphic'] : false,
-							'THANKS_REPUT_HEIGHT'		=> sprintf('%dpx', $this->config['thanks_reput_height']),
-							'THANKS_REPUT_GRAPHIC_WIDTH'=> sprintf('%dpx', $this->config['thanks_reput_level']*$this->config['thanks_reput_height']),
-							'THANKS_REPUT_IMAGE' 		=> (isset($this->config['thanks_reput_image'])) ? $this->phpbb_root_path . $this->config['thanks_reput_image'] : '',
-							'THANKS_REPUT_IMAGE_BACK'	=> (isset($this->config['thanks_reput_image_back'])) ? $this->phpbb_root_path . $this->config['thanks_reput_image_back'] : '',
+							'THANKS_REPUT_HEIGHT'		=> (int) $this->config['thanks_reput_height'],
+							'THANKS_REPUT_GRAPHIC_WIDTH'=> (int) $this->config['thanks_reput_level']*$this->config['thanks_reput_height'],
+							'THANKS_REPUT_IMAGE' 		=> (isset($this->config['thanks_reput_image'])) ? generate_board_url() . '/' . $this->config['thanks_reput_image'] : '',
+							'THANKS_REPUT_IMAGE_BACK'	=> (isset($this->config['thanks_reput_image_back'])) ? generate_board_url() . '/' . $this->config['thanks_reput_image_back'] : '',
 						));
 					}
 				}
@@ -402,6 +409,7 @@ class toplist
 		$this->template->assign_vars(array(
 			'PAGE_NUMBER'				=> $this->pagination->on_page($total_match_count, $this->config['posts_per_page'], $start),
 			'PAGE_TITLE'				=> $page_title,
+			'PHPBB_VERSION'				=> phpbb_version_compare(PHPBB_VERSION, '3.2.0', '>=') ? '3.2' : '3.1',
 			'S_THANKS_FORUM_REPUT_VIEW' => isset($this->config['thanks_forum_reput_view']) ? $this->config['thanks_forum_reput_view'] : false,
 			'S_THANKS_TOPIC_REPUT_VIEW' => isset($this->config['thanks_topic_reput_view']) ? $this->config['thanks_topic_reput_view'] : false,
 			'S_THANKS_POST_REPUT_VIEW'	=> isset($this->config['thanks_post_reput_view']) ? $this->config['thanks_post_reput_view'] : false,
@@ -413,12 +421,9 @@ class toplist
 			'U_SEARCH_FORUM'			=> $u_search_forum,
 		));
 
-		page_header($page_title);
-		$this->template->set_filenames(array(
-			'body' => 'toplist_body.html'));
-
 		make_jumpbox(append_sid("{$this->phpbb_root_path}viewforum.$this->php_ext"));
-		page_footer();
-		return new Response($this->template->return_display('body'), 200);
+
+		// Send all data to the template file
+		return $this->controller_helper->render('toplist_body.html', $page_title);
 	}
 }

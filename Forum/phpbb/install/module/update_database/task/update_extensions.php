@@ -77,11 +77,11 @@ class update_extensions extends task_base
 	 */
 	static public $default_extensions_update = [
 		'3.2.0-RC2' => ['phpbb/viglink'],
-		'3.2.0-RC2' => ['alg/addonforthanksforposts'],
      	'3.2.0-RC2' => ['arty/scss'],
      	'3.2.0-RC2' => ['boardtools/quickreply'],
      	'3.2.0-RC2' => ['gfksx/ListSubforumsInColumns'],
-      	'3.2.0-RC2' => ['gfksx/ThanksForPosts'],
+      	'3.2.0-RC2' => ['gfksx/thanksforposts'],
+		'3.2.0-RC2' => ['alg/addonforthanksforposts'],
        	'3.2.0-RC2' => ['kirk/new_topic_button_in_topic'],
        	'3.2.0-RC2' => ['meis2m/jalali'],
      	'3.2.0-RC2' => ['paul999/mention'],

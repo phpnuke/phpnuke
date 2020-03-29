@@ -212,7 +212,7 @@ function themefooter($custom_theme_setup = array(), $replace = false)
 				<p>".$caspian_configs['about_us']."</p>
 			</div>
 			<div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3\">
-				<h4><i class=\"fa fa-newspaper-o\"></i> "._LATEST_ARTICLES."</h4>
+				<h4><i class=\"fa fa-newspaper-o\"></i> "._TOP_ARTICLES."</h4>
 				<div class=\"line-fooot-box-head\" style=\"border-right-width: 100px;\"></div>
 				<ul>";
 					if(isset($articles[1]))
@@ -225,7 +225,7 @@ function themefooter($custom_theme_setup = array(), $replace = false)
 				$contents .= "</ul>
 			</div>
 			<div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3\">
-				<h4><i class=\"fa fa-random\"></i> "._RANDOM_ARTICLES."</h4>
+				<h4><i class=\"fa fa-random\"></i> "._HOT_ARTICLES."</h4>
 				<div class=\"line-fooot-box-head\" style=\"border-right-width: 100px;\"></div>
 				<ul>";
 					if(isset($articles[2]))
@@ -399,7 +399,7 @@ function article_index($article_info)
 		}
 	}
 	
-	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".$article_info['post_image']."&h=155&w=230&q=90")."\" width=\"230\" height=\"155\" />":"";
+	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".LinkToGT($article_info['post_image'])."&h=155&w=230&q=90&a=c")."\" width=\"230\" height=\"155\" />":"";
 	
 	$content = "
 	<article>
@@ -413,6 +413,7 @@ function article_index($article_info)
 			$post_imge
 			<p class=\"GSJustify\">".$article_info['hometext']."</p>
 		</div>
+		<div class=\"clear=\"></div>
 		<div class=\"meta\">
 			<ul>
 				<li class=\"hidden-xs\"><i class=\"fa fa-user\"></i> <a href=\"".$article_info['aid_url']."\"> ".$article_info['aid']."</a></li>
@@ -450,7 +451,7 @@ function article_more($article_info)
 		}
 	}
 	
-	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".$article_info['post_image']."&h=155&w=230&q=90")."\" width=\"230\" height=\"155\" />":"";
+	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".LinkToGT($article_info['post_image'])."&h=155&w=230&q=90&a=c")."\" width=\"230\" height=\"155\" />":"";
 	
 	$post_files = '';
 	if(!empty($article_info['download']))
@@ -491,6 +492,7 @@ function article_more($article_info)
 				".$post_files."<br />
 				<div class=\"article-tags\">$htmltags</div></p>
 			</div>
+			<div class=\"clear=\"></div>
 			<div class=\"meta\">
 				<ul>
 					<li class=\"hidden-xs\"><i class=\"fa fa-user\"></i> <a href=\"".$article_info['aid_url']."\"> ".$article_info['aid']."</a></li>
@@ -519,11 +521,11 @@ function comments_theme($el, $post_comment, $depth, $main_parent)
 	if (($el->comments_configs['anonymous'] == 1 OR is_admin() OR is_user()) && $depth <= $el->comments_configs['depth'])
 	{
 		$depth++;
-		$options[] = "<a href=\"".$el->Req_URIs_2."#commenteditor\" onclick=\"reply_to('".$post_comment['cid']."','$main_parent','".$post_comment['username']."','".mb_word_wrap(strip_tags(stripslashes($post_comment['comment'])), 100)."');\" title=\""._REPLY."\"><i class=\"glyphicon glyphicon-share-alt\"></i></a> ";
+		$options[] = "<a href=\"".$el->Req_URIs_2."\" class=\"reply-comment\" data-cid=\"".$post_comment['cid']."\" data-main-parent=\"$main_parent\" data-name=\"".$post_comment['username']."\" data-message=\"".mb_word_wrap(strip_tags(stripslashes($post_comment['comment'])), 100)."\" data-replylang=\""._IN_REPLY."\" title=\""._REPLY."\"><i class=\"glyphicon glyphicon-share-alt\"></i></a> ";
 	}
 	if ($el->comments_configs['allow_reporting'] == 1)
 	{
-		$options[] = "<a href=\"".LinkToGT("index.php?sop=report&module_name=comments&post_id=".$post_comment['cid']."&post_title="._COMMENTS."")."\" data-toggle=\"modal\" data-target=\"#sitemodal\" title=\""._POST_REPORT."\"><i class=\"glyphicon glyphicon-warning-sign\"></i></a> ";
+		$options[] = "<a href=\"".LinkToGT("index.php?sop=report&module_name=comments&post_id=".$post_comment['cid']."&post_title="._COMMENTS."")."\" data-mode=\"inline\" data-toggle=\"modal\" data-target=\"#sitemodal\" title=\""._POST_REPORT."\"><i class=\"glyphicon glyphicon-warning-sign\"></i></a> ";
 	}
 	if($el->comments_configs['allow_rating'] == 1)
 		$options[] = "<a>".$post_comment['rating_box']."</a> ";

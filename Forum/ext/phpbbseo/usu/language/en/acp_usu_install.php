@@ -4,7 +4,7 @@
 * acp_usu_install [english]
 * @package Ultimate phpBB SEO Friendly URL
 * @version $$
-* @copyright (c) 2017 www.phpbb-seo.org
+* @copyright (c) 2017 www.phpBB-SEO.ir
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */

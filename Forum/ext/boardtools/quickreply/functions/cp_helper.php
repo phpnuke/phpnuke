@@ -2,7 +2,7 @@
 /**
  *
  * @package       QuickReply Reloaded
- * @copyright (c) 2014 - 2017 Tatiana5 and LavIgor
+ * @copyright (c) 2014 - 2019 Tatiana5 and LavIgor
  * @license       http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
@@ -123,8 +123,8 @@ class cp_helper
 	public function qr_init_forums_data($forum_data)
 	{
 		return array(
-			'qr_ajax_submit' => $forum_data['qr_ajax_submit'],
-			'qr_form_type'   => $forum_data['qr_form_type'],
+			'qr_ajax_submit' => (isset($forum_data['qr_ajax_submit'])) ? $forum_data['qr_ajax_submit'] : 0,
+			'qr_form_type'   => (isset($forum_data['qr_form_type'])) ? $forum_data['qr_form_type'] : 0,
 		);
 	}
 }

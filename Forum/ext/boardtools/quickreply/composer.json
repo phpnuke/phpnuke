@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Extended possibilities to use the QuickReply feature.",
     "homepage": "http://boardtools.github.io/QuickReply/",
-    "version": "2.0.0-beta",
+    "version": "2.0.0-beta4",
     "license": "GPL-2.0",
     "authors": [
         {
@@ -18,8 +18,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "fortawesome/font-awesome": "~4.3"
+        "php": ">=5.3.3"
     },
     "require-dev": {
         "phpbb/epv": "dev-master"

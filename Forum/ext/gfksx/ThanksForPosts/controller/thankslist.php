@@ -8,9 +8,7 @@
 *
 */
 
-namespace gfksx\ThanksForPosts\controller;
-
-use Symfony\Component\HttpFoundation\Response;
+namespace gfksx\thanksforposts\controller;
 
 class thankslist
 {
@@ -29,6 +27,9 @@ class thankslist
 	/** @var \phpbb\user */
 	protected $user;
 
+	/** @var \phpbb\language\language */
+	protected $language;
+
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
 
@@ -41,7 +42,7 @@ class thankslist
 	/** @var \phpbb\request\request_interface */
 	protected $request;
 
-	/** @var phpbb\controller\helper */
+	/** @var \phpbb\controller\helper */
 	protected $controller_helper;
 
 	/** @var string THANKS_TABLE */
@@ -57,32 +58,33 @@ class thankslist
 	protected $php_ext;
 
 	/**
-	* Constructor
-	*
-	* @param \phpbb\config\config                 $config                Config object
-	* @param \phpbb\db\driver\driver_interface    $db                    DBAL object
-	* @param \phpbb\auth\auth                     $auth                  Auth object
-	* @param \phpbb\template\template             $template              Template object
-	* @param \phpbb\user                          $user                  User object
-	* @param \phpbb\cache\driver\driver_interface $cache                 Cache driver object
-	* @param \phpbb\pagination                    $pagination            Pagination object
-	* @param \phpbb\profilefields\manager         $profilefields_manager Profile fields manager object
-	* @param \phpbb\request\request_interface     $request               Request object
-	* @param \phpbb\controller\helper             $controller_helper     Controller helper object
-	* @param string                               $thanks_table          THANKS_TABLE
-	* @param string                               $users_table           USERS_TABLE
-	* @param string                               $phpbb_root_path       phpbb_root_path
-	* @param string                               $php_ext               phpEx
-	* @return gfksx\ThanksForPosts\controller\thankslist
-	* @access public
-	*/
-	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\auth\auth $auth, \phpbb\template\template $template, \phpbb\user $user, \phpbb\cache\driver\driver_interface $cache, \phpbb\pagination $pagination, \phpbb\profilefields\manager $profilefields_manager, \phpbb\request\request_interface $request, \phpbb\controller\helper $controller_helper, $thanks_table, $users_table, $phpbb_root_path, $php_ext)
+	 * Constructor
+	 *
+	 * @param \phpbb\config\config					$config					Config object
+	 * @param \phpbb\db\driver\driver_interface		$db						DBAL object
+	 * @param \phpbb\auth\auth						$auth					Auth object
+	 * @param \phpbb\template\template				$template				Template object
+	 * @param \phpbb\user							$user					User object
+	 * @param \phpbb\language\language				$language				Language object
+	 * @param \phpbb\cache\driver\driver_interface	$cache					Cache driver object
+	 * @param \phpbb\pagination						$pagination				Pagination object
+	 * @param \phpbb\profilefields\manager			$profilefields_manager	Profile fields manager object
+	 * @param \phpbb\request\request_interface		$request				Request object
+	 * @param \phpbb\controller\helper				$controller_helper		Controller helper object
+	 * @param string								$thanks_table			THANKS_TABLE
+	 * @param string								$users_table			USERS_TABLE
+	 * @param string								$phpbb_root_path		phpbb_root_path
+	 * @param string								$php_ext				phpEx
+	 * @access public
+	 */
+	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\auth\auth $auth, \phpbb\template\template $template, \phpbb\user $user, \phpbb\language\language $language, \phpbb\cache\driver\driver_interface $cache, \phpbb\pagination $pagination, \phpbb\profilefields\manager $profilefields_manager, \phpbb\request\request_interface $request, \phpbb\controller\helper $controller_helper, $thanks_table, $users_table, $phpbb_root_path, $php_ext)
 	{
 		$this->config = $config;
 		$this->db = $db;
 		$this->auth = $auth;
 		$this->template = $template;
 		$this->user = $user;
+		$this->language = $language;
 		$this->cache = $cache;
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->php_ext = $php_ext;
@@ -96,8 +98,8 @@ class thankslist
 
 	public function main($mode, $author_id, $give)
 	{
-		$this->user->add_lang(array('memberlist', 'groups', 'search'));
-		$this->user->add_lang_ext('gfksx/ThanksForPosts', 'thanks_mod');
+		$this->language->add_lang(['memberlist', 'groups', 'search']);
+		$this->language->add_lang('thanks_mod', 'gfksx/thanksforposts');
 
 		// Grab data
 		$row_number	= $total_users = 0;
@@ -116,7 +118,6 @@ class thankslist
 		}
 		$top = $this->request->variable('top', 0);
 		$start = $this->request->variable('start', 0);
-		$submit = (isset($_POST['submit'])) ? true : false;
 		$default_key = 'a';
 		$sort_key = $this->request->variable('sk', $default_key);
 		$sort_dir = $this->request->variable('sd', 'd');
@@ -128,27 +129,26 @@ class thankslist
 		{
 			case 'givens':
 				$per_page = $this->config['posts_per_page'];
-				$total_match_count = 0;
 				$page_title = $this->user->lang['SEARCH'];
 				$template_html = 'thanks_results.html';
 
 				switch ($give)
 				{
 					case 'true':
-					$u_search = $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $author_id, 'give' => 'true', 'tslash' => ''));
+					$u_search = $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $author_id, 'give' => 'true', 'tslash' => ''));
 
 					$sql = 'SELECT COUNT(user_id) AS total_match_count
 						FROM ' . $this->thanks_table . '
-						WHERE (' . $this->db->sql_in_set('forum_id', $ex_fid_ary, true) . ' OR forum_id = 0) AND user_id = '.$author_id;
+						WHERE (' . $this->db->sql_in_set('forum_id', $ex_fid_ary, true) . ' OR forum_id = 0) AND user_id = ' . (int) $author_id;
 					$where = 'user_id';
 					break;
 
 					case 'false':
-					$u_search = $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $author_id, 'give' => 'false', 'tslash' => ''));
+					$u_search = $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $author_id, 'give' => 'false', 'tslash' => ''));
 
 					$sql = 'SELECT COUNT(DISTINCT post_id) as total_match_count
 						FROM ' . $this->thanks_table . '
-						WHERE (' . $this->db->sql_in_set('forum_id', $ex_fid_ary, true) . ' OR forum_id = 0) AND poster_id = '.$author_id;
+						WHERE (' . $this->db->sql_in_set('forum_id', $ex_fid_ary, true) . ' OR forum_id = 0) AND poster_id = ' . (int) $author_id;
 					$where = 'poster_id';
 					break;
 				}
@@ -167,7 +167,7 @@ class thankslist
 					$sql_array = array(
 						'SELECT'	=> 'u.username, u.user_colour, p.poster_id, p.post_id, p.topic_id, p.forum_id, p.post_time, p.post_subject, p.post_text, p.post_username, p.bbcode_bitfield, p.bbcode_uid, p.post_attachment, p.enable_bbcode, p. enable_smilies, p.enable_magic_url',
 						'FROM'		=> array ($this->thanks_table => 't'),
-						'WHERE'		=> '('. $this->db->sql_in_set('t.forum_id', $ex_fid_ary, true) . ' OR t.forum_id = 0) AND t.' . $where . "= $author_id"
+						'WHERE'		=> '('. $this->db->sql_in_set('t.forum_id', $ex_fid_ary, true) . ' OR t.forum_id = 0) AND t.' . $where . ' = ' . (int) $author_id,
 					);
 					$sql_array['LEFT_JOIN'][] = array(
 						'FROM'	=> array($this->users_table => 'u'),
@@ -264,7 +264,7 @@ class thankslist
 					'PAGE_NUMBER'		=> $this->pagination->on_page($total_match_count, $per_page, $start),
 					'TOTAL_MATCHES'		=> $total_match_count,
 					'SEARCH_MATCHES'	=> $l_search_matches,
-					'U_THANKS'			=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('tslash' => '')),
+					'U_THANKS'			=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('tslash' => '')),
 				));
 
 			break;
@@ -299,24 +299,11 @@ class thankslist
 				// Sorting
 				$sort_key_text = array('a' => $this->user->lang['SORT_USERNAME'], 'b' => $this->user->lang['SORT_LOCATION'], 'c' => $this->user->lang['SORT_JOINED'], 'd' => $this->user->lang['SORT_POST_COUNT'], 'e' => 'R_THANKS', 'f' => 'G_THANKS',);
 				$sort_key_sql = array('a' => 'u.username_clean', 'b' => 'u.user_from', 'c' => 'u.user_regdate', 'd' => 'u.user_posts', 'e' => 'count_thanks', 'f' => 'count_thanks');
-				$sort_dir_text = array('a' => $this->user->lang['ASCENDING'], 'd' => $this->user->lang['DESCENDING']);
+
 				if ($this->auth->acl_get('u_viewonline'))
 				{
 					$sort_key_text['l'] = $this->user->lang['SORT_LAST_ACTIVE'];
 					$sort_key_sql['l'] = 'u.user_lastvisit';
-				}
-
-				$s_sort_key = '';
-				foreach ($sort_key_text as $key => $value)
-				{
-					$selected = ($sort_key == $key) ? ' selected="selected"' : '';
-					$s_sort_key .= '<option value="' . $key . '"' . $selected . '>' . $value . '</option>';
-				}
-				$s_sort_dir = '';
-				foreach ($sort_dir_text as $key => $value)
-				{
-					$selected = ($sort_dir == $key) ? ' selected="selected"' : '';
-					$s_sort_dir .= '<option value="' . $key . '"' . $selected . '>' . $value . '</option>';
 				}
 
 				// Sorting and order
@@ -335,7 +322,7 @@ class thankslist
 				);
 				foreach ($check_params as $key => $call)
 				{
-					if (!isset($_REQUEST[$key]))
+					if (!$this->request->is_set($key))
 					{
 						continue;
 					}
@@ -349,7 +336,7 @@ class thankslist
 						$sort_params[] = $param;
 					}
 				}
-				$pagination_url = $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array_merge($params, array('tslash' => '')));
+				$pagination_url = $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array_merge($params, array('tslash' => '')));
 
 				// Grab relevant data
 				$sql = 'SELECT DISTINCT poster_id
@@ -360,6 +347,7 @@ class thankslist
 				{
 					$rowsp[] = $row['poster_id'];
 				}
+				$this->db->sql_freeresult($result);
 
 				$sql = 'SELECT DISTINCT user_id
 					FROM ' . $this->thanks_table;
@@ -369,6 +357,7 @@ class thankslist
 				{
 					$rowsu[] = $row['user_id'];
 				}
+				$this->db->sql_freeresult($result);
 
 				if ($sort_key == 'e')
 				{
@@ -454,8 +443,8 @@ class thankslist
 					$id_cache = array();
 					do
 					{
-						$row['session_time'] = (!empty($session_times[$session['user_id']])) ? $session_times[$session['user_id']] : 0;
-						$row['last_visit'] = (!empty($session['session_time'])) ? $session['session_time'] : $session['user_lastvisit'];
+						$row['session_time'] = (!empty($session_times[$row['user_id']])) ? $session_times[$row['user_id']] : 0;
+						$row['last_visit'] = (!empty($row['session_time'])) ? $row['session_time'] : $row['user_lastvisit'];
 						$user_list[] = (int) $row['user_id'];
 						$id_cache[$row['user_id']] = $row;
 					}
@@ -492,11 +481,15 @@ class thankslist
 					{
 						$user_id = $user_list[$i];
 						$row = $id_cache[$user_id];
-						$last_visit = $row['user_lastvisit'];
 						$rank_title = $rank_img = $rank_img_src = '';
-						include_once($this->phpbb_root_path . 'includes/functions_display.' . $this->php_ext);
-						get_user_rank($row['user_rank'], (($user_id == ANONYMOUS) ? false : $row['user_posts']), $rank_title, $rank_img, $rank_img_src);
 						$sthanks = true;
+
+						if (!function_exists('get_user_rank'))
+						{
+							include($this->phpbb_root_path . 'includes/functions_display.' . $this->php_ext);
+						}
+						get_user_rank($row['user_rank'], (($user_id == ANONYMOUS) ? false : $row['user_posts']), $rank_title, $rank_img, $rank_img_src);
+
 						// Custom Profile Fields
 						$cp_row = array();
 						if ($this->config['load_cpf_memberlist'])
@@ -504,26 +497,12 @@ class thankslist
 							$cp_row = isset($profile_fields_cache[$user_id]) ? $this->profilefields_manager->generate_profile_fields_template_data($profile_fields_cache[$user_id], false) : array();
 						}
 
-						$memberrow = array_merge(phpbb_show_profile($row), array(
+						$memberrow = array_merge(phpbb_show_profile($row, false, false, false), array(
 							'ROW_NUMBER'			=> $row_number + ($start + 1),
-							'RANK_TITLE'			=> $rank_title,
-							'RANK_IMG'				=> $rank_img,
-							'RANK_IMG_SRC'			=> $rank_img_src,
 							'GIVENS'				=> (!isset($givens[$user_id])) ? 0 : $givens[$user_id],
 							'RECEIVED'				=> (!isset($reseved[$user_id])) ? 0 : $reseved[$user_id],
-							'JOINED'				=> $this->user->format_date($row['user_regdate']),
-							'VISITED'				=> (empty($last_visit)) ? ' - ' : $this->user->format_date($last_visit),
-							'POSTS'					=> ($row['user_posts']) ? $row['user_posts'] : 0,
-							'USERNAME_FULL'			=> get_username_string('full', $row['user_id'], $row['username'], $row['user_colour']),
-							'USERNAME'				=> get_username_string('username', $row['user_id'], $row['username'], $row['user_colour']),
-							'USER_COLOR'			=> get_username_string('colour', $row['user_id'], $row['username'], $row['user_colour']),
-							'U_VIEW_PROFILE'		=> get_username_string('profile', $row['user_id'], $row['username'], $row['user_colour']),
-							'U_SEARCH_USER'			=> ($this->auth->acl_get('u_search')) ? append_sid("{$this->phpbb_root_path}search.$this->php_ext", "author_id=$user_id&amp;sr=posts") : '',
-							'U_SEARCH_USER_GIVENS'	=> ($this->auth->acl_get('u_search')) ? $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $user_id, 'give' => 'true', 'tslash' => '')) : '',
-							'U_SEARCH_USER_RECEIVED'=> ($this->auth->acl_get('u_search')) ? $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $user_id, 'give' => 'false', 'tslash' => '')) : '',
-							'L_VIEWING_PROFILE'		=> sprintf($this->user->lang['VIEWING_PROFILE'], $row['username']),
-							'VISITED'				=> (empty($last_visit)) ? ' - ' : $this->user->format_date($last_visit),
-							'S_CUSTOM_FIELDS'		=> (isset($cp_row['row']) && sizeof($cp_row['row'])) ? true : false,
+							'U_SEARCH_USER_GIVENS'	=> ($this->auth->acl_get('u_search')) ? $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $user_id, 'give' => 'true', 'tslash' => '')) : '',
+							'U_SEARCH_USER_RECEIVED'=> ($this->auth->acl_get('u_search')) ? $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller_user', array('mode' => 'givens', 'author_id' => $user_id, 'give' => 'false', 'tslash' => '')) : ''
 						));
 
 						if (isset($cp_row['row']) && sizeof($cp_row['row']))
@@ -545,13 +524,14 @@ class thankslist
 					$this->pagination->generate_template_pagination($pagination_url, 'pagination', 'start', $total_users, $this->config['topics_per_page'], $start);
 					$this->template->assign_vars(array(
 						'PAGE_NUMBER'			=> $this->pagination->on_page($total_users, $this->config['topics_per_page'], $start),
-						'U_SORT_POSTS'			=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('mode' => $mode, 'sk' => 'd', 'sd' => (($sort_key == 'd' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
-						'U_SORT_USERNAME'		=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('mode' => $mode, 'sk' => 'a', 'sd' => (($sort_key == 'a' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
-						'U_SORT_FROM'			=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('mode' => $mode, 'sk' => 'b', 'sd' => (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
-						'U_SORT_JOINED'			=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('mode' => $mode, 'sk' => 'c', 'sd' => (($sort_key == 'c' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
-						'U_SORT_THANKS_R'		=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('mode' => $mode, 'sk' => 'e', 'sd' => (($sort_key == 'e' && $sort_dir == 'd') ? 'a' : 'd'), 'tslash' => '')),
-						'U_SORT_THANKS_G'		=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('mode' => $mode, 'sk' => 'f', 'sd' => (($sort_key == 'f' && $sort_dir == 'd') ? 'a' : 'd'), 'tslash' => '')),
-						'U_SORT_ACTIVE'			=> ($this->auth->acl_get('u_viewonline')) ? $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('mode' => $mode, 'sk' => 'l', 'sd' => (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')) : '',
+						'U_SORT_POSTS'			=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('mode' => $mode, 'sk' => 'd', 'sd' => (($sort_key == 'd' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
+						'U_SORT_USERNAME'		=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('mode' => $mode, 'sk' => 'a', 'sd' => (($sort_key == 'a' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
+						'U_SORT_FROM'			=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('mode' => $mode, 'sk' => 'b', 'sd' => (($sort_key == 'b' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
+						'U_SORT_JOINED'			=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('mode' => $mode, 'sk' => 'c', 'sd' => (($sort_key == 'c' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')),
+						'U_SORT_THANKS_R'		=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('mode' => $mode, 'sk' => 'e', 'sd' => (($sort_key == 'e' && $sort_dir == 'd') ? 'a' : 'd'), 'tslash' => '')),
+						'U_SORT_THANKS_G'		=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('mode' => $mode, 'sk' => 'f', 'sd' => (($sort_key == 'f' && $sort_dir == 'd') ? 'a' : 'd'), 'tslash' => '')),
+						'U_SORT_ACTIVE'			=> ($this->auth->acl_get('u_viewonline')) ? $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('mode' => $mode, 'sk' => 'l', 'sd' => (($sort_key == 'l' && $sort_dir == 'a') ? 'd' : 'a'), 'tslash' => '')) : '',
+						'S_VIEWONLINE'		=> $this->auth->acl_get('u_viewonline')
 					));
 				}
 			break;
@@ -560,18 +540,13 @@ class thankslist
 		// Output the page
 		$this->template->assign_vars(array(
 			'TOTAL_USERS'		=> $this->user->lang('LIST_USERS', $total_users),
-			'U_THANKS'			=> $this->controller_helper->route('gfksx_ThanksForPosts_thankslist_controller', array('tslash' => '')),
+			'U_THANKS'			=> $this->controller_helper->route('gfksx_thanksforposts_thankslist_controller', array('tslash' => '')),
 			'S_THANKS'			=> $sthanks,
 		));
 
-		page_header($page_title);
-
-		$this->template->set_filenames(array(
-			'body' => $template_html)
-		);
-
 		make_jumpbox(append_sid("{$this->phpbb_root_path}viewforum.$this->php_ext"));
-		page_footer();
-		return new Response($this->template->return_display('body'), 200);
+
+		// Send all data to the template file
+		return $this->controller_helper->render($template_html, $page_title);
 	}
 }

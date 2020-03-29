@@ -11,12 +11,14 @@ if(isset($pn_credits_config['credits_direct_msg']) && $pn_credits_config['credit
 
 $contents .= OpenTable(_CREDITS_ADMIN.' - '.$form_title);
 
+$gateways_list = (isset($pn_credits_config['gateways']) && !empty($pn_credits_config['gateways'])) ? credit_get_gateways_list(true):"";
+
 $contents .= "
 <form action=\"".LinkToGT("index.php?modname=Credits")."\" id=\"credit_form\" method=\"post\" class=\"form-horizontal\" style=\"padding:10px;\" enctype=\"multipart/form-data\">
 	<div class=\"form-group\">
 		<label class=\"col-sm-2 control-label\">"._CREDITS_PAY_METHOD."</label>
 		<div class=\"col-sm-5\">";
-		if(isset($pn_credits_config['gateways']) && !empty($pn_credits_config['gateways']))
+		if($gateways_list != '')
 		{
 			$contents .= "<input type=\"radio\" name=\"credit_method\" value=\"1\" id=\"online_credit\" data-label=\""._CREDITS_PAY_ONLINE."\" checked /> <label for=\"online_credit\">"._CREDITS_PAY_ONLINE."</label>";
 		}
@@ -43,7 +45,7 @@ $contents .= "
 		else
 		{
 		$contents .= "<div class=\"col-sm-5\">
-			<input type=\"radio\" name=\"credit_method\" value=\"2\" id=\"offline_credit\" data-label=\""._CREDITS_PAY_OFFLINE."\" /> <label for=\"offline_credit\">"._CREDITS_PAY_OFFLINE."</label>
+			<input type=\"radio\" name=\"credit_method\" value=\"2\" id=\"offline_credit\" data-label=\""._CREDITS_PAY_OFFLINE."\" ".(($gateways_list == '' && (!isset($order_data) || empty($order_data))) ? "checked":"")." /> <label for=\"offline_credit\">"._CREDITS_PAY_OFFLINE."</label>
 		</div>";
 		}
 	$contents .= "</div>";
@@ -78,14 +80,14 @@ $contents .= "
 		";
 	}
 	$contents .= "<div class=\"credit_form\">
-		<div id=\"online_form\">";
-			if(isset($pn_credits_config['gateways']) && !empty($pn_credits_config['gateways']))
+		<div id=\"online_form\" style=\"display:".(($gateways_list == '') ? 'none':'block').";\">";
+			if($gateways_list != '')
 			{
 			$contents .= "<div class=\"form-group\">
 				<label class=\"col-sm-2 control-label\">"._CREDIT_DETAILS_GATEWAY."</label>
 				<div class=\"col-sm-10\">
 					<select class=\"selectpicker\" name=\"credit_gateway\" id=\"credit_gateway\" data-validation=\"required\">
-						".credit_get_gateways_list(true)."
+						".$gateways_list."
 					</select>
 				</div>
 			</div>";
@@ -95,7 +97,7 @@ $contents .= "
 			$contents .= "<div class=\"form-group\">
 				<label class=\"col-sm-2 control-label\">"._CREDITS_AMOUNT."</label>
 				<div class=\"col-sm-10\">
-					<input class=\"form-control digit_group_numbers\" id=\"online_creditamount\" name=\"online_credit[amount]\" type=\"text\" placeholder=\""._CREDITS_AMOUNT_IN_RIAL."\" data-validation=\"number required\">
+					<input class=\"form-control digit_group_numbers\" id=\"online_creditamount\" name=\"online_credit[amount]\" type=\"text\" placeholder=\""._CREDITS_AMOUNT_IN_RIAL."\" data-validation=\"required\">
 				</div>
 			</div>";
 			}
@@ -113,7 +115,7 @@ $contents .= "
 			</div>
 		</div>
 		
-		<div id=\"offline_form\" style=\"display:none;\">";
+		<div id=\"offline_form\" style=\"display:".(($gateways_list == '') ? 'block':'none').";\">";
 			if(!isset($order_data) || empty($order_data))
 			{
 			$contents .= "<div class=\"form-group\">
@@ -170,7 +172,21 @@ $contents .= "
 			</div>
 		</div>
 	</div>
-</form>
+</form>";
+$contents .= CloseTable();
+
+	
+$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
+$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.css\" rel=\"stylesheet\" type=\"text/css\">";
+
+$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
+$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
+
+$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\" /></script>";
+$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
+$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
+
+$defer_js[] = "
 <script>
 	$(document).ready(function(){
 		$(\"#online_credit\").on('click', function(){
@@ -198,7 +214,15 @@ $contents .= "
 			modules : 'security',
 		});
 	});
-</script>
-";
-$contents .= CloseTable();
+</script>";
+
+if($nuke_configs['multilingual'] == 1)
+{
+	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
+	if($nuke_configs['datetype'] == 1)
+		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
+	elseif($nuke_configs['datetype'] == 2)
+		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
+}
+
 ?>

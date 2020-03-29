@@ -11,6 +11,7 @@
 namespace paul999\mention\controller;
 
 use phpbb\auth\auth;
+use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
 use phpbb\exception\http_exception;
 use phpbb\request\request_interface;
@@ -43,19 +44,26 @@ class main
 	private $request;
 
 	/**
+	 * @var config
+	 */
+	private $config;
+
+	/**
 	 * Constructor
 	 *
 	 * @param user $user
 	 * @param driver_interface $db
 	 * @param auth $auth
 	 * @param request_interface $request
+	 * @param config $config
 	 */
-	public function __construct(user $user, driver_interface $db, auth $auth, request_interface $request)
+	public function __construct(user $user, driver_interface $db, auth $auth, request_interface $request, config $config)
 	{
 		$this->user = $user;
 		$this->db = $db;
 		$this->auth = $auth;
 		$this->request = $request;
+		$this->config = $config;
 	}
 
 	/**
@@ -72,14 +80,14 @@ class main
 		}
 		$name = utf8_clean_string($this->request->variable('q', '', true));
 
-		if (strlen($name) < 2)
+		if (strlen($name) < $this->config['simple_mention_minlength'])
 		{
-			return new JsonResponse(['usernames' => []]);
+			return new JsonResponse([]);
 		}
 
-		$sql = 'SELECT user_id, username 
-					FROM ' . USERS_TABLE . ' 
-					WHERE user_id <> ' . ANONYMOUS . ' 
+		$sql = 'SELECT user_id, username
+					FROM ' . USERS_TABLE . '
+					WHERE user_id <> ' . ANONYMOUS . '
 					AND ' . $this->db->sql_in_set('user_type', [USER_NORMAL, USER_FOUNDER]) .  '
 					AND username_clean ' . $this->db->sql_like_expression($name . $this->db->get_any_char());
 		$result = $this->db->sql_query($sql);
@@ -88,8 +96,8 @@ class main
 		while ($row = $this->db->sql_fetchrow($result))
 		{
 			$return[] = [
-				'name'  => $row['username'],
-				'id'    => $row['user_id'],
+				'key'       =>$row['username'],
+				'value'     => $row['username'],
 			];
 		}
 		$this->db->sql_freeresult($result);

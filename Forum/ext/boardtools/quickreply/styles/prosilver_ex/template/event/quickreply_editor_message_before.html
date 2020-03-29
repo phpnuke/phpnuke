@@ -1,0 +1,91 @@
+<!-- IF S_QR_NOT_CHANGE_SUBJECT -->
+	<input type="hidden" name="subject" value="{SUBJECT}" />
+<!-- ENDIF -->
+
+<!-- IF S_DISPLAY_USERNAME -->
+<dl style="clear: left;">
+	<dt><label for="username">{L_USERNAME}{L_COLON}</label></dt>
+	<dd><input type="text" tabindex="1" name="username" id="username" size="25" value="{USERNAME}" class="inputbox autowidth" /></dd>
+</dl>
+<!-- ENDIF -->
+
+<!-- IF CAPTCHA_TEMPLATE and S_CONFIRM_CODE -->
+<!-- DEFINE $CAPTCHA_TAB_INDEX = 3 -->
+<div id="qr_captcha_container">
+<!-- INCLUDE {CAPTCHA_TEMPLATE} -->
+</div>
+<!-- ENDIF -->
+
+<!-- IF S_QR_CAPS_ENABLE -->
+<script>
+	function qr_formatToggle(s)
+	{
+		var t = '', sc = s.length, c;
+		for (i = 0; i < sc; i++)
+		{
+			c = s.charAt(i);
+			if (c.toLowerCase() == c) c = c.toUpperCase();
+			else if (c.toUpperCase() == c) c = c.toLowerCase();
+			t += c;
+		}
+		return t;
+	}
+    // param: reg = 0 - lowercase, reg = 1 - uppercase, reg = 2 - inverse
+	function qr_updateCase(reg)
+	{
+		var buf = '', selection = null, start, end;
+		var txtarea = document.forms[form_name].elements[text_name];
+
+		if (document.selection) {
+			selection = document.selection.createRange();
+			buf = selection.text;
+		}
+		else if (typeof (txtarea.selectionStart) == "number") {
+			start = txtarea.selectionStart;
+			end = txtarea.selectionEnd;
+			if (start != end)  buf = txtarea.value.substr(start, end - start);
+			else buf = txtarea.value;
+		}
+		else {
+			buf = txtarea.value;
+		}
+
+		switch (parseInt(reg)) {
+			case 0: buf = buf.toLowerCase(); break;
+			case 1: buf = buf.toUpperCase(); break;
+			case 2: buf = qr_formatToggle(buf); break;
+		}
+
+		if (selection) {
+			selection.text = buf;
+		}
+		else if (start != end) {
+			txtarea.value = txtarea.value.substr(0, start) + buf + txtarea.value.substr(end);
+		}
+		else {
+			txtarea.value = buf;
+		}
+		txtarea.focus();
+	}
+</script>
+<!-- ENDIF -->
+<!-- IF S_ABBC3_INSTALLED and S_BBCODE_BUTTONS -->
+	<!-- INCLUDE @vse_abbc3/abbc3_posting_buttons.html -->
+<!-- ENDIF -->
+
+<!-- IF S_QR_CAPS_ENABLE or S_QR_SHOW_BUTTON_TRANSLIT-->
+<div id="register-and-translit">
+<!-- IF S_QR_CAPS_ENABLE -->
+	<abbr style="border-bottom:1px dashed #777; cursor:help;" title="{L_QR_TRANSFORM_TEXT_TOOLTIP}">{L_QR_TRANSFORM_TEXT}{L_COLON}</abbr>&nbsp;
+	<input type="button" class="button2" accesskey="t" name="uppercase" value="{L_QR_TRANSFORM_TEXT_UPPER}" onclick="qr_updateCase(1)"  title="{L_QR_TRANSFORM_TEXT_UPPER_TOOLTIP}" />
+    <input type="button" class="button2" accesskey="t" name="lowercase" value="{L_QR_TRANSFORM_TEXT_LOWER}" onclick="qr_updateCase(0)"  title="{L_QR_TRANSFORM_TEXT_LOWER_TOOLTIP}" />
+	<input type="button" class="button2" accesskey="t" name="inverscase" value="{L_QR_TRANSFORM_TEXT_INVERS}" onclick="qr_updateCase(2)"  title="{L_QR_TRANSFORM_TEXT_INVERS_TOOLTIP}" />
+<!-- ENDIF -->
+<!-- IF S_QR_SHOW_BUTTON_TRANSLIT -->
+	<abbr style="border-bottom:1px dashed #777; cursor:help;" title="{L_QR_TRANSLIT_TEXT_TOOLTIP}">{L_QR_TRANSLIT_TEXT}{L_COLON}</abbr>&nbsp;
+	<input type="button" class="button2" accesskey="t" name="uppercase" value="{L_QR_TRANSLIT_TEXT_TO_RU}" onclick="translit()"  title="{L_QR_TRANSLIT_TEXT_TOOLTIP}" />
+<!-- ENDIF -->
+</div>
+<!-- ENDIF -->
+<!-- EVENT ext_quickreply_transform_text_buttons_after -->
+<!-- INCLUDE @boardtools_quickreply/quickreply_form_buttons.html -->

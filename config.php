@@ -75,6 +75,8 @@ $pn_cache_type = "MySQL";
 $admin_file = "admin";
 $pn_salt = "";
 $old_site_link = "";
+define("_MAX_CACHE_COUNTER_TIME", 3600);
+define("_MAX_CACHE_COUNTER_LINES", 1000);
 
 /*********************************************************************/
 /* You finished to configure the Database. Now you can change all    */

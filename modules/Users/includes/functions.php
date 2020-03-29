@@ -30,21 +30,21 @@ $ya_config['data_verification']['username'] = array(
 	"data-validation" => "required length server",
 	"data-validation-length" => "".$ya_config['nick_min']."-".$ya_config['nick_max']."",
 	"data-validation-url" => LinkToGT("index.php?modname=$module_name&op=check_register_fields"),
-	"data-validation-req-params" => array('json', json_encode(array('field'=>'username', 'default_check'=>'true'))),
+	"data-validation-req-params" => array('json', json_encode(array('field'=>'username', 'mode'=>'{MODE}', 'default_value'=>'{DEFAULT}', 'csrf_token'=>get_form_token()))),
 	"data-validation-param-name" => "value"
 );
 
 $ya_config['data_verification']['user_realname'] = array(
 	"data-validation"=> "server",
 	"data-validation-url" => LinkToGT("index.php?modname=$module_name&op=check_register_fields"),
-	"data-validation-req-params" => array('json', json_encode(array('field'=>'user_realname', 'default_check'=>'true'))),
+	"data-validation-req-params" => array('json', json_encode(array('field'=>'user_realname', 'default_value'=>'{DEFAULT}', 'mode'=>'{MODE}', 'csrf_token'=>get_form_token()))),
 	"data-validation-param-name" => "value"
 );
 
 $ya_config['data_verification']['user_email'] = array(
 	"data-validation" => "required email server",
 	"data-validation-url" => LinkToGT("index.php?modname=$module_name&op=check_register_fields"),
-	"data-validation-req-params" => array('json', json_encode(array('field'=>'user_email', 'default_check'=>'true'))),
+	"data-validation-req-params" => array('json', json_encode(array('field'=>'user_email', 'default_value'=>'{DEFAULT}', 'mode'=>'{MODE}', 'csrf_token'=>get_form_token()))),
 	"data-validation-param-name" => "value"
 );
 
@@ -229,13 +229,16 @@ function avatar_gravatar($data, &$error)
 	if(isset($data['gravatar']) && $data['gravatar'] != '')
 	{
 		$gravatar =  adv_filter($data['gravatar'], array('sanitize_email'));
+		
 		if($gravatar[0] != 'error')
 			$user_gravatar = $gravatar[1];
 		else
+		{
 			$error[] = "خطا : ".$gravatar[1]."";
 			return false;
+		}
 	}
-		
+
 	if(!validate_mail($user_gravatar))
 	{
 		$error[] = "ایمیل نامعتبر : $user_gravatar";

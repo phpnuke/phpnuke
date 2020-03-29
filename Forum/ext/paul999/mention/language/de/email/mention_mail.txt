@@ -2,7 +2,7 @@ Subject: Du wurdest erwähnt
 
 Hallo,
 
-Du wurdest von "{USERNAME}" bei "{SITENAME}" erwähnt.
+Du wurdest von "{AUTHOR_NAME}" bei "{SITENAME}" erwähnt.
 
 Um den Beitrag zu lesen, in dem du erwähnt wurdest, rufe den folgenden Link auf:
 

@@ -70,6 +70,7 @@ function login_sign_up_theme($mode="header")
 		"default_link_rel" => array(
 			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/114x114.png\">",
 			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/72x72.png\">",
+			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"57x57\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/57x57.png\">",
 			"<link rel=\"apple-touch-icon-precomposed\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/default.png\">",
 			"<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/favicon.png\">",
 		),
@@ -184,7 +185,7 @@ function ya_custum_userfields(&$userinfo, $user_id)
 	}
 }
 
-function _check_register_fields($field = 'username', $value = '', $retuen_num = false, $default_check = false)
+function _check_register_fields($field = 'username', $value = '', $retuen_num = false, $mode = 'new', $default_value = '')
 {
 	global $db, $nuke_configs, $ya_config;
 
@@ -200,9 +201,12 @@ function _check_register_fields($field = 'username', $value = '', $retuen_num = 
 	  'message' => 'Post argument is missing.'
 	);
 	
-	if(filter_var($default_check, FILTER_VALIDATE_BOOLEAN) && isset($userinfo[$field]) && $userinfo[$field] == $value)
+	if(filter($mode, 'nohtml') == 'edit' && isset($userinfo[$field]) && $userinfo[$field] == $value)
 	{
-		$response = array('valid' => true, 'message' => '');
+		$default_value = (isset($default_value) && $default_value != '') ? filter($default_value, "nohtml"):"";
+		$response = ($default_value != '' && $default_value == $userinfo[$field]) ? true:false;
+		$message = ($response) ? '':(($field == "username") ? _USER_HAS_REGISTERED:(($field == "user_email") ? _USER_EMAIL_HAS_SELECTED:'bad value'));
+		$response = array('valid' => $response, 'message' => $message);
 		die(json_encode($response));
 	}
 	

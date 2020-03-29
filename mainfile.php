@@ -879,22 +879,6 @@ if(isset($captcha) && isset($id) && $id != '')
 
 suspend_site_show();
 
-$sop = (isset($sop)) ? filter($sop, "nohtml"):"";
-if($sop != '')
-{
-	switch($sop)
-	{
-		case"report":
-			$post_link = isset($post_link) ? filter($post_link):"";
-			$module_name = isset($module_name) ? filter($module_name, "nohtml"):"";
-			$post_title = isset($post_title) ? filter($post_title, "nohtml"):"";
-			$post_id = isset($post_id) ? intval($post_id):0;
-			report_friend_form(false, $sop, $post_id, $post_title, $module_name, '', '', $post_link, '', '');
-		break;
-	}
-	die();
-}
-
 $plugin_files = get_dir_list(INCLUDE_PATH.'/plugins', 'files', false, array(".","..","index.html",".htaccess"));
 $plugin_files2 = get_dir_list('themes/'.$nuke_configs['ThemeSel'].'/plugins', 'files', false, array(".","..","index.html",".htaccess"));
 if(!empty($plugin_files))
@@ -912,4 +896,21 @@ if(!empty($plugin_files2))
 		if(file_exists('themes/'.$nuke_configs['ThemeSel'].'/plugins/'.$plugin_file))
 			@include('themes/'.$nuke_configs['ThemeSel'].'/plugins/'.$plugin_file);
 }
+
+$sop = (isset($sop)) ? filter($sop, "nohtml"):"";
+if($sop != '')
+{
+	switch($sop)
+	{
+		case"report":
+			$post_link = isset($post_link) ? filter($post_link):"";
+			$module_name = isset($module_name) ? filter($module_name, "nohtml"):"";
+			$post_title = isset($post_title) ? filter($post_title, "nohtml"):"";
+			$post_id = isset($post_id) ? intval($post_id):0;
+			report_friend_form(false, $sop, $post_id, $post_title, $module_name, '', '', $post_link, '', '');
+		break;
+	}
+	die();
+}
+
 ?>

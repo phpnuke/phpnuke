@@ -1,0 +1,153 @@
+/* This file is style-specific and can be modified in other styles. */
+/* Styling for some features of QuickReply Reloaded. */
+a span.imageset.icon_topic_latest {
+	display: inline-block;
+	font: normal normal normal 14px/1 FontAwesome;
+	text-rendering: auto;
+	font-size: 1px;
+	letter-spacing: -1px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background-image: none;
+	width: 14px;
+	height: 14px;
+	padding: 0;
+}
+
+a span.imageset.icon_topic_latest:before {
+	display: inline-block;
+	content: '\f08e';
+	font-size: 14px;
+	letter-spacing: normal;
+	color: inherit;
+	padding-top: 2px;
+}
+
+.btn.qr-quickquote {
+	background-color: #aaa;
+	border-color: #aaa;
+}
+
+#preview h3 {
+	margin: 0;
+}
+
+#preview_close {
+	top: 15px;
+	right: 18px;
+}
+
+.qr_dropdown.popover{
+	display: block;
+	padding: 0;
+}
+
+.qr_dropdown.popover .dropdown-menu {
+	display: block;
+	position: relative;
+	padding: 0;
+	margin: 0;
+	border: none;
+	border-radius: inherit;
+	overflow: hidden;
+}
+
+.qr_quickquote {
+	cursor: pointer;
+}
+
+#register-and-translit {
+	margin-left: 0;
+	margin-top: 5px;
+}
+
+#register-and-translit abbr {
+	display: inline-block;
+	text-decoration: none;
+	border-bottom: 1px dashed #fff;
+	padding: 5px 0 0 0;
+	cursor: help;
+	float: left;
+}
+
+.hidden_subject .panel-body {
+	border-radius: 4px;
+}
+
+.hidden_subject .panel-body .post-info-left,
+.hidden_subject .panel-body.badger-right:after {
+	border-top-right-radius: 4px;
+}
+
+.hidden_subject .panel-body .post-info-right,
+.hidden_subject .panel-body.badger-left:after {
+	border-top-left-radius: 4px;
+}
+
+/* Fixed form style. */
+.qr_fixed_form #attach-tab,
+.qr_fixed_form > .panel > .panel-heading,
+.qr_extended_form > .panel > .panel-heading span.clickable {
+	display: none;
+}
+
+.qr_fixed_form #register-and-translit,
+.qr_fixed_form > #preview > .panel-heading {
+	display: block;
+}
+
+.qr_fixed_form .col-md-9 {
+	width: 100%;
+	transition: width 0.5s ease;
+	float: left;
+}
+
+.qr_fixed_form.with_smileys .col-md-9 {
+	width: 75%;
+}
+
+.qr_fixed_form #smiley-box {
+	width: 25%;
+	float: left;
+}
+
+#qr_postform.qr_fixed_form.with_smileys #message-box {
+	width: 100%;
+}
+
+#qr_text_action_box {
+	margin-left: 3px;
+}
+
+.qr_fixed_form #format-buttons,
+.qr_fixed_form .submit-buttons {
+	padding: 10px 15px;
+}
+
+.qr_fixed_form .form-group .panel-heading,
+.qr_fixed_form .panel-footer {
+	padding: 0;
+}
+
+.qr_fixed_form .panel,
+.qr_fixed_form .form-group:not(.additional-element) {
+	margin-bottom: 0;
+}
+
+.qr_fixed_form #attach-tab {
+	margin-top: 15px;
+}
+
+@media only screen and (max-width: 700px), only screen and (max-device-width: 700px) {
+	.qr_fixed_form #smiley-box {
+		width: 100%;
+	}
+
+	.qr_fixed_form.with_smileys .col-md-9 {
+		width: 100%;
+	}
+}
+
+/* Compact form style. */
+
+/* Fullscreen form style. */

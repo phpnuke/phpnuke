@@ -8,7 +8,7 @@
 *
 */
 
-namespace gfksx\ThanksForPosts\migrations;
+namespace gfksx\thanksforposts\migrations;
 
 class v_1_2_5 extends \phpbb\db\migration\migration
 {
@@ -17,42 +17,12 @@ class v_1_2_5 extends \phpbb\db\migration\migration
 
 	public function effectively_installed()
 	{
-		return (isset($this->config['thanks_for_posts_version']) && version_compare($this->config['thanks_for_posts_version'], '1.2.5', '>='))
-				|| (isset($this->config['thanks_mod_version']) && version_compare($this->config['thanks_mod_version'], '1.2.5', '>='));
+		return isset($this->config['thanks_only_first_post']);
 	}
 
 	static public function depends_on()
 	{
-		return array('\gfksx\ThanksForPosts\migrations\v_0_4_0');
-	}
-
-	public function update_schema()
-	{
-		if (!$this->db_tools->sql_table_exists($this->table_prefix . 'thanks'))
-		{
-			return array(
-				'add_tables' => array(
-					$this->table_prefix . 'thanks' => array(
-						'COLUMNS'		=> array(
-							'post_id'		=> array('UINT', 0),
-							'poster_id'		=> array('UINT', 0),
-							'user_id'		=> array('UINT', 0),
-						),
-						'PRIMARY_KEY'	=> array('post_id', 'user_id'),
-					),
-				),
-			);
-		}
-
-		return array(
-		);
-	}
-
-	public function revert_schema()
-	{
-		return array(
-			'drop_tables'	=> array($this->table_prefix . 'thanks'),
-		);
+		return array('\gfksx\thanksforposts\migrations\v_0_4_0');
 	}
 
 	public function update_data()
@@ -66,9 +36,6 @@ class v_1_2_5 extends \phpbb\db\migration\migration
 			array('config.add', array('thanks_number', 100)),
 			array('config.add', array('thanks_info_page', 1)),
 			array('config.add', array('thanks_only_first_post', 0)),
-
-			// Current version
-			array('config.add', array('thanks_for_posts_version', '1.2.5')),
 
 			// Add permissions
 			array('permission.add', array('f_thanks', false)),

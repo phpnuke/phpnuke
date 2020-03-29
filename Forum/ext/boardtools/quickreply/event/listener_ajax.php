@@ -2,7 +2,7 @@
 /**
  *
  * @package       QuickReply Reloaded
- * @copyright (c) 2014 - 2017 Tatiana5 and LavIgor
+ * @copyright (c) 2014 - 2019 Tatiana5 and LavIgor
  * @license       http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
@@ -68,7 +68,7 @@ class listener_ajax implements EventSubscriberInterface
 			'core.posting_modify_submission_errors' => 'detect_new_posts',
 			'core.posting_modify_template_vars'     => 'ajax_preview',
 			'core.submit_post_end'                  => array('ajax_submit', -2),
-			'rxu.postsmerging.posts_merging_end'    => 'ajax_submit',
+			'rxu.postsmerging.posts_merging_end'    => array('ajax_submit', -2),
 		);
 	}
 
@@ -132,6 +132,16 @@ class listener_ajax implements EventSubscriberInterface
 					'qr'             => 1,
 					'qr_cur_post_id' => (int) max($post_list)
 				)));
+			}
+
+			// Add lastclick for phpBB 3.2.4+
+			if (phpbb_version_compare($this->config['version'], '3.2.4', '>='))
+			{
+				$qr_hidden_fields = array(
+					'lastclick' => (int) time(),
+				);
+
+				$this->template->append_var('QR_HIDDEN_FIELDS', build_hidden_fields($qr_hidden_fields));
 			}
 
 			$this->template->assign_vars($this->ajax_helper->template_variables_for_ajax($topic_data));

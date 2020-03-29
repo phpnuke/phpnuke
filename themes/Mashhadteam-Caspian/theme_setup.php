@@ -314,7 +314,7 @@ function get_caspian_posts_media()
 	}
 	//fetch from post files
 	
-	$poster = ($block_global_contents['post_image'] != '') ? $block_global_contents['post_image']:"";
+	$poster = (isset($block_global_contents['post_image']) && $block_global_contents['post_image'] != '') ? $block_global_contents['post_image']:"";
 	
 	return array($all_medias, $poster, $first_audio, $first_video, $first_atitle, $first_vtitle);
 }

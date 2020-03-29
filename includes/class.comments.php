@@ -169,16 +169,7 @@ class phpnuke_comments
 			
 			$this->output .= "
 			<div class=\"clear\"></div>
-			<a name=\"postcomments\"></a>
-			<script>
-				function reply_to(cid, main_parent, name, message)
-				{
-					$(\"#reply_pid\").val(cid);
-					main_parent = (main_parent == 0) ? cid:main_parent;
-					$(\"#reply_main_parent\").val(main_parent);		
-					$(\"#reply_to_html\").html('"._IN_REPLY." '+name+' : '+message );
-				}
-			</script>";
+			<a name=\"postcomments\"></a>";
 			
 			if($this->sendtoconfirm == 1 && $this->comments_configs['confirm_need'] == 1 && !is_admin())
 			{

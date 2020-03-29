@@ -3,7 +3,7 @@
 *
 * @package Ultimate phpBB SEO Friendly URL
 * @version $$
-* @copyright (c) 2017 www.phpbb-seo.org
+* @copyright (c) 2017 www.phpBB-SEO.ir
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
@@ -12,7 +12,7 @@ namespace phpbbseo\usu\acp;
 
 /**
 * phpBB_SEO Class
-* www.phpBB-SEO.org
+* www.phpBB-SEO.ir
 * @package Ultimate phpBB SEO Friendly URL
 */
 class usu
@@ -140,9 +140,10 @@ class usu
 		{
 			case 'settings':
 
-				$display_vars['title'] = 'ACP_PHPBB_SEO_CLASS';
-				$this->user->lang['ACP_PHPBB_SEO_CLASS_EXPLAIN'] = sprintf($this->user->lang['ACP_PHPBB_SEO_CLASS_EXPLAIN'], $this->modrtype_lang['ulink'], $this->modrtype_lang['uforumlink'], '</p><hr/><p><b>' . $this->user->lang['ACP_PHPBB_SEO_MODE'] . ' : ' . $this->modrtype_lang['link'] . ' - ( ' . $this->modrtype_lang['forumlink'] . ' )</b></p><hr/><p>');
 				$display_vars['vars'] = array();
+				$display_vars['title'] = 'ACP_PHPBB_SEO_CLASS';
+				$display_vars['ACP_PHPBB_SEO_CLASS_EXPLAIN'] = sprintf($this->language->lang('ACP_PHPBB_SEO_CLASS_EXPLAIN'), $this->modrtype_lang['ulink'], $this->modrtype_lang['uforumlink'], '</p><hr/><p><b>' . $this->language->lang('ACP_PHPBB_SEO_MODE') . ' : ' . $this->modrtype_lang['link'] . ' - ( ' . $this->modrtype_lang['forumlink'] . ' )</b></p><hr/><p>');
+
 				$i = 2;
 				$display_vars['vars']['legend1'] = 'ACP_PHPBB_SEO_CLASS';
 
@@ -229,7 +230,8 @@ class usu
 				}
 
 				$display_vars['title'] = 'ACP_FORUM_URL';
-				$this->user->lang['ACP_FORUM_URL_EXPLAIN'] = $this->user->lang['ACP_FORUM_URL_EXPLAIN'] . '</p><hr/><p><b>' . $this->user->lang['ACP_PHPBB_SEO_VERSION'] . ' : ' . $this->modrtype_lang['link'] . ' - ( ' . $this->modrtype_lang['forumlink'] . ' )</b></p><hr/><p>';
+				$display_vars['ACP_FORUM_URL_EXPLAIN'] = $this->user->lang('ACP_FORUM_URL_EXPLAIN') . '</p><hr/><p><b>' . $this->user->lang('ACP_PHPBB_SEO_VERSION') . ' : ' . $this->modrtype_lang['link'] . ' - ( ' . $this->modrtype_lang['forumlink'] . ' )</b></p><hr/><p>';
+
 				$display_vars['vars'] = array();
 				$display_vars['vars']['legend1'] = 'ACP_FORUM_URL';
 
@@ -324,7 +326,8 @@ class usu
 			case 'server':
 
 				$display_vars['title'] = 'ACP_REWRITE_CONF';
-                $this->user->lang['ACP_REWRITE_CONF_EXPLAIN'] = $this->user->lang['ACP_REWRITE_CONF_EXPLAIN'] . '</p><hr/><p><b>' . $this->user->lang['ACP_PHPBB_SEO_VERSION'] . ' : ' . $this->modrtype_lang['link'] . ' - ( ' . $this->modrtype_lang['forumlink'] . ' )</b></p><p>';
+            	$display_vars['ACP_REWRITE_CONF_EXPLAIN'] =  $this->language->lang('ACP_REWRITE_CONF_EXPLAIN') . '</p><hr/><p><b>' . $this->user->lang('ACP_PHPBB_SEO_VERSION') . ' : ' . $this->modrtype_lang['link'] . ' - ( ' . $this->modrtype_lang['forumlink'] . ' )</b></p><p>';
+
 				$display_vars['vars'] = array();
 				$display_vars['vars']['legend1'] = 'ACP_REWRITE_CONF';
 				if ($this->core->seo_path['phpbb_script'] && !$this->core->seo_opt['virtual_root'])
@@ -347,7 +350,7 @@ class usu
 				}
 
 				// Dirty yet simple templating
-				$this->user->lang['ACP_REWRITE_CONF_EXPLAIN'] = $this->user->lang['ACP_REWRITE_CONF_EXPLAIN'] . $this->seo_server_conf();
+				$display_vars['ACP_REWRITE_CONF_EXPLAIN'] = $this->language->lang('ACP_REWRITE_CONF_EXPLAIN') . $this->seo_server_conf();
 
 				$this->template->assign_vars(array(
 					'S_SEO_HTACCESS'	=> 1,
@@ -730,7 +733,7 @@ class usu
 					// Let's make sure that the proper field was added to the topic table
 					if ($config_name === 'sql_rewrite' && $config_value == 1 && !$this->core->seo_opt['sql_rewrite'])
 					{
-						$db_tools = new \phpbb\db\tools($this->db);
+						$db_tools = new \phpbb\db\tools\tools($this->db);
 						$db_tools->db->sql_return_on_error(true);
 
 						if (!$db_tools->sql_column_exists(TOPICS_TABLE, 'topic_url'))
@@ -784,7 +787,7 @@ class usu
 				$file = $this->core->cache_config['file'];
 				ksort($this->core->cache_config['forum_urls']);
 
-				$update = '<'.'?php' . "\n" . '/**' . "\n" . '* phpBB SEO' . "\n" . '* www.phpBB-SEO.org' . "\n" . '* @package phpBB SEO USU' . "\n" . '*/' . "\n" . 'if (!defined(\'IN_PHPBB\')) {' . "\n\t" . 'exit;' . "\n" . '}' . "\n";
+				$update = '<'.'?php' . "\n" . '/**' . "\n" . '* phpBB SEO' . "\n" . '* www.phpBB-SEO.ir' . "\n" . '* @package phpBB SEO USU' . "\n" . '*/' . "\n" . 'if (!defined(\'IN_PHPBB\')) {' . "\n\t" . 'exit;' . "\n" . '}' . "\n";
 				$update .= '$settings = ' . preg_replace('`[\s]+`', ' ', var_export($this->core->cache_config['settings'], true)) . ';'. "\n";
 				$update .= '$forum_urls = ' . preg_replace('`[\s]+`', ' ', var_export($this->core->cache_config['forum_urls'], true)) . ';';
 
@@ -815,7 +818,7 @@ class usu
 		$this->tpl_name = 'acp_board';
 		$this->page_title = $display_vars['title'];
 
-		$l_title_explain = $this->user->lang[$display_vars['title'] . '_EXPLAIN'];
+		$l_title_explain = $this->language->lang($display_vars['title'] . '_EXPLAIN');
 
 		if ($mode != 'extended')
 		{
@@ -1467,7 +1470,7 @@ RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}([a-z0-9_-]+){FORUM_PAGINATION}$ {DEFAULT
 RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '(style\.{PHP_EX}|ucp\.{PHP_EX}|mcp\.{PHP_EX}|faq\.{PHP_EX}|posting\.{PHP_EX}|download/file\.{PHP_EX}|report\.{PHP_EX}|adm/index\.{PHP_EX}|cron\.{PHP_EX})$ {DEFAULT_SLASH}{PHPBB_RPATH}$1 [QSA,L,NC' . $fix_301_redirect . ']',
 
 			'relative_images' => '# FIX RELATIVE PATHS : IMAGES
-RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '(styles/.*|images/.*|assets/.*|ext/.*)$ {DEFAULT_SLASH}{PHPBB_RPATH}$1 [QSA,L,NC' . $fix_301_redirect . ']',
+RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '.+/(styles/.*|images/.*|assets/.*|ext/.*)$ {DEFAULT_SLASH}{PHPBB_RPATH}$1 [QSA,L,NC' . $fix_301_redirect . ']',
 		);
 
 		// mods server_conf pos2
@@ -1550,10 +1553,6 @@ RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '(styles/.*|images/
 			}
 		}
 
-		$this->template->assign_vars(array(
-			'SEO_REWRITE_ENGINES'	=> '["' . (implode('","', array_keys($rewrite_conf))) . '"]',
-		));
-
 		if ($html)
 		{
 			// HTML output
@@ -1570,7 +1569,12 @@ RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '(styles/.*|images/
 			}
 
 			$html_output .= '</ul></div><p>' . "\n";
+			$this->template->assign_vars(array(
+				'SEO_REWRITE_ENGINES'	=> str_replace('"', "\"", $html_output),
+			));
+
 			return $html_output;
+
 		}
 		else
 		{
@@ -1657,17 +1661,17 @@ RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '(styles/.*|images/
 		$modrtype_lang['type'] = $modrtype_lang['types'][$this->core->modrtype];
 
 		$modrtype_lang['modrlinks_en'] = array(
-			1	=> 'http://www.phpbb-seo.org/simple-seo-url/simple-phpbb-seo-url-t1566.html',
-			2	=> 'http://www.phpbb-seo.org/mixed-seo-url/mixed-phpbb-seo-url-t1565.html',
-			3	=> 'http://www.phpbb-seo.org/advanced-seo-url/advanced-phpbb-seo-url-t1219.html',
-			'u'	=> 'http://www.phpbb-seo.org/phpbb-mod-rewrite/ultimate-seo-url-t4608.html',
+			1	=> 'http://www.phpBB-SEO.ir/simple-seo-url/simple-phpbb-seo-url-t1566.html',
+			2	=> 'http://www.phpBB-SEO.ir/mixed-seo-url/mixed-phpbb-seo-url-t1565.html',
+			3	=> 'http://www.phpBB-SEO.ir/advanced-seo-url/advanced-phpbb-seo-url-t1219.html',
+			'u'	=> 'http://www.phpBB-SEO.ir/phpbb-mod-rewrite/ultimate-seo-url-t4608.html',
 		);
 
 		$modrtype_lang['modrforumlinks_en'] = array(
-			1	=> 'http://www.phpbb-seo.org/simple-seo-url/',
+			1	=> 'http://www.phpBB-SEO.ir/simple-seo-url/',
 			2	=> 'http://www.phpbb-seo.or/mixed-seo-url/',
-			3	=> 'http://www.phpbb-seo.org/advanced-seo-url/',
-			'u'	=> 'http://www.phpbb-seo.org/phpbb-mod-rewrite/',
+			3	=> 'http://www.phpBB-SEO.ir/advanced-seo-url/',
+			'u'	=> 'http://www.phpBB-SEO.ir/phpbb-mod-rewrite/',
 		);
 
 		if (strpos($this->config['default_lang'], 'fr') !== false)

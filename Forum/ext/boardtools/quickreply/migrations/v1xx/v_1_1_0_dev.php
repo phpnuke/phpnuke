@@ -48,7 +48,7 @@ class v_1_1_0_dev extends \phpbb\db\migration\migration
 			array('config.update', array('qr_version', '1.1.0-dev')),
 
 			// Add configs
-			array('config.add', array('qr_quicknick_string', '1')),
+			array('config.add', array('qr_quicknick_string', '0')),
 		);
 	}
 }

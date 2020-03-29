@@ -2,11 +2,13 @@
 *
 * @package Ultimate phpBB SEO Friendly URL
 * @version $$
-* @copyright (c) 2006 - 2014 www.phpbb-seo.org
+* @copyright (c) 2006 - 2014 www.phpBB-SEO.ir
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
-phpbb_seo = phpbb_seo || {};
+$(document).ready(function () {
+
+//phpbb_seo = phpbb_seo || {};
 /**
 * Jump to page
 */
@@ -109,3 +111,5 @@ phpbb_seo.external_hrefs = function () {
 if (phpbb_seo.external || phpbb_seo.hashfix) {
 	$(document).ready(phpbb_seo.external_hrefs);
 }
+
+});

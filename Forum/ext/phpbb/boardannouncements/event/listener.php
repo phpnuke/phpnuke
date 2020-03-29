@@ -30,6 +30,9 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\controller\helper */
 	protected $controller_helper;
 
+	/** @var \phpbb\language\language */
+	protected $language;
+
 	/** @var \phpbb\request\request */
 	protected $request;
 
@@ -39,6 +42,9 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\user */
 	protected $user;
 
+	/** @var string */
+	protected $php_ext;
+
 	/**
 	* Constructor
 	*
@@ -46,20 +52,24 @@ class listener implements EventSubscriberInterface
 	* @param \phpbb\config\config                 $config            Config object
 	* @param \phpbb\config\db_text                $config_text       DB text object
 	* @param \phpbb\controller\helper             $controller_helper Controller helper object
+	* @param \phpbb\language\language             $language          Language object
 	* @param \phpbb\request\request               $request           Request object
 	* @param \phpbb\template\template             $template          Template object
 	* @param \phpbb\user                          $user              User object
+	* @param string                               $php_ext           PHP extension
 	* @access public
 	*/
-	public function __construct(\phpbb\cache\driver\driver_interface $cache, \phpbb\config\config $config, \phpbb\config\db_text $config_text, \phpbb\controller\helper $controller_helper, \phpbb\request\request $request, \phpbb\template\template $template, \phpbb\user $user)
+	public function __construct(\phpbb\cache\driver\driver_interface $cache, \phpbb\config\config $config, \phpbb\config\db_text $config_text, \phpbb\controller\helper $controller_helper, \phpbb\language\language $language, \phpbb\request\request $request, \phpbb\template\template $template, \phpbb\user $user, $php_ext)
 	{
 		$this->cache = $cache;
 		$this->config = $config;
 		$this->config_text = $config_text;
 		$this->controller_helper = $controller_helper;
+		$this->language = $language;
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
+		$this->php_ext = $php_ext;
 	}
 
 	/**
@@ -104,6 +114,13 @@ class listener implements EventSubscriberInterface
 			return;
 		}
 
+		// Do not continue if announcements are only displayed on the board index,
+		// and the user is not currently viewing the board index
+		if ($this->config['board_announcements_index_only'] && $this->user->page['page_name'] !== "index.{$this->php_ext}")
+		{
+			return;
+		}
+
 		// Get board announcement data from the cache
 		$board_announcement_data = $this->cache->get('_board_announcement_data');
 
@@ -141,7 +158,7 @@ class listener implements EventSubscriberInterface
 		);
 
 		// Add board announcements language file
-		$this->user->add_lang_ext('phpbb/boardannouncements', 'boardannouncements');
+		$this->language->add_lang('boardannouncements','phpbb/boardannouncements');
 
 		// Output board announcement to the template
 		$this->template->assign_vars(array(

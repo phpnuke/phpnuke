@@ -2,7 +2,7 @@
 /**
  *
  * @package       QuickReply Reloaded
- * @copyright (c) 2014 - 2017 Tatiana5 and LavIgor
+ * @copyright (c) 2014 - 2019 Tatiana5 and LavIgor
  * @license       http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  *
  */
@@ -84,14 +84,14 @@ class form_helper
 		// Show attachment box for adding attachments
 		$show_attach_box = $this->qr_attachments_allowed($forum_id);
 
-		if ($show_attach_box)
-		{
-			$this->handle_attachments($forum_id, $topic_id, $show_attach_box);
-		}
-
 		if ($bbcode_status || $smilies_status || $show_attach_box)
 		{
 			$this->user->add_lang('posting');
+		}
+
+		if ($show_attach_box)
+		{
+			$this->handle_attachments($forum_id, $topic_id, $show_attach_box);
 		}
 	}
 

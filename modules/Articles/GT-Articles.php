@@ -8,7 +8,7 @@ $rewrite_rule["article"] = array(
 	"category/?$" => 'index.php?modname=Articles&op=article_categories',
 	"tags/([^/]+?)(/page/([0-9]{1,}+))?/?$" => 'index.php?modname=Articles&tags=$1&page=$3',
 	"(most-visit|most-comment|most-rate)(/page/([0-9]{1,}+))?/?$" => 'index.php?modname=Articles&orderby=$1&page=$3',
-	"([0-9]{4,})/(([0-9]{1,2})/)?(([0-9]{1,2})/)?(most-visit|most-comment|most-rate)?/?(page/([0-9]{1,}+))?/?$" => 'index.php?modname=Articles&datetime=$1-$3-$5&orderby=$6&page=$8',
+	"([0-9]{4})/(([0-9]{1,2})/)?(([0-9]{1,2})/)?(most-visit|most-comment|most-rate)?/?(page/([0-9]{1,}+))?/?$" => 'index.php?modname=Articles&datetime=$1-$3-$5&orderby=$6&page=$8',
 	"([^/]+)/(pdf|print|friend|report)?/?(comment-page-([0-9]{1,}+))?/?$" => 'index.php?modname=Articles&op=article_show&post_url=$1&mode=$2&page=$4',
 	"page/([0-9]{1,}+)?/?$" => 'index.php?modname=Articles&page=$1',
 	"(.+)/(([^/]+)/?)(pdf|print|friend|report)?/?(comment-page-([0-9]{1,}+))?/?$" => 'index.php?modname=Articles&op=article_show&args=$1&post_url=$3&mode=$4&page=$6',
