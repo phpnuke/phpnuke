@@ -1123,7 +1123,7 @@ function get_groups_permissions()
 
 function phpnuke_permissions_check($permissions)
 {
-	global $userinfo, $pn_Bots;
+	global $userinfo, $pn_Bots, $users_system;
 	
 	$allow_to_view = false;
 	$disallow_message_arr = array();
@@ -1157,7 +1157,7 @@ function phpnuke_permissions_check($permissions)
 	if(in_array(5, $permissions) && !is_admin())
 		$disallow_message_arr[] = _ADMINS;
 	if(isset($userinfo['group_id']) && !in_array($userinfo['group_id'], $permissions))
-		$disallow_message_gr = _NOT_IN_ALLOWED_GROUPS;
+		$disallow_message_gr = sprintf(_NOT_IN_ALLOWED_GROUPS, $users_system->register_url);
 	
 	$disallow_message = $disallow_message.((!empty($disallow_message_arr)) ? implode(" "._AND." ", $disallow_message_arr):"").".".$disallow_message_gr;
 	
@@ -1489,62 +1489,65 @@ function insert_update_meta_fields($data, $id = 0, $meta_part = "Articles")
 	if($id == 0)
 		return;
 	
-	$meta_keys = array_keys($nuke_meta_keys_parts[$meta_part]);
-	
-	$insert_keys = $update_keys = $old_meta_keys = array();
-	
-	$result = $db->table(POSTS_META_TABLE)
-				->where('post_id', $id)
-				->where('meta_part', strtolower($meta_part))
-				->select();
-	if($result->count() > 0)
+	if(isset($nuke_meta_keys_parts[$meta_part]) && !empty($nuke_meta_keys_parts[$meta_part]))
 	{
-		$rows = $result->results();
-		foreach($rows as $row)
-		{
-			$mid = intval($row['mid']);
-			$meta_key = filter($row['meta_key'], "nohtml");
-			
-			$old_meta_keys[$mid] = $meta_key;
-			
-			if(in_array($meta_key, $meta_keys))
-				$update_keys[$mid] = $meta_key;
-		}
-		foreach($meta_keys as $meta_key)
-		{
-			if(!in_array($meta_key, $old_meta_keys))
-				$insert_keys[] = $meta_key;
-		}
+		$meta_keys = array_keys($nuke_meta_keys_parts[$meta_part]);
 		
-		if(!empty($update_keys))
+		$insert_keys = $update_keys = $old_meta_keys = array();
+		
+		$result = $db->table(POSTS_META_TABLE)
+					->where('post_id', $id)
+					->where('meta_part', strtolower($meta_part))
+					->select();
+		if($result->count() > 0)
 		{
-			foreach($update_keys as $mid => $meta_key)
+			$rows = $result->results();
+			foreach($rows as $row)
+			{
+				$mid = intval($row['mid']);
+				$meta_key = filter($row['meta_key'], "nohtml");
+				
+				$old_meta_keys[$mid] = $meta_key;
+				
+				if(in_array($meta_key, $meta_keys))
+					$update_keys[$mid] = $meta_key;
+			}
+			foreach($meta_keys as $meta_key)
+			{
+				if(!in_array($meta_key, $old_meta_keys))
+					$insert_keys[] = $meta_key;
+			}
+			
+			if(!empty($update_keys))
+			{
+				foreach($update_keys as $mid => $meta_key)
+				{
+					$db->table(POSTS_META_TABLE)
+						->where('post_id', $id)
+						->where('mid', $mid)
+						->where('meta_key', $meta_key)
+						->update([
+							"meta_value" => (($data[$meta_key] == '' || $data[$meta_key] === null || !isset($data[$meta_key])) ? '':$data[$meta_key])
+						]);
+				}
+			}
+		}
+		else
+			foreach($meta_keys as $meta_key)
+				$insert_keys[] = $meta_key;
+				
+		if(!empty($insert_keys))
+		{
+			foreach($insert_keys as $meta_key)
 			{
 				$db->table(POSTS_META_TABLE)
-					->where('post_id', $id)
-					->where('mid', $mid)
-					->where('meta_key', $meta_key)
-					->update([
+					->insert([
+						"post_id" => $id,
+						"meta_part" => strtolower($meta_part),
+						"meta_key" => $meta_key,
 						"meta_value" => (($data[$meta_key] == '' || $data[$meta_key] === null || !isset($data[$meta_key])) ? '':$data[$meta_key])
 					]);
 			}
-		}
-	}
-	else
-		foreach($meta_keys as $meta_key)
-			$insert_keys[] = $meta_key;
-			
-	if(!empty($insert_keys))
-	{
-		foreach($insert_keys as $meta_key)
-		{
-			$db->table(POSTS_META_TABLE)
-				->insert([
-					"post_id" => $id,
-					"meta_part" => strtolower($meta_part),
-					"meta_key" => $meta_key,
-					"meta_value" => (($data[$meta_key] == '' || $data[$meta_key] === null || !isset($data[$meta_key])) ? '':$data[$meta_key])
-				]);
 		}
 	}
 	return true;
@@ -5393,7 +5396,6 @@ function pn_nav_menu($args = array())
 	static $menu_id_slugs = array();
 
 	$defaults = array(
-		'nav_php_class' => 'Walker_nav_menus', 
 		'menu' => '', 
 		'list_type' => 'ul', 
 		'container' => 'div', 
@@ -5478,7 +5480,7 @@ function pn_nav_menu($args = array())
 	
 	if(!empty($sorted_menu_items))
 	{
-		$walker = new $args->nav_php_class;
+		$walker = ( empty( $args->walker ) ) ? new Walker_nav_menus : new $args->walker;
 		$args2 = array($sorted_menu_items, 'nid', 'pid', $args->depth, $args);
 		$items .= call_user_func_array(array($walker, "walk"), $args2);
 	}

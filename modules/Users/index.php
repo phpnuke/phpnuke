@@ -844,7 +844,7 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 										'user_lastvisit' => _NOWTIME,
 										'check_num' => $check_num,
 										'user_status' => $user_status,
-										'user_referrer' => (($ya_config['invitation'] == 1 && $pn_Sessions->exists('invitation_referrer')) ? $pn_Sessions->get('invitation_referrer', false):""),
+										'user_referrer' => (($ya_config['invitation'] == 1 && $pn_Sessions->exists('invitation_referrer')) ? $pn_Sessions->get('invitation_referrer', false):0),
 									]);
 					
 					if(!$result)

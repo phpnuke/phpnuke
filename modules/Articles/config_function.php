@@ -724,6 +724,7 @@ function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name
 			
 			$(\".input_post_fields_wrap\").add_field({ 
 				addButton: $(\".add_post_field_button\"),
+				maxField: 1000,
 				remove_button: '.remove_field',
 				fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._FILENAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"'+fields_name+'\" />&nbsp;<input placeholder=\""._FILELINK."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"'+fields_name+'\" size=\"40\" />&nbsp;&nbsp;<input placeholder=\""._FILESIZE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"'+fields_name+'\" size=\"8\" />&nbsp;&nbsp;<input placeholder=\""._FILEDESC."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"'+fields_name+'\" />&nbsp;&nbsp;"._FILETYPE." <select class=\"styledselect-select field_type_select\" name=\"'+fields_name+'\" style=\"width:120px;\"><option value=\"files\" selected>"._FILES."</option><option value=\"images\">"._IMAGES."</option><option value=\"audios\">"._AUDIOS."</option><option value=\"videos\">"._VIDEOS."</option></select>&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
 				x: '$i',

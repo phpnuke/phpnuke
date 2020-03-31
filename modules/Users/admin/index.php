@@ -1631,6 +1631,7 @@ if (check_admin_permission($module_name, false, true))
 				<tr>
 					<td>
 						<div class=\"input_fields_wrap\">";
+						$x = 1;
 						if(intval($result->count()) > 0)
 						{
 							$key = 0;

@@ -127,8 +127,11 @@ class users_system{
 		$this->server_protocol			= $this->config['server_protocol'];
 		$this->forum_path				= $this->config['script_path'];
 		$this->forum_url				= $this->config['server_protocol'].$this->config['server_name']."/".$this->config['script_path'];
+		
 		$this->profile_url 				= $this->forum_url.(($nuke_configs['gtset'] == 1 && $nuke_configs['forum_GTlink_active'] == 1 && isset($nuke_configs['forum_seo_profile_link']) && $nuke_configs['forum_seo_profile_link'] != '') ? str_replace(array("{UID}","{UN}"),array('%1$d','%2$s'), $nuke_configs['forum_seo_profile_link']):'memberlist.php?mode=viewprofile&u=%1$d');
 		$this->ucp_url 					= $this->forum_url.(($nuke_configs['gtset'] == 1 && $nuke_configs['forum_GTlink_active'] == 1 && isset($nuke_configs['forum_seo_ucp_link']) && $nuke_configs['forum_seo_ucp_link'] != '') ? str_replace(array("{UID}","{UN}"),array('%1$d','%2$s'), $nuke_configs['forum_seo_ucp_link']):'ucp.php');
+		$this->register_url				= $this->forum_url.(($nuke_configs['gtset'] == 1 && $nuke_configs['forum_GTlink_active'] == 1 && isset($nuke_configs['forum_seo_register_link']) && $nuke_configs['forum_seo_register_link'] != '') ? str_replace(array("{UID}","{UN}"),array('%1$d','%2$s'), $nuke_configs['forum_seo_register_link']):'ucp.php?mode=register');
+		$this->passlost_url				= $this->forum_url.(($nuke_configs['gtset'] == 1 && $nuke_configs['forum_GTlink_active'] == 1 && isset($nuke_configs['forum_seo_passlost_link']) && $nuke_configs['forum_seo_passlost_link'] != '') ? $nuke_configs['forum_seo_passlost_link']:'ucp.php?mode=sendpassword');
 		$this->forum_admin_path			= $this->config['script_path']."adm/index.php";
 		
 		if(!defined("IN_INSTALL"))
@@ -2101,11 +2104,8 @@ class users_system{
 			$sql_ary = array('session_time' => $this->time_now);
 
 			// Do not update the session page for ajax requests, so the view online still works as intended
-			if ($this->update_session_page && !is_ajax())
-			{
-				//$sql_ary['session_page'] = substr($this->page['page'], 0, 199);
-				$sql_ary['session_page'] = $REQUESTURL;
-			}
+			//$sql_ary['session_page'] = substr($this->page['page'], 0, 199);
+			$sql_ary['session_page'] = ($this->update_session_page && !is_ajax() && $REQUESTURL != '' && $REQUESTURL !== null) ? $REQUESTURL:"index.php";
 
 			$this->update_session($sql_ary);
 

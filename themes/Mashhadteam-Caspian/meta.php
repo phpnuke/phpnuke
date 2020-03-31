@@ -32,6 +32,8 @@ $meta_tags['keywords'] = (isset($meta_tags['keywords']) && $meta_tags['keywords'
 
 $extra_meta_tags = (isset($meta_tags['extra_meta_tags']) && !empty($meta_tags['extra_meta_tags'])) ? $meta_tags['extra_meta_tags']:array();
 
+$meta_tags['url'] = (isset($meta_tags['url']) && $meta_tags['url'] != '') ? $meta_tags['url']:"";
+
 $meta_contents = array(
 	"<meta http-equiv=\"content-type\" content=\"text/html;charset=UTF-8\">",
 	"<title>".$meta_tags['title']."</title>",
@@ -41,7 +43,7 @@ $meta_contents = array(
 if($meta_tags['description'] != '')
 	$meta_contents[] = "<meta name=\"description\" content=\"".$meta_tags['description']."\">";
 
-if(isset($meta_tags['url']) && $meta_tags['url'] != '')
+if($meta_tags['url'] != '')
 	$meta_contents[] = "<link rel=\"canonical\" href=\"".$meta_tags['url']."\" />";
 
 if(isset($meta_tags['prev']) && $meta_tags['prev'] != '')
@@ -62,7 +64,7 @@ $meta_contents[] = "<meta property=\"og:description\" content=\"".$meta_tags['de
 $meta_contents[] = "<meta property=\"og:locale\" content=\"".$nuke_configs['locale']."\" />";
 $meta_contents[] = "<meta property=\"og:type\" content=\"article\" />";
 
-if(isset($meta_tags['url']) && $meta_tags['url'] != '')
+if($meta_tags['url'] != '')
 	$meta_contents[] = "<meta property=\"og:url\" content=\"".$meta_tags['url']."\" />";
 
 if($modname == "Articles" && $op == "article_show")

@@ -431,7 +431,7 @@ function article_show($sid=0, $post_url='', $mode = '')
 			if($true_link != trim(rawurldecode($REQUESTURL), "/")."/")
 			{
 			    redirect_to($true_link);
-				die_error("404");
+				die();
 			}
 		}
 		else
@@ -1170,7 +1170,7 @@ $security_code		= isset($security_code)? filter($security_code, "nohtml") : "";
 $security_code_id	= isset($security_code_id)? filter($security_code_id, "nohtml") : "";
 $args 				= isset($args) ? filter($args, "nohtml") : "";
 
-if($args != '')
+if($args != '' && $nuke_configs['userurl'] != 3)
 {
     if ( filter_var($args, FILTER_VALIDATE_INT) !== false) {
         $sid = intval($args);

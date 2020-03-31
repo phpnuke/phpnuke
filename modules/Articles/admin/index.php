@@ -168,7 +168,7 @@ if (check_admin_permission($module_name, false, true))
 					switch($this_status)
 					{
 						case"future":
-							$this_post_status = " ("._FUTURE_PUBLISH.")";
+							$this_post_status = " ("._PUBLISH_IN_FUTURE.")";
 						break;
 						case"draft":
 							$this_post_status = " ("._DRAFT.")";

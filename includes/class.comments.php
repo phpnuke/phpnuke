@@ -111,9 +111,9 @@ class phpnuke_comments
 			$first_where = "c.pid = '0'";
 			
 			$query_all = "SELECT c.*, 
-				IF(c.username IS NULL OR c.username = '', '', (SELECT CONCAT_WS(',', ".$users_system->user_fields['group_id'].", ".$users_system->user_fields['user_avatar'].", ".$users_system->user_fields['user_avatar_type'].", ".$users_system->user_fields['user_email'].") FROM ".$users_system->users_table." WHERE ".$users_system->user_fields['username']." = c.username)) as user_avatar_data,
-				EXISTS(SELECT 1 FROM ".COMMENTS_TABLE." WHERE pid= c.cid LIMIT 1) as replies,
-				EXISTS(SELECT 1 FROM ".REPORTS_TABLE." WHERE post_id= c.cid AND module='comments' LIMIT 1) as reported
+				IF(c.username IS NULL OR c.username = '', '', (SELECT CONCAT_WS(',', ".$users_system->user_fields['group_id'].", ".$users_system->user_fields['user_avatar'].", ".$users_system->user_fields['user_avatar_type'].", ".$users_system->user_fields['user_email'].") FROM ".$users_system->users_table." WHERE ".$users_system->user_fields['username']." = c.username)) as user_data,
+				(SELECT 1 FROM ".COMMENTS_TABLE." WHERE pid= c.cid LIMIT 1) as replies,
+				(SELECT 1 FROM ".REPORTS_TABLE." WHERE post_id= c.cid AND module='comments' LIMIT 1) as reported
 				{TOTAL_ROWS_QUERY}
 				FROM ".COMMENTS_TABLE." AS c 
 				{TOTAL_ROWS_LEFT}
@@ -208,10 +208,10 @@ class phpnuke_comments
 			{
 				if($post_comment['pid'] != $pid) continue;
 			
-				$user_avatar_data = ($post_comment['user_avatar_data'] != '') ? explode(",", $post_comment['user_avatar_data']):array();
-				$post_comment['user_avatar'] = (isset($user_avatar_data['user_avatar']) && !empty($user_avatar_data['user_avatar'])) ? $user_avatar_data['user_avatar']:'';
-				$post_comment['user_avatar_type'] = (isset($user_avatar_data['user_avatar_type']) && !empty($user_avatar_data['user_avatar_type'])) ? $user_avatar_data['user_avatar_type']:'';
-				$post_comment['user_email'] = (isset($user_avatar_data['user_email']) && !empty($user_avatar_data['user_email'])) ? $user_avatar_data['user_email']:'';
+				$user_data = (isset($post_comment['user_data']) && $post_comment['user_data'] != '') ? explode(",", $post_comment['user_data']):array();
+				$post_comment['user_avatar'] = (isset($user_data[1]) && !empty($user_data[1])) ? $user_data[1]:'';
+				$post_comment['user_avatar_type'] = (isset($user_data[2]) && !empty($user_data[2])) ? $user_data[2]:'';
+				$post_comment['user_email'] = (isset($user_data[3]) && !empty($user_data[3])) ? $user_data[3]:'';
 				
 				$post_comment['deact'] = ((is_admin() || $post_comment['ip'] == $visitor_ip) AND $post_comment['status'] == 0) ? "<p align=\"center\" style=\"color:#FF0000;\"><b>"._INACTIVE."</b></p>":"";
 				
@@ -219,14 +219,14 @@ class phpnuke_comments
 				
 				$post_comment['comment'] = smilies_parse(stripslashes($post_comment['comment']));
 				
-				if($nuke_configs['have_forum'] == 1 && isset($user_avatar_data['group_id']) && isset($this->forum_groups_cacheData[$user_avatar_data['group_id']]))
+				if($nuke_configs['have_forum'] == 1 && isset($user_data[0]) && isset($this->forum_groups_cacheData[$user_data[0]]))
 				{
-					$post_comment['user_colour'] = $this->forum_groups_cacheData[$user_avatar_data['group_id']]['group_colour'];
-					$post_comment['user_group_name'] = $this->forum_groups_cacheData[$user_avatar_data['group_id']]['group_name'];
+					$post_comment['user_colour'] = $this->forum_groups_cacheData[$user_data[0]]['group_colour'];
+					$post_comment['user_group_name'] = $this->forum_groups_cacheData[$user_data[0]]['group_name'];
 				}
 				else
 				{
-					$post_comment['user_colour'] = "#000000";
+					$post_comment['user_colour'] = "000000";
 					$post_comment['user_group_name'] = "GUESTS";
 				}
 				

@@ -116,7 +116,7 @@ function themeheader($meta_tags, $custom_theme_setup = array(), $replace = false
 						</div>
 						<div class=\"collapse navbar-collapse\" id=\"main-menu\">";
 								$contents .= pn_nav_menu(array(
-									'nav_php_class'	=> 'caspian_nav_menus',
+									'walker'	=> 'caspian_nav_menus',
 									'theme_location'	=> 'primary',
 									'container_class'	=> '',
 									'menu_id'			=> 'main-menu',

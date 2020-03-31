@@ -447,10 +447,17 @@ if($pn_Cookies->exists('user'))
 	$user = explode(":", $user);
 }
 
+$forum_class = "no_forum";
+
 if(isset($nuke_configs['have_forum']) && $nuke_configs['have_forum'] == 1 && is_dir($nuke_configs['forum_path']))
-	require_once(INCLUDE_PATH."/forums_classes/class.".$nuke_configs['forum_system'].".php");
-else
-	require_once(INCLUDE_PATH."/forums_classes/class.no_forum.php");
+{
+	if(is_dir($nuke_configs['forum_path']."/install"))
+		$nuke_configs['have_forum'] = 0;
+	else
+		$forum_class = $nuke_configs['forum_system'];
+}
+
+require_once(INCLUDE_PATH."/forums_classes/class."."$forum_class.php");
 	
 $users_system = new users_system();
 

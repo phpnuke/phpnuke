@@ -144,6 +144,16 @@ function caspian_theme_config()
 	$checked1 = ($caspian_configs['active_slider'] == 1) ? "checked":"";
 	$checked2 = ($caspian_configs['active_slider'] == 0) ? "checked":"";
 	$contents .= "<input type='radio' class='styled' name='config_fields[caspian_configs][active_slider]' value='1' data-label=\"" . _YES . "\" $checked1> &nbsp; &nbsp;<input type='radio' class='styled' name='config_fields[caspian_configs][active_slider]' value='0' data-label=\"" . _NO . "\" $checked2>
+	</td></tr>
+	<tr><th style=\"width:200px;\">"._THEME_COLOR."</th><td>";
+	$sel1 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'green') ? "checked":"";
+	$sel2 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'blue') ? "checked":"";
+	$sel3 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'red') ? "checked":"";
+	$contents .= "<select name=\"config_fields[caspian_configs][theme_color]\" class=\"styledselect-select\">
+		<option value=\"green\"".$sel1.">"._THEME_GREEN."</option>
+		<option value=\"blue\"".$sel2.">"._THEME_BLUE."</option>
+		<option value=\"red\"".$sel3.">"._THEME_RED."</option>
+	</select>
 	</td></tr>";
 	
 	for($i=0; $i<10; $i++)
