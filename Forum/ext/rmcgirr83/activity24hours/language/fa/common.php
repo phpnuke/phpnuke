@@ -32,20 +32,26 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 // Some characters you may want to copy&paste:
 // ’ » “ ” …
-
 $lang = array_merge($lang, array(
-	'USERS_24HOUR_TOTAL'	=> array(
-		1 => 'تعداد %d کاربر',
-		2 => 'تعداد %d کاربر',
+	'BOTS_24HOUR_TOTAL'	=> array(
+		1 => '%d ربات',
+		2 => '%d ربات',
 	),
+	'USERS_24HOUR_TOTAL'	=>  '%d عضو شده,',
+	'HIDDEN_24HOUR_TOTAL'	=> ' %d مخفی, ',
 	'GUEST_ONLINE_24'		=> array(
 		1 => ' و %d نفر مهمان',
 		2 => ' و %d نفر مهمان',
 	),
-	'TWENTYFOURHOUR_STATS'	=> ' آمار انجمن در 24 ساعت گذشته',
-	'24HOUR_TOPICS'			=> '%d موضوع جدید',
-	'24HOUR_POSTS'			=> '%d پست جدید',
-	'24HOUR_USERS'			=> '%d کاربر جدید',
+	'LAST_24_HOURS'	=> 	'',
+	'24HOUR_TOPICS'			=> 'موضوع جدید %d',
+	'24HOUR_POSTS'			=> 'پست جدید %d',
+	'24HOUR_USERS'			=> 'کاربر جدید %d',
+	'NO_ONLINE_BOTS'		=> 'بدون ربات فعال',
 
-	'LAST_24_HOURS'			=> 'در 24 ساعت گذشته از انجمن بازدید داشتند',
+	'TWENTYFOURHOUR_STATS'	=> 'آمار انجمن در 24 ساعت گذشته',
+	'TOTAL_24HOUR_USERS'	=> array(
+		1 => 'به طور کلی تعداد %d نفر از انجمن بازدید کرده اند :: ',
+		2 => 'به طور کلی تعداد %d نفر از انجمن بازدید کرده اند :: ',
+	),
 ));
