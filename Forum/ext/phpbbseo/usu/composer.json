@@ -3,9 +3,9 @@
     "type": "phpbb-extension",
     "description": "This Extension will URL rewrite phpBB URLs in various manners, injecting, or not, forums and topic titles in their URLS, each URL being rewritten once, no matter the number of links using it on the page.",
     "homepage": "http://www.phpBB-SEO.ir",
-    "version": "2.0.0-b5",
+    "version": "2.0.0-b6",
 	"keywords": ["phpbbSEO", "extension", "seo", "Friendly User"],
-    "time": "2019-03-20",
+    "time": "2020-04-20",
     "license": "GPL-2.0",
     "authors": [
         {
@@ -20,8 +20,6 @@
         },
         {
 			"name": "Carlo",
-			"email": "carlo@phpbbitalia.net",
-			"homepage": "http://www.phpbbitalia.net/",
             "role": "Previous Developer"
         }
     ],

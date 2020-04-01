@@ -1470,7 +1470,7 @@ RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}([a-z0-9_-]+){FORUM_PAGINATION}$ {DEFAULT
 RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '(style\.{PHP_EX}|ucp\.{PHP_EX}|mcp\.{PHP_EX}|faq\.{PHP_EX}|posting\.{PHP_EX}|download/file\.{PHP_EX}|report\.{PHP_EX}|adm/index\.{PHP_EX}|cron\.{PHP_EX})$ {DEFAULT_SLASH}{PHPBB_RPATH}$1 [QSA,L,NC' . $fix_301_redirect . ']',
 
 			'relative_images' => '# FIX RELATIVE PATHS : IMAGES
-RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '.+/(styles/.*|images/.*|assets/.*|ext/.*)$ {DEFAULT_SLASH}{PHPBB_RPATH}$1 [QSA,L,NC' . $fix_301_redirect . ']',
+RewriteRule ^{WIERD_SLASH}{PHPBB_LPATH}' . $fix_left_match . '(styles/.*|images/.*|assets/.*|ext/.*)$ {DEFAULT_SLASH}{PHPBB_RPATH}$1 [QSA,L,NC' . $fix_301_redirect . ']',
 		);
 
 		// mods server_conf pos2

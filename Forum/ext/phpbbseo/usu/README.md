@@ -11,4 +11,4 @@ Report Bugs: https://github.com/phpbb-seo/usu/issues <br />
 <b>Working on phpBB 3.2 & 3.3</b>
 
 <b>Support Community:</b>
-<br /> no longer Exist anymore...
+<br /> phpBB-SEO.ir/community/
