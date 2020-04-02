@@ -3,7 +3,7 @@
  *
  * This file is part of the phpBB Forum Software package.
  *
- * phpBB 3.2.X Project - Persian Translation
+ * phpBB 3.3.X Project - Persian Translation
  * Translators: PHP-BB.IR Group Meis@M Nobari
  *
  * @copyright (c) phpBB Limited <https://www.phpbb.com>
@@ -52,7 +52,7 @@ $lang = array_merge($lang, array(
 	
 	// Support page
 	'SUPPORT_TITLE'		=> 'پشتیبانی',
-	'SUPPORT_BODY'		=> 'سیستم phpBB پشتیبانی کامل و بدون هزینه ای از نسخه اخیر را که شامل موارد زیر است بر عهده میگیرد:</p><ul><li>نصب</li><li>پیکربندی</li><li>سوالات تخصصی</li><li>مشکلات مربوط به باگ ها و نواقص نرم افزار</li><li>ارتقا از نسخه های کاندید به نسخه های پایدار</li><li>تبدیل از نسخه 2.0 به نسخه 3</li><li>تبدیل سایر انجمن سازها و سیستم ها به این سیستم (مشاهده کنید <a href="https://www.phpbb.com/community/viewforum.php?f=486">تالار تبدیل ها</a>)</li></ul><p>ماکاربرانی را که از نسخه های بتا استفاده میکنند تشویق به استفاده از نسخه های پایدار میکنیم</p><h2>افزونه ها / قالب ها</h2><p>مسائل و مشکلات مربوط به افزونه ها <a href="https://www.phpbb.com/community/viewforum.php?f=451">تالار افزونه ها</a>.<br />مسائل و مشکلات مربوط به قالب ها <a href="https://www.phpbb.com/community/viewforum.php?f=471">تالار قالب ها</a>.<br /><br />چنانچه سوالاتی درباره پیکج نرم افزار دارید هم میتوانید بپرسید.</p><h2>بخش پشتیبانی</h2><p><a href="https://www.phpbb.com/community/viewtopic.php?f=14&amp;t=571070">پکیج خوشآمد گویی</a><br /><a href="https://www.phpbb.com/support/">بخش پشتیبانی</a><br /><a href="https://www.phpbb.com/support/docs/en/3.1/ug/quickstart/">راهنمای سریع</a><br /><br />جهت اطمینان از آخرین اخبار <a href="https://www.phpbb.com/support/">به لیست پستی ما مشترک شوید</a>?<br /><br />',
+	'SUPPORT_BODY'		=> 'Full support will be provided for the current stable release of phpBB3, free of charge. This includes:</p><ul><li>installation</li><li>configuration</li><li>technical questions</li><li>problems relating to potential bugs in the software</li><li>updating from Release Candidate (RC) versions to the latest stable version</li><li>converting from phpBB 2.0.x to phpBB3</li><li>converting from other discussion board software to phpBB3 (please see the <a href="https://www.phpbb.com/community/viewforum.php?f=486">Convertors Forum</a>)</li></ul><p>We encourage users still running beta versions of phpBB3 to replace their installation with a fresh copy of the latest version.</p><h2>Extensions / Styles</h2><p>For issues relating to Extensions, please post in the appropriate <a href="https://www.phpbb.com/community/viewforum.php?f=451">Extensions Forum</a>.<br />For issues relating to styles, templates and themes, please post in the appropriate <a href="https://www.phpbb.com/community/viewforum.php?f=471">Styles Forum</a>.<br /><br />If your question relates to a specific package, please post directly in the topic dedicated to the package.</p><h2>Obtaining Support</h2><p><a href="https://www.phpbb.com/support/">Support Section</a><br /><a href="https://www.phpbb.com/support/docs/en/3.3/ug/quickstart/">Quick Start Guide</a><br /><br />To ensure you stay up to date with the latest news and releases, follow us on <a href="https://www.twitter.com/phpbb/">Twitter</a> and <a href="https://www.facebook.com/phpbb/">Facebook</a><br /><br />',
 
 	// License
 	'LICENSE_TITLE'		=> 'General Public License',
@@ -73,7 +73,7 @@ $lang = array_merge($lang, array(
 
 	<p>phpBB این پایگاه های داده را پشتیبانی می کند :</p>
 	<ul>
-		<li>MySQL 3.23 or above (MySQLi supported)</li>
+		<li>MySQL 4.1.3 or above (MySQLi supported)</li>
 		<li>PostgreSQL 8.3+</li>
 		<li>SQLite 3.6.15+</li>
 		<li>MS SQL Server 2000 or above (directly or via ODBC)</li>
@@ -109,7 +109,7 @@ $lang = array_merge($lang, array(
 
 	// Server requirements
 	'PHP_VERSION_REQD'					=> 'نسخه PHP',
-	'PHP_VERSION_REQD_EXPLAIN'			=> 'phpBB نیاز به نسخه 5.4.0 PHP دارد.',
+	'PHP_VERSION_REQD_EXPLAIN'			=> 'phpBB نیاز به نسخه 7.1.3 PHP دارد.',
 	'PHP_GETIMAGESIZE_SUPPORT'			=> 'تابع phpBB getimagesize() در دسترس است',
 	'PHP_GETIMAGESIZE_SUPPORT_EXPLAIN'	=> '<strong>ضروری</strong> - برای این که phpBB عملکرد درستی داشته باشد، باید تابع getimagesize در دسترس باشد.',
 	'PCRE_UTF_SUPPORT'			     	=> 'PCRE UTF-8 پشتیبانی',
@@ -190,7 +190,6 @@ $lang = array_merge($lang, array(
 	// Database options
 	'DB_OPTION_MSSQL_ODBC'	=> 'MSSQL Server 2000+ via ODBC',
 	'DB_OPTION_MSSQLNATIVE'	=> 'MSSQL Server 2005+ [ Native ]',
-	'DB_OPTION_MYSQL'		=> 'MySQL',
 	'DB_OPTION_MYSQLI'		=> 'MySQL with MySQLi Extension',
 	'DB_OPTION_ORACLE'		=> 'Oracle',
 	'DB_OPTION_POSTGRES'	=> 'PostgreSQL',
@@ -569,7 +568,7 @@ $lang = array_merge($lang, array(
 
 	// Finish conversion
 	'CONVERT_COMPLETE'			=> 'فرآیند تبدیل اتمام یافت',
-    'CONVERT_COMPLETE_EXPLAIN'	=> 'انجمن شما با موفقیت به نسخه phpBB 3.2 ارتقا پیدا کرد شما میتوانید هم اکنوان وارد اکانت خود شوید.<a href="../">دسترسی به انجمن</a>. لطفا قبل از حذف پوشه نصب و فعال سازی انجمن از تغییر تمامی تنظیمات جدید اطمینان حاصل نمایید. راهنمای استفاده از این سیستم در این آدرس موجود است. <a href="https://www.phpbb.com/support/docs/en/3.2/ug/">Documentation</a> و <a href="https://www.phpbb.com/community/viewforum.php?f=466">انجمن پشتیبانی</a>.',
+    'CONVERT_COMPLETE_EXPLAIN'	=> 'انجمن شما با موفقیت به نسخه phpBB 3.3 ارتقا پیدا کرد شما میتوانید هم اکنوان وارد اکانت خود شوید.<a href="../">دسترسی به انجمن</a>. لطفا قبل از حذف پوشه نصب و فعال سازی انجمن از تغییر تمامی تنظیمات جدید اطمینان حاصل نمایید. راهنمای استفاده از این سیستم در این آدرس موجود است. <a href="https://www.phpbb.com/support/docs/en/3.3/ug/">Documentation</a> و <a href="https://www.phpbb.com/community/viewforum.php?f=661">انجمن پشتیبانی</a>.',
 
 	'CONV_ERROR_ATTACH_FTP_DIR'			=> 'در تالار قدیمی،آپلود FTP برای پیوست ها فعال می باشد. لطفا آپلود پیوست با FTP را غیر فعال کنید و مطمئن باشید که دایرکتوری مشخصی برای آپلود تایین شده است. و سپس تمام پیوست ها را به این دایرکتوری قابل دسترس آپلود کرده و تبدیل گر را دوباره فعال کنید.',
 	'CONV_ERROR_CONFIG_EMPTY'			=> 'اطلاعات پیکربندی برای تبدیل گر وجود ندارد.',

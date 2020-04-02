@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -229,16 +229,6 @@ $lang = array_merge($lang, array(
 
 	'BACK'					=> 'بازگشت',
 
-	'CANNOT_CHANGE_FILE_GROUP'	=> 'فایل گروه قابل تغییر نیست',
-	'CANNOT_CHANGE_FILE_PERMISSIONS'	=> 'دسترسی فایل قابل انجام نیست',
-	'CANNOT_COPY_FILES'		=> 'قادر به کپی نمیباشد',
-	'CANNOT_CREATE_SYMLINK'	=> 'قادر به ساخت لینک نمی باشد',
-	'CANNOT_DELETE_FILES'	=> 'حذف فایل ها از سیستم امکانپذیر نیست',
-	'CANNOT_DUMP_FILE'		=> 'حذف فایل مجاز نیست',
-	'CANNOT_MIRROR_DIRECTORY'	=> 'امکان دسترسی به فایل اصلی وجود ندارد',
-	'CANNOT_RENAME_FILE'	=> 'امکان تغییر نام فایل سیستم وجود ندارد',
-	'CANNOT_TOUCH_FILES'	=> 'محدود کردن فایل موجود امکان ندارد',
-
 	'CONTAINER_EXCEPTION' => 'در هنگام نصب افزونه امکان خطا وجود دارد. به همین جهت در این هنگام به صورت موقت تمامی افزونه ها غیر فعال میشود. لطفا کش را از صفحه اصلی پاک کنید. هنگامیکه خطاها رفع شود مجدد افزونه ها فعال خواهد شد. چنانچه این مشکل ادامه دار شد با پشتیبانی زیر تماس بگیرید <a href="https://www.phpbb.com/support">phpBB.com</a> ',
 	'EXCEPTION' => 'استثنا',
 
@@ -328,6 +318,7 @@ $lang = array_merge($lang, array(
 	'TOTAL_SIZE'			=> 'حجم کلی',
 
 	'UCP'					=> 'کنترل پنل کاربر',
+	'URL_INVALID'			=> 'آدرس های “%1$s” نا معتبرند.',
 	'USERNAMES_EXPLAIN'		=> 'هر نام کاربری را در سطر جداگانه ای قرار دهید.',
 	'USER_CONTROL_PANEL'	=> 'کنترل پنل کاربر',
 
@@ -375,7 +366,7 @@ $lang = array_merge($lang, array(
 	'DATABASE_SERVER_INFO'	=> 'سرور پایگاه داده',
 	'DATABASE_SIZE'			=> 'حجم پایگاه داده',	
 
-	// Enviroment configuration checks, mbstring related
+	// Environment configuration checks, mbstring related
 	'ERROR_MBSTRING_FUNC_OVERLOAD'					=> 'تابع اضافه بار به طور نامناسب پیکربندی شده است',	
 	'ERROR_MBSTRING_FUNC_OVERLOAD_EXPLAIN'			=> '<var>mbstring.func_overload</var> باید 0 یا 4 انتخاب شود، می توانید داده را از صفحه <samp>اطلاعات PHP</samp> کنترل کنید.',
 	'ERROR_MBSTRING_ENCODING_TRANSLATION'			=> 'Transparent character encoding به طور نامناسب پیکربندی شده است',	

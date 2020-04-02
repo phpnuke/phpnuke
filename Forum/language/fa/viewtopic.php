@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -91,6 +91,7 @@ $lang = array_merge($lang, array(
 	'NO_UNREAD_POSTS'		=> 'پست ناخوانده دیگری در این انجمن موجود نیست.',
 	'NO_VOTE_OPTION'		=> 'در هنگام ارسال راي لطفا يک گزينه را انتخاب کنيد.',
 	'NO_VOTES'				=> 'بدون راي',
+	'NO_AUTH_PRINT_TOPIC'	=> 'شما اجازه پرینت موضوع را ندارید.',
 
 	'POLL_ENDED_AT'			=> 'پايان نظرسنجي در %s',
 	'POLL_RUN_TILL'			=> 'مدت زمان نظر سنجی تا %s ادامه خواهد داشت.',

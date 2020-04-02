@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -47,7 +47,7 @@ $lang = array_merge($lang, array(
 	'BOARD_STYLE'					=> 'قالب انجمن',
 	'CUSTOM_DATEFORMAT'				=> 'سفارشی…',
 	'DEFAULT_DATE_FORMAT'			=> 'فرمت تاریخ',
-	'DEFAULT_DATE_FORMAT_EXPLAIN'	=> 'فرمت تاریخ همان تابع <code>date</code> PHP می باشد.',
+	'DEFAULT_DATE_FORMAT_EXPLAIN'	=> 'فرمت تاریخ همان تابع <code><a href="https://secure.php.net/manual/function.date.php">date()</a></code> PHP می باشد.',
 	'DEFAULT_LANGUAGE'				=> 'زبان پیشفرض',
 	'DEFAULT_STYLE'					=> 'قالب پیشفرض',
 	'DEFAULT_STYLE_EXPLAIN'			=> 'قالب پیش فرض برای کاربران جدید',
@@ -55,6 +55,8 @@ $lang = array_merge($lang, array(
 	'DISABLE_BOARD_EXPLAIN'			=> 'این گزینه تالار را برای کاربران غیرفعال می کند، می توانید توضیحات کوتاهی (حداکثر 250 کاراکتر) وارد کنید تا به کاربران نمایش داده شود.',
 	'DISPLAY_LAST_SUBJECT'			=> 'نمایش آخرین پست ها در صفحه اصلی انجمن',
 	'DISPLAY_LAST_SUBJECT_EXPLAIN'	=> 'نمایش آخرین پست های ارسال شده در لیست انجمن ها در صفحه اصلی به عنوان لینک. عنوان هایی که در انجمن های دارای پسورد و یا کاربردسترسی خواندن به آنها را نداشته باشد نمایش داده نمیشود.',
+	'DISPLAY_UNAPPROVED_POSTS'		=> 'نمایش پست های تایید نشده برای نویسنده',
+	'DISPLAY_UNAPPROVED_POSTS_EXPLAIN'	=> 'پست های تایید نشده برای نویسنده قابل نمایش است. اما برای مهمانان خیر',
 	'GUEST_STYLE' 				=> 'قالب مهمان',
 	'GUEST_STYLE_EXPLAIN' 		        => 'قالب انجمن برای مهمانان',
 	'OVERRIDE_STYLE'				=> 'لغو قالب کاربر',
@@ -114,9 +116,9 @@ $lang = array_merge($lang, array(
 	'ALLOW_GRAVATAR'				=> 'فعال سازی نمایه گراواتار',
 	'ALLOW_LOCAL'					=> 'فعال سازی گالری نمایه',
 	'ALLOW_REMOTE'					=> 'فعال سازی نمایه از راه دور',
-	'ALLOW_REMOTE_EXPLAIN'			=> 'نمایه هایی که به سایر سایت ها لینک داده می شوند',
+	'ALLOW_REMOTE_EXPLAIN'			=> 'نمایه هایی که به سایر وب سایت های متصل می شوند<br><em><strong class="error">هشدار:</strong> با فعال سازی این گزینه کاربران میتوانند بررسی کنند فایل های موجود و قابل دسترسی که در شبکه های محلی وجود دارند.</em>',
 	'ALLOW_REMOTE_UPLOAD'			=> 'فعال سازی اپلود از راه دور نمایه',
-	'ALLOW_REMOTE_UPLOAD_EXPLAIN'	=> 'پذیرفتن آپلود نمایه از سایر سایت ها.',
+	'ALLOW_REMOTE_UPLOAD_EXPLAIN'	=> 'پذیرفتن آپلود نمایه از سایر وب سایت ها<br><em><strong class="error">هشدار:</strong>با فعال سازی این گزینه کاربران میتوانند بررسی کنند فایل های موجود و قابل دسترسی که در شبکه های محلی وجود دارند.</em>',
 	'ALLOW_UPLOAD'					=> 'فعال سازی آپلود نمایه',
 	'AVATAR_GALLERY_PATH'			=> 'مسیر گالری نمایه',
 	'AVATAR_GALLERY_PATH_EXPLAIN'	=> 'مسیری در دایرکتوری روت  phpBB برای تصاویر از پیش آماده شده. برای مثال <samp>images/avatars/gallery</samp>.',
@@ -351,7 +353,7 @@ $lang = array_merge($lang, array(
 
 // Cookie Settings
 $lang = array_merge($lang, array(
-	'ACP_COOKIE_SETTINGS_EXPLAIN'		=> 'این گزینه ها جزئیات نحوه ارسال کوکی ها به مرورگر را تعیین می کنند. در اغلب موارد تنظیمات پیشفرض برای کوکی ها کافی است. اگر خواستار تغییر این تنظیمات باشید باید دقت کافی به عمل آورید زیرا تنظیمات نا درست از ورود کاربران جلوگیری خواهد کرد چنانچه مشکلاتی با ورود کاربران به تالار دارید به این لینک مراجعه کنید  <strong><a href="https://www.phpbb.com/support/go/cookie-settings/">phpBB.com Knowledge Base - Fixing incorrect cookie settings</a></strong>',
+	'ACP_COOKIE_SETTINGS_EXPLAIN'		=> 'این گزینه ها جزئیات نحوه ارسال کوکی ها به مرورگر را تعیین می کنند. در اغلب موارد تنظیمات پیشفرض برای کوکی ها کافی است. اگر خواستار تغییر این تنظیمات باشید باید دقت کافی به عمل آورید زیرا تنظیمات نا درست از ورود کاربران جلوگیری خواهد کرد چنانچه مشکلاتی با ورود کاربران به تالار دارید به این لینک مراجعه کنید  <strong><a href="https://www.phpbb.com/support/go/cookie-settings">phpBB.com Knowledge Base - Fixing incorrect cookie settings</a></strong>',
 	
 	'COOKIE_DOMAIN'				=> 'دامنه کوکی',
 	'COOKIE_DOMAIN_EXPLAIN'		=> 'در بیشتر مواقع دامنه کوکی تنظیم است. چنانچه مطمئن نیستید آن را خالی بگذارید.<br><br>اما اگر تالار شما با برنامه دیگری هماهنگ شده و یا از دامنه های بیشتری استفاده میکنید, آنگاه طبق دستور زیر تنظیمات کوکی را انجام دهید.ج. اگر چیزی شبیه این دارید <i>example.com</i> و <i>forums.example.com</i>,یا شاید <i>forums.example.com</i> و <i>blog.example.com</i>. زیردامنه ها را حذف کنید تا دامنه اصلی مشخص شود, <i>example.com</i>. حالا یک نقطه به جلو دامنه اضافه  کنید مانند .example.com توجه: نقطه در ابتدا است در این مثال).',
@@ -440,7 +442,7 @@ $lang = array_merge($lang, array(
 	'AUTH_PROVIDER_OAUTH_TITLE'					=> 'OAuth',
 	'AUTH_PROVIDER_OAUTH_SECRET'				=> 'رمز',
 
-	'APACHE_SETUP_BEFORE_USE'	=> 'قبل از تغییر روش به آپاچی، باید آپاچی در سرور شما نصب باشد. در نظر داشته باشید که نام کاربری استفاده شده در آپاچی باید با نام کاربری شما در phpBB یکی باشد. تایید با آپاچی فقط با mod_php (همراه با نسخه CGI نباشد) اگر و safe_mode غیرفعال باشد،قابل اجرا است',
+	'APACHE_SETUP_BEFORE_USE'	=> 'قبل از تغییر روش به آپاچی، باید آپاچی در سرور شما نصب باشد. در نظر داشته باشید که نام کاربری استفاده شده در آپاچی باید با نام کاربری شما در phpBB یکی باشد. تایید با آپاچی فقط با mod_php (همراه با نسخه CGI نباشد)',
 
 	'LDAP'							=> 'LDAP',
 	'LDAP_DN'						=> 'LDAP base <var>dn</var>',
@@ -572,7 +574,9 @@ $lang = array_merge($lang, array(
 	'EMAIL_FORCE_SENDER_EXPLAIN'	=> 'This will set the <samp>Return-Path</samp> to the from email address instead of using the local user and hostname of the server. This setting does not apply when using SMTP.<br><em><strong>Warning:</strong> Requires the user that the webserver runs as to be added as trusted user to the sendmail configuration.</em>',
 	'EMAIL_PACKAGE_SIZE'			=> 'حجم بسته ایمیل',
 	'EMAIL_PACKAGE_SIZE_EXPLAIN'	=> 'این حداکثر تعداد ایمیلی می باشد که می توان در یک بسته ارسال کرد این تنظیمات در پیغام های داخلی اعمال می شود. اگر با مشکلی در ارسال ایمیل ها روبرو شدید این گزینه را با وارد کردن 0 غیرفعال کنید.',
-	'EMAIL_SIG'						=> 'امضای ایمیل',
+	'EMAIL_MAX_CHUNK_SIZE'			=> 'حداکثر ایمیل مجاز دریافتی',
+	'EMAIL_MAX_CHUNK_SIZE_EXPLAIN'	=> 'در صورت لزوم میتوانید حداکثر ایمیل مجاز دریافتی را تنظیم کنید تا از تنظیمات سرور شما تجاوز نکند',
+    'EMAIL_SIG'						=> 'امضای ایمیل',
 	'EMAIL_SIG_EXPLAIN'				=> 'این متن به تمامی ایمیل های ارسالی از این تالار پیوست خواهد شد.',
 	'ENABLE_EMAIL'					=> 'فعال سازی ایمیل ها در تالار',
 	'ENABLE_EMAIL_EXPLAIN'			=> 'اگر این گزینه غیرفعال باشد،هیچ ایمیلی از تالار ارسال نخواهد شد. <em>لطفا توجه داشته باشید که تنظیمات فعال سازی اکانت کاربران و مدیران نیازمند آن است تا این گزینه فعال باشد. اگر اخیراً از فعال سازی "کاربران" و یا "مدیران" استفاده می کنید، غیرفعال کردن این گزینه، باعث غیر فعال شدن ثبت نام می شود.</em>',
@@ -591,8 +595,8 @@ $lang = array_merge($lang, array(
 	'SMTP_POP_BEFORE_SMTP'			=> 'POP-BEFORE-SMTP',
 	'SMTP_PORT'						=> 'پورت سرور SMTP',
 	'SMTP_PORT_EXPLAIN'				=> 'این گزینه را فقط هنگامی استفاده کنید که مطمئن باشید سرور شما در پورت دیگری جز این اجرا می شود.',
-	'SMTP_SERVER'					=> 'آدرس سرور SMTP و قوانین',
-	'SMTP_SERVER_EXPLAIN'			=> 'توجه کنید که سرور شما باید پروتوکل های مربوطه را پشتیبانی کند اگر هم از SSL استفاده میکند باید از"ssl://your.mailserver.com" استفاده کنید.',
+	'SMTP_SERVER'					=> 'آدرس سرور SMTP',
+	'SMTP_SERVER_EXPLAIN'			=> 'لطفا از پروتوکل (<samp>ssl://</samp> or <samp>tls://</samp>)  استفاده نکنید، مگر سرور به شما اجازه چنین کاری بدهد',
 	'SMTP_SETTINGS'					=> 'تنظیمات SMTP',
 	'SMTP_USERNAME'					=> 'نام کاربری SMTP',
 	'SMTP_USERNAME_EXPLAIN'			=> 'فقط هنگامی کلمه عبور را وارد کنید که سرور ایمیل آن را خواسته باشد.',

@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -119,6 +119,9 @@ $lang = array_merge($lang, array(
 	'SEARCH_GUEST_INTERVAL_EXPLAIN'			=> 'تعدا ثانیه هایی که مهمانان باید بین دو جستجو صبر کنند،اگر مهمانی جستجویی را انجام دهد،مهمانان دیگر باید این تعداد ثانیه صبر کنند تا بتوانند جستجوی دیگری را انجام دهند.',
 	'SEARCH_INDEX_CREATE_REDIRECT'			=> array(
 		2	=> 'همه پست ها تا id %1$d از بین %2$d پست در این مرحله شاخص بندی شدند.رتبه شاخص بندی کنونی تقریبا %3$در ثانیه می باشد.<br />شاخص بندی در حال اجرا است.',
+	),
+	'SEARCH_INDEX_CREATE_REDIRECT_RATE'		=> array(
+		2	=> 'The current rate of indexing is approximately %1$.1f posts per second.<br />Indexing in progress…',
 	),
 	'SEARCH_INDEX_DELETE_REDIRECT'			=> array(
 		2	=> 'تمامی پست های شماره %2$d پاک شدند, که تعداد %1$d پست در مرحله اجراست<br />',

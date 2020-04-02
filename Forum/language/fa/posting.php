@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 * 
 * This file is part of the phpBB Forum Software package.
@@ -46,6 +46,7 @@ $lang = array_merge($lang, array(
 	'ADD_POLL'					=> 'ایجاد نظرسنجی',
 	'ADD_POLL_EXPLAIN'			=> 'اگر نمیخواهد نظرسنجی ای را برای موضوع خود ایجاد منید،لطفا فیلد زیر را خالی بگزارید.',
 	'ALREADY_DELETED'			=> 'با عرض پوزش این پیغام قبلا حذف شده است.',
+	'ATTACH_COMMENT_NO_EMOJIS'	=> 'توضیحات مربوط به فایل پیوست حاوی کاراکترهای غیر مجاز است ( ایموجی)',
 	'ATTACH_DISK_FULL'			=> 'فضای کافی جهت پیوست فایل وجود ندارد.',
 	'ATTACH_QUOTA_REACHED'		=> 'با عرض پوزش،سهمیه پیوست فایل در تالار برای شما اتمام یافته است.',
 	'ATTACH_SIG'				=> 'پیوست امضا (امضایتان را میتوانید از کنترل پنل کاربر تغییر دهید)',
@@ -148,6 +149,7 @@ $lang = array_merge($lang, array(
 	'LOAD_DRAFT_EXPLAIN'		=> 'در این بخش میتوانید پیش نویس هایی را که مایل به تکمیل کردن آنها هستید،انتخاب کنبد. پست کنونی شما لغو و حذف خواهد شد.برای مشاهده،ویرایش و یا حذف پیش نویس ها به کنترل پنل کاربر مراجعه کنید.',
 	'LOGIN_EXPLAIN_BUMP'		=> 'برای بامپ(bump) کردن انجمن،باید ابتدا وارد شوید.',
 	'LOGIN_EXPLAIN_DELETE'		=> 'برای پاک کردن پست های این انجمن باید ابتدا وارد شوید.',
+	'LOGIN_EXPLAIN_SOFT_DELETE'	=> 'برای پاک کردن پست ها باید ابتدا وارد شوید',
 	'LOGIN_EXPLAIN_POST'		=> 'برای ارسال پستی در این انجمن باید ابتدا وارد شوید.',
 	'LOGIN_EXPLAIN_QUOTE'		=> 'برای نقل قول پست ها در این انجمن باید ابتدا وارد شوید.',
 	'LOGIN_EXPLAIN_REPLY'		=> 'برای پاسخ به موضوعی باید ابتدا وارد شوید.',
@@ -267,7 +269,6 @@ $lang = array_merge($lang, array(
 	'TOPIC_BUMPED'				=> 'این موضوع با موفقیت بامپ(bump) شد',
 
 	'UNAUTHORISED_BBCODE'		=> 'از BBCode های مقابل نمیتوانید استفاده کنید : %s.',
-	'UNGLOBALISE_EXPLAIN'		=> 'برای بازگردانی این موضوع از حالت سراسری به حالت معمولی،باید انجمنی را انتخاب کنید که میخواهید موضوع در آن انجمن ذخیره شود.',
 	'UNSUPPORTED_CHARACTERS_MESSAGE'	=> 'متن شما حاوی کاراکترهای غیر مجاز زیر است:<br />%s',
 	'UNSUPPORTED_CHARACTERS_SUBJECT'	=> 'متن شما حاوی کاراکترهای غیر مجاز زیر است:<br />%s',
 	'UPDATE_COMMENT'			=> 'بروزرسانی نظر',

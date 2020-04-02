@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -24,7 +24,7 @@ if (!defined('IN_PHPBB'))
 
 if (empty($lang) || !is_array($lang))
 {
-	$lang = array();
+	$lang = [];
 }
 
 // DEVELOPERS PLEASE NOTE
@@ -39,8 +39,8 @@ if (empty($lang) || !is_array($lang))
 // equally where a string contains only two placeholders which are used to wrap text
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
-$lang = array_merge($lang, array(
-	'ACP_STYLES_EXPLAIN'	=> 'در این بخش میتوانید به مدیریت قالب های انجمن خود بپردازید.',
+$lang = array_merge($lang, [
+	'ACP_STYLES_EXPLAIN'	        => 'در این بخش میتوانید به مدیریت قالب های انجمن خود بپردازید.',
 
 	'CANNOT_BE_INSTALLED'			=> 'امکان نصب وجود ندارد.',
 	'CONFIRM_UNINSTALL_STYLES'		=> 'آیا از حذف قالب انتخابی اطمینان دارید؟',
@@ -88,6 +88,8 @@ $lang = array_merge($lang, array(
 	'STYLE_VERSION'				=> 'نسخه قالب',
 
 	'UNINSTALL_DEFAULT'		=> 'نمی توانید قالب پیش فرض را حذف کنید.',
-	
+	'UNINSTALL_PROSILVER'						=> 'نمیتوانید قالب prosilver را حذف کنید.',
+	'UNINSTALL_DEFAULT'							=> 'نمیتوانید قالب پیشفرض را حذف کنید.',
+ 
 	'BROWSE_STYLES_DATABASE'	=> 'جستجوی قالب در پایگاه',
-));
+]);

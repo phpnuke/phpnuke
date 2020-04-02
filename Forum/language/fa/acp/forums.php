@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -100,6 +100,7 @@ $lang = array_merge($lang, array(
 	'FORUM_LINK_TRACK_EXPLAIN'			=> 'تعداد دفعات انتقال مسیر رل ذخیره می کند.',
 	'FORUM_NAME'						=> 'نام انجمن',
 	'FORUM_NAME_EMPTY'					=> 'باید نامی را برای این انجمن وارد کنید.',
+	'FORUM_NAME_EMOJI'					=> 'نام انجمن وارد شده نامعتبر است<br> حاوی کاراکترهای غیر مجاز<br>%s',
 	'FORUM_PARENT'						=> 'انجمن ریشه',
 	'FORUM_PASSWORD'					=> 'کلمه عبور انجمن',
 	'FORUM_PASSWORD_CONFIRM'			=> 'تایید کلمه عبور انجمن',
@@ -131,6 +132,8 @@ $lang = array_merge($lang, array(
 	'GENERAL_FORUM_SETTINGS'	=> 'تنظیمات عمومی انجمن',
 
 	'LINK'						=> 'لینک',
+	'LIMIT_SUBFORUMS'			=> 'Limit legend to direct child-subforums',
+	'LIMIT_SUBFORUMS_EXPLAIN'	=> 'Limits the subforums to be displayed to subforums that are direct descendants (children) of the current forum. Disabling this will display all subforums with the “List subforums in legend” option enabled, regardless of depth.',
 	'LIST_INDEX'				=> 'نمايش زير انجمنها در فهرست',
 	'LIST_INDEX_EXPLAIN'		=> 'با فعال کردن اين گزينه, انجمن مورد نظر در هر کجاي انجمنها باشد در نخستين صفحه قابل نمايش ميباشد. براي آنکه تمامي زير انجمنها فقط در انجمن والد خود نمایش داده شوند گزینه "نمايش فهرست زير انجمنها در انجمن والد" را انتخاب نمائید.',
 	'LIST_SUBFORUMS'			=> 'نمايش فهرست زير انجمنها در انجمن والد',

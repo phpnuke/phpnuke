@@ -1,4 +1,5 @@
 Subject: اطلاعیه پست انجمن - "{FORUM_NAME}"
+لیست انجمن های عضو نشده: <{U_STOP_WATCHING_FORUM}>
 
 سلام {USERNAME},
 

@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -114,7 +114,7 @@ $lang = array_merge($lang, array(
 	'FIRST_OPTION'				=> 'اولین گزینه',
 
 	'HIDE_PROFILE_FIELD'			=> 'مخفی کردن فیلد پروفایل',
-	'HIDE_PROFILE_FIELD_EXPLAIN'	=> 'این گزینه فیلد را از دید عموم به جز کسانی که هم اکنون می توانند این فیلد را ببینند،مخفی می کند.اگر نمایش فیلد در کنترل پنل کاربر غیرفعال باشد،هیچ کاربری نمی تواند این فیلد را ببیند و یا در آن تغییراتی اعمال کند و در این صورت فیلد توسط مدیران قابل مشاهده و ویرایش خواهد بود.',
+	'HIDE_PROFILE_FIELD_EXPLAIN'	=> 'این گزینه فیلد را از دید عموم به جز مدیران کل و مدیران تالار،مخفی می کند.اگر نمایش فیلد در کنترل پنل کاربر غیرفعال باشد،هیچ کاربری نمی تواند این فیلد را ببیند و یا در آن تغییراتی اعمال کند و در این صورت فیلد توسط مدیران قابل مشاهده و ویرایش خواهد بود.',
 
 	'INVALID_CHARS_FIELD_IDENT'	=> 'شناسایی فیلد فقط می تواند حاوی حروف کوچک لاتین و _ باشد',
 	'INVALID_FIELD_IDENT_LEN'	=> 'طول شناسایی فیلد فقط می تواند 17 کاراکتر باشد',

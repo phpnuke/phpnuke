@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -45,7 +45,7 @@ $lang = array_merge($lang, array(
 	'ACP_BBCODES_EXPLAIN'		=> 'BBCode نوعی کدهایی شبیه به HTML می باشند.در این بخش می توانید BBCode ها را ویرایش کرده و یا آنها را اضافه کنید.',
 	'ADD_BBCODE'				=> 'اضافه کردن BBCode',
 
-	'BBCODE_DANGER'				=> 'BBCode قابل اضافه شدن نیست زیرا، {TEXT} مورد نامطابقی از HTML هست. ممکن است خطای امنیتی XSS باشد. سعی کنید که از انواع {SIMPLETEXT} یا {INTTEXT} استفاده کنید. فقط هنگامی این مرحله را ادامه دهید که از پیامدهای خطا آگاه باشید و فقط هنگامی از {TEXT} استفاده کنید که عدم استفاده از آن ممکن نباشد.',
+	'BBCODE_DANGER'				=> 'شما در حال تلاش برای اضافه کردن BBCode هاامن هستید. چنانچه BBCode شما حاوی متن حساس {TEXT} میباشد از یک نوع مطمئن تر استفاده کنید. تنها میتوان موقعی استفاده کرد که از خطر آن اگاه باشید. ',
 	'BBCODE_DANGER_PROCEED'		=> 'ادامه', //'I understand the risk',
 
 	'BBCODE_ADDED'				=> 'BBCode با موفقیت اضافه شد.',
@@ -59,7 +59,7 @@ $lang = array_merge($lang, array(
 
 	'BBCODE_INVALID_TAG_NAME'	=> 'نام تگ BBCode انتخاب شده در حال حاضر موجود می باشد.',
 	'BBCODE_INVALID'			=> 'ساختار BBCode معتبر نمی باشد.',
-	'BBCODE_OPEN_ENDED_TAG'		=> 'BBCode سفارشی باید حاوی هر دو تگ باز و بسته کردن باشد.',
+	'BBCODE_INVALID_TEMPLATE'	=> 'قالب BBCode شما نا معتبر است.',
 	'BBCODE_TAG'				=> 'تگ',
 	'BBCODE_TAG_TOO_LONG'		=> 'نام تگ وارد شده بسیار طولانی می باشد.',
 	'BBCODE_TAG_DEF_TOO_LONG'	=> 'توضیحات تگ وارد شده بسیار طولانی می باشد.',
@@ -81,7 +81,7 @@ $lang = array_merge($lang, array(
 	'TOO_MANY_BBCODES'		=> 'نمی توانید بیشتر از این BBCode اضافه کنید،لطفا یک یا چند مورد را حذف کرده و دوباره امتحان کنید.',
 
 	'tokens'	=>	array(
-		'TEXT'			=> 'هر نوع متن شامل کاراکترهای خارجی، اعداد و… نباید از این در تگ های HTML استفاده کنید. به جای آن از IDENTIFIER, INTTEXT و یا SIMPLETEXT استفاده کنید.',
+        'TEXT'			=> 'هر نوع متن شامل کاراکترهای خارجی، اعداد و… ',
 		'SIMPLETEXT'	=> 'کاراکتر های زبان لاتین، اعداد, خط فاصله, کاما, نقطه, منها, به علاوه, خط ربط و و خط زیرین.',
 		'INTTEXT'		=> 'کاراکتر های یونی کد، اعداد, خط فاصله, کاما, نقطه, متها, به علاوه, خط ربط, خط زیرین و فضای خالی.',
 		'IDENTIFIER'	=> 'کاراکتر های زبان لاتین (A-Z) اعداد, خط ربط و خط زیرین.',

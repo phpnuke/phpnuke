@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -81,7 +81,6 @@ $lang = array_merge($lang, array(
 	'CLI_DESCRIPTION_REPARSER_REPARSE_OPT_RANGE_SIZE'	=> 'تعداد تقریبی رکورد برای هر پردازش در زمان',
 	'CLI_DESCRIPTION_REPARSER_REPARSE_OPT_RESUME'		=> 'شروع بازسازی از جایی که آخرین توقف انجام شده ا ست',
 
-	'CLI_DESCRIPTION_RECALCULATE_EMAIL_HASH'			=> 'محاسبه مجدد ستون user_email_hash از جدول کاربران',
 
 	'CLI_DESCRIPTION_SET_ATOMIC_CONFIG'					=> 'مقداردهی تنظیمات پیکربندی تنها هنگامیکه مقادیر فعلی قدیمی باشند',
 	'CLI_DESCRIPTION_SET_CONFIG'						=> 'مقداردهی تنظیمات پیکربندی',
@@ -133,7 +132,6 @@ $lang = array_merge($lang, array(
         'CLI_EXTENSIONS_ENABLED' => 'فعال',
 
     'CLI_FIXUP_FIX_LEFT_RIGHT_IDS_SUCCESS'		=> 'تعمیرات ساختار  درختی انجمن ها و مدل ها با موفقیت انجام شد. ',
-	'CLI_FIXUP_RECALCULATE_EMAIL_HASH_SUCCESS'	=> 'هش Hash تمامی ایمیل های با موفقیت محاسبه شد.',
 	'CLI_FIXUP_UPDATE_HASH_BCRYPT_SUCCESS'		=> 'پسوردهای منقضی و هش شده با موفقیت به روز رسانی شد.',
 	
 	'CLI_MIGRATION_NAME'					=> 'نام مهاجرت ، که شامل فضای جمله می شود ( استفاده از اسلش به جای بک اسلش جهت جلوگیری از مشکلات )',

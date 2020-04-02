@@ -1,9 +1,9 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
-* Version: 3.2.3 
+* Version: 3.3.0 - 1398/10/16
 *
 * @copyright (c) phpBB Limited <https://www.phpbb.com>
 * @license GNU General Public License, version 2 (GPL-2.0)
@@ -64,7 +64,6 @@ $lang = array_merge($lang, array(
 
 	'ACCOUNT_ALREADY_ACTIVATED'		=> 'اکانت شما در حال حاضر فعال میباشد.',
 	'ACCOUNT_DEACTIVATED'			=> '.اکانت شما به طور دستی غیرفعال شده است و فقط از جانل مدیران کل قابل فعال سازی است',
-	'ACCOUNT_NOT_ACTIVATED'			=> 'اکانت شما هنوز فعال نشده است.',
 	'ACP'							=> 'کنترل پنل مدیر کل',
 	'ACP_SHORT'						=> 'پنل مدیر کل',
 	'ACTIVE'						=> 'فعال',
@@ -94,7 +93,9 @@ $lang = array_merge($lang, array(
 	'ATTACHED_IMAGE_NOT_IMAGE'		=> 'تصویر پیوست شده اعتبار ندارد.',
 	'AUTHOR'						=> 'نویسنده',
 	'AUTH_NO_PROFILE_CREATED'		=> 'ایجاد مشخصات کاربر ناموفق بود.',
+ 	'AUTH_PROVIDER_OAUTH_ERROR_ALREADY_LINKED'				=> 'این اکانت به کاربر دیگری متصل شده است.',
 	'AUTH_PROVIDER_OAUTH_ERROR_INVALID_ENTRY'				=> 'ورود به پایگاه داده با مشکل مواجه شده است.',
+	'AUTH_PROVIDER_OAUTH_ERROR_REQUEST'						=> 'هنگام انجام مرحله OAuth مشکلی پیش آمده است.',
 	'AUTH_PROVIDER_OAUTH_ERROR_INVALID_SERVICE_TYPE'		=> 'سرویس راه دور مجاز نیست.',
 	'AUTH_PROVIDER_OAUTH_ERROR_SERVICE_NOT_CREATED'			=> 'سرویس ورود راه دور ساخته نشد.',
 	'AUTH_PROVIDER_OAUTH_SERVICE_BITLY'						=> 'بیتلی ( Bitly )',
@@ -269,6 +270,17 @@ $lang = array_merge($lang, array(
 	'FROM'					=> 'از',
 	'FSOCK_DISABLED'		=> 'عملیات پایان نیافت. تابع <var>fsockopen</var> غیرفعال شده است و یا در سرور یافت نشد.',
 	'FSOCK_TIMEOUT'			=> 'درحین خواندن از شبکه،نشست قطع شد.',
+
+	'FILESYSTEM_CANNOT_CHANGE_FILE_GROUP'		=> 'گروه فایل قابل تغییر نیست',
+	'FILESYSTEM_CANNOT_CHANGE_FILE_PERMISSIONS'	=> 'سطح دسترسی فایل قابل تغییر نیست',
+	'FILESYSTEM_CANNOT_COPY_FILES'				=> 'فایل های قابل کپی برداری نیست',
+	'FILESYSTEM_CANNOT_CREATE_SYMLINK'			=> 'ایجاد لینک ها ممکن نیست',
+	'FILESYSTEM_CANNOT_CREATE_DIRECTORY'		=> 'ساخت دایرکتوری ممکن نیست',
+	'FILESYSTEM_CANNOT_DELETE_FILES'			=> 'فایل های سیستم قابل حذف نیست',
+	'FILESYSTEM_CANNOT_DUMP_FILE'				=> 'فایل مورد نظر قابل حذف نیست',
+	'FILESYSTEM_CANNOT_MIRROR_DIRECTORY'		=> 'دایرکتوری قابل کپی برداری نیست',
+	'FILESYSTEM_CANNOT_RENAME_FILE'				=> 'فایل داخل سیستم قابل تغییر نام نیست',
+	'FILESYSTEM_CANNOT_TOUCH_FILES'				=> 'قابلیت ایجاد یا تغییر فایل وجود ندارد',
 
 	'FTP_FSOCK_HOST'				=> 'هاست FTP',
 	'FTP_FSOCK_HOST_EXPLAIN'		=> 'سرور FTP (سروری که برای اتصال به سایتتان استفاده میکنید)',
@@ -490,7 +502,7 @@ $lang = array_merge($lang, array(
 	'NOTIFICATION_TOPIC_IN_QUEUE'		=> '<strong>تایید موضوع</strong> توسط %1$s:',
 	'NOTIFICATION_TYPE_NOT_EXIST'		=> 'نوع پیام "%s" از سیستم حذف شده است.',
 	'NOTIFICATION_ADMIN_ACTIVATE_USER'	=> '<strong>درخواست فعال سازی</strong> برای کاربران غیر فعال و یا تازه عضو شده : “%1$s”',
-	// Used in conjuction with NOTIFICATION_BOOKMARK and NOTIFICATION_POST.
+	// Used in conjunction with NOTIFICATION_BOOKMARK and NOTIFICATION_POST.
 	'NOTIFICATION_MANY_OTHERS'			=> 'سایر پیام ها',
 	'NOTIFICATION_X_OTHERS'				=> array(
 		2	=> '%d سایر پیام ها',
@@ -525,7 +537,8 @@ $lang = array_merge($lang, array(
 	'NO_POSTS_TIME_FRAME'		=> 'در بازه زمانی انتخاب شده،پستی درون انجمن موجود نیست.',
 	'NO_FEED_ENABLED'			=> 'در این تالار خوراک (feeds) در دسترس نیستند.',
 	'NO_FEED'					=> 'خوراک (feed) درخواست شده،در دسترس نیست',
-	'NO_STYLE_DATA'				=> 'داده ای از طرف قالب انجمن دریافت نشد.',
+    'NO_STYLE_DATA'				=> 'داده ای از طرف قالب انجمن برای user_style %s و کاربر user_id %s دریافت نشد  ',
+	'NO_STYLE_CFG'				=> 'امکان دریافت  تنظیمات فایل قالب وجود ندارد: %s',
 	'NO_SUBJECT'				=> 'عنوانی برای موضوع انتخاب نشده است.',								// Used for posts having no subject defined but displayed within management pages.
 	'NO_SUCH_SEARCH_MODULE'		=> 'جستجوی مورد نظر نتیجه ای دربر نداشت.',
 	'NO_SUPPORTED_AUTH_METHODS'	=> 'متد های تایید پشتیبانی نمیشود.',
@@ -609,6 +622,7 @@ $lang = array_merge($lang, array(
 	'POST_TIME'				=> 'تاریخ پست',
 	'POST_TOPIC'			=> 'ارسال موضوع جدید',
 	'POST_UNAPPROVED_ACTION'	=> 'پست منتظر تایید است:',
+	'POST_UNAPPROVED_EXPLAIN'	=> 'این پست قابل مشاهده برای کاربران دیگر تا زمانی که مدیران آن را تایید نکنند، نیست',
 	'POST_UNAPPROVED'		=> 'این پست با موفقیت تایید شد.',
 	'POWERED_BY'			=> 'توسعه یافته توسط %s',
 	'PREVIEW'				=> 'پیشنمایش',
@@ -733,7 +747,7 @@ $lang = array_merge($lang, array(
 	'STOP_WATCHING_TOPIC'		=> 'لغو عضویت در موضوع',
 	'STRING_LIST_MULTI'			=> '%1$s, و %2$s',
 	'STRING_LIST_SIMPLE'		=> '%1$s و %2$s',
-	'SUBFORUM'					=> 'یرانجمن',
+	'SUBFORUM'					=> 'زیرانجمن',
 	'SUBFORUMS'					=> 'زیرانجمن ها',
 	'SUBJECT'					=> 'عنوان',
 	'SUBMIT'					=> 'ارسال',
@@ -787,6 +801,10 @@ $lang = array_merge($lang, array(
 	'TOPIC_REVIEW'		=> 'پیشنمایش موضوع',
 	'TOPIC_TITLE'		=> 'عنوان موضوع',
 	'TOPIC_UNAPPROVED'	=> 'این موضوع تایید نشده است.',
+	'TOPIC_UNAPPROVED_FORUM'	=> array(
+		1	=> 'موضوع در انتظار تایید',
+		2	=> 'موضوعات در انتظار تایید',
+	),
 	'TOPIC_DELETED'		=> 'این موضوع با موفقیت حذف شد.',
 	'TOTAL_ATTACHMENTS'	=> 'پیوست ها',
 	'TOTAL_LOGS'		=> array(
@@ -919,19 +937,20 @@ $lang = array_merge($lang, array(
 			2		=> '%d دقیقه قبل',
 		),
 
-		'Sunday'	=> 'یک شنبه',
-		'Monday'	=> 'دو شنبه',
-		'Tuesday'	=> 'شه شنبه',
+
+		'Sunday'	=> 'یک‌شنبه',
+		'Monday'	=> 'دوشنبه',
+		'Tuesday'	=> 'سه‌شنبه',
 		'Wednesday'	=> 'چهارشنبه',
-		'Thursday'	=> 'پنج شنبه',
+		'Thursday'	=> 'پنج‌شنبه',
 		'Friday'	=> 'جمعه',
 		'Saturday'	=> 'شنبه',
-
-		'Sun'		=> 'یک شنبه',
-		'Mon'		=> 'دو شنبه',
-		'Tue'		=> 'سه شنبه',
-		'Wed'		=> 'چهار شنبه',
-		'Thu'		=> 'پنج شنبه',
+		
+		'Sun'		=> 'یک‌شنبه',
+		'Mon'		=> 'دوشنبه',
+		'Tue'		=> 'سه‌شنبه',
+		'Wed'		=> 'چهارشنبه',
+		'Thu'		=> 'پنج‌شنبه',
 		'Fri'		=> 'جمعه',
 		'Sat'		=> 'شنبه',
 

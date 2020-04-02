@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -46,10 +46,9 @@ $lang = array_merge($lang, array(
 	'RECAPTCHA_INCORRECT'			=> 'جواب شما نادرست است.',
 	'RECAPTCHA_NOSCRIPT'			=> 'لطفا جاوا اسکریپت مرورگر خود را فعال کنید.',
 
-	'RECAPTCHA_PUBLIC'				=> 'کلید عمومی reCaptcha',
-	'RECAPTCHA_PUBLIC_EXPLAIN'		=> 'کلید عمومی reCaptcha شما. کلیدها می تواند روی <a href="http://www.google.com/recaptcha">www.google.com/recaptcha</a> تهیه شود.',
-	'RECAPTCHA_PRIVATE'				=> 'کلید خصوصی reCaptcha',
-	'RECAPTCHA_PRIVATE_EXPLAIN'		=> 'Your private reCaptcha key. Keys can be obtained on <a href="http://www.google.com/recaptcha">www.google.com/recaptcha</a>.',
-	'RECAPTCHA_PRIVATE_EXPLAIN' 	=> 'کلید خصوصی reCaptcha شما. کلیدها می تواند روی <a href="http://www.google.com/recaptcha">www.google.com/recaptcha</a> تهیه شود.',
-	'RECAPTCHA_EXPLAIN'				=> 'جهت جلوگیری از ارسال خودکارقسمت مربوطه را کامل کنید.',
+	'RECAPTCHA_PUBLIC'				=> 'کلید سایت',
+	'RECAPTCHA_PUBLIC_EXPLAIN'		=> 'کلید reCaptcha شما. کلیدها می تواند روی <a href="http://www.google.com/recaptcha">www.google.com/recaptcha</a> تهیه شود.',
+	'RECAPTCHA_PRIVATE'				=> 'کلید reCaptcha سایت',
+	'RECAPTCHA_PRIVATE_EXPLAIN' 	=> 'کلید امنیتی reCaptcha شما. کلیدها می تواند روی <a href="http://www.google.com/recaptcha">www.google.com/recaptcha</a> تهیه شود.',
+	'RECAPTCHA_INVISIBLE'			=> 'فایل کپچا در حال حاضر قابل رویت نیست، جهت تایید کار آن باید یک ایکن کوچک در قسمت سمت راست صفحه به نمایش در آید',
 ));

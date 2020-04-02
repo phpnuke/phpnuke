@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -82,6 +82,8 @@ $lang = array_merge($lang, array(
 	'ACL_U_SAVEDRAFTS'	=> 'توانایی ذخیره پیش نویس',
 	'ACL_U_CHGCENSORS'	=> 'توانایی لغو سانسور کلمات',
 	'ACL_U_SIG'			=> 'توانایی استفاده از امضا',
+	'ACL_U_EMOJI'		=> 'توانایی استفاده از ایموجی و کاراکترهای غنی در عنوان موضوعات',
+
 
 	'ACL_U_SENDPM'		=> 'توانایی ارسال پیغام خصوصی',
 	'ACL_U_MASSPM'		=> 'توانایی ارسال پیغام خصوصی به چند نفر',

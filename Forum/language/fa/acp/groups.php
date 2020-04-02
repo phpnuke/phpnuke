@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -114,6 +114,7 @@ $lang = array_merge($lang, array(
 	'GROUP_USERS_ADDED'				=> 'کاربران جدید با موفقیت اضافه شدند.',
 	'GROUP_USERS_EXIST'				=> 'کاربران انتخاب شده در حال حاضر عضو می باشند.',
 	'GROUP_USERS_REMOVE'			=> 'کاربران با موفقیت از گروه حذف شدند.',
+	'GROUP_USERS_INVALID'			=> 'هیچ کاربری به گروه اضافه نشد، زیرا کاربران زیر وجود ندارند: %s',
 
 	'LEGEND_EXPLAIN'				=> 'گروه هایی که در " لیست مدیران" نمایش داده می شوند:',
 	'LEGEND_SETTINGS'				=> 'تنظیمات گروه',

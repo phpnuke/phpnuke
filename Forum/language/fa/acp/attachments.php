@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* phpBB 3.2.X Project - Persian Translation
+* phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
 *
 * This file is part of the phpBB Forum Software package.
@@ -71,7 +71,6 @@ $lang = array_merge($lang, array(
 	'ATTACH_QUOTA_EXPLAIN'				=> 'حداکثر فضا جهت در اختیار قرار دادن پیوست ها در انجمن. عدد 0 به معنای نامحدود بودن است.',
 	'ATTACH_TO_POST'					=> 'پيوست فايل در پست',
 
-	'CAT_FLASH_FILES'			=> 'فایل های فلش',
 	'CAT_IMAGES'				=> 'تصاویر',
 	'CHECK_CONTENT'				=> 'کنترل فایل های پیوست',
 	'CHECK_CONTENT_EXPLAIN'		=> 'بعضی از مرورگر ها ممکن هست دچار اشتباه شوند و آپلود بعضی از فایل های نامجاز را که نوع فرمت آنها (mimetype) تغییر یافته است،قبول کنند. این گزینه باعث اطمینان از این نوع فایل ها خواهد شد.',
@@ -102,7 +101,6 @@ $lang = array_merge($lang, array(
 	'EXT_GROUP_ARCHIVES'			=> 'آرشیو',
 	'EXT_GROUP_DOCUMENTS'			=> 'اسناد',
 	'EXT_GROUP_DOWNLOADABLE_FILES'	=> 'فایل های قابل بارگیری',
-	'EXT_GROUP_FLASH_FILES'			=> 'فایل های فلش',
 	'EXT_GROUP_IMAGES'				=> 'تصاویر',
 	'EXT_GROUP_PLAIN_TEXT'			=> 'متن ساده',
 
@@ -114,8 +112,6 @@ $lang = array_merge($lang, array(
 
 	'IMAGE_LINK_SIZE'			=> 'ابعاد تصویر لینک',
 	'IMAGE_LINK_SIZE_EXPLAIN'	=> 'اگر تصویر نمایش داده شده بزرگتر از قالب تالار باشد در آن صورت به صورت لینکی مکایش داده خواهد شد. برای غیر فعال کردن این ویژگی، داده های 0 px و 0 px را وارد کنید',
-	'IMAGICK_PATH'				=> 'Imagemagick مسیر ',
-	'IMAGICK_PATH_EXPLAIN'		=> 'مسیر کامل به نرم افزار تبدیل Imagemagic. برای مثال <samp>/usr/bin/</samp>.',
 
 	'MAX_ATTACHMENTS'				=> 'حداکثر تعداد پیوست در هر پست',
 	'MAX_ATTACHMENTS_PM'			=> 'حداکثر تعداد پیوست در هر پیغام خصوصی',
@@ -138,7 +134,6 @@ $lang = array_merge($lang, array(
 	'NO_EXT_GROUP_SPECIFIED'	=> 'هیچ گروه پسوندی انتخاب نشده است.',
 	'NO_FILE_CAT'				=> 'هیچ کدام',
 	'NO_IMAGE'					=> 'بدون تصویر',
-	'NO_THUMBNAIL_SUPPORT'		=> 'پشتيباني از Thumbnail غيرفعال است. براي داشتن تابع مناسب بايد يکي از دو برنامه GD extension و يا imagemagic نصب شده باشند. هردو يافت نشدند.',
 	'NO_UPLOAD_DIR'				=> 'دایرکتوری upload انتخاب شده موجود نیست',
 	'NO_WRITE_UPLOAD'			=> 'دایرکتوری upload قابل نوشتن نیست،لطفا سطوح دسترسی آن را تغییر دهید تا سرور بتواند بر روی آن بنویسد.',
 
@@ -154,7 +149,6 @@ $lang = array_merge($lang, array(
 	'REMOVE_DISALLOWED_IPS'		=> 'IP/hostnam های <em>غیر مجاز</em> را حذف کرده و یا قبول کنید.',
 	'RESYNC_FILES_STATS_CONFIRM'	=> 'آیا از هم زمان سازی آمار فایل های پیوست اطمینان دارید؟',
 		
-	'SEARCH_IMAGICK'				=> 'جستجو براي Imagemagick',
 	'SECURE_ALLOW_DENY'				=> 'ليست پذيريش/عدم پذيريش',
 	'SECURE_ALLOW_DENY_EXPLAIN'		=> 'دگرگون سازی رفتار پیشفرض هنگامی فعال بودن دانلود ایمن در لیست پذیریش/عدم پذیریش و دربرابر آن یک <strong>لیست سفید</strong> ( فعال ) و یک <strong>لیست سیاه</strong> غیر فعال.',
 	'SECURE_DOWNLOADS'				=> 'فعال بودن دانلود ايمن',

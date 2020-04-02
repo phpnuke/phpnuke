@@ -3,7 +3,7 @@
  *
  * This file is part of the phpBB Forum Software package.
  *
- * phpBB 3.2.X Project - Persian Translation
+ * phpBB 3.3.X Project - Persian Translation
  * Translators: PHP-BB.IR Group Meis@M Nobari
  *
  * @copyright (c) phpBB Limited <https://www.phpbb.com>
