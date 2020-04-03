@@ -380,6 +380,8 @@ function search_categories($module, $selected_category)
 	$categories = new categories_list($nuke_categories_cacheData[$module]);
 	$categories->categories_list();
 	asort($categories->result);
+	
+	$contents = '';
 	foreach($categories->result as $cid => $catname)
 	{
 		if($catname == 'uncategorized') continue;

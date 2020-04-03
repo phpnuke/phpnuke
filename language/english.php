@@ -1274,6 +1274,7 @@ $nuke_languages['english'] = array_merge($nuke_languages['english'], array(
 	"_AUDIOS" => "فایلهای صوتی",
 	"_VIDEOS" => "فایلهای تصویری",
 	"_CSRF_TOKEN_EXPIRETIME" => "زمان ماندگاری فرم",
+	"_STATISTICS_REFRESH_TIME" => "زمان بروزرسانی اطلاعات آماری",
 	"_CSRF_TOKEN_ERROR" => "فرم ارسالی معتبر نمی باشد. لطفاً مجدد تلاش فرمایید.",
 	"_ENTER_TIME_IN_SEC" => "زمان را به ثانیه وارد کنید",
 	"_ENTER_TIME_IN_MIN" => "زمان را به دقیقه وارد کنید",
@@ -1285,6 +1286,8 @@ $nuke_languages['english'] = array_merge($nuke_languages['english'], array(
 	"_MOST_REPLYES" => "داغ ترینها",
 	"_MOST_IMPORTANT" => "مهم ها",
 	"_ANNOUNCEMENTS" => "اطلاعیه ها",
+	"_COPY" => "کپی",
+	"_SHARE_THIS_LINK" => "لینک اشتراک گذاری",
 ));
 
 $nuke_configs['formatBytes'] = array(

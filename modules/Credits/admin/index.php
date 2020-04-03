@@ -762,7 +762,7 @@ if (check_admin_permission($module_name, false, true))
 			unset($u_result);
 			unset($u_row);
 		}
-		
+			
 		if($target_username != '')
 		{
 			$u_result = $db->table($users_system->users_table)
@@ -793,144 +793,153 @@ if (check_admin_permission($module_name, false, true))
 			$payment_data['number'] = '';
 				
 			$results_msg = '';
-			$request_fields = array(
-				"aid" => $aid,
-				"factor_number" => _NOWTIME,
-				"create_time" => _NOWTIME,
-				"update_time" => _NOWTIME,
-				"status" => _CREDIT_STATUS_OK,
-				"gateway" => 'offline',
-				"data" => phpnuke_serialize($payment_data),
-				"title" => (isset($credits_fields['title']) && $credits_fields['title'] != '') ? $credits_fields['title']:"",
-				"description" => (isset($credits_fields['description']) && $credits_fields['description'] != '') ? $credits_fields['description']:"",
-				"order_part" => '',
-				"order_id" => '',
-				"order_link" => '',
-				"order_data" => '',
-			);
 			
-			if($mode == "credits_transfer" && $user_id != 0 && $target_user_id != 0 && $credits_amount != 0)
+			if($user_id == 0)
 			{
-				$transfer_amount1 = $transfer_amount2 = 0;
+				$results_msg = _INCORRECT_USERNAME;
+			}
+			else
+			{
+			
+				$request_fields = array(
+					"aid" => $aid,
+					"factor_number" => _NOWTIME,
+					"create_time" => _NOWTIME,
+					"update_time" => _NOWTIME,
+					"status" => _CREDIT_STATUS_OK,
+					"gateway" => 'offline',
+					"data" => phpnuke_serialize($payment_data),
+					"title" => (isset($credits_fields['title']) && $credits_fields['title'] != '') ? $credits_fields['title']:"",
+					"description" => (isset($credits_fields['description']) && $credits_fields['description'] != '') ? $credits_fields['description']:"",
+					"order_part" => '',
+					"order_id" => '',
+					"order_link" => '',
+					"order_data" => '',
+				);
 				
-				$target_user_credits_allowed = user_credits_allowed($user_id);
-				
-				if($target_user_credits_allowed > 0)
+				if($mode == "credits_transfer" && $user_id != 0 && $target_user_id != 0 && $credits_amount != 0)
 				{
-					$transfer_amount1 = $transfer_amount2 = $credits_amount;
+					$transfer_amount1 = $transfer_amount2 = 0;
 					
-					if(isset($credits_fields['credit_all']) && $credits_fields['credit_all'] == 1)
+					$target_user_credits_allowed = user_credits_allowed($user_id);
+					
+					if($target_user_credits_allowed > 0)
 					{
-						$transfer_amount1 = $transfer_amount2 = $target_user_credits_allowed;
-						$user_credit = $user_credit-$transfer_amount1;
-						$target_user_credit = $target_user_credit+$transfer_amount2;
-					}
-					elseif($target_user_credits_allowed < $credits_amount)
-					{
-						switch(intval($credits_fields['credit_transfer_type']))
+						$transfer_amount1 = $transfer_amount2 = $credits_amount;
+						
+						if(isset($credits_fields['credit_all']) && $credits_fields['credit_all'] == 1)
 						{
-							case"1":
-								$transfer_amount1 = $transfer_amount2 = $target_user_credits_allowed;
-								$user_credit = $user_credit-$transfer_amount1;
-								$target_user_credit = $target_user_credit+$transfer_amount2;
-							break;
-							case"2":
-								$transfer_amount1 = $credits_amount;
-								$transfer_amount2 = $target_user_credits_allowed;
-								$user_credit = $user_credit-$credits_amount;
-								$target_user_credit = $target_user_credit+$target_user_credits_allowed;
-							break;
-							case"3":
-								$transfer_amount1 = $transfer_amount2 = $credits_amount;
-								$user_credit = $user_credit-$transfer_amount1;
-								$target_user_credit = $target_user_credit+$transfer_amount2;
-							break;
-							case"4":
-								$transfer_amount1 = $transfer_amount2 = 0;//do nothing
-							break;
+							$transfer_amount1 = $transfer_amount2 = $target_user_credits_allowed;
+							$user_credit = $user_credit-$transfer_amount1;
+							$target_user_credit = $target_user_credit+$transfer_amount2;
 						}
-					}
+						elseif($target_user_credits_allowed < $credits_amount)
+						{
+							switch(intval($credits_fields['credit_transfer_type']))
+							{
+								case"1":
+									$transfer_amount1 = $transfer_amount2 = $target_user_credits_allowed;
+									$user_credit = $user_credit-$transfer_amount1;
+									$target_user_credit = $target_user_credit+$transfer_amount2;
+								break;
+								case"2":
+									$transfer_amount1 = $credits_amount;
+									$transfer_amount2 = $target_user_credits_allowed;
+									$user_credit = $user_credit-$credits_amount;
+									$target_user_credit = $target_user_credit+$target_user_credits_allowed;
+								break;
+								case"3":
+									$transfer_amount1 = $transfer_amount2 = $credits_amount;
+									$user_credit = $user_credit-$transfer_amount1;
+									$target_user_credit = $target_user_credit+$transfer_amount2;
+								break;
+								case"4":
+									$transfer_amount1 = $transfer_amount2 = 0;//do nothing
+								break;
+							}
+						}
+						
+						if($transfer_amount1 != 0 && $transfer_amount2 != 0)
+						{
+							//for user 1
+							$request_fields['user_id'] = $user_id;
+							$request_fields['type'] = _CREDIT_TRANSACTION_TRANSFER_W;
+							$request_fields['amount'] = $transfer_amount1;
+							
+							$result = $db->table(TRANSACTIONS_TABLE)
+							->insert($request_fields);
+							
+							user_credit_update($user_id, ["-",$transfer_amount1]);
+							
+							//for user 2
+							$request_fields['user_id'] = $target_user_id;
+							$request_fields['type'] = _CREDIT_TRANSACTION_TRANSFER_D;
+							$request_fields['amount'] = $transfer_amount2;
+							
+							$result = $db->table(TRANSACTIONS_TABLE)
+							->insert($request_fields);
+							
+							user_credit_update($target_user_id, ["+",$transfer_amount2]);
+							
+							$results_msg = sprintf(_CREDITS_TRANSFER_MSG, $username, number_format($transfer_amount1, 0), $target_username, number_format($transfer_amount2, 0));
+							
+							$email_texts[] = array($username, _CREDITS_DEDUCTION, number_format($transfer_amount1, 0), $user_credit, $user_email);
+							$sms_text[] = array($user_phone, sprintf(_CREDITS_TRANSFER_SMS, $username, $target_username, number_format($transfer_amount1, 0), $nowtime));
+							
+							$email_texts[] = array($target_username, _CREDITS_CHARGE, number_format($transfer_amount2, 0), $target_user_credit, $target_user_email);
+							$sms_text[] = array($target_user_phone, sprintf(_CREDITS_TRANSFER_SMS, $username, $target_username, number_format($transfer_amount2, 0), $nowtime));
+						}
+					}			
+				}
+				
+				if($mode == "credits_charge" && $user_id != 0 && $credits_amount != 0)
+				{
+					$request_fields['user_id'] = $user_id;
+					$request_fields['type'] = 1;
+					$request_fields['amount'] = $credits_amount;
 					
-					if($transfer_amount1 != 0 && $transfer_amount2 != 0)
-					{
-						//for user 1
-						$request_fields['user_id'] = $user_id;
-						$request_fields['type'] = _CREDIT_TRANSACTION_TRANSFER_W;
-						$request_fields['amount'] = $transfer_amount1;
-						
-						$result = $db->table(TRANSACTIONS_TABLE)
-						->insert($request_fields);
-						
-						user_credit_update($user_id, ["-",$transfer_amount1]);
-						
-						//for user 2
-						$request_fields['user_id'] = $target_user_id;
-						$request_fields['type'] = _CREDIT_TRANSACTION_TRANSFER_D;
-						$request_fields['amount'] = $transfer_amount2;
-						
-						$result = $db->table(TRANSACTIONS_TABLE)
-						->insert($request_fields);
-						
-						user_credit_update($target_user_id, ["+",$transfer_amount2]);
-						
-						$results_msg = sprintf(_CREDITS_TRANSFER_MSG, $username, number_format($transfer_amount1, 0), $target_username, number_format($transfer_amount2, 0));
-						
-						$email_texts[] = array($username, _CREDITS_DEDUCTION, number_format($transfer_amount1, 0), $user_credit, $user_email);
-						$sms_text[] = array($user_phone, sprintf(_CREDITS_TRANSFER_SMS, $username, $target_username, number_format($transfer_amount1, 0), $nowtime));
-						
-						$email_texts[] = array($target_username, _CREDITS_CHARGE, number_format($transfer_amount2, 0), $target_user_credit, $target_user_email);
-						$sms_text[] = array($target_user_phone, sprintf(_CREDITS_TRANSFER_SMS, $username, $target_username, number_format($transfer_amount2, 0), $nowtime));
-					}
-				}			
-			}
-			
-			if($mode == "credits_charge" && $user_id != 0 && $credits_amount != 0)
-			{
-				$request_fields['user_id'] = $user_id;
-				$request_fields['type'] = 1;
-				$request_fields['amount'] = $credits_amount;
+					$result = $db->table(TRANSACTIONS_TABLE)
+					->insert($request_fields);
+					
+					user_credit_update($user_id, ["+",$credits_amount]);
+					$user_credit = $user_credit+$credits_amount;
+					$email_texts[] = array($username, _CREDITS_CHARGE, number_format($credits_amount, 0), $user_credit, $user_email);
+							
+					$results_msg = sprintf(_CREDITS_CHARGE_MSG, $username, number_format($credits_amount, 0));
+					$sms_text[] = array($user_phone, sprintf(_CREDITS_CHAREG_SMS, $username, number_format($credits_amount, 0), $nowtime));
+				}
 				
-				$result = $db->table(TRANSACTIONS_TABLE)
-				->insert($request_fields);
+				if($mode == "credits_deduction" && $user_id != 0 && $credits_amount != 0)
+				{
+					$request_fields['user_id'] = $user_id;
+					$request_fields['type'] = 2;
+					$request_fields['amount'] = $credits_amount;
+					
+					$result = $db->table(TRANSACTIONS_TABLE)
+					->insert($request_fields);
+					
+					user_credit_update($user_id, ["-",$credits_amount]);
+					$user_credit = $user_credit-$credits_amount;
+					$email_texts[] = array($username, _CREDITS_DEDUCTION, number_format($credits_amount, 0), $user_credit, $user_email);
+					
+					$results_msg = sprintf(_CREDITS_DEDUCTION_MSG, $username, number_format($credits_amount, 0));
+					$sms_text[] = array($user_phone, sprintf(_CREDITS_DEDUCTION_SMS, $username, number_format($credits_amount, 0), $nowtime));
+				}
 				
-				user_credit_update($user_id, ["+",$credits_amount]);
-				$user_credit = $user_credit+$credits_amount;
-				$email_texts[] = array($username, _CREDITS_CHARGE, number_format($credits_amount, 0), $user_credit, $user_email);
-						
-				$results_msg = sprintf(_CREDITS_CHARGE_MSG, $username, number_format($credits_amount, 0));
-				$sms_text[] = array($user_phone, sprintf(_CREDITS_CHAREG_SMS, $username, number_format($credits_amount, 0), $nowtime));
-			}
-			
-			if($mode == "credits_deduction" && $user_id != 0 && $credits_amount != 0)
-			{
-				$request_fields['user_id'] = $user_id;
-				$request_fields['type'] = 2;
-				$request_fields['amount'] = $credits_amount;
-				
-				$result = $db->table(TRANSACTIONS_TABLE)
-				->insert($request_fields);
-				
-				user_credit_update($user_id, ["-",$credits_amount]);
-				$user_credit = $user_credit-$credits_amount;
-				$email_texts[] = array($username, _CREDITS_DEDUCTION, number_format($credits_amount, 0), $user_credit, $user_email);
-				
-				$results_msg = sprintf(_CREDITS_DEDUCTION_MSG, $username, number_format($credits_amount, 0));
-				$sms_text[] = array($user_phone, sprintf(_CREDITS_DEDUCTION_SMS, $username, number_format($credits_amount, 0), $nowtime));
-			}
-			
-			if($mode == "credits_suspend" && $user_id != 0)
-			{
-				$request_fields['user_id'] = $user_id;
-				$request_fields['type'] = _CREDIT_TRANSACTION_SUSPEND;
-				$request_fields['amount'] = $credits_amount;
-				
-				$result = $db->table(TRANSACTIONS_TABLE)
-				->insert($request_fields);
-				
-				$email_texts[] = array($username, _CREDITS_SUSPEND, (($credits_amount == 0) ? "All":number_format($credits_amount, 0)), $user_credit, $user_email);
-				
-				$results_msg = ($credits_amount == 0) ? sprintf(_CREDITS_SUSPEND_ALL_MSG, $username):sprintf(_CREDITS_SUSPEND_MSG, $username, number_format($credits_amount, 0));
-				$sms_text[] = array($user_phone, (($credits_amount == 0) ? sprintf(_CREDITS_SUSPEND_ALL_SMS, $username, $nowtime):sprintf(_CREDITS_SUSPEND_SMS, $username, number_format($credits_amount,0), $nowtime)));
+				if($mode == "credits_suspend" && $user_id != 0)
+				{
+					$request_fields['user_id'] = $user_id;
+					$request_fields['type'] = _CREDIT_TRANSACTION_SUSPEND;
+					$request_fields['amount'] = $credits_amount;
+					
+					$result = $db->table(TRANSACTIONS_TABLE)
+					->insert($request_fields);
+					
+					$email_texts[] = array($username, _CREDITS_SUSPEND, (($credits_amount == 0) ? "All":number_format($credits_amount, 0)), $user_credit, $user_email);
+					
+					$results_msg = ($credits_amount == 0) ? sprintf(_CREDITS_SUSPEND_ALL_MSG, $username):sprintf(_CREDITS_SUSPEND_MSG, $username, number_format($credits_amount, 0));
+					$sms_text[] = array($user_phone, (($credits_amount == 0) ? sprintf(_CREDITS_SUSPEND_ALL_SMS, $username, $nowtime):sprintf(_CREDITS_SUSPEND_SMS, $username, number_format($credits_amount,0), $nowtime)));
+				}
 			}
 			
 			if(!empty($results_msg))
@@ -963,19 +972,19 @@ if (check_admin_permission($module_name, false, true))
 				}
 
 				add_log($results_msg, 1);
-				$contents = GraphicAdmin();
-				$contents .= credits_menu();
-		
-				$contents .= OpenAdminTable();
-				$contents .= "<p align=\"center\">".$results_msg."</p>";
-				$contents .= CloseAdminTable();
-				//$contents .= redirect_to("".$admin_file.".php?op=credits_list", 3);
-				
 				phpnuke_db_error();
-				include("header.php");
-				$html_output .= $contents;
-				include("footer.php");
 			}
+			
+			$contents = GraphicAdmin();
+			$contents .= credits_menu();
+	
+			$contents .= OpenAdminTable();
+			$contents .= "<p align=\"center\">".$results_msg."</p>";
+			$contents .= CloseAdminTable();
+			
+			include("header.php");
+			$html_output .= $contents;
+			include("footer.php");
 		}
 		
 		$result = $db->query("SELECT t.*, u.".$users_system->user_fields['username']." as username, u.".$users_system->user_fields['user_email']." as user_email, u.".$users_system->user_fields['user_credit']." as user_credit FROM ".TRANSACTIONS_TABLE." as t LEFT JOIN ".$users_system->users_table." AS u ON u.".$users_system->user_fields['user_id']." = t.user_id WHERE t.tid = '$tid'");

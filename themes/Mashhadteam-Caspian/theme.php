@@ -490,6 +490,16 @@ function article_more($article_info)
 				".$article_info['hometext']."<br />
 				".$article_info['bodytext']."<br />
 				".$post_files."<br />
+				<div id=\"article-more-share\">
+					<div class=\"form-inline\">
+						<div class=\"input-group\">
+							<span class=\"input-group-addon btn copytoClipboard\" data-clipboard-target=\"#copytoClipboard\"><i class=\"fa fa-copy\"></i> "._COPY."</span>
+								<input class=\"form-control\" id=\"copytoClipboard\" value=\"".$nuke_configs['nukeurl']."".$article_info['sid']."/\" type=\"text\" readonly />
+							<div class=\"input-group-addon copytoClipboard\" data-clipboard-target=\"#copytoClipboard\">لینک اشتراک گذاری</div>
+						</div>
+					</div>
+				</div>
+				<div class=\"clear\"></div>
 				<div class=\"article-tags\">$htmltags</div></p>
 			</div>
 			<div class=\"clear=\"></div>

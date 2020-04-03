@@ -290,7 +290,7 @@ function show_microdata_as_json(&$meta_tags)
 		)
 	);
 	
-	if($modname == 'Articles' && $op == "article_show")
+	if($modname == 'Articles' && $op == "article_show" && isset($block_global_contents['article_link']))
 	{
 		if($block_global_contents['catname_link'] != 'uncategorized')
 		{

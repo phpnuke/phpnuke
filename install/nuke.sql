@@ -404,7 +404,8 @@ http://ping.feedburner.com'),
 ('pn_credits', 'a:7:{s:10:"min_amount";s:5:"10000";s:10:"max_amount";s:9:"500000000";s:6:"notify";a:1:{s:3:"sms";s:1:"1";}s:18:"credits_direct_msg";s:0:"";s:16:"credits_list_msg";s:0:"";s:10:"currencies";a:5:{i:0;a:3:{s:4:"code";s:3:"USD";s:4:"name";s:21:"دلار آمريکا";s:12:"rial_ex_rate";s:0:"";}i:1;a:3:{s:4:"code";s:3:"EUR";s:4:"name";s:8:"يورو";s:12:"rial_ex_rate";s:0:"";}i:2;a:3:{s:4:"code";s:3:"AED";s:4:"name";s:21:"درهم امارات";s:12:"rial_ex_rate";s:0:"";}i:3;a:3:{s:4:"code";s:3:"GBP";s:4:"name";s:21:"پوند انگليس";s:12:"rial_ex_rate";s:0:"";}i:4;a:3:{s:4:"code";s:3:"KWD";s:4:"name";s:19:"دينار کويت";s:12:"rial_ex_rate";s:0:"";}}s:8:"gateways";a:0:{}}'),
 ('sms', '0'),
 ('pn_sms', 'a:5:{s:8:"operator";s:5:"opsms";s:8:"username";s:0:"";s:8:"password";s:0:"";s:14:"default_number";s:0:"";s:10:"recipients";s:0:"";}'),
-('csrf_token_time', '1800');
+('csrf_token_time', '1800'),
+('statistics_refresh', '1800');
 
 -- --------------------------------------------------------
 

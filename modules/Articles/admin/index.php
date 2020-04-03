@@ -738,6 +738,7 @@ if (check_admin_permission($module_name, false, true))
 		$set_publish_date = ($datetime > _NOWTIME) ? "checked":"";
 
 		$post_link = LinkToGT(articleslink($sid, $article_fields['title'], $article_fields['post_url'], $article_fields['time'], $article_fields['cat_link']));
+		$short_link = $nuke_configs['nukeurl']."$sid/";
 		
 		$article_sel = ($article_fields['post_type'] == 'article') ? "selected":"";
 		$other_sel = ($article_fields['post_type'] != 'article' && $article_fields['post_type'] != '') ? "selected":"";
@@ -757,6 +758,10 @@ if (check_admin_permission($module_name, false, true))
 		<link rel=\"stylesheet\" href=\"".INCLUDE_PATH."/Ajax/jquery/jquery.minicolors.css\">
 		<!-- MiniColors -->
 		<script type=\"text/javascript\" src=\"".INCLUDE_PATH."/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>
+		<script type=\"text/javascript\" src=\"".INCLUDE_PATH."/Ajax/jquery/clipboard.min.js\"></script>
+		<script type=\"text/javascript\">
+			new ClipboardJS('.copytoClipboard');
+		</script>
 		
 		<form action=\"".$admin_file.".php\" method=\"post\" enctype=\"multipart/form-data\" id=\"article_form\">
 			<table width=\"100%\" class=\"id-form product-table no-border\">";
@@ -770,7 +775,14 @@ if (check_admin_permission($module_name, false, true))
 				{
 				$contents .="<tr>
 					<th style=\"width:200px\">"._POST_LINK."</th>
-					<td class=\"dleft aright\"><a href=\"$post_link\" target=\"_blank\">"._VIEW."</a> <input type=\"text\" class=\"inp-form-ltr\" style=\"width:100%;\" value=\"$post_link\" /></td>
+					<td class=\"dleft aright\">
+						<input type=\"text\" class=\"inp-form-ltr\" id=\"copytoClipboard\" style=\"float:left;width:40%;\" value=\"$post_link\" /><span style=\"float:left;cursor:pointer;border:1px solid #ccc;border-radius:3px;padding:10px 6px;margin-left:5px;\" class=\"copytoClipboard\" data-clipboard-target=\"#copytoClipboard\"><i class=\"fa fa-copy fa-2\"></i> "._COPY."</span>
+						
+						<input type=\"text\" class=\"inp-form-ltr\" id=\"short_copytoClipboard\" style=\"float:left;width:200px;margin-left:10px;\" value=\"$short_link\" />
+						<span style=\"float:left;cursor:pointer;border:1px solid #ccc;border-radius:3px;padding:10px 6px;margin-left:5px;\" class=\"copytoClipboard\" data-clipboard-target=\"#short_copytoClipboard\"><i class=\"fa fa-copy fa-2\"></i> "._COPY."</span>
+						
+						<a href=\"$post_link\" target=\"_blank\" style=\"float:right;border:1px solid #ccc;border-radius:3px;padding:10px 6px;margin-left:2px;\"><i class=\"fa fa-eye\"></i> "._VIEW."</a>
+					</td>
 				</tr>";
 				}
 				$contents .="<tr>

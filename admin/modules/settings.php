@@ -796,6 +796,10 @@ if (check_admin_permission($filename))
 				".bubble_show(_ENTER_TIME_IN_SEC)."
 			</td></tr>
 			
+			<tr><th>"._STATISTICS_REFRESH_TIME."</th><td>
+				<input type=\"text\" name='config_fields[statistics_refresh]' class=\"inp-form-ltr\" value=\"".$nuke_configs['statistics_refresh']."\">
+			</td></tr>
+			
 			<tr><th>"._SITE_SUSPEND."</th><td>";
 			$checked1 = ($nuke_configs['suspend_site'] == 1) ? "checked":"";
 			$checked2 = ($nuke_configs['suspend_site'] == 0) ? "checked":"";

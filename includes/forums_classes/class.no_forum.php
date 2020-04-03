@@ -257,7 +257,7 @@ class users_system{
 			
 		$statistics_data['update_time'] = isset($statistics_data['update_time']) ? $statistics_data['update_time']:0;
 		
-		if((_NOWTIME-$statistics_data['update_time']) >= 3600)
+		if((_NOWTIME-$statistics_data['update_time']) >= ((isset($nuke_configs['statistics_refresh']) && $nuke_configs['statistics_refresh'] != '') ? $nuke_configs['statistics_refresh']:3600))
 		{
 			$today_year = date("Y");
 			$today_month = date("m");

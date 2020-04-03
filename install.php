@@ -847,7 +847,7 @@ function step_install()
 					else
 					{
 					echo"
-					<form action=\"install.php?op=first\" method=\"post\"><button class=\"btn btn-default\">ادامه بروزرسانی</button></form>";
+					<form action=\"install.php?op=first\" method=\"post\"><input class=\"btn btn-default\" type=\"submit\" value=\"ادامه بروزرسانی\" /></form>";
 					}
 				echo"</p>
 				</div>
@@ -1649,11 +1649,63 @@ function upgrade_comments($start = 0)
 		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
+	$modules_comments = array(
+		"stories_comments" => array(
+			"module_id" => "sid",
+			"new_module_id" => "sid",
+			"module_name" => "Articles",
+			"module_table" => "stories",
+			"module_title" => "title",
+			"progress_link" => "install.php?op=comments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=pages_comments",
+		),
+		"pages_comments" => array(
+			"module_id" => "pid",
+			"new_module_id" => "sid",
+			"module_name" => "Surveys",
+			"module_table" => "pages",
+			"module_title" => "title",
+			"progress_link" => "install.php?op=comments&module=pages_comments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=products_comments",
+		),
+		"products_comments" => array(
+			"module_id" => "sid",
+			"new_module_id" => "sid",
+			"module_name" => "products",
+			"module_table" => "products",
+			"module_title" => "title",
+			"progress_link" => "install.php?op=comments&module=products_comments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=pollcomments",
+		),
+		"pollcomments" => array(
+			"module_id" => "pollID",
+			"new_module_id" => "pollID",
+			"module_name" => "Surveys",
+			"module_table" => "poll_desc",
+			"module_title" => "pollTitle",
+			"progress_link" => "install.php?op=comments&module=pollcomments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=staticpages_comments",
+		),
+		"staticpages_comments" => array(
+			"module_id" => "pid",
+			"new_module_id" => "sid",
+			"module_name" => "static",
+			"module_table" => "staticpages",
+			"module_title" => "title",
+			"progress_link" => "install.php?op=comments&module=staticpages_comments&start={NEW_START}",
+			"finish_link" => "install.php?op=feedbacks",
+		),
+	);
+	
 	$module = (isset($module) && $module != '' && $module != 'stories_comments') ? $module:"stories_comments";
-	$module_id = ($module == 'stories_comments') ? "sid":"pollID";
-	$module_name = ($module == 'stories_comments') ? "Articles":"Surveys";
-	$module_table = ($module == 'stories_comments') ? "stories":"poll_desc";
-	$module_title = ($module == 'stories_comments') ? "title":"pollTitle";
+	
+	$module_id = $modules_comments[$module]['module_id'];
+	$new_module_id = $modules_comments[$module]['new_module_id'];
+	$module_name = $modules_comments[$module]['module_name'];
+	$module_table = $modules_comments[$module]['module_table'];
+	$module_title = $modules_comments[$module]['module_title'];
+	$finish_link = $modules_comments[$module]['finish_link'];
+	$progress_link = $modules_comments[$module]['progress_link'];
 	
 	$run_per_step = 500;
 	// update nuke_comments
@@ -1691,7 +1743,7 @@ function upgrade_comments($start = 0)
 	}
 
 	$insert_query = array();
-	$result = $db->query("SELECT t.*, s.$module_title as post_title, (SELECT COUNT(tid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."` as t LEFT JOIN `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module_table."` as s ON s.$module_id = t.$module_id ORDER BY tid ASC LIMIT $start, $run_per_step");
+	$result = $db->query("SELECT t.*, s.$module_title as post_title, s.$module_id as post_id, (SELECT COUNT(tid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."` as t LEFT JOIN `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module_table."` as s ON s.$module_id = t.$module_id ORDER BY tid ASC LIMIT $start, $run_per_step");
 	$fetched_rows = intval($result->count());
 	
 	if($fetched_rows > 0)
@@ -1721,7 +1773,7 @@ function upgrade_comments($start = 0)
 					'pid' => $row['pid'], 
 					'main_parent' => $main_parent, 
 					'module' => $module_name,
-					"$module_id" => $row[$module_id],
+					"$new_module_id" => $row['post_id'],
 					'post_title' => $row['post_title'],
 					'date' => $row['date'],
 					'name' => ((isset($fields[$row['tid']]['name']) && $fields[$row['tid']]['name'] != '') ? $fields[$row['tid']]['name']:$row['name']),
@@ -1745,8 +1797,7 @@ function upgrade_comments($start = 0)
 	$new_start = $start+$run_per_step;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	$finish_link = ($module == 'stories_comments') ? "install.php?op=comments&module=pollcomments":"install.php?op=feedbacks";
-	$progress_link = ($module == 'stories_comments') ? "install.php?op=comments&start=$new_start":"install.php?op=comments&module=pollcomments&start=$new_start";
+	$progress_link = str_replace("{NEW_START}", $new_start, $progress_link);
 	
 	upgrade_progress_output("انتقال نظرات", $total_rows, $fetched_rows, $start, $finish_link, $progress_link, 16, $run_per_step);
 }

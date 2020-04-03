@@ -273,7 +273,7 @@ class csrfProtector
 				header("location: $location");
 			case 3:
 				//send custom error message
-				$customErrorMessage = (isset(self::$config['customErrorMessage']) && self::$config['customErrorMessage']) ? self::$config['customErrorMessage']:_CSRF_TOKEN_ERROR;
+				$customErrorMessage = (isset(self::$config['customErrorMessage']) && self::$config['customErrorMessage']) ? self::$config['customErrorMessage']:'_CSRF_TOKEN_ERROR';
 				exit($customErrorMessage);
 				break;
 			case 4:

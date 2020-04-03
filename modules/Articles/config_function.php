@@ -415,7 +415,7 @@ function _article_select_month($in = 0)
 
 function article_result_parse(&$article_info = array(), $query_set = array(), $query_params = array(), $orderby = 'time', $mode = 'index')
 {
-	global $db, $nuke_articles_categories_cacheData, $nuke_authors_cacheData, $pn_Cookies, $votetype, $nuke_configs, $articles_votetype, $nuke_meta_keys_parts, $this_module_name, $visitor_ip;
+	global $db, $nuke_articles_categories_cacheData, $nuke_authors_cacheData, $pn_Cookies, $votetype, $nuke_configs, $articles_votetype, $nuke_meta_keys_parts, $this_module_name, $visitor_ip, $userinfo;
 		
 	// AND (sc.rating_ip = '$ip' OR sc.username = '".$userinfo['username']."') was removed for all
 	$user_id = (isset($userinfo['user_id']) && isset($userinfo['is_registered']) && $userinfo['is_registered'] == 1) ? intval($userinfo['user_id']):0;
@@ -527,11 +527,12 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 		// get posts scores
 	}
 	unset($result);
-		
+	
+	$article_info['total_rows'] = 0;
 	foreach ($rows as $key => $row)
 	{
 		$article_info[$key] = $row;
-		$article_info['total_rows']			= (!isset($article_info['total_rows'])) ? ((isset($row['total_rows'])) ? intval($row['total_rows']):1):$article_info['total_rows'];
+		$article_info['total_rows']			= ($key == 0 && isset($row['total_rows'])) ? intval($row['total_rows']):$article_info['total_rows'];
 		$article_info[$key]['sid']			= intval($row['sid']);
 		$article_info[$key]['aid']			= filter($row['aid'], "nohtml");
 		$article_info[$key]['post_type']		= filter($row['post_type'], "nohtml");

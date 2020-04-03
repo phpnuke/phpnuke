@@ -415,6 +415,15 @@ class phpnuke_comments
 			if(isset($this->comments_configs['inputs']['url_act']) && $this->comments_configs['inputs']['url_act'] == 1 && isset($this->comments_configs['inputs']['url_req']) && $this->comments_configs['inputs']['url_req'] == 1 && $comment_form_fields['url'] == '' && !isset($userinfo['is_registered']))
 				$errors[] = _ENTER_URL;
 			
+			if(!isset($comment_form_fields['name']))
+				$comment_form_fields['name'] = '';
+			
+			if(!isset($comment_form_fields['email']))
+				$comment_form_fields['email'] = '';
+			
+			if(!isset($comment_form_fields['url']))
+				$comment_form_fields['url'] = '';
+			
 			if($comment_form_fields['comment'] == '')
 				$errors[] = _ENTER_UCOMMENT;
 

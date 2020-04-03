@@ -3449,10 +3449,12 @@ function submit_ratings($jrating_Response)
 	$idBox = intval($idBox);
 	$c_votetype = intval($c_votetype);
 	// AND (rating_ip='$ip' OR username = '$uname') was removed for all
+	$user_id = (isset($userinfo['user_id']) && isset($userinfo['is_registered']) && $userinfo['is_registered'] == 1) ? intval($userinfo['user_id']):0;
+	$vote_where = ($user_id != 0) ? "user_id = :user_id":"rating_ip = :visitor_ip";
 	
 	if(is_user())
 	{
-		$user_id_ip = $userinfo['user_id'];
+		$user_id_ip = $user_id;
 		$gust = 0;
 	}
 	else
@@ -3476,6 +3478,10 @@ function submit_ratings($jrating_Response)
 	}else{
 		$r_cookie[] = $idBox;
 	}
+	
+	$result = $db->query("SELECT id FROM ".SCORES_TABLE." WHERE ($vote_where) AND post_id = s.".$db_table_var." AND db_table = '".$db_table."' ORDER BY id DESC LIMIT 1");
+	if($result->sql_numrows() > 0)
+		$rated = true;
 	
 	if(!$rated)
 	{
@@ -4191,6 +4197,7 @@ function update_tags($old_tags, $updated_tags = '')
 function formatBytes($size, $precision = 2, $show_unit=false)
 {
 	global $nuke_configs;
+	$size = preg_replace("/[^0-9]/", "", $size);
     $base = log($size) / log(1024);
     $suffixes = array('', 'K', 'M', 'G', 'T');   
 
@@ -5529,7 +5536,7 @@ function update_points($id,$uid=false)
 	$users_table_exists = false;
     if (is_user() && !$uid)
 	{
-        $username = trim($userinfo['username']);
+        $user_id = trim($userinfo['user_id']);
 		$users_table_exists = users_table_exists();
 	}
 	
@@ -5538,19 +5545,10 @@ function update_points($id,$uid=false)
 		$col_result = $db->query("SHOW COLUMNS FROM ".$users_system->users_table." LIKE '".$users_system->user_fields['user_points']."'");
 		if(intval($col_result->count()) > 0)
 		{
-			if(isset($uid) && $uid > 0)
-			{
-				$col = $users_system->user_fields['user_id'];
-				$col_val = $uid;
-			}
-			elseif($username != '')
-			{
-				$col = $users_system->user_fields['username'];
-				$col_val = $username;
-			}
+			$col_val = (isset($uid) && $uid > 0) ? $uid:$user_id;
 			
 			$db->table($users_system->users_table)
-				->where($col, $col_val)
+				->where($users_system->user_fields['user_id'], $col_val)
 				->update([
 					''.$users_system->user_fields['user_points'].'' => ["+", $points]
 				]);

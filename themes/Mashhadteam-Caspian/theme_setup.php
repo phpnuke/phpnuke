@@ -26,6 +26,7 @@ $theme_setup = array(
 		"<!--[if lt IE 9]> <script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/html5shiv/dist/html5shiv.js\"></script><script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/respond/respond.min.js\"></script> <![endif]-->",
 		"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap.min.js\"></script>",
 		"<script type=\"text/javascript\" src=\" ".$nuke_configs['nukecdnurl']."includes/jrating/jRating.jquery.js\"></script>",
+		"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/clipboard.min.js\"></script>",
 		"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/script/script.js\"></script>",
 	),
 	"default_link_rel" => array(
@@ -146,9 +147,9 @@ function caspian_theme_config()
 	$contents .= "<input type='radio' class='styled' name='config_fields[caspian_configs][active_slider]' value='1' data-label=\"" . _YES . "\" $checked1> &nbsp; &nbsp;<input type='radio' class='styled' name='config_fields[caspian_configs][active_slider]' value='0' data-label=\"" . _NO . "\" $checked2>
 	</td></tr>
 	<tr><th style=\"width:200px;\">"._THEME_COLOR."</th><td>";
-	$sel1 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'green') ? "checked":"";
-	$sel2 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'blue') ? "checked":"";
-	$sel3 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'red') ? "checked":"";
+	$sel1 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'green') ? "selected":"";
+	$sel2 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'blue') ? "selected":"";
+	$sel3 = (isset($caspian_configs['theme_color']) && $caspian_configs['theme_color'] == 'red') ? "selected":"";
 	$contents .= "<select name=\"config_fields[caspian_configs][theme_color]\" class=\"styledselect-select\">
 		<option value=\"green\"".$sel1.">"._THEME_GREEN."</option>
 		<option value=\"blue\"".$sel2.">"._THEME_BLUE."</option>

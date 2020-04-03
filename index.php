@@ -31,8 +31,9 @@ $op = trim($op);
 ///////////////////////////// Nuke mobile Version - Zero-F
 if($nuke_configs['mobile_mode'] == 1 && $modname != 'AvantGo')
 {
+	$user_agent = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT']:"";
 	if(@preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone)/i',
-	strtolower($_SERVER['HTTP_USER_AGENT'])))
+	strtolower($user_agent)))
 	{
 		$mobile_browser++;
 	}
@@ -43,7 +44,7 @@ if($nuke_configs['mobile_mode'] == 1 && $modname != 'AvantGo')
 		$mobile_browser++;
 	}
 
-	$mobile_ua = strtolower(substr($_SERVER['HTTP_USER_AGENT'],0,4));
+	$mobile_ua = strtolower(substr($user_agent,0,4));
 	$mobile_agents = array(
 		'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
 		'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
@@ -64,7 +65,7 @@ if($nuke_configs['mobile_mode'] == 1 && $modname != 'AvantGo')
 	{
 		$mobile_browser++;
 	}
-	if (strpos(strtolower($_SERVER['HTTP_USER_AGENT']),'windows')>0)
+	if (strpos(strtolower($user_agent),'windows')>0)
 	{
 		$mobile_browser=0;
 	}

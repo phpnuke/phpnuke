@@ -418,10 +418,9 @@ function article_show($sid=0, $post_url='', $mode = '')
 		$query_params[':status'] = 'publish';
 	}
 		
-		
 	article_result_parse($article_info, $query_set, $query_params, 'time', 'more');
 	
-	if(!empty($article_info))
+	if(isset($article_info[0]))
 	{
 		$article_info = $article_info[0];
 		$urlop = (($mode != '') && in_array($mode, array("pdf","print","friend","report"))) ? "$mode/":"";
