@@ -1,2 +1,0 @@
-parameters:
-    tables.thanks: '%core.table_prefix%thanks'
