@@ -1,0 +1,40 @@
+{% INCLUDE 'overall_header.html' %}
+
+<a name="maincontent"></a>
+
+<h1>{{ lang('TITLE') }}</h1>
+<p>{{ lang('TITLE_EXPLAIN') }}</p>
+{% if S_ERROR %}
+	<div class="errorbox">
+		<h3>{{ lang('WARNING') }}</h3>
+		<p>{{ ERROR_MSG }}</p>
+	</div>
+{% endif %}
+
+<form id="acp_thanks" method="post" action="{{ U_ACTION }}">
+
+{% for options in loops.options %}
+	{% if options.S_LEGEND %}
+		{% if not options.S_FIRST_ROW %}
+			</fieldset>
+		{% endif %}
+		<fieldset>
+			<legend>{{ options.LEGEND }}</legend>
+	{% else %}
+		<dl>
+			<dt><label for="{{ options.KEY }}">{{ options.TITLE }}{{ lang('COLON') }}</label>{% if options.S_EXPLAIN %}<br /><span>{{ options.TITLE_EXPLAIN }}</span>{% endif %}</dt>
+			<dd>{{ options.CONTENT }}</dd>
+		</dl>
+
+	{% endif %}
+{% endfor %}
+
+	<p class="submit-buttons">
+		<input class="button1" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />&nbsp;
+		<input class="button2" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}" />
+	</p>
+	{{ S_FORM_TOKEN }}
+</fieldset>
+</form>
+
+{% INCLUDE 'overall_footer.html' %}

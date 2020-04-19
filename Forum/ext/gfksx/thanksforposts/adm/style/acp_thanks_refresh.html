@@ -1,0 +1,35 @@
+{% INCLUDE 'overall_header.html' %}
+
+<a name="maincontent"></a>
+
+<h1>{{ lang('THANKS_REFRESH') }}</h1>
+
+<p>{{ lang('THANKS_REFRESH_EXPLAIN') }}</p>
+
+<fieldset>
+	<legend>{{ lang('THANKS_REFRESH') }}</legend>
+	{% if not S_REFRESH %}
+	<div class="errorbox">
+		<h3>{{ lang('WARNING') }}</h3>
+		<p>{{ lang('THANKS_REFRESH_MSG') }}</p>
+	</div>
+	{% else %}
+	<div class="successbox">
+		<h3>{{ lang('NOTIFY') }}</h3>
+		<p>{{ lang('THANKS_REFRESHED_MSG') }}</p>
+	</div>
+	{% endif %}
+	<dl>
+		<dt>{{ lang('ACP_POSTS') }}{{ lang('COLON') }}<br /><br /><br />{{ lang('ACP_POSTSTHANKS') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_USERSTHANKS') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_ALLTHANKS') }}{{ lang('COLON') }}<br /><br /><br />{{ lang('ACP_UPDATETHANKS') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_DELTHANKS') }}{{ lang('COLON') }}<br /><br /><br />{{ lang('ACP_POSTSEND') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_USERSEND') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_THANKSEND') }}{{ lang('COLON') }}</dt>
+		<dd>{{ POSTS }}<br /><br /><br />{{ POSTSTHANKS }}<br /><br />{{ USERSTHANKS }}<br /><br />{{ ALLTHANKS }}<br /><br /><br /><span style="color:red">{{ UPDATETHANKS }}</span><br /><br /><span style="color:red">{{ DELTHANKS }}</span><br /><br /><br /><span style="color:green">{{ POSTSEND }}</span><br /><br /><span style="color:green">{{ USERSEND }}</span><br /><br /><span style="color:green">{{ THANKSEND }}</span></dd>
+	</dl>
+</fieldset>
+{% if not S_REFRESH %}
+<form id="acp_thanks_refresh" method="post" action="{{ U_ACTION }}">
+	<fieldset class="submit-buttons">
+		<legend>{{ lang('SUBMIT') }}</legend>
+		<input class="button1" type="submit" id="refresh" name="refresh" value="{{ lang('REFRESH') }}" />
+	</fieldset>
+</form>
+{% endif %}
+{% INCLUDE 'overall_footer.html' %}
