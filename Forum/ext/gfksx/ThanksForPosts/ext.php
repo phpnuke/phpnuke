@@ -10,6 +10,7 @@
 
 namespace gfksx\thanksforposts;
 
+
 /**
 * Extension class for custom enable/disable/purge actions
 *
