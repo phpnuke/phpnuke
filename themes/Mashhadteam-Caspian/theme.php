@@ -403,7 +403,7 @@ function article_index($article_info)
 	
 	$content = "
 	<article>
-		<h2><i class=\"fa fa-th\"></i><a href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">".$article_info['title']."</a></h2>";
+		<h2><i class=\"fa fa-th\"></i><a href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">".$article_info['title']."</a>".(($article_info['status'] == 'future') ? " ("._PUBLISH_IN_FUTURE.")":"")."</h2>";
 		if(!empty($cats_name)){
 		$content .="<div class=\"GScat\">
 			<i class=\"fa fa-comment\"></i> "._CATEGORIES." : ".implode(", ", $cats_name)."
@@ -413,14 +413,13 @@ function article_index($article_info)
 			$post_imge
 			<p class=\"GSJustify\">".$article_info['hometext']."</p>
 		</div>
-		<div class=\"clear=\"></div>
 		<div class=\"meta\">
 			<ul>
 				<li class=\"hidden-xs\"><i class=\"fa fa-user\"></i> <a href=\"".$article_info['aid_url']."\"> ".$article_info['aid']."</a></li>
 				<li class=\"hidden-xs\"><i class=\"fa fa-calendar\"></i> ".$article_info['datetime']."</li>
 				<li><i class=\"fa fa-eye\"></i> ".$article_info['counter']."</li>
 				<li><i class=\"fa fa-comment\"></i> <a href=\"".$article_info['article_link']."#comments\">".$article_info['comments']."</a></li>
-				".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\"><i class=\"fa fa-remove\"></i></a></li>":"")."
+				".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\" onclick=\"return confirm('"._DELETE_THIS_SURE."');\"><i class=\"fa fa-remove\"></i></a></li>":"")."
 			</ul>
 			<span class=\"more\"><a href=\"".$article_info['article_link']."\">"._ARTICLE_MORE."</a></span>
 		</div>
@@ -432,12 +431,13 @@ function article_more($article_info)
 {
 	global $nuke_configs, $admin_file;
 	
+	$module = (isset($article_info['post_type']) && $article_info['post_type'] != '') ? $article_info['post_type']:"Articles";
 	$tags = str_replace(" ","-",$article_info['tags']);
 	$tags = explode(",",$tags);
 	$tags = array_filter($tags);
 	$htmltags = '';
 	foreach($tags as $tag)
-		$htmltags .= "<i><a href=\"".LinkToGT("index.php?modname=Articles&tags=$tag")."\">".str_replace("_"," ",$tag)."</a></i> ";
+		$htmltags .= "<i><a href=\"".LinkToGT("index.php?modname=$module&tags=$tag")."\">".str_replace("_"," ",$tag)."</a></i> ";
 	
 	$article_info['comments'] = ($article_info['comments']==0) ? "0":$article_info['comments'];
 	
@@ -459,61 +459,52 @@ function article_more($article_info)
 		$post_files .=""._ARTICLE_FILES."<br /><ul class=\"post-files\">";
 		foreach($article_info['download'] as $file)
 		{
-		/*	if($file[4] != 'files')
-				continue;*/
-				
-			$post_files .="<li class=\"post-file-item\"><i class=\"fa fa-file\"></i> <a href=\"".LinkToGT($file[1])."\" target=\"_blank\">".$file[0]."</a> <span class=\"post-file-size\">".formatBytes($file[2], 2 ,true)."</span> <span class=\"post-file-desc\">".(($file[3] != '') ? "(".$file[3].")":"")."</span></li>";
+			$post_files .="<li class=\"post-file-item\"><i class=\"fa fa-file\"></i> <a href=\"".LinkToGT($file[1])."\" target=\"_blank\">".$file[0]."</a>"; 
+			if($file[2] != '' && $file[2] != 0)
+				$post_files .=" <span class=\"post-file-size\">".formatBytes($file[2], 2 ,true)."</span>";
+			
+			if($file[3] != '')	
+				$post_files .=" <span class=\"post-file-desc\">(".$file[3].")</span></li>";
 		}
 		$post_files .="</ul>";
 	}
 	
-	if(($article_info['post_type'] != '' || $article_info['post_type'] != 'article') && file_exists("themes/".$nuke_configs['ThemeSel']."/".$article_info['post_type']."_more.php"))
-		include("themes/".$nuke_configs['ThemeSel']."/".$article_info['post_type']."_more.php");
-	elseif($article_info['post_type'] != 'article' && function_exists("".$article_info['post_type']."_more"))
-	{
-		$func_name = "".$article_info['post_type']."_more";
-		$contents .= $func_name($article_info);
-	}
-	else
-	{
-		$content = "
-		<article>
-			<h2><i class=\"fa fa-th\"></i><a href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">".$article_info['title']."</a></h2>";
-			if(!empty($cats_name)){
-			$content .="<div class=\"GScat\">
-				<i class=\"fa fa-comment\"></i> "._CATEGORIES." : ".implode(", ", $cats_name)."
-			</div>";
-			}
-			$content .="<div class=\"GSContent\">
-				$post_imge
-				<p class=\"GSJustify\">
-				".$article_info['hometext']."<br />
-				".$article_info['bodytext']."<br />
-				".$post_files."<br />
-				<div id=\"article-more-share\">
-					<div class=\"form-inline\">
-						<div class=\"input-group\">
-							<span class=\"input-group-addon btn copytoClipboard\" data-clipboard-target=\"#copytoClipboard\"><i class=\"fa fa-copy\"></i> "._COPY."</span>
-								<input class=\"form-control\" id=\"copytoClipboard\" value=\"".$nuke_configs['nukeurl']."".$article_info['sid']."/\" type=\"text\" readonly />
-							<div class=\"input-group-addon copytoClipboard\" data-clipboard-target=\"#copytoClipboard\">لینک اشتراک گذاری</div>
-						</div>
+	$content = "
+	<article>
+		<h2><i class=\"fa fa-th\"></i><a href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">".$article_info['title']."</a></h2>";
+		if(!empty($cats_name)){
+		$content .="<div class=\"GScat\">
+			<i class=\"fa fa-comment\"></i> "._CATEGORIES." : ".implode(", ", $cats_name)."
+		</div>";
+		}
+		$content .="<div class=\"GSContent\">
+			$post_imge
+			<p class=\"GSJustify\">
+			".$article_info['hometext']."<br />
+			".$article_info['bodytext']."<br />
+			".$post_files."<br />
+			<div id=\"article-more-share\">
+				<div class=\"form-inline\">
+					<div class=\"input-group\">
+						<span class=\"input-group-addon btn copytoClipboard\" data-clipboard-target=\"#copytoClipboard\"><i class=\"fa fa-copy\"></i> "._COPY."</span>
+							<input class=\"form-control\" id=\"copytoClipboard\" value=\"".$article_info['article_short_link']."\" type=\"text\" readonly />
+						<div class=\"input-group-addon copytoClipboard\" data-clipboard-target=\"#copytoClipboard\">لینک اشتراک گذاری</div>
 					</div>
 				</div>
-				<div class=\"clear\"></div>
-				<div class=\"article-tags\">$htmltags</div></p>
 			</div>
-			<div class=\"clear=\"></div>
-			<div class=\"meta\">
-				<ul>
-					<li class=\"hidden-xs\"><i class=\"fa fa-user\"></i> <a href=\"".$article_info['aid_url']."\"> ".$article_info['aid']."</a></li>
-					<li class=\"hidden-xs\"><i class=\"fa fa-calendar\"></i> ".$article_info['datetime']."</li>
-					<li><i class=\"fa fa-eye\"></i> ".$article_info['counter']."</li>
-					<li><i class=\"fa fa-comment\"></i> <a href=\"".$article_info['article_link']."#comments\">".$article_info['comments']."</a></li>
-					".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\"><i class=\"fa fa-remove\"></i></a></li>":"")."
-				</ul>
-			</div>
-		</article>";
-	}
+			<div class=\"clear\"></div>
+			<div class=\"article-tags\">$htmltags</div></p>
+		</div>
+		<div class=\"meta\">
+			<ul>
+				<li class=\"hidden-xs\"><i class=\"fa fa-user\"></i> <a href=\"".$article_info['aid_url']."\"> ".$article_info['aid']."</a></li>
+				<li class=\"hidden-xs\"><i class=\"fa fa-calendar\"></i> ".$article_info['datetime']."</li>
+				<li><i class=\"fa fa-eye\"></i> ".$article_info['counter']."</li>
+				<li><i class=\"fa fa-comment\"></i> <a href=\"".$article_info['article_link']."#comments\">".$article_info['comments']."</a></li>
+				".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\" onclick=\"return confirm('"._DELETE_THIS_SURE."');\"><i class=\"fa fa-remove\"></i></a></li>":"")."
+			</ul>
+		</div>
+	</article>";
 	return $content;
 }
 
@@ -599,12 +590,11 @@ function mail_theme($subject, $logoimage, $message)
 	return $message;
 }
 
-function print_theme($pagetitle, $title, $datetime, $category, $html_content, $page_link, $css=array(), $js=array())
+function print_theme($pagetitle, $print_data)
 {
 	global $nuke_configs;
-	
-	$css		= array_merge($css, array("themes/".$nuke_configs['ThemeSel']."/style/print.css"));
-	$js			= array_merge(array("includes/Ajax/jquery/jquery.min.js"), $js);
+	$css	= array('includes/Ajax/jquery/bootstrap/css/bootstrap.min.css','includes/Ajax/jquery/bootstrap/css/bootstrap-rtl.css','themes/'.$nuke_configs['ThemeSel'].'/style/print.css');
+	$js		= array('includes/Ajax/jquery/jquery.min.js', 'includes/Ajax/jquery/bootstrap/js/bootstrap.min.js');
 	
 	$pagetitle	= $nuke_configs['sitename']." - ".((isset($pagetitle)) ? $pagetitle:'');
 	$favicon	= ((file_exists("themes/".$nuke_configs['ThemeSel']."/images/favicon.ico")) ? "<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\" type=\"image/x-icon\">":"");
@@ -616,7 +606,17 @@ function print_theme($pagetitle, $title, $datetime, $category, $html_content, $p
 	foreach($js as $js_link)
 		$html_js[] = "<script type=\"text/javascript\" src=\"".LinkToGT($js_link)."\"></script>";
 	$html_js	= implode("\n\t\t", $html_js);
+
+	header("X-Robots-Tag: noindex, nofollow", true);
 		
+	$html_content = "<style>.article-header{width:100%;float:right;}.article-header span {width: calc(100% - 270px);float: right;}.article-header span:nth-child(2), .article-header span:nth-child(4) {color: #a7a9ac;}.article-header span:nth-child(3) {font-size: 20px;font-weight: bold;line-height: 35px;color: #333;padding: 9px 0 17px;}.article-header img{float:right;width:250px;margin-left:20px;}.p-nt {margin: 17px 0;float:right;width:100%;padding-top: 17px;border-top:1px dotted #ccc;}.p-nt p {margin-bottom: 19px;} img{max-width:99%;}</style>
+	<div class=\"article-header\">
+		".(($print_data['post_image'] != "" && $print_data['article_image_width'] != 0 && $print_data['article_image_height'] != 0) ? "<img src=\"".$print_data['post_image']."\" width=\"".$print_data['article_image_width']."\" height=\"".$print_data['article_image_height']."\" alt=\"".$print_data['title']."\" title=\"".$print_data['title']."\" />":"<span></span>")."
+		".(($print_data['title_lead'] != '') ? "<span style=\"color:#ccc;\">".$print_data['title_lead']."</span>":"")."
+		<span>".$print_data['title']."</span>
+		<span>".$print_data['hometext']."</span>
+	</div>
+	<div class=\"p-nt\"><p class=\"rtejustify\">".$print_data['hometext']."<br />".$print_data['bodytext']."</div>";		
 	echo "<!DOCTYPE html>
 	<html>
 	<head>

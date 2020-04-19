@@ -90,8 +90,8 @@ if(!function_exists("article_more"))
 		$contents .= "
 		<div class=\"Articles\">
 			<div class=\"ArticlesTitle\">
-				<a href=\"".$article_info['report_link']."\" data-toggle=\"modal\" data-target=\"#sitemodal\">"._POST_REPORT."</a>
-				<a href=\"".$article_info['friend_link']."\" data-toggle=\"modal\" data-target=\"#sitemodal\">"._INTRODUCE_TO_FRIENDS."</a>
+				<a href=\"".$article_info['report_link']."\" data-mode=\"inline\" data-toggle=\"modal\" data-target=\"#sitemodal\">"._POST_REPORT."</a>
+				<a href=\"".$article_info['friend_link']."\" data-mode=\"inline\" data-toggle=\"modal\" data-target=\"#sitemodal\">"._INTRODUCE_TO_FRIENDS."</a>
 				<a href=\"".$article_info['pdf_link']."\">"._PDFFILE."</a>
 				<a href=\"".$article_info['print_link']."\">"._PRINT."</a>
 				<div class=\"ArticlesRating\">".$article_info['rating_box']."</div>
@@ -119,39 +119,56 @@ if(!function_exists("article_more"))
 	}
 }
 
-function articles_home($category='', $tags='', $orderby = '')
+function articles_home($category='', $tags='', $orderby = '', $main_module = 'Articles')
 {
-	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_articles_categories_cacheData, $nuke_configs, $articles_votetype, $nuke_modules_cacheData, $nuke_authors_cacheData;
-	$link_to = "index.php?modname=$module_name";
+	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $articles_votetype, $nuke_modules_cacheData, $nuke_authors_cacheData;
+	$link_to = "index.php?modname=".(($main_module != 'Articles') ? "$main_module":"");
 
 	$top_middle = ((isset($tags) && $tags != '') || (isset($page) && intval($page) != 0) || (isset($category) && $category != '')) ? false:true;
 
 	$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
 	
 	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
-	$catid = get_category_id($module_name, $category, $nuke_categories_cacheData);	
+	$catid = get_category_id($main_module, $category, $nuke_categories_cacheData);	
 	
 	$catid = intval($catid);
 	if($catid < 0)
 		header("location: ".LinkToGT("index.php")."");
 
+	switch($main_module)
+	{
+		case"Downloads":
+			$module_name_title = _DOWNLOADS;
+		break;
+		case"Pages":
+			$module_name_title = _PAGESCONTENTS;
+		break;
+		case"Statics":
+			$module_name_title = _STATICS;
+		break;
+		case"Gallery":
+			$module_name_title = _GALLERY;
+		break;
+		case"Faqs":
+			$module_name_title = _FAQS;
+		break;
+	}
+		
 	if ($nuke_configs['multilingual'] == 1)
 	{
 		$module_titles = $lang_titles = ($nuke_modules_cacheData_by_title[$module_name]['lang_titles'] != "") ? phpnuke_unserialize(stripslashes($nuke_modules_cacheData_by_title[$module_name]['lang_titles'])):"";
 		
-		$module_title = (($catid > 0) ? $category." - ":"").$module_titles[$nuke_configs['currentlang']];
+		$module_title = (($catid > 0) ? $category." - ":"").(($main_module == 'Articles') ? $module_titles[$nuke_configs['currentlang']]:$module_name_title);
 	}
 	else
-		$module_title = (($catid > 0) ? $category." - ":"").$nuke_modules_cacheData_by_title[$module_name]['title'];
+		$module_title = (($catid > 0) ? $category." - ":"").(($main_module == 'Articles') ? $nuke_modules_cacheData_by_title[$module_name]['title']:$module_name_title);
 	
 	$db->table(POSTS_TABLE)
-		->where('post_type', 'article')
 		->where('status', 'future')
 		->where('time', '<',  _NOWTIME)
 		->update([
 			'status' => 'publish'
-		]);
-		
+		]);		
 	
 	$votetype = ($articles_votetype) ? $articles_votetype:$nuke_configs['votetype'];
 	
@@ -175,6 +192,7 @@ function articles_home($category='', $tags='', $orderby = '')
 	$query_params = array();
 	
 	$query_params[':visitor_ip'] = $visitor_ip;
+	$query_params[':visitor_ip'] = $visitor_ip;
 	
 	if(!is_admin())
 		$query_set['status'] = "s.status = 'publish'";
@@ -182,7 +200,7 @@ function articles_home($category='', $tags='', $orderby = '')
 	$query_set['alanguage'] = "";
 	$query_set['ihome'] = "";
 	$query_set['cat'] = array();
-	$query_set['post_type'] = "(s.post_type = 'article' OR s.post_type = '')";
+	$query_set['post_type'] = "(s.post_type = '$main_module')";
 	
 	if ($nuke_configs['multilingual'] == 1)
 	{
@@ -197,7 +215,7 @@ function articles_home($category='', $tags='', $orderby = '')
 	{
 		unset($query_set['ihome']);
 
-		$all_sub_cats = array_unique(get_sub_categories_id($module_name, $catid, $nuke_categories_cacheData, array($catid)));
+		$all_sub_cats = array_unique(get_sub_categories_id($main_module, $catid, $nuke_categories_cacheData, array($catid)));
 
 		$c=1;
 		foreach($all_sub_cats as $sub_cat)
@@ -206,7 +224,7 @@ function articles_home($category='', $tags='', $orderby = '')
 			$query_params[":cat_$c"] = $sub_cat;
 			$c++;
 		}
-		$query_set['cat']= "(".implode(" OR ", $query_set['cat']).") OR s.cat_link = :cat_link";
+		$query_set['cat']= "(".implode(" OR ", $query_set['cat'])." OR s.cat_link = :cat_link)";
 		$query_params[":cat_link"] = $catid;
 	}
 			
@@ -220,6 +238,9 @@ function articles_home($category='', $tags='', $orderby = '')
 	$tags2 = $tags3 = "";
 	if($tags != "")
 	{
+		if($main_module == 'Articles')
+			unset($query_set['post_type']);
+			
 		$tags	= str_replace(array("_","-")," ",$tags);
 		$tags	= check_html($tags);
 		$tags_arr	= adv_filter($tags, array('sanitize_string'),array('required'));
@@ -264,45 +285,46 @@ function articles_home($category='', $tags='', $orderby = '')
 	
 	if ($catid > 0)
 	{
-		$numrows_a = (isset($nuke_articles_categories_cacheData[$catid]) && !empty($nuke_articles_categories_cacheData[$catid])) ? 1:0;
-		$parent_id = intval($nuke_articles_categories_cacheData[$catid]['parent_id']);
+		$numrows_a = (isset($nuke_categories_cacheData[$main_module][$catid]) && !empty($nuke_categories_cacheData[$main_module][$catid])) ? 1:0;
+		$parent_id = intval($nuke_categories_cacheData[$main_module][$catid]['parent_id']);
 		
 		if ($numrows_a == 0)
 		{
 			$contents .= OpenTable();
-			$contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename']."</font><br><br>"._NOINFO4TOPIC."<br><br>[ <a href=\"".LinkToGT("index.php?modname=$module_name")."\">"._GOTONEWSINDEX."</a> | <a href=\"".LinkToGT("index.php?modname=Articles&op=article_categories")."\">"._SELECTNEWTOPIC."</a> ]</div>";
+			$contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename']."</font><br><br>"._NOINFO4TOPIC."<br><br>[ <a href=\"".LinkToGT("index.php?modname=$main_module")."\">"._GOTONEWSINDEX."</a> | <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_categories")."\">"._SELECTNEWTOPIC."</a> ]</div>";
 			$contents .= CloseTable();
 		}
 		else
 		{
 			$contents .= OpenTable();
-			$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($catid, $nuke_articles_categories_cacheData, "parent_id", "catname_url"))), "nohtml"), array("/"));
+			$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($catid, $nuke_categories_cacheData[$main_module], "parent_id", "catname_url"))), "nohtml"), array("/"));
 			
 			$attrs = array(
 				"title" => "{CAT_TEXT}",
 				"id" => "category-{CATID}"
 			);
-			$cats_link_deep = implode("/", category_link($module_name, $cat_title, $attrs));
+			$cats_link_deep = implode("/", category_link($main_module, $cat_title, $attrs));
 			
 			$contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename'].": $cats_link_deep</font><br><br>
 			<form action=\"".LinkToGT("index.php?modname=Search")."\" method=\"post\">
 			<input type=\"hidden\" name=\"search_category\" value=\"$catid\">
+			<input type=\"hidden\" name=\"search_module\" value=\"$main_module\">
 			"._SEARCHONTOPIC.": <input type=\"name\" name=\"search_query\" size=\"30\">&nbsp;&nbsp;
 			<input type=\"submit\" value=\""._SEARCH."\">
 			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 			</form>
-			[ <a href=\"".LinkToGT("index.php")."\">"._GOTOHOME."</a> | <a href=\"".LinkToGT("index.php?modname=Articles&op=article_categories")."\">"._SELECTNEWTOPIC."</a> ]</div><br />";
+			[ <a href=\"".LinkToGT("index.php")."\">"._GOTOHOME."</a> | <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_categories")."\">"._SELECTNEWTOPIC."</a> ]</div><br />";
 			$sub_cats_contents_num=0;
 			$j=1;
 			$sub_cats_contents = "<table width=\"100%\" border=\"0\"><tr><td align=\"center\"><b>"._SUB_CATS."</b><br /><br /></td></tr>";
-			foreach($nuke_articles_categories_cacheData as $key => $val)
+			foreach($nuke_categories_cacheData[$main_module] as $key => $val)
 			{
 				if($val['parent_id'] == $catid)
 				{
-					$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($key, $nuke_articles_categories_cacheData, "parent_id", "catname_url"))), "nohtml"), array("/"));
+					$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($key, $nuke_categories_cacheData[$main_module], "parent_id", "catname_url"))), "nohtml"), array("/"));
 					
 					if ($j==1) $sub_cats_contents .= "<tr>";
-					$sub_cats_contents .= "<td width=\"100\"><a href=\"".LinkToGT("index.php?modname=Articles&category=$cat_link")."\">".category_lang_text($val['cattext'])."</a></td>";
+					$sub_cats_contents .= "<td width=\"100\"><a href=\"".LinkToGT("index.php?modname=$main_module&category=$cat_link")."\">".category_lang_text($val['cattext'])."</a></td>";
 					if ($j==5)
 					{
 						$j=0;
@@ -329,7 +351,7 @@ function articles_home($category='', $tags='', $orderby = '')
 	$query_params[':entries_per_page'] = $entries_per_page;
 	$article_info = array();
 	
-	article_result_parse($article_info, $query_set, $query_params, $orderby);
+	article_result_parse($article_info, $query_set, $query_params, $orderby, 'index');
 	
 	$total_rows	= intval($article_info['total_rows']);
 	unset($article_info['total_rows']);
@@ -338,10 +360,17 @@ function articles_home($category='', $tags='', $orderby = '')
 	{
 		foreach ($article_info as $row)
 		{
-			if(file_exists("themes/".$nuke_configs['ThemeSel']."/article_index.php"))
-				include("themes/".$nuke_configs['ThemeSel']."/article_index.php");
-			elseif(function_exists("article_index"))
+			if(file_exists("themes/".$nuke_configs['ThemeSel']."/".$main_module."_index.php"))
+				include("themes/".$nuke_configs['ThemeSel']."/".$main_module."_index.php");
+			elseif(function_exists("".$main_module."_index"))
+			{
+				$module_function_name = "".$main_module."_index";
+				$contents .= $module_function_name($row);
+			}
+			elseif(!function_exists("".$main_module."_index"))
+			{
 				$contents .= article_index($row);
+			}
 			else
 				$contents .= "";
 		}
@@ -375,19 +404,21 @@ function articles_home($category='', $tags='', $orderby = '')
 		):"",
 	);
 	
+	$main_module_box = (($main_module != 'Articles')) ? strtolower($main_module)."_index":"index";
+	
 	if($top_middle)
-		$boxes_contents = show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+		$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	else
-		$boxes_contents = show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","right"), $contents);
+		$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","right"), $contents);
 
 	include("header.php");
 	$html_output .= $boxes_contents;
 	include("footer.php");
 }
 
-function article_show($sid=0, $post_url='', $mode = '')
+function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles')
 {
-	global $db, $module_name, $REQUESTURL, $articles_votetype, $nuke_configs, $userinfo, $articles_ratecookie, $nuke_articles_categories_cacheData, $nuke_bookmarksite_cacheData, $visitor_ip, $pn_Cookies, $nuke_authors_cacheData;
+	global $db, $module_name, $REQUESTURL, $articles_votetype, $nuke_configs, $userinfo, $articles_ratecookie, $nuke_bookmarksite_cacheData, $visitor_ip, $pn_Cookies, $nuke_authors_cacheData, $your_pass;
 	$article_info = array();
 	$sid = intval($sid);
 
@@ -395,28 +426,30 @@ function article_show($sid=0, $post_url='', $mode = '')
 	$query_params = array();
 	
 	$query_params[':visitor_ip'] = $visitor_ip;
-	$query_params[':post_type'] = 'article';
+	$query_params[':post_type'] = $main_module;
 	
 	if($nuke_configs['gtset'] == 1)
 	{
-		$query_set[] = "s.post_url=:post_url OR s.sid=:post_url";
-		$query_params[':post_url'] = $post_url;
-		$query_params[':sid'] = $post_url;
-		
 		if($post_url == '')
 			die_error("404");
+			
+		$query_set[] = "(s.post_url=:post_url OR s.sid=:post_url)";
+		$query_params[':post_url'] = $post_url;
+		$query_params[':sid'] = intval($post_url);
 	}
 	else
 	{
 		$query_set[] = "s.sid=:sid";
 		$query_params[':sid'] = $sid;
 	}
-		
+	
+	$query_params[':status'] = 'publish';
 	if(!is_admin())
 	{
-		$query_set[] = "s.status = 'publish'";
-		$query_params[':status'] = 'publish';
+		$query_set[] = "s.status = :status";
 	}
+	
+	$query_set[] = "s.post_type = :post_type";
 		
 	article_result_parse($article_info, $query_set, $query_params, 'time', 'more');
 	
@@ -426,7 +459,7 @@ function article_show($sid=0, $post_url='', $mode = '')
 		$urlop = (($mode != '') && in_array($mode, array("pdf","print","friend","report"))) ? "$mode/":"";
 		if(intval($article_info['sid'] > 0))
 		{
-		    $true_link = trim(articleslink(intval($article_info['sid']), filter($article_info['title'], "nohtml"), filter($article_info['post_url'], "nohtml"), filter($article_info['time'], "nohtml"), intval($article_info['cat_link'])).$urlop, "/")."/";
+		    $true_link = trim(articleslink(intval($article_info['sid']), filter($article_info['title'], "nohtml"), filter($article_info['post_url'], "nohtml"), filter($article_info['time'], "nohtml"), intval($article_info['cat_link']), $main_module).$urlop, "/")."/";
 			if($true_link != trim(rawurldecode($REQUESTURL), "/")."/")
 			{
 			    redirect_to($true_link);
@@ -438,16 +471,26 @@ function article_show($sid=0, $post_url='', $mode = '')
 	}
 	else
 	{
+		//check if link is related to another module
+		$result = $db->table(POSTS_TABLE)
+					->where('post_url',$post_url)
+					->select(['sid']);
+		if($result->count() == 1)
+		{
+			$sid = intval($result->results()[0]['sid']);
+			redirect_to(LinkToGT(articleslink($sid)));
+			die();
+		}
 		die_error("404");
 	}
 	
 	$article_info['next_article_title']	= (intval($article_info['nsid']) != 0) ? filter($article_info['ntitle'], "nohtml"):"";
-	$article_info['next_article_link']	= (intval($article_info['nsid']) != 0) ? LinkToGT(articleslink(intval($article_info['nsid']), filter($article_info['ntitle'], "nohtml"), filter($article_info['npost_url'], "nohtml"), $article_info['ntime'], intval($article_info['ncat_link']))):"";
+	$article_info['next_article_link']	= (intval($article_info['nsid']) != 0) ? LinkToGT(articleslink(intval($article_info['nsid']), filter($article_info['ntitle'], "nohtml"), filter($article_info['npost_url'], "nohtml"), $article_info['ntime'], intval($article_info['ncat_link']), $main_module)):"";
 	$article_info['prev_article_title']	= (intval($article_info['psid']) != 0) ? filter($article_info['ptitle'], "nohtml"):"";
-	$article_info['prev_article_link']	= (intval($article_info['psid']) != 0) ? LinkToGT(articleslink(intval($article_info['psid']), filter($article_info['ptitle'], "nohtml"), filter($article_info['ppost_url'], "nohtml"), $article_info['ptime'], intval($article_info['pcat_link']))):"";
+	$article_info['prev_article_link']	= (intval($article_info['psid']) != 0) ? LinkToGT(articleslink(intval($article_info['psid']), filter($article_info['ptitle'], "nohtml"), filter($article_info['ppost_url'], "nohtml"), $article_info['ptime'], intval($article_info['pcat_link']), $main_module)):"";
 
 	if (empty($article_info['aid']))
-		Header("Location: ".LinkToGT("index.php?modname=$module_name")."");
+		Header("Location: ".LinkToGT("index.php?modname=$main_module")."");
 
 	$db->table(POSTS_TABLE)
 		->where('sid', $article_info['sid'])
@@ -516,10 +559,10 @@ function article_show($sid=0, $post_url='', $mode = '')
 	}
 	else
 	{
-		$article_info['print_link'] = "index.php?modname=$module_name&op=article_show&mode=print&sid=".$article_info['sid']."";
-		$article_info['pdf_link'] = "index.php?modname=$module_name&op=article_show&mode=pdf&sid=".$article_info['sid']."";
-		$article_info['friend_link'] = "index.php?modname=$module_name&op=article_show&mode=friend&sid=".$article_info['sid']."";
-		$article_info['report_link'] = "index.php?modname=$module_name&op=article_show&mode=report&sid=".$article_info['sid']."";
+		$article_info['print_link'] = "index.php?modname=$main_module&op=article_show&mode=print&sid=".$article_info['sid']."";
+		$article_info['pdf_link'] = "index.php?modname=$main_module&op=article_show&mode=pdf&sid=".$article_info['sid']."";
+		$article_info['friend_link'] = "index.php?modname=$main_module&op=article_show&mode=friend&sid=".$article_info['sid']."";
+		$article_info['report_link'] = "index.php?modname=$main_module&op=article_show&mode=report&sid=".$article_info['sid']."";
 	}
 	
 	$meta_tags = array(
@@ -538,20 +581,28 @@ function article_show($sid=0, $post_url='', $mode = '')
 			$GLOBALS['block_global_contents'] = $article_info;
 			$GLOBALS['block_global_contents']['post_id'] = $article_info['sid'];
 			$GLOBALS['block_global_contents']['post_title'] = $article_info['title'];
-			$GLOBALS['block_global_contents']['module_name'] = $module_name;
+			$GLOBALS['block_global_contents']['module_name'] = $main_module;
 			$GLOBALS['block_global_contents']['allow_comments'] = $article_info['allow_comment'];
 			$GLOBALS['block_global_contents']['db_table'] = POSTS_TABLE;
 			$GLOBALS['block_global_contents']['db_id'] = 'sid';
 			
 			$contents = '';
-			if(file_exists("themes/".$nuke_configs['ThemeSel']."/article_more.php"))
-				include("themes/".$nuke_configs['ThemeSel']."/article_more.php");
-			elseif(function_exists("article_more"))
+			if(file_exists("themes/".$nuke_configs['ThemeSel']."/".$article_info['post_type']."_more.php"))
+				include("themes/".$nuke_configs['ThemeSel']."/".$article_info['post_type']."_more.php");
+			elseif(function_exists("".$article_info['post_type']."_more"))
+			{
+				$module_func_name = "".$article_info['post_type']."_more";
+				$contents .= $module_func_name($article_info);
+			}
+			elseif(!function_exists("".$article_info['post_type']."_more"))
+			{
 				$contents .= article_more($article_info);
+			}
 			else 
 				$contents .= "";
 				
-			$boxes_contents = show_modules_boxes($module_name, "more", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+			$main_module_box = (($main_module != 'Articles')) ? strtolower($main_module)."_more":"more";
+			$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 			
 			include("header.php");
 			
@@ -567,7 +618,7 @@ function article_show($sid=0, $post_url='', $mode = '')
 		case"friend":
 		case"report":
 			header("X-Robots-Tag: noindex, nofollow", true);
-			report_friend_form(false, $mode, $article_info['sid'], $article_info['title'], $module_name, '', '', $article_info['article_link'], '', '');
+			report_friend_form(false, $mode, $article_info['sid'], $article_info['title'], $main_module, '', '', $article_info['article_link'], '', '');
 			die();
 		break;
 		
@@ -577,26 +628,14 @@ function article_show($sid=0, $post_url='', $mode = '')
 			die();
 		break;
 		
-		case"print":
-			header("X-Robots-Tag: noindex, nofollow", true);
-			$css	= array('includes/Ajax/jquery/bootstrap/css/bootstrap.min.css','includes/Ajax/jquery/bootstrap/css/bootstrap-rtl.css');
-			$js		= array('includes/Ajax/jquery/bootstrap/js/bootstrap.min.js');
-			$html_content = "<style>.article-header{width:100%;float:right;}.article-header span {width: calc(100% - 270px);float: right;}.article-header span:nth-child(2), .article-header span:nth-child(4) {color: #a7a9ac;}.article-header span:nth-child(3) {font-size: 20px;font-weight: bold;line-height: 35px;color: #333;padding: 9px 0 17px;}.article-header img{float:right;width:250px;margin-left:20px;}.p-nt {margin: 17px 0;float:right;width:100%;padding-top: 17px;border-top:1px dotted #ccc;}.p-nt p {margin-bottom: 19px;} img{max-width:99%;}</style>
-			<div class=\"article-header\">
-				".(($article_info['post_image'] != "" && $article_info['article_image_width'] != 0 && $article_info['article_image_height'] != 0) ? "<img src=\"".$article_info['post_image']."\" width=\"".$article_info['article_image_width']."\" height=\"".$article_info['article_image_height']."\" alt=\"".$article_info['title']."\" title=\"".$article_info['title']."\" />":"<span></span>")."
-				".(($article_info['title_lead'] != '') ? "<span style=\"color:#ccc;\">".$article_info['title_lead']."</span>":"")."
-				<span>".$article_info['title']."</span>
-				<span>".$article_info['hometext']."</span>
-			</div>
-			<div class=\"p-nt\"><p class=\"rtejustify\">".$article_info['hometext']."<br />".$article_info['bodytext']."</div>";
-			
-			print_theme($pagetitle, $article_info['title'], $article_info['datetime'], $article_info['cattext_link'], $html_content, $article_info['article_link'], $css, $js);
+		case"print":			
+			print_theme($pagetitle, $article_info);
 			die();
 		break;
 	}
 }
 
-function article_archive($year, $month, $month_l, $mode)
+function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main_module = 'Articles')
 {
 	global $userinfo, $db, $user, $page, $module_name, $nuke_configs;
 	
@@ -611,7 +650,7 @@ function article_archive($year, $month, $month_l, $mode)
 	
 	$month_l = str_replace(" ","-", $nuke_configs[$month_names][$month]);
 	
-	$link = "index.php?modname=Articles&op=article_archive".
+	$link = "index.php?modname=$main_module&op=article_archive".
 	(($year != 0) ? "&year=$year":"").
 	(($month != 0) ? "&month=$month":"").
 	(($month_l != '') ? "&month_l=$month_l":"").
@@ -648,10 +687,10 @@ function article_archive($year, $month, $month_l, $mode)
 	$entries_per_page			= 20;
 	$current_page				= (empty($page)) ? 1 : $page;
 	$start_at					= ($current_page * $entries_per_page) - $entries_per_page;
-	$link_to					= ($year != 0 && $month != 0 && $month_l != '') ? "index.php?modname=$module_name&op=article_archive&year=$year&month=$month&month_l=$month_l":"index.php?modname=$module_name&op=article_archive";
+	$link_to					= ($year != 0 && $month != 0 && $month_l != '') ? "index.php?modname=$main_module&op=article_archive&year=$year&month=$month&month_l=$month_l":"index.php?modname=$main_module&op=article_archive";
 	
 	$total_rows = $db->table(POSTS_TABLE)
-					->where('post_type', 'article')
+					->where('post_type', $main_module)
 					->whereBetween('time', $where_between)
 					->select(['sid'])
 					->count();
@@ -659,7 +698,7 @@ function article_archive($year, $month, $month_l, $mode)
 	if(!is_admin())
 		$query_set['status']	= "s.status = 'publish'";
 		
-	$query_set['post_type'] = "(s.post_type = 'article' OR s.post_type = '')";
+	$query_set['post_type'] = "(s.post_type = '$main_module' OR s.post_type = '')";
 	$query_set['alanguage']		= "";
 	
 	if ($nuke_configs['multilingual'] == 1)
@@ -702,7 +741,7 @@ function article_archive($year, $month, $month_l, $mode)
 			$cat_link				= intval($row['cat_link']);
 			$score					= intval($row['score']);
 			$ratings				= intval($row['ratings']);
-			$article_link			= LinkToGT(articleslink($sid, $title, $post_url, $time, $cat_link));
+			$article_link			= LinkToGT(articleslink($sid, $title, $post_url, $time, $cat_link, $main_module));
 			$time					= nuketimes($time);
 
 			$this_status			= filter($row['status'], "nohtml");	
@@ -732,16 +771,16 @@ function article_archive($year, $month, $month_l, $mode)
 			}
 			else
 			{
-				$print_link			= "index.php?modname=$module_name&op=article_show&mode=print&sid=$sid";
-				$pdf_link			= "index.php?modname=$module_name&op=article_show&mode=pdf&sid=$sid";
-				$friend_link		= "index.php?modname=$module_name&op=article_show&mode=friend&sid=$sid";
+				$print_link			= "index.php?modname=$main_module&op=article_show&mode=print&sid=$sid";
+				$pdf_link			= "index.php?modname=$main_module&op=article_show&mode=pdf&sid=$sid";
+				$friend_link		= "index.php?modname=$main_module&op=article_show&mode=friend&sid=$sid";
 			}
 			
-			$actions				= "<a href=\"$print_link\"><img src=\"".$nuke_configs['nukecdnurl']."images/print.gif\" border=0 alt=\""._PRINT."\" title=\""._PRINT."\" width=\"16\" height=\"11\"></a>&nbsp;";
-			$actions				.= "<a href=\"$pdf_link\"><img src=\"".$nuke_configs['nukecdnurl']."images/pdf.gif\" border=0 alt=\""._PDFFILE."\" title=\""._PDFFILE."\" width=\"16\" height=\"11\"></a>&nbsp;";
+			$actions				= "<a href=\"$print_link\" title=\""._PRINT."\"><i class=\"fa fa-print\"></i></a>&nbsp;";
+			$actions				.= "<a href=\"$pdf_link\" title=\""._PDFFILE."><i class=\"fa fa-pdf\"></i></a>&nbsp;";
 			if(is_user())
 			{
-				$actions			.= "<a href=\"$friend_link\" class=\"thickbox\"><img src=\"".$nuke_configs['nukecdnurl']."images/friend.gif\" border=0 alt=\""._SEND_POST_TO_FRIEND."\" title=\""._SEND_POST_TO_FRIEND."\" width=\"16\" height=\"11\"></a>";
+				$actions			.= "<a href=\"$friend_link\" class=\"thickbox\" title=\""._SEND_POST_TO_FRIEND."\"><i class=\"fa fa-email\"></i></a>";
 			}
 			if ($score != 0)
 			{
@@ -788,7 +827,7 @@ function article_archive($year, $month, $month_l, $mode)
 	<br><br><hr size=\"1\" noshade>";
 	$contents					.= article_select_month(1);
 	$contents					.="<div align=\"center\">
-	[ <a href=\"".LinkToGT("index.php?modname=$module_name&op=article_select_month")."\">"._ARCHIVESINDEX."</a>".(($mode !== 'all') ? " | <a href=\"".LinkToGT("index.php?modname=$module_name&op=article_archive")."\">"._SHOWALLSTORIES."</a>":"")." ]</div>";
+	[ <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_select_month")."\">"._ARCHIVESINDEX."</a>".(($mode !== 'all') ? " | <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_archive")."\">"._SHOWALLSTORIES."</a>":"")." ]</div>";
 	
 	if (intval($page) != 0)
 	{
@@ -837,30 +876,34 @@ function article_select_month($in = 0)
 	_article_select_month($in);
 }
 
-function article_categories()
+function article_categories($main_module = 'Articles')
 {
-	global $userinfo, $db, $user, $page, $module_name, $nuke_articles_categories_cacheData, $nuke_configs;
-		
+	global $userinfo, $db, $user, $page, $module_name, $nuke_configs;
+	
+	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 	$contents 								= "";
 	$contents 								.= OpenTable();
 	
 	$sub_cats_contents_num 					= 0;
 	$array_contents 						= array();
-	foreach($nuke_articles_categories_cacheData as $key => $val)
+	foreach($nuke_categories_cacheData[$main_module] as $key => $val)
 	{
 		if($val['parent_id'] == 0)
 		{
 			$cat_link						= filter($val['catname_url'], "nohtml");
-			$array_contents[$key] = array($val, $cat_link, LinkToGT("index.php?modname=Articles&category=$cat_link"));
+			$array_contents[$key] = array($val, $cat_link, LinkToGT("index.php?modname=".$main_module."&category=$cat_link"));
 			$sub_cats_contents_num++;
 		}
 	}
 	if($sub_cats_contents_num > 0)
 	{
-		if(file_exists("themes/".$nuke_configs['ThemeSel']."/article_categories.php"))
-			include("themes/".$nuke_configs['ThemeSel']."/article_categories.php");
-		elseif(function_exists("article_categories_html"))
-			$contents .= article_categories_html($array_contents);
+		if(file_exists("themes/".$nuke_configs['ThemeSel']."/".$main_module."_categories.php"))
+			include("themes/".$nuke_configs['ThemeSel']."/".$main_module."_categories.php");
+		elseif(function_exists("".$main_module."_categories_html"))
+		{
+			$module_func_name = "".$main_module."_categories_html";
+			$contents .= $module_func_name($array_contents);
+		}
 		else
 		{
 			$j 								= 1;
@@ -883,7 +926,7 @@ function article_categories()
 	$contents								.= CloseTable();
 		
 	$meta_tags = array(
-		"url" 								=> LinkToGT("index.php?modname=$module_name&op=article_categories"),
+		"url" 								=> LinkToGT("index.php?modname=$main_module&op=article_categories"),
 		"title" 							=> _ARTICLES_CATEGORIES,
 		"description" 						=> '',
 		"keywords" 							=> '',
@@ -897,9 +940,9 @@ function article_categories()
 	include("footer.php");
 }
 
-function send_article($preview, $submit, $article_fields, $security_code, $security_code_id)
+function send_article($preview = '', $submit = '', $article_fields = array(), $security_code = '', $security_code_id = '', $main_module = 'Articles')
 {
-	global $db, $userinfo, $nuke_configs, $module_name, $nuke_articles_categories_cacheData, $PnValidator, $visitor_ip;
+	global $db, $userinfo, $nuke_configs, $module_name, $PnValidator, $visitor_ip;
 	
 	$finish = false;
 	$contents = '';
@@ -933,12 +976,14 @@ function send_article($preview, $submit, $article_fields, $security_code, $secur
 		$PnValidator->validation_rules(array(
 			'title'		=> 'required',
 			'alanguage'	=> 'required|alpha|in_languages,'.implode("-",$languageslist).'',
-			'hometext'	=> 'required'
+			'hometext'	=> 'required',
+			'post_type'	=> 'required'
 		)); 
 		// Get or set the filtering rules
 		$PnValidator->filter_rules(array(
 			'title'		=> 'sanitize_string',
 			'alanguage'	=> 'sanitize_string',
+			'post_type'	=> 'addslashes',
 			'hometext'	=> 'addslashes',
 			'bodytext'	=> 'addslashes'
 		)); 
@@ -969,7 +1014,6 @@ function send_article($preview, $submit, $article_fields, $security_code, $secur
 				if($code_accepted)
 				{
 					$article_fields['ip'] = $visitor_ip;
-					$article_fields['post_type'] = 'article';
 					$article_fields['status'] = 'pending';
 					$article_fields['time'] = _NOWTIME;
 					$article_fields['cat'] = (isset($article_fields['cats']) && !empty($article_fields['cats'])) ? implode(",",$article_fields['cats']):"";
@@ -1025,7 +1069,7 @@ function send_article($preview, $submit, $article_fields, $security_code, $secur
 			'var_value'		=> 'catname'
 		);
 		
-		$all_cats = (!empty($nuke_articles_categories_cacheData)) ? get_sub_lists($nuke_articles_categories_cacheData, $nuke_articles_categories_cacheData, 0, $list_config):"";
+		$all_cats = (!empty($nuke_categories_cacheData[$main_module])) ? get_sub_lists($nuke_categories_cacheData[$main_module], $nuke_categories_cacheData[$main_module], 0, $list_config):"";
 		
 		$contents .= OpenTable();
 		$contents .= "
@@ -1117,6 +1161,8 @@ function send_article($preview, $submit, $article_fields, $security_code, $secur
 			</tr>
 		</table>
 		<input type=\"hidden\" name=\"op\" value=\"send_article\">
+		<input type=\"hidden\" name=\"main_module\" value=\"$main_module\">
+		<input type=\"hidden\" name=\"article_fields[post_type]\" value=\"$main_module\">
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		</form>
 		<script>
@@ -1139,7 +1185,7 @@ function send_article($preview, $submit, $article_fields, $security_code, $secur
 	$custom_theme_setup_replace = false;
 	
 	$meta_tags = array(
-		"url" => LinkToGT("index.php?modname=$module_name&op=send_article"),
+		"url" => LinkToGT("index.php?modname=$main_module&op=send_article"),
 		"title" => _SEND_POST,
 		"description" => _SEND_POST_DESCRIPTION,
 		"keywords" => '',
@@ -1167,51 +1213,30 @@ $preview			= isset($preview)? filter($preview, "nohtml") : "";
 $submit				= isset($submit)? filter($submit, "nohtml") : "";
 $security_code		= isset($security_code)? filter($security_code, "nohtml") : "";
 $security_code_id	= isset($security_code_id)? filter($security_code_id, "nohtml") : "";
-$args 				= isset($args) ? filter($args, "nohtml") : "";
-
-if($args != '' && $nuke_configs['userurl'] != 3)
-{
-    if ( filter_var($args, FILTER_VALIDATE_INT) !== false) {
-        $sid = intval($args);
-    }
-    
-	$result = $db->table(ARTICLES_TABLE)
-		->where('sid', intval($sid))
-		->select(['post_url',"title","time", "cat_link"]);
-	if(intval($result->count()) > 0)
-	{
-		$row = $result->results()[0];
-		$post_url = filter($row['post_url'], "nohtml");
-		$title = filter($row['title'], "nohtml");
-		$time = filter($row['time'], "nohtml");
-		$cat_link = intval($row['cat_link']);
-		redirect_to(articleslink($sid, $title, $post_url, $time, $cat_link));
-		die();
-	}
-}
-
+$main_module		= isset($main_module)? filter($main_module, "nohtml") : "Articles";
+	
 if($year == 0 && $month == 0 && $mode != 'all' && $op == 'article_archive')
 	$op = "article_select_month";
 
 switch ($op)
 {
 	case "article_archive":
-		article_archive($year, $month, $month_l, $mode);
+		article_archive($year, $month, $month_l, $mode, $main_module);
 	break;
 	case"article_select_month":
 		article_select_month(0);
 	break;
 	case"article_categories":
-		article_categories();
+		article_categories($main_module);
 	break;
 	case"send_article":
-		send_article($preview, $submit, $article_fields, $security_code, $security_code_id);
+		send_article($preview, $submit, $article_fields, $security_code, $security_code_id, $main_module);
 	break;
 	case"article_show":
-		article_show($sid, $post_url, $mode);
+		article_show($sid, $post_url, $mode, $main_module);
 	break;
 	default:
-	articles_home($category, $tags, $orderby);
+	articles_home($category, $tags, $orderby, $main_module);
 	break;
 }
 

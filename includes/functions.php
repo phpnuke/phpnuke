@@ -1309,8 +1309,11 @@ function show_modules_boxes($module_name, $part='index', $active_boxes=array(), 
 	
 	$theme_boxes_templates = $theme_setup['theme_boxes_templates'];
 	$output = "";
-	
+		
 	$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
+	
+	if(in_array($module_name, array("Downloads","Pages","Gallery","Faqs","Static")) && !isset($nuke_modules_cacheData_by_title[$module_name]))
+		$nuke_modules_cacheData_by_title[$module_name] = $nuke_modules_cacheData_by_title['Articles'];
 	
 	$all_module_boxes = ($nuke_modules_cacheData_by_title[$module_name]['module_boxes'] != '') ? phpnuke_unserialize(stripslashes($nuke_modules_cacheData_by_title[$module_name]['module_boxes'])):array();
 	
@@ -1527,7 +1530,7 @@ function insert_update_meta_fields($data, $id = 0, $meta_part = "Articles")
 						->where('mid', $mid)
 						->where('meta_key', $meta_key)
 						->update([
-							"meta_value" => (($data[$meta_key] == '' || $data[$meta_key] === null || !isset($data[$meta_key])) ? '':$data[$meta_key])
+							"meta_value" => ((!isset($data[$meta_key]) || (isset($data[$meta_key]) && ($data[$meta_key] == '' || $data[$meta_key] === null))) ? '':$data[$meta_key])
 						]);
 				}
 			}
@@ -1545,7 +1548,7 @@ function insert_update_meta_fields($data, $id = 0, $meta_part = "Articles")
 						"post_id" => $id,
 						"meta_part" => strtolower($meta_part),
 						"meta_key" => $meta_key,
-						"meta_value" => (($data[$meta_key] == '' || $data[$meta_key] === null || !isset($data[$meta_key])) ? '':$data[$meta_key])
+						"meta_value" => ((!isset($data[$meta_key]) || (isset($data[$meta_key]) && ($data[$meta_key] == '' || $data[$meta_key] === null))) ? '':$data[$meta_key])
 					]);
 			}
 		}
@@ -3638,7 +3641,7 @@ function parse_GT_link($REQUESTURL)
 
 	$REQUESTURL = trim($REQUESTURL,'/');
 			
-	if ($nuke_configs['gtset'] == "1")
+	if ($nuke_configs['gtset'] == "1" && !file_exists($REQUESTURL))
 	{
 		$matched_rule = '';
 		$matched_query = '';
@@ -3665,7 +3668,7 @@ function parse_GT_link($REQUESTURL)
 						$rewrite = array_merge($rewrite, $nuke_modules_friendly_urls_cacheData[1][$parsed_url[0]]);
 				}
 				else
-					$rewrite = $nuke_modules_friendly_urls_cacheData[1]['article'];
+					$rewrite = $nuke_modules_friendly_urls_cacheData[1]['Articles'];
 
 				foreach ( (array) $rewrite as $match => $query )
 				{
@@ -3778,7 +3781,11 @@ function parse_timthumbs_str($matches)
 	foreach($output as $key => $val)
 	{
 		if($key == "src")
-			$src = base64_encode($val).".jpg";
+		{
+			$meta_data = read_media_metadata($val);
+			$file_format = (!empty($meta_data)) ? $meta_data['fileformat']:"jpg";
+			$src = base64_encode($val).".$file_format";
+		}
 		if($key == "w")
 			$dims[0] = $val;
 		if($key == "h")
@@ -3859,7 +3866,6 @@ function parse_timthumbs_args($inputs)
 	if(!empty($inputs))
 	{
 		$src = end($inputs);
-		$src = str_replace(".jpg", "", $src);
 		$timtumb_data['src'] = is_base64_encoded($src) ? base64_decode($src):$src;
 	}
 	

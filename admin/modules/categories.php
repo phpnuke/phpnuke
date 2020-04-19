@@ -42,7 +42,7 @@ if (check_admin_permission($filename))
 				"id" => "{CATID}"
 			);
 			$cats_link_deep = implode("/", category_link($cat_modulename, $cat_title, $attrs));
-			$cats_link_deep = preg_replace('#<a(.*)href="(.*)"(.*)id="(.*)">(.*)</a>#isU', '<a$1href="'.$admin_file.'.php?op=categories&module='.$cat_modulename.'&parent_id=$4"$3>$5</a>', $cats_link_deep);
+			$cats_link_deep = preg_replace('#<a(.*)href="(.*)"(.*)id="(.*)">(.*)</a>#isU', '<a$1href="'.$admin_file.'.php?op=categories&cat_modulename='.$cat_modulename.'&parent_id=$4"$3>$5</a>', $cats_link_deep);
 			
 			$cats_link_deep = " - <a href=\"".$admin_file.".php?op=categories&cat_modulename=$cat_modulename\">"._MAIN_CATS."</a>/$cats_link_deep";
 		}
@@ -57,7 +57,7 @@ if (check_admin_permission($filename))
 			$all_modules_categories_link[] = "<option value=\"".$admin_file.".php?op=categories&cat_modulename=$modules_category\" $sel>$modules_category</option>";
 		}
 		
-		$contents .= "<div align=\"center\" style=\"margin:20px 0;\">[ <a href=\"#\" title=\""._ADD_CAT."\" class=\"editindialog\" data-op=\"categories_admin\" data-catid=\"0\" data-cat_modulename=\"$cat_modulename\">"._ADD_CAT."</a> ]<br /><br />"._SHOW_MODULES_CAT." <select onchange=\"top.location.href=this.options[this.selectedIndex].value\" class=\"styledselect-select\">".implode("\n", $all_modules_categories_link)."</select></div>";
+		$contents .= "<div align=\"center\" style=\"margin:20px 0;\">[ <a href=\"#\" title=\""._ADD_CAT."\" class=\"editindialog\" data-op=\"categories_admin\" data-catid=\"0\" data-cat-modulename=\"$cat_modulename\">"._ADD_CAT."</a> ]<br /><br />"._SHOW_MODULES_CAT." <select onchange=\"top.location.href=this.options[this.selectedIndex].value\" class=\"styledselect-select\">".implode("\n", $all_modules_categories_link)."</select></div>";
 		
 		$contents .= OpenAdminTable();
 		$contents .= "
@@ -116,7 +116,7 @@ if (check_admin_permission($filename))
 						<td>".((intval($row['sub_cats']) > 0) ? "<a href=\"$module_link_to\">$cattext</a>":"$cattext")."$sub_cats</td>
 						<td align=\"center\">$module</td>
 						<td align=\"center\">
-							<a href=\"#\" title=\""._EDIT."\" class=\"table-icon icon-1 info-tooltip editindialog\" data-op=\"categories_admin\" data-catid=\"$catid\" data-module=\"$module\"></a>
+							<a href=\"#\" title=\""._EDIT."\" class=\"table-icon icon-1 info-tooltip editindialog\" data-op=\"categories_admin\" data-catid=\"$catid\" data-cat-modulename=\"$module\"></a>
 							".(($type != 1) ? "<a href=\"".$admin_file.".php?op=categories_delete&catid=$catid&cat_modulename=$module&csrf_token="._PN_CSRF_TOKEN."\" title=\""._DELETE."\" class=\"table-icon icon-2 info-tooltip\"></a>":"")."
 							<a href=\"$cat_link\" title=\""._SHOW."\" class=\"table-icon icon-7 info-tooltip\"></a>
 						</td>
@@ -135,7 +135,7 @@ if (check_admin_permission($filename))
 			{
 				e.preventDefault();
 				var catid = $(this).data('catid');
-				var cat_modulename = $(this).data('module');
+				var cat_modulename = $(this).data('cat-modulename');
 				var op = $(this).data('op');
 				$.ajax({
 					type : 'post',
@@ -187,7 +187,6 @@ if (check_admin_permission($filename))
 		if(isset($update) && $update != "" && isset($cat_fields) && is_array($cat_fields) && !empty($cat_fields))
 		{
 			$cat_fields['cattext'] = (!empty($cat_fields['cattext'])) ? phpnuke_serialize($cat_fields['cattext']):"";
-			
 			if($catid > 0)
 			{
 				if($cat_fields['parent_id'] != $catid)
@@ -227,7 +226,7 @@ if (check_admin_permission($filename))
 			cache_system("nuke_categories");
 			if($module == 'Articles') cache_system("nuke_articles_categories");
 			add_log(sprintf(_CATS_ADD_EDIT_LOG, (($catid > 0) ? _EDIT:_ADD), $catname), 1);
-			header("location: ".$admin_file.".php?op=categories&module=$module");
+			header("location: ".$admin_file.".php?op=categories&cat_modulename=$module");
 			die();
 		}
 		
@@ -454,7 +453,7 @@ if (check_admin_permission($filename))
 			categories_admin($catid, $update, $cat_fields, $cat_modulename);
 		break;
 		case "categories_delete":
-			categories_delete($catid);
+			categories_delete($catid, $cat_modulename);
 		break;
 	}
 }

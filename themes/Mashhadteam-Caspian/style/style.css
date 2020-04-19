@@ -76,7 +76,7 @@ article .post-files {clear:both;list-style:none;padding:0 !important;margin:5px 
 article .post-files li{clear:both;}
 article .post-files li a{color:#620a85 !important;}
 article .post-files li a:hover{color:#256629 !important;}
-article .meta {background: #eee;border-top: 1px solid #e0e0e0;height: 30px;}
+article .meta {clear:both;background: #eee;border-top: 1px solid #e0e0e0;height: 30px;}
 article .meta ul{float: right;list-style: none;list-style-position: inside;padding: 0px !important;}
 article .meta ul li {float: right;font-size: 10px;font-weight: bold;padding:6px;}
 article .meta .more{float: left;transition: all 0.5s ease;padding:6px;}
@@ -84,6 +84,7 @@ article .meta .more a{color:#fff!important;}
 article .meta .more:hover{background: #2e5c0b;transition: all 0.5s ease;}
 article .GSpost {margin:5px 5px;}
 article .GSpost a{display:block}
+article .GSContent {padding:8px;}
 article .GSContent img {max-width:100%;height:auto;}
 /* End Body */
 /* Start Footer */
@@ -213,3 +214,9 @@ p.jRatingInfos span.rateinfo{display:block}
 /*ltr version*/
 .body-ltr #TB_ajaxContent{text-align:left;}
 /*ltr version*/
+
+#article-more-share{clear:both;float:left;margin:30px 0;}
+#article-more-share input{float:left;direction:ltr;padding-top:8px; margin:0px -2px 0 -2px;width:250px;}@media  (max-width:385px)
+{
+	#article-more-share input{width:150px;margin-left:-15px;}
+}

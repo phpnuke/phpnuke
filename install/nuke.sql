@@ -191,6 +191,7 @@ CREATE TABLE `{NUKEPREFIX}categories` (
   `cattext` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `catdesc` text COLLATE utf8mb4_unicode_ci,
   `parent_id` int(10) NOT NULL DEFAULT '0',
+  `imported_id` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`catid`),
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -221,6 +222,7 @@ CREATE TABLE `{NUKEPREFIX}comments` (
   `last_moderation` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `status` int(1) NOT NULL DEFAULT '0',
   `reported` tinyint(1) NOT NULL DEFAULT '0',
+  `imported_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`cid`),
   KEY `pid` (`pid`),
   KEY `post_id` (`post_id`),
@@ -650,7 +652,7 @@ INSERT INTO `{NUKEPREFIX}points_groups` (`id`, `type`, `title`, `description`, `
 CREATE TABLE `{NUKEPREFIX}posts` (
   `sid` int(11) NOT NULL AUTO_INCREMENT,
   `status` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `post_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'article',
+  `post_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'articles',
   `aid` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `title` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `title_lead` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',

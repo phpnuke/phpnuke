@@ -19,7 +19,7 @@ if (!defined('ADMIN_FILE')) {
 if (check_admin_permission($module_name, false, true))
 {
 	/*********************************************************/
-	/* articles Functions                                  */
+	/* Users Functions                                  */
 	/*********************************************************/
 	define("MODULE_FILE", true);
 	include_once("modules/$module_name/includes/functions.php");

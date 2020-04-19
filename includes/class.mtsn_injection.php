@@ -32,11 +32,12 @@ class sql_inject
 	
 	function __construct($mLog=FALSE,$bdestroy_session=FALSE,$urlRedirect=FALSE)
 	{
+		global $nuke_config;
         $this->bLog = ($mLog!=FALSE) ? $mLog:'';
         $this->urlRedirect = (((trim($urlRedirect)!='') && file_exists($urlRedirect))?$urlRedirect:'');
         $this->bdestroy_session = $bdestroy_session;
         $this->rq = '';
-		$this->banning_expire = ($nuke_config['mtsn_block_ip_expire'] != 0) ? (_NOWTIME+$nuke_config['mtsn_block_ip_expire']):0;
+		$this->banning_expire = ($nuke_config['mtsn_block_ip_expire'] != 0) ? (_NOWTIME+$nuke_configs['mtsn_block_ip_expire']):0;
     }
    
 	function test($sRQ)

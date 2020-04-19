@@ -230,8 +230,8 @@ if (check_admin_permission($module_name, false, true))
 	
 		if(isset($submit) && $submit != "" && isset($feedback_reply_message) && $feedback_reply_message != '')
 		{
-			$sender_name		= isset($userinfo['username']) ? $userinfo['username']:$aid;
-			$sender_email		= isset($userinfo['user_email']) ? $userinfo['user_email']:$nuke_authors_cacheData[$aid]['email'];
+			$sender_name		= isset($row['sender_name']) ? $row['sender_name']:$aid;
+			$sender_email		= isset($row['sender_email']) ? $row['sender_email']:$nuke_authors_cacheData[$aid]['email'];
 			$nowtime = _NOWTIME;
 			$feedback_reply_message = str_replace("\n","<br />", $feedback_reply_message);
 			$subject = ""._ADMIN_REPLY_ABOUT_SUBJECT." : ".$row['subject']."";

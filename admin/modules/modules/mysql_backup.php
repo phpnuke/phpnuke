@@ -87,9 +87,9 @@ class BackupMySQL
 
 	function _GetTables()
 	{
-		global $db;
+		global $db, $pn_dbname;
 		$value = array();
-		if (!($result = $db->query('SHOW TABLES')))
+		if (!($result = $db->query("SELECT table_name, table_rows FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '$pn_dbname';")))
 		{
 			return false;
 		}
@@ -98,17 +98,10 @@ class BackupMySQL
 		{
 			foreach ($result as $row)
 			{
-				$row = array_values($row);
-				if(!empty($this->tables) && !in_array($row[0], $this->tables)) continue;
-				$result1 = $db->table($row[0])
-								->select()
-								->count();
-				if ($db->error())
-				{
-					return false;
-				}
-				
-				$value[] = $row[0].':'.$result1;
+				$table_name = $row['table_name'];
+				$table_rows = $row['table_rows'];
+				if(!empty($this->tables) && !in_array($table_name, $this->tables)) continue;				
+				$value[] = $table_name.':'.$table_rows;
 			}
 		}
 		

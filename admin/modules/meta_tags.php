@@ -186,12 +186,11 @@ if (check_admin_permission($filename))
 		
 		$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 
-		foreach($nuke_categories_cacheData as $module => $cat_data)
+		foreach($nuke_categories_cacheData as $module_name => $cat_data)
 		{
 			$new_module = '';
-			$contents .= "<tr><th rowspan=\"".(sizeof($cat_data)+2)."\">"._MODULE_FEED." $module</th><td></tr>";
-			$module_name = ($module == "article") ? "Articles":$module;
-			$module = ($module == "Articles") ? "article":$module;
+			$contents .= "<tr><th rowspan=\"".(sizeof($cat_data)+2)."\">"._MODULE_FEED." $module_name</th><td></tr>";
+
 			foreach($cat_data as $catid => $catdata)
 			{
 				$catname_url = filter($catdata['catname_url'], "nohtml");
@@ -206,9 +205,9 @@ if (check_admin_permission($filename))
 				$catlink_arr = category_link($module_name, $cat_title, $attrs, 3);
 				$catlink = rtrim(end($catlink_arr), "/")."/feed/";
 				
-				if($new_module != $module)
+				if($new_module != $module_name)
 				{
-					$new_module = $module;
+					$new_module = $module_name;
 				}
 				
 				$contents .= "<tr>

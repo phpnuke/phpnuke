@@ -135,7 +135,7 @@ if(($main_module == "" && $modname == '') || $modname != $_REQUEST['modname'])
 	$html_output .= "<p align=\"center\">"._NOMODULE_EXISTS."</p>";
 	include("footer.php");
 }
-elseif($main_module != '' && $modname == '' || $modname != $_REQUEST['modname'])// is in home
+elseif($main_module != '' && (trim($REQUESTURL,"/") == '' || in_array($REQUESTURL, array("index.php","index.html","index.htm"))))// is in home
 {
 	$modname = $main_module;
 	define('INDEX_FILE', true);

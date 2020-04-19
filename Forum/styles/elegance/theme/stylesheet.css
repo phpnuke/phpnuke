@@ -308,6 +308,7 @@ ul ul ul {
 .logo:hover {
 	text-decoration: none;
 }
+.site-logo {background:url('images/logo_hd.png') no-repeat; height:120px;}
 .site-description h1,
 .site-description p.sitename {
 	margin-left: 0;
@@ -4965,6 +4966,7 @@ ul.linklist.bulletin > li.small-icon.icon-team:before {
 	.navbar.tabbed .nav-tabs .tab {
 		border-radius: 0 !important;
 	}
+	.site-logo {background:url('images/logo.png') no-repeat; height:60px;width:140px;}
 	.site-description {
 		float: none;
 		width: auto;

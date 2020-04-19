@@ -157,10 +157,10 @@ if (check_admin_permission($filename))
 	
 	function nav_menus_admin($nav_id=0, array $nav_fields, array $nav_menu_fields, $mode='add_nav')
 	{
-		global $db, $admin_file, $nuke_configs, $pagetitle, $theme_setup, $nuke_articles_categories_cacheData;
+		global $db, $admin_file, $nuke_configs, $pagetitle, $theme_setup;
 		
 		$nav_id = intval($nav_id);
-		
+		$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 		$theme_nav_menus = (isset($theme_setup['theme_nav_menus'])) ? $theme_setup['theme_nav_menus']:array();
 		
 		// add menu to a nav
@@ -196,8 +196,8 @@ if (check_admin_permission($filename))
 				{
 					foreach($nav_categories as $cat_id => $cat_text)
 					{
-						$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($cat_id, $nuke_articles_categories_cacheData, "parent_id", "catname_url"))), "nohtml"), array("/"));
-						$insert_values[] = array($new_increment_nid, $nav_id, $cat_text, $nav_menu_fields['type'], $nav_menu_fields['module'], $cat_id, LinkToGT("index.php?modname=Articles&category=$cat_link"));
+						$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($cat_id, $nuke_categories_cacheData[$nav_menu_fields['module']], "parent_id", "catname_url"))), "nohtml"), array("/"));
+						$insert_values[] = array($new_increment_nid, $nav_id, $cat_text, $nav_menu_fields['type'], $nav_menu_fields['module'], $cat_id, LinkToGT("index.php?modname=".$nav_menu_fields['module']."&category=$cat_link"));
 						$new_increment_nid++;
 					}
 				}
@@ -481,11 +481,11 @@ if (check_admin_permission($filename))
 		$walker = new Walker_nav_categories;
 		foreach($nuke_categories_cacheData as $module => $nuke_categories_cacheData_val)
 		{
-			foreach ($nuke_categories_cacheData_val as $key => &$nuke_articles_categorie) {
-				$nuke_articles_categorie['cattext'] = category_lang_text($nuke_articles_categorie['cattext']);
-				$nuke_articles_categorie = (object)$nuke_articles_categorie;
+			foreach ($nuke_categories_cacheData_val as $key => &$nuke_categories_cacheData_value) {
+				$nuke_categories_cacheData_value['cattext'] = category_lang_text($nuke_categories_cacheData_value['cattext']);
+				$nuke_categories_cacheData_value = (object)$nuke_categories_cacheData_value;
 			}
-			$args = array($nuke_categories_cacheData_val, 'catid', 'parent_id', $max_depth, $args);
+			$argsnew = array($nuke_categories_cacheData_val, 'catid', 'parent_id', $max_depth, $args);
 
 			$categories_output .= "
 									<div class=\"beefup nav_select\" id=\"nav_cats_select-$module\">
@@ -495,7 +495,7 @@ if (check_admin_permission($filename))
 
 										<div class=\"beefup__body\">
 											<ul class=\"categories_select checktree\" data-module=\"$module\">
-												".call_user_func_array(array($walker, "walk"), $args)."
+												".call_user_func_array(array($walker, "walk"), $argsnew)."
 											</ul>
 											<input data-label=\""._CHECKALL."\" type=\"checkbox\" class=\"styled select-all\" data-element=\"#nav_cats_select-$module\">
 											<div class=\"single-field\">
@@ -667,7 +667,7 @@ if (check_admin_permission($filename))
 	}
 	
 	$op = (isset($op)) ? filter($op, "nohtml"):'';
-	$mode = (isset($mode)) ? filter($mode, "nohtml"):'Articles';
+	$mode = (isset($mode)) ? filter($mode, "nohtml"):'';
 	$nav_fields = (isset($nav_fields)) ? $nav_fields:array();
 	$nav_menu_fields = (isset($nav_menu_fields)) ? $nav_menu_fields:array();
 	$nav_id = (isset($nav_id)) ? intval($nav_id):0;

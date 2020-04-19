@@ -472,6 +472,7 @@ function credit_response($tid, $credit_gateway='')
 			unset($gateway_class);
 			include("modules/$module_name/includes/gateways/".$row['gateway'].".php");
 			$func_name = $row['gateway']."_gateway";
+			
 			if(class_exists("$func_name"))
 			{
 				$gateway_class = new $func_name();
@@ -483,7 +484,7 @@ function credit_response($tid, $credit_gateway='')
 					$new_user_credit = $user_credit+$row['amount'];
 					
 					user_credit_update($userinfo['user_id'], $new_user_credit);
-
+					$userinfo = $users_system->getuserinfo(true);
 					$update_data = array(
 						"status" => _CREDIT_STATUS_OK,
 						"update_time" => _NOWTIME,
@@ -520,7 +521,7 @@ function credit_response($tid, $credit_gateway='')
 					{
 						$user_credits_allowed = user_credits_allowed();
 						if($user_credits_allowed > 0)
-						{							
+						{
 							$user_credit = $new_user_credit-$row['amount'];
 							
 							user_credit_update($userinfo['user_id'], $user_credit);
@@ -540,6 +541,7 @@ function credit_response($tid, $credit_gateway='')
 								"order_part" => (isset($row['order_part'])) ? $row['order_part']:"",
 								"order_id" => (isset($row['order_id'])) ? $row['order_id']:"",
 								"order_link" => (isset($row['order_link'])) ? $row['order_link']:"",
+								"order_data" => phpnuke_serialize($order_data),
 							);
 							
 							$result = $db->table(TRANSACTIONS_TABLE)
@@ -587,6 +589,7 @@ function credit_response($tid, $credit_gateway='')
 									"order_part" => $row['order_part'],
 									"order_id" => $row['order_id'],
 									"order_link" => $row['order_link'],
+									"order_data" => phpnuke_serialize($order_data),
 								);
 								
 								$last_user_credit = ($user_credit+$order_data['reward']);
@@ -685,7 +688,7 @@ switch($op)
 	break;
 	
 	case"credit_response":
-		credit_response($tid);
+		credit_response($tid, $credit_gateway);
 	break;
 	
 	case"credit_view":

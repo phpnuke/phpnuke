@@ -24,7 +24,7 @@ global $nuke_configs, $db, $block_global_contents;
 
 $params = array();
 
-$querylang = "WHERE status = 'publish' AND post_type = 'article'";
+$querylang = "WHERE status = 'publish' AND post_type = 'Articles'";
 
 if ($nuke_configs['multilingual'] == 1) {
     $querylang .= " AND (alanguage=:currentlang OR alanguage=:alanguage)";

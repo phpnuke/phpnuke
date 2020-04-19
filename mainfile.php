@@ -147,7 +147,7 @@ require_once(INCLUDE_PATH."/functions.php");
 require_once("config.php");
 
 $request_url = (isset($_SERVER['REQUEST_URI'])) ?  $_SERVER['REQUEST_URI']:((isset($_SERVER['SCRIPT_URL'])) ? $_SERVER['SCRIPT_URL']:"");
-if(preg_match("#/thumbs/(.*)\.jpg$#i", $request_url, $matches))
+if(preg_match("#/thumbs/(.*)\.(jpg|png|bmp|gif)$#i", $request_url, $matches))
 {
 	$timthumbs_data = parse_timthumbs_args($matches[1]);
 	$QUERY_STRING = array();
@@ -522,11 +522,6 @@ else
 
 $nuke_configs['nukecdnurl'] = (isset($nuke_configs['nukecdnurl']) && $nuke_configs['nukecdnurl'] != '') ? $nuke_configs['nukecdnurl']:$nuke_configs['nukeurl'];
 
-
-$PingOptimizer = new PingOptimizer();
-
-$PingOptimizer->phpnuke_FuturePing();
-
 /* define languages */
 if ((isset($datetype)) && !isset($captcha))
 {
@@ -600,6 +595,8 @@ foreach($nuke_languages[$nuke_configs['currentlang']] as $nuke_language_key => $
 		define($nuke_language_key, $nuke_language_val);
 }
 unset($nuke_languages);
+
+$PingOptimizer = new PingOptimizer();
 
 if(_DIRECTION == "rtl")
 {

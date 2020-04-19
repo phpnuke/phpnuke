@@ -26,7 +26,7 @@ $content = "";
 	
 $content .= "<div class=\"text-center\"><font class=\"content\">"._SELECTMONTH2VIEW."</font><br><br></div>";
 $result = $db->table(POSTS_TABLE)
-				->where('post_type', 'article')
+				->where('post_type', 'Articles')
 				->order_by(['time' => 'DESC'])
 				->select();
 $content .= "<ul>";

@@ -577,6 +577,7 @@ if (check_admin_permission($filename)) {
 				showhide_box : '"._SHOW_HIDE."',
 				add_block : '"._ADD_BLOCK."',
 			};
+			var pn_csrf_token = '"._PN_CSRF_TOKEN."';
 		</script>
 				
 		<script src=\"admin/template/js/jquery/jquery.blocks.js\" type=\"text/javascript\"></script>

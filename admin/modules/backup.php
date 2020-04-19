@@ -226,7 +226,7 @@ if (check_admin_permission($filename)) {
 		foreach($table_details as $key => $val)
 		{
 			$val = explode(":", $val);
-			$contents .= "<option value=\"$val[0]\" style=\"direction:ltr;text-align:left;\">$val[0] &nbsp;&nbsp;($val[1] "._ROW.")</option>";
+			$contents .= "<option value=\"$val[0]\" style=\"direction:ltr;text-align:left;\">$val[0]</option>";
 		}
 		$contents .= "</select>
 		<script src=\"includes/Ajax/jquery/jquery.multi-select.js\" type=\"text/javascript\"></script>

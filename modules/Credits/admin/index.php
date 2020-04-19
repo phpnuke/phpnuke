@@ -821,32 +821,32 @@ if (check_admin_permission($module_name, false, true))
 				{
 					$transfer_amount1 = $transfer_amount2 = 0;
 					
-					$target_user_credits_allowed = user_credits_allowed($user_id);
+					$user_credits_allowed = user_credits_allowed($user_id);
 					
-					if($target_user_credits_allowed > 0)
+					if($user_credits_allowed > 0)
 					{
 						$transfer_amount1 = $transfer_amount2 = $credits_amount;
 						
 						if(isset($credits_fields['credit_all']) && $credits_fields['credit_all'] == 1)
 						{
-							$transfer_amount1 = $transfer_amount2 = $target_user_credits_allowed;
+							$transfer_amount1 = $transfer_amount2 = $user_credits_allowed;
 							$user_credit = $user_credit-$transfer_amount1;
 							$target_user_credit = $target_user_credit+$transfer_amount2;
 						}
-						elseif($target_user_credits_allowed < $credits_amount)
+						elseif($user_credits_allowed < $credits_amount)
 						{
 							switch(intval($credits_fields['credit_transfer_type']))
 							{
 								case"1":
-									$transfer_amount1 = $transfer_amount2 = $target_user_credits_allowed;
+									$transfer_amount1 = $transfer_amount2 = $user_credits_allowed;
 									$user_credit = $user_credit-$transfer_amount1;
 									$target_user_credit = $target_user_credit+$transfer_amount2;
 								break;
 								case"2":
 									$transfer_amount1 = $credits_amount;
-									$transfer_amount2 = $target_user_credits_allowed;
+									$transfer_amount2 = $user_credits_allowed;
 									$user_credit = $user_credit-$credits_amount;
-									$target_user_credit = $target_user_credit+$target_user_credits_allowed;
+									$target_user_credit = $target_user_credit+$user_credits_allowed;
 								break;
 								case"3":
 									$transfer_amount1 = $transfer_amount2 = $credits_amount;

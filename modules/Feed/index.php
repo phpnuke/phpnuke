@@ -27,21 +27,16 @@ function get_feed_data($module_args)
 	
 	$feeds_data = array();
 	
-	$module_args['name'] = (isset($module_args['name']) && is_active($module_args['name'])) ? $module_args['name']:"Articles";
-
-	$module_args['name'] = filter($module_args['name'], "nohtml");
+	$module_feed_function = (isset($module_args['main_module'])) ? ((is_active($module_args['main_module'])) ? strtolower($module_args['main_module'])."_feed":"articles_feed"):"articles_feed";
+	$post_type = (isset($module_args['main_module']) && $module_args['main_module'] != 'Articles') ? $module_args['main_module']:'Articles';
 	
-	if(function_exists($module_args['name']."_feed"))
-	{
-		eval('$module_feed_func = "'.$module_args['name'].'_feed";');
-		
-		$feeds_data = $module_feed_func($module_args);
-	}
+	if(function_exists($module_feed_function))
+		$feeds_data = $module_feed_function($module_args, $post_type);
 	
 	return $feeds_data;
 }
 
-function feed($module_link = 'article', $mode = 'ATOM')
+function feed($module_link = 'Articles', $mode = 'ATOM')
 {
 	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $nuke_authors_cacheData;
 
@@ -49,13 +44,6 @@ function feed($module_link = 'article', $mode = 'ATOM')
 		$mode = 'atom';
 	
 	$module_args = parse_GT_link($module_link);
-	
-	$module_args[0]['name'] = (isset($module_args[0]['name']) && $module_args[0]['name'] != '') ? $module_args[0]['name']:"Articles";
-
-	eval('$link_validateor_function = "is_valid_'.$module_args[0]['name'].'_link";');
-	
-	if(!$link_validateor_function($module_args[0]))
-		die_error("404");
 	
 	$feeds_data = get_feed_data($module_args[0]);
 
@@ -66,7 +54,7 @@ function feed($module_link = 'article', $mode = 'ATOM')
 
 	$now = date('Y-m-d\TH:i:s+00:00',_NOWTIME);
 
-	eval('$rss_ver = ucfirst($mode);');
+	$rss_ver = ucfirst($mode);
 	
 	//Creating an instance of RSS1 class.
 	$TestFeed = new $rss_ver();
@@ -197,7 +185,6 @@ function sitemap()
 <'.$maintag.' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/'.$xsi_link.'" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 	
 	$result = $db->table(POSTS_TABLE)
-				->where('post_type', 'article')
 				->order_by(['time', 'DESC'])
 				->limit(0,1)
 				->select(['time']);
@@ -251,22 +238,25 @@ function sitemap()
 			}
 		}
 		
-		if(is_active("Articles") && $site_last_modified > 0)
+		if($site_last_modified > 0)
 		{
-			global $nuke_articles_categories_cacheData;
+			$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 			$array_contents = array();
 			
-			foreach($nuke_articles_categories_cacheData as $key => $val)
+			foreach($nuke_categories_cacheData as $module_name => $cat_data)
 			{
-				$catid = get_category_id($module, $val['catname_url'], $nuke_articles_categories_cacheData);	
-				$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($key, $nuke_articles_categories_cacheData, "parent_id", "catname_url"))), "nohtml"), array("/"))."/";
-				$cat_link = LinkToGT("index.php?modname=Articles&category=$cat_link");
-				$contents .="<url>
-					<loc>".$cat_link."</loc>
-						<lastmod>" . date('Y-m-d\TH:i:s+00:00',$site_last_modified) . "</lastmod>
-						<changefreq>weekly</changefreq>
-					<priority>0.5</priority>
-				</url>";
+				foreach($cat_data as $key => $val)
+				{
+					$catid = get_category_id($module, $val['catname_url'], $cat_data);	
+					$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($key, $cat_data, "parent_id", "catname_url"))), "nohtml"), array("/"))."";
+					$cat_link = LinkToGT("index.php?modname=$module_name&category=$cat_link");
+					$contents .="<url>
+						<loc>".$cat_link."</loc>
+							<lastmod>" . date('Y-m-d\TH:i:s+00:00',$site_last_modified) . "</lastmod>
+							<changefreq>weekly</changefreq>
+						<priority>0.5</priority>
+					</url>";
+				}
 			}
 		}
 	}
@@ -294,9 +284,9 @@ function sitemap()
 				}
 			}		
 		}
-		elseif(preg_match("#Articles#isU", $module))
+		else
 		{
-			$result = $db->query("SELECT sid, title, time, post_url, cat_link from ".POSTS_TABLE." WHERE post_type = 'article' AND time >= '$currenttime' AND time < '$nexttime' order by time DESC");
+			$result = $db->query("SELECT sid, title, time, post_url, cat_link from ".POSTS_TABLE." WHERE post_type = '$module' AND time >= '$currenttime' AND time < '$nexttime' order by time DESC");
 			if(intval($db->count()) > 0)
 			{
 				$rows = $result->results();
@@ -307,7 +297,7 @@ function sitemap()
 					$post_url = $row['post_url'];
 					$time = $row['time'];
 					$cat_link = $row['cat_link'];
-					$link = LinkToGT(articleslink($sid, $title, $post_url, $time, $cat_link));
+					$link = LinkToGT(articleslink($sid, $title, $post_url, $time, $cat_link, $module));
 					$contents .='<url>
 						<loc>'.$link.'</loc>
 						<lastmod>'.date('Y-m-d\TH:i:s+00:00',$time).'</lastmod>
@@ -324,30 +314,42 @@ function sitemap()
 			<loc>'.LinkToGT("sitemap-misc.xml").'</loc>
 			<lastmod>'.date('Y-m-d\TH:i:s+00:00',$site_last_modified).'</lastmod>
 		</sitemap>';
-		if(is_active("Articles") && $site_last_modified > 0)
+		if($site_last_modified > 0)
 		{
 			$result = $db->table(POSTS_TABLE)
-						->where('post_type', 'article')
+						->where('status', 'publish')
 						->order_by(['time' => 'DESC'])
-						->select(['time']);
+						->select(['post_type','time']);
 			if(intval($db->count()) > 0)
 			{
 				$thismonth = "";
 				$rows = $result->results();
+				$all_modules_sitemap = array();
 				foreach($rows as $row)
 				{
 					$time = $row['time'];
-					$dateTimes_year = date("Y",$time);
-					$dateTimes_month = date("m",$time);
-					if ($dateTimes_month != $thismonth)
+					$post_type = $row['post_type'];
+					$year_month = date("Y-m",$time);
+					if(!isset($all_modules_sitemap[$post_type][$year_month]))
 					{
-						$contents .='<sitemap>
-							<loc>'.LinkToGT('sitemap-Articles-'.$dateTimes_year.'-'.$dateTimes_month.'.xml').'</loc>
+						$all_modules_sitemap[$post_type][$year_month] ='<sitemap>
+							<loc>'.LinkToGT('sitemap-'.$post_type.'-'.$year_month.'.xml').'</loc>
 							<lastmod>'.date('Y-m-d\TH:i:s+00:00',$time).'</lastmod>
 						</sitemap>';
-						$thismonth = $dateTimes_month;
 					}
 				}
+				unset($rows);
+				
+				if(!empty($all_modules_sitemap))
+				{
+					ksort($all_modules_sitemap);
+					foreach($all_modules_sitemap as $post_type => $sitemap_dates)
+					{
+						foreach($sitemap_dates as $sitemap_data)
+							$contents .= $sitemap_data;
+					}
+				}
+				unset($all_modules_sitemap);
 			}
 		
 			$result = $db->table(TAGS_TABLE)

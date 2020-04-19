@@ -189,9 +189,12 @@ $contents .= "\n\t\t".implode("\n\t\t", $meta_contents);
 // microdata settings
 function show_microdata_as_json(&$meta_tags)
 {
-	global $block_global_contents, $nuke_configs, $nuke_authors_cacheData, $modname, $op, $nuke_articles_categories_cacheData;
+	global $block_global_contents, $nuke_configs, $nuke_authors_cacheData, $modname, $op, $main_module;
 	
 	$admin_name = "admin";
+	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
+	
+	$nuke_categories_cacheData = isset($nuke_categories_cacheData[$main_module]) ? $nuke_categories_cacheData[$main_module]:array();
 	
 	$now = date('Y-m-d\TH:i:s+00:00',$meta_tags['time']);
 	
@@ -292,9 +295,9 @@ function show_microdata_as_json(&$meta_tags)
 	
 	if($modname == 'Articles' && $op == "article_show" && isset($block_global_contents['article_link']))
 	{
-		if($block_global_contents['catname_link'] != 'uncategorized')
+		if(isset($block_global_contents['cat_link']) && $block_global_contents['catname_link'] != 'uncategorized' && isset($nuke_categories_cacheData[$block_global_contents['cat_link']]))
 		{
-			$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($block_global_contents['cat_link'], $nuke_articles_categories_cacheData, "parent_id", "catname_url"))), "nohtml"), array("/"));
+			$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($block_global_contents['cat_link'], $nuke_categories_cacheData, "parent_id", "catname_url"))), "nohtml"), array("/"));
 			$meta_tags['breadcrumb'][] = array(
 				"@type" => "ListItem",
 				"position" => $breadcrumb_pos,
@@ -302,7 +305,7 @@ function show_microdata_as_json(&$meta_tags)
 					"@type" => "WebPage",
 					"@id" => LinkToGT("index.php?modname=Articles&category=$cat_link"),
 					"url" => LinkToGT("index.php?modname=Articles&category=$cat_link"),
-					"name" => category_lang_text($nuke_articles_categories_cacheData[$block_global_contents['cat_link']]['cattext']),
+					"name" => category_lang_text($nuke_categories_cacheData[$block_global_contents['cat_link']]['cattext']),
 				)
 			);
 			$breadcrumb_pos++;

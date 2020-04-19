@@ -198,7 +198,7 @@ class csrfProtector
 		//currently for same origin only
 		if($must_validate)
 		{
-			if (!isset($method[self::$config['CSRFP_TOKEN']]))
+			if (!isset($_REQUEST[self::$config['CSRFP_TOKEN']]))
 				self::failedValidationAction();
 
 			if (!$pn_Sessions->exists(self::$config['CSRFP_TOKEN']))
@@ -216,7 +216,7 @@ class csrfProtector
 				$token = $token_data['token'];
 				$token_time = $token_data['time'];
 			
-				if($method[self::$config['CSRFP_TOKEN']] === $token)
+				if($_REQUEST[self::$config['CSRFP_TOKEN']] === $token)
 				{
 					$csrf_token_time = (isset($nuke_configs['csrf_token_time']) && $nuke_configs['csrf_token_time'] != '') ? $nuke_configs['csrf_token_time']:(30*60);
 

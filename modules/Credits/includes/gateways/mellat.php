@@ -73,7 +73,7 @@ class mellat_gateway{
 	function create_form($tid, $form_data){
 		global $db, $module_name, $nuke_configs, $pn_credits_config;
 		
-		$redirect = LinkToGT("index.php?modname=$module_name&op=credit_response&tid=$tid&credit_gateway=".$this->gateway_name."");
+		$redirect = $nuke_configs['nukeurl']."index.php?modname=$module_name&op=credit_response&tid=$tid&credit_gateway=".$this->gateway_name."&csrf_token="._PN_CSRF_TOKEN."";
 		
 		include_once(INCLUDE_PATH."/nusoap.php");
 		$client = new nusoap_client($this->gwebservice);
@@ -130,14 +130,14 @@ class mellat_gateway{
             return $this->response;
         }
 		$parameters = array(
-			'terminalId' => $register_settings['gateways_configs'][$this->gateway_name]['terminalId'],
-			'userName' => $register_settings['gateways_configs'][$this->gateway_name]['userName'],
-			'userPassword' => $register_settings['gateways_configs'][$this->gateway_name]['userPassword'],
+			'terminalId' => $pn_credits_config['gateways'][$this->gateway_name]['terminalId'],
+			'userName' => "".$pn_credits_config['gateways'][$this->gateway_name]['userName']."",
+			'userPassword' => "".$pn_credits_config['gateways'][$this->gateway_name]['userPassword']."",
 			'orderId' => $factor_number,
 			'saleOrderId' => $SaleOrderId,
 			'saleReferenceId' => $SaleReferenceId
 		);
-				
+		
 		if($ResCode == 0)
 		{
 			try{
@@ -166,7 +166,7 @@ class mellat_gateway{
 				}
 				
 				unset($result);
-				$result = $client->call('bpSettleRequest',$params,self::namespace);
+				$result = $client->call('bpSettleRequest',$parameters,$this->namespace);
 				$error = $client->getError();
 				if($error){
 					$this->response['error_code'] = 1004;

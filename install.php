@@ -147,7 +147,7 @@ function upgrade_header($step = 1, $progress = 0)
 	echo"<!DOCTYPE html>
 <html lang=\"en\">
 <head>
-	<title>نصب نيوک فارسي 8.4</title>
+	<title>نصب نيوک فارسي 8.4.2</title>
 	<meta charset=\"UTF-8\">
 	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
 	<link href=\"includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\">
@@ -288,6 +288,7 @@ function step_db()
 						<label class=\"control-label col-sm-4\" for=\"pn_db_forumname\">تالار گفتمان:</label>
 						<div class=\"col-sm-8\" id=\"have_forum\">
 							<input type=\"radio\" name=\"db_fields[db_have_forum]\" value=\"1\" /> فعال
+							<input type=\"radio\" name=\"db_fields[db_have_forum]\" value=\"2\" /> صرفاً انتقال کاربران
 							<input type=\"radio\" name=\"db_fields[db_have_forum]\" value=\"0\" checked /> غیر فعال
 						</div>
 					</div>
@@ -354,7 +355,7 @@ function step_db()
 	<script>
 	$(document).ready(function(){
 		$(\"#have_forum\").find('input').click(function(){
-			if($(this).val() == 1)
+			if($(this).val() != 0)
 				$(\".have_forum\").show();
 			else
 				$(\".have_forum\").hide();
@@ -635,7 +636,7 @@ function step_admin_info()
 	echo"
 	<form role=\"form\" class=\"form-horizontal\" id=\"nukeform\" action=\"install.php?step=install\" method=\"post\">
 		<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
+			<div class=\"wizard-card\" data-cardname=\"group\" style=\"height: 300px;\">
 				<h3>$step_title</h3>
 				<div class=\"wizard-input-section\">";
 					if($install_options['mode'] == 'install')
@@ -676,6 +677,12 @@ function step_admin_info()
 						<label class=\"control-label col-sm-4\" for=\"old_site_link\">آدرس سایت قبلی:</label>
 						<div class=\"col-sm-8\">
 							<input type=\"text\" class=\"form-control\" id=\"old_site_link\" name=\"install_fields[old_site_link]\" />
+						</div>
+					</div>
+					<div class=\"form-group\">
+						<label class=\"control-label col-sm-4\" for=\"old_site_path\">مسیر فایلهای نیوک 8.3:</label>
+						<div class=\"col-sm-8\">
+							<input type=\"text\" class=\"form-control\" id=\"old_site_path\" name=\"install_fields[old_site_path]\" />
 						</div>
 					</div>
 					<div class=\"form-group\">
@@ -800,60 +807,58 @@ function step_install()
 	upgrade_header(6, (($install_options['mode'] == 'install') ? 100:90));
 
 	echo"
-	<form role=\"form\" class=\"form-horizontal\" id=\"nukeform\" action=\"install.php?step=install\" method=\"post\">
-		<div class=\"wizard-card-container\" style=\"height: 326px;\">
-			<div class=\"wizard-card\" data-cardname=\"group\">
-				<h3>نصب سیستم</h3>
-				<div class=\"wizard-input-section\">
-					<div class=\"alert alert-success\">
-						<span class=\"create-server-name\"></span>جداول نیوک شما <strong>با موفقیت نصب شد.</strong>
-					</div>";
-					/*<table width=\"100%\">
-						<tr>
-							<th class=\"text-center\" style=\"width:40%\">عنوان</th>
-							<th class=\"text-center\" style=\"width:15%\">در حال کار</th>
-							<th class=\"text-center\" style=\"width:15%\">انجام شده</th>
-							<th class=\"text-center\" style=\"width:15%\">باقیمانده</th>
-							<th class=\"text-center\" style=\"width:15%\">کل</th>
-						</tr>
-						<tr>
-							<td>تعداد ردیف</td>
-							<td id=\"line-session\" align=\"center\">".$result['lines_this']."</td>
-							<td id=\"line-done\" align=\"center\">".$result['lines_done']."</td>
-							<td id=\"line-togo\" align=\"center\">".$result['lines_togo']."</td>
-							<td id=\"line-total\" align=\"center\">".$result['lines_tota']."</td>
-						</tr>
-						<tr>
-							<td>تعداد کوئری</td>
-							<td id=\"query-session\" align=\"center\">".$result['queries_this']."</td>
-							<td id=\"query-done\" align=\"center\">".$result['queries_done']."</td>
-							<td id=\"query-togo\" align=\"center\">".$result['queries_togo']."</td>
-							<td id=\"query-total\" align=\"center\">".$result['queries_tota']."</td>
-						</tr>
-						<tr>
-							<td>حجم اطلاعات Byte</td>
-							<td id=\"byte-session\" align=\"center\" dir=\"ltr\">".$result['bytes_this']."</td>
-							<td id=\"byte-done\" align=\"center\" dir=\"ltr\">".$result['bytes_done']."</td>
-							<td id=\"byte-togo\" align=\"center\" dir=\"ltr\">".$result['bytes_togo']."</td>
-							<td id=\"byte-total\" align=\"center\" dir=\"ltr\">".$result['bytes_tota']."</td>
-						</tr>
-					</table><br /><br />*/
-					echo"<p align=\"center\">";
-					if($install_options['mode'] == 'install')
-					{
-					echo"
-					<meta http-equiv=\"refresh\" content=\"5;URL='install.php?op=final'\" />";
-					}
-					else
-					{
-					echo"
-					<form action=\"install.php?op=first\" method=\"post\"><input class=\"btn btn-default\" type=\"submit\" value=\"ادامه بروزرسانی\" /></form>";
-					}
-				echo"</p>
-				</div>
+	<div class=\"wizard-card-container\" style=\"height: 326px;\">
+		<div class=\"wizard-card\" data-cardname=\"group\">
+			<h3>نصب سیستم</h3>
+			<div class=\"wizard-input-section\">
+				<div class=\"alert alert-success\">
+					<span class=\"create-server-name\"></span>جداول نیوک شما <strong>با موفقیت نصب شد.</strong>
+				</div>";
+				/*<table width=\"100%\">
+					<tr>
+						<th class=\"text-center\" style=\"width:40%\">عنوان</th>
+						<th class=\"text-center\" style=\"width:15%\">در حال کار</th>
+						<th class=\"text-center\" style=\"width:15%\">انجام شده</th>
+						<th class=\"text-center\" style=\"width:15%\">باقیمانده</th>
+						<th class=\"text-center\" style=\"width:15%\">کل</th>
+					</tr>
+					<tr>
+						<td>تعداد ردیف</td>
+						<td id=\"line-session\" align=\"center\">".$result['lines_this']."</td>
+						<td id=\"line-done\" align=\"center\">".$result['lines_done']."</td>
+						<td id=\"line-togo\" align=\"center\">".$result['lines_togo']."</td>
+						<td id=\"line-total\" align=\"center\">".$result['lines_tota']."</td>
+					</tr>
+					<tr>
+						<td>تعداد کوئری</td>
+						<td id=\"query-session\" align=\"center\">".$result['queries_this']."</td>
+						<td id=\"query-done\" align=\"center\">".$result['queries_done']."</td>
+						<td id=\"query-togo\" align=\"center\">".$result['queries_togo']."</td>
+						<td id=\"query-total\" align=\"center\">".$result['queries_tota']."</td>
+					</tr>
+					<tr>
+						<td>حجم اطلاعات Byte</td>
+						<td id=\"byte-session\" align=\"center\" dir=\"ltr\">".$result['bytes_this']."</td>
+						<td id=\"byte-done\" align=\"center\" dir=\"ltr\">".$result['bytes_done']."</td>
+						<td id=\"byte-togo\" align=\"center\" dir=\"ltr\">".$result['bytes_togo']."</td>
+						<td id=\"byte-total\" align=\"center\" dir=\"ltr\">".$result['bytes_tota']."</td>
+					</tr>
+				</table><br /><br />*/
+				echo"<p align=\"center\">";
+				if($install_options['mode'] == 'install')
+				{
+				echo"
+				<meta http-equiv=\"refresh\" content=\"5;URL='install.php?op=final'\" />";
+				}
+				else
+				{
+				echo"
+				<form action=\"install.php?op=first\" method=\"post\"><input class=\"btn btn-default\" type=\"submit\" value=\"ادامه بروزرسانی\" /></form>";
+				}
+			echo"</p>
 			</div>
 		</div>
-	</form>";
+	</div>";
 	upgrade_footer();
 }
 
@@ -1025,11 +1030,13 @@ function upgrade_progress_output($pagetitle = '', $total_rows = 0, $fetched_rows
 				</div> 
 				<a class=\"btn btn-default\" href=\"".$install_options['admininfo']['admin_filename'].".php\">ورود به مدیریت</a>  
 				<a class=\"btn btn-default\" href=\"".$install_options['siteinfo']['nukeurl']."\">نمایش سایت</a>";
-				if(isset($install_options['db_info']['db_have_forum']) && $install_options['db_info']['db_have_forum'] != 0)
+				if(isset($install_options['db_info']['db_have_forum']) && $install_options['db_info']['db_have_forum'] == 1)
 				{
 					echo"<a class=\"btn btn-default\" target=\"_blank\" href=\"".$install_options['siteinfo']['nukeurl'].$install_options['db_info']['db_forumpath']."/install/\">".(($install_options['mode'] == 'install') ? "نصب":"بروزرسانی")." تالار گفتمان</a>";
 				}
-			echo"</div>";
+			echo"
+			<div align=\"center\" style=\"margin-top:30px;\"><a href=\"http://www.phpnuke.ir/Donate_us/\"><button type=\"button\" class=\"btn btn-info\"><i class=\"fa fa-usd\"></i> حمایت از ما <i class=\"fa fa-usd\"></i></button></a></div>
+			</div>";
 		}
 	echo"</div>";
 	upgrade_footer();
@@ -1250,30 +1257,12 @@ function upgrade_first()
 		}
 	}
 	
-	// update nuke_categories
-	$db->query("set names 'latin1'");
-	$insert_query = array();
-	$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_topics`");
-	if(intval($result->count()) > 0)
-	{
-		$rows = $result->results();
-		foreach($rows as $row)
-		{
-			$insert_query[] = array($row['topicid'],0,'Articles',$row['topicname'],$row['topicimage'],$row['topictext'],$row['parent_id']);
-		}
-		$insert_query[] = array('Null', 1, 'Articles', 'uncategorized', '', 'uncategorized', 0);
-
-		$db->query("set names '$pn_dbcharset'");
-		if(isset($insert_query) && !empty($insert_query))
-			$db->table(CATEGORIES_TABLE)->multiinsert(array("catid","type","module","catname","catimage","cattext","parent_id"),$insert_query);
-	}
-	
 	// update nuke_config	
 	$when_query = array();
 	$insert_query = array();
 	$params_index = array();
 	$query_IN = array();
-	$feedback_configs = $nuke_configs['feedbacks'];
+	$feedback_configs = (isset($nuke_configs['feedbacks']) && !empty($nuke_configs['feedbacks']) && !is_array($nuke_configs['feedbacks'])) ? phpnuke_unserialize($nuke_configs['feedbacks']):$nuke_configs['feedbacks'];
 	$feedback_configs['depts'] = array();
 	
 	$db->query("set names 'latin1'");
@@ -1350,6 +1339,16 @@ function upgrade_first()
 				$db->table(CONFIG_TABLE)->multiinsert(array("config_name","config_value"),$insert_query);
 		}
 	}
+	$db->table(CONFIG_TABLE)
+		->where('config_name', 'Default_Theme')
+		->update([
+			"config_value" => "Mashhadteam-Caspian"
+		]);
+	$db->table(CONFIG_TABLE)
+		->where('config_name', 'multilingual')
+		->update([
+			"config_value" => "1"
+		]);
 
 	// update nuke_headlines
 	$db->query("set names 'latin1'");
@@ -1636,11 +1635,11 @@ function upgrade_first()
 			</div>
 		</div>
 	</div>
-	<meta http-equiv=\"refresh\" content=\"5;URL='install.php?op=comments'\" />";
+	<meta http-equiv=\"refresh\" content=\"5;URL='install.php?op=cateogories'\" />";
 	upgrade_footer();
 }
 
-function upgrade_comments($start = 0)
+function upgrade_cateogories()
 {
 	global $db, $nuke_configs, $cache, $pn_dbcharset, $module;
 	
@@ -1649,157 +1648,96 @@ function upgrade_comments($start = 0)
 		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
 	}
 	
-	$modules_comments = array(
-		"stories_comments" => array(
-			"module_id" => "sid",
-			"new_module_id" => "sid",
-			"module_name" => "Articles",
-			"module_table" => "stories",
-			"module_title" => "title",
-			"progress_link" => "install.php?op=comments&start={NEW_START}",
-			"finish_link" => "install.php?op=comments&module=pages_comments",
-		),
-		"pages_comments" => array(
-			"module_id" => "pid",
-			"new_module_id" => "sid",
-			"module_name" => "Surveys",
-			"module_table" => "pages",
-			"module_title" => "title",
-			"progress_link" => "install.php?op=comments&module=pages_comments&start={NEW_START}",
-			"finish_link" => "install.php?op=comments&module=products_comments",
-		),
-		"products_comments" => array(
-			"module_id" => "sid",
-			"new_module_id" => "sid",
-			"module_name" => "products",
-			"module_table" => "products",
-			"module_title" => "title",
-			"progress_link" => "install.php?op=comments&module=products_comments&start={NEW_START}",
-			"finish_link" => "install.php?op=comments&module=pollcomments",
-		),
-		"pollcomments" => array(
-			"module_id" => "pollID",
-			"new_module_id" => "pollID",
-			"module_name" => "Surveys",
-			"module_table" => "poll_desc",
-			"module_title" => "pollTitle",
-			"progress_link" => "install.php?op=comments&module=pollcomments&start={NEW_START}",
-			"finish_link" => "install.php?op=comments&module=staticpages_comments",
-		),
-		"staticpages_comments" => array(
-			"module_id" => "pid",
-			"new_module_id" => "sid",
-			"module_name" => "static",
-			"module_table" => "staticpages",
-			"module_title" => "title",
-			"progress_link" => "install.php?op=comments&module=staticpages_comments&start={NEW_START}",
-			"finish_link" => "install.php?op=feedbacks",
-		),
-	);
-	
-	$module = (isset($module) && $module != '' && $module != 'stories_comments') ? $module:"stories_comments";
-	
-	$module_id = $modules_comments[$module]['module_id'];
-	$new_module_id = $modules_comments[$module]['new_module_id'];
-	$module_name = $modules_comments[$module]['module_name'];
-	$module_table = $modules_comments[$module]['module_table'];
-	$module_title = $modules_comments[$module]['module_title'];
-	$finish_link = $modules_comments[$module]['finish_link'];
-	$progress_link = $modules_comments[$module]['progress_link'];
-	
-	$run_per_step = 500;
-	// update nuke_comments
+	// update nuke_categories for articles
 	$db->query("set names 'latin1'");
-	$result1 = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_comments_config` WHERE code = '1'");
-	if(intval($result1->count()) > 0)
-	{
-		$rows1 = $result1->results();
-		foreach($rows1 as $row1)
-		{
-			if(preg_match("#name#isU", $row1['name']))
-				$comments_config[$row1['cfid']] = 'name';
-				
-			if(preg_match("#email#isU", $row1['name']))
-				$comments_config[$row1['cfid']] = 'email';
-				
-			if(preg_match("#website#isU", $row1['name']))
-				$comments_config[$row1['cfid']] = 'url';
-				
-			if(preg_match("#url#isU", $row1['name']))
-				$comments_config[$row1['cfid']] = 'url';
-		}
-	}
-
-	$result2 = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."_fildes`");
-	if(intval($result2->count()) > 0)
-	{
-		$rows2 = $result2->results();
-		foreach($rows2 as $row2)
-		{
-			if(!isset($comments_config[$row2['cfid']]))
-				continue;
-			$fields[$row2['tid']][$comments_config[$row2['cfid']]] = $row2['cfvalue'];
-		}
-	}
-
 	$insert_query = array();
-	$result = $db->query("SELECT t.*, s.$module_title as post_title, s.$module_id as post_id, (SELECT COUNT(tid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."` as t LEFT JOIN `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module_table."` as s ON s.$module_id = t.$module_id ORDER BY tid ASC LIMIT $start, $run_per_step");
-	$fetched_rows = intval($result->count());
-	
-	if($fetched_rows > 0)
+	$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_topics`");
+	if(intval($result->count()) > 0)
 	{
 		$rows = $result->results();
-		$all_rows = array();
-		$total_rows_set = false;
 		foreach($rows as $row)
 		{
-			if(!$total_rows_set)
-			{
-				$cache->store('total_rows', intval($row['total_rows']));
-				unset($row['total_rows']);
-				$total_rows_set = true;
-			}
-			$all_rows[$row['tid']] = $row;
+			$insert_query[] = array($row['topicid'],0,'Articles',$row['topicname'],$row['topicimage'],$row['topictext'],$row['topictext'],$row['parent_id'],$row['topicid']);
 		}
-		
-		unset($rows);
-		
-		if(!empty($all_rows))
-		{
-			foreach($all_rows as $row)
-			{
-				$main_parent = ($row['pid'] != 0) ? get_main_childs_parent($all_rows, $row['pid'], 'pid'):0;
-				$insert_query[$row['tid']] = array(
-					'pid' => $row['pid'], 
-					'main_parent' => $main_parent, 
-					'module' => $module_name,
-					"$new_module_id" => $row['post_id'],
-					'post_title' => $row['post_title'],
-					'date' => $row['date'],
-					'name' => ((isset($fields[$row['tid']]['name']) && $fields[$row['tid']]['name'] != '') ? $fields[$row['tid']]['name']:$row['name']),
-					'email' => ((isset($fields[$row['tid']]['email']) && $fields[$row['tid']]['email'] != '') ? $fields[$row['tid']]['email']:$row['email']),
-					'url' => ((isset($fields[$row['tid']]['url']) && $fields[$row['tid']]['url'] != '') ? $fields[$row['tid']]['url']:$row['url']),
-					'host_name' => $row['host_name'],
-					'comment' => $row['comment'],
-					'score' => $row['score'],
-					'reason' => $row['reason'],
-					'act' => $row['act']
-				);
-				
-			}
-		}
-		
-		$db->query("set names '$pn_dbcharset'");
-		if(isset($insert_query) && !empty($insert_query))
-			$db->table(COMMENTS_TABLE)->multiinsert(array("pid","main_parent","module","post_id","post_title","date","name","email","url","ip","comment","score","reason","status"),$insert_query);
+		$insert_query[] = array('Null', 1, 'Articles', 'uncategorized', '', 'uncategorized', 'uncategorized', 0, 0);
 	}
 	
-	$new_start = $start+$run_per_step;
-	$total_rows = $cache->retrieve('total_rows');
+	// update nuke_categories for downloads
+	$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_downloads_categories`");
+	if(intval($result->count()) > 0)
+	{
+		$insert_query[] = array('Null', 1, 'Downloads', 'uncategorized', '', 'uncategorized', 'uncategorized', 0, 0);
+		$rows = $result->results();
+		foreach($rows as $row)
+		{
+			$insert_query[] = array('Null', 0,'Downloads',$row['title'],'',$row['cdescription'],$row['cdescription'],$row['parentid'],$row['cid']);
+		}
+	}
 	
-	$progress_link = str_replace("{NEW_START}", $new_start, $progress_link);
+	// update nuke_categories for faqs
+	$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_faqcategories`");
+	if(intval($result->count()) > 0)
+	{
+		$insert_query[] = array('Null', 1, 'Faqs', 'uncategorized', '', 'uncategorized', 'uncategorized', 0, 0);
+		$rows = $result->results();
+		foreach($rows as $row)
+		{
+			$insert_query[] = array('Null', 0,'Faqs',$row['categories'],'',$row['categories'],$row['categories'],0,$row['id_cat']);
+		}
+	}
 	
-	upgrade_progress_output("انتقال نظرات", $total_rows, $fetched_rows, $start, $finish_link, $progress_link, 16, $run_per_step);
+	// update nuke_categories for Pages
+	$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_pages_categories`");
+	if(intval($result->count()) > 0)
+	{
+		$insert_query[] = array('Null', 1, 'Pages', 'uncategorized', '', 'uncategorized', 'uncategorized', 0, 0);
+		$rows = $result->results();
+		foreach($rows as $row)
+		{
+			$insert_query[] = array('Null', 0,'Pages',$row['title'],'',$row['title'],$row['description'],0,$row['cid']);
+		}
+	}
+	
+	// update nuke_categories for Products
+	/*$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_products_topics`");
+	if(intval($result->count()) > 0)
+	{
+		$insert_query[] = array('Null', 1, 'Products', 'uncategorized', '', 'uncategorized', 'uncategorized', 0, 0);
+		$rows = $result->results();
+		foreach($rows as $row)
+		{
+			$insert_query[] = array('Null', 0,'Products',$row['topicname'],$row['topicimage'],$row['topictext'],$row['topictext'],$row['parent_id'],$row['topicid']);
+		}
+	}*/
+	
+	// update nuke_categories for Gallery
+	$insert_query[] = array('Null', 1, 'Gallery', 'uncategorized', '', 'uncategorized', 'uncategorized', 0, 0);
+	$insert_query[] = array('Null', 0, 'Gallery', 'gallery', '', 'gallery', 'gallery', 0, 0);
+	
+	$insert_query[] = array('Null', 1, 'Statics', 'uncategorized', '', 'uncategorized', 'uncategorized', 0, 0);
+	$insert_query[] = array('Null', 0, 'Statics', 'statics', '', 'statics', 'statics', 0, 0);
+
+	$db->query("set names '$pn_dbcharset'");
+	if(isset($insert_query) && !empty($insert_query))
+		$db->table(CATEGORIES_TABLE)->multiinsert(array("catid","type","module","catname","catimage","cattext","catdesc","parent_id","imported_id"),$insert_query);
+	
+	upgrade_header(7, 95);
+	echo"<div class=\"wizard-card\">
+		<h3>بروزرسانی سیستم</h3>
+		<div class=\"wizard-input-section\">
+			<p>سیستم در حال نصب می باشد شکیبا باشید<br /><br /></p>
+			انتقال موضوعات : مطالب، دانلودها، گالری، مقالات و سؤالات متداول
+			<div class=\"progress\">
+				<div class=\"progress-bar progress-bar-info progress-bar-striped active\" role=\"progressbar\" aria-valuenow=\"100\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:100%\"></div>
+			</div>
+			کل عملیات بروزرسانی
+			<div class=\"progress\">
+				<div class=\"progress-bar progress-bar-primary progress-bar-striped active\" role=\"progressbar\" aria-valuenow=\"6\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:6%\"></div>
+			</div>
+		</div>
+	</div>
+	<meta http-equiv=\"refresh\" content=\"5;URL='install.php?op=feedbacks'\" />";
+	upgrade_footer();
 }
 
 function upgrade_feedbacks($start)
@@ -1824,6 +1762,7 @@ function upgrade_feedbacks($start)
 		
 		if(!empty($rows))
 			$total_rows_set = false;
+			$timer = 1;
 			foreach($rows as $row)
 			{
 				if(!$total_rows_set)
@@ -1832,7 +1771,8 @@ function upgrade_feedbacks($start)
 					unset($row['total_rows']);
 					$total_rows_set = true;
 				}
-				$insert_query[] = array($row['fid'],$row['sender_name'],$row['sender_email'],$row['subject'],$row['message'],$row['responsibility'],$row['replys'],_NOWTIME);
+				$insert_query[] = array($row['fid'],$row['sender_name'],$row['sender_email'],$row['subject'],$row['message'],$row['responsibility'],$row['replys'],(_NOWTIME+$timer));
+				$timer++;
 			}
 
 		$db->query("set names '$pn_dbcharset'");
@@ -1879,7 +1819,7 @@ function upgrade_feedbacks($start)
 	$new_start = $start+$transfer_counter;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال پیامهای ارتباط با ما", $total_rows, $fetched_rows, $start, "install.php?op=ipbans", "install.php?op=feedbacks&start=$new_start", 30, $transfer_counter);
+	upgrade_progress_output("انتقال پیامهای ارتباط با ما", $total_rows, $fetched_rows, $start, "install.php?op=ipbans", "install.php?op=feedbacks&start=$new_start", 12, $transfer_counter);
 }
 /*
 function upgrade_mtsn($start)
@@ -1960,7 +1900,7 @@ function upgrade_ipbans($start)
 	$new_start = $start+$run_per_step;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال آی پی های مسدود شده", $total_rows, $fetched_rows, $start, "install.php?op=reports", "install.php?op=ipbans&start=$new_start", 40, $run_per_step);
+	upgrade_progress_output("انتقال آی پی های مسدود شده", $total_rows, $fetched_rows, $start, "install.php?op=reports", "install.php?op=ipbans&start=$new_start", 18, $run_per_step);
 }
 
 function upgrade_reports($start)
@@ -2002,7 +1942,7 @@ function upgrade_reports($start)
 	$new_start = $start+$run_per_step;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال گزارشات", $total_rows, $fetched_rows, $start, "install.php?op=scores", "install.php?op=reports&start=$new_start", 48, $run_per_step);
+	upgrade_progress_output("انتقال گزارشات", $total_rows, $fetched_rows, $start, "install.php?op=scores", "install.php?op=reports&start=$new_start", 24, $run_per_step);
 }
 
 function upgrade_scores($start)
@@ -2032,7 +1972,7 @@ function upgrade_scores($start)
 				unset($row['total_rows']);
 				$total_rows_set = true;
 			}
-			$insert_query[] = array($row['id'], $row['sid'],'articles',$row['rating_ip'],$row['score'],$row['user_id'],$row['gust']);
+			$insert_query[] = array($row['id'], $row['sid'],'Articles',$row['rating_ip'],$row['score'],$row['user_id'],$row['gust']);
 		}
 		
 		if(isset($insert_query) && !empty($insert_query))
@@ -2042,7 +1982,7 @@ function upgrade_scores($start)
 	$new_start = $start+$run_per_step;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال امتیازات اخبار", $total_rows, $fetched_rows, $start, "install.php?op=statistics", "install.php?op=scores&start=$new_start", 56, $run_per_step);
+	upgrade_progress_output("انتقال امتیازات اخبار", $total_rows, $fetched_rows, $start, "install.php?op=statistics", "install.php?op=scores&start=$new_start", 30, $run_per_step);
 }
 
 function upgrade_statistics($start = 0)
@@ -2165,7 +2105,7 @@ function upgrade_statistics($start = 0)
 	
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال آمار سایت", $total_rows, $fetched_rows, $start, "install.php?op=tags", "install.php?op=statistics&start=$new_start", 64, $run_per_step);
+	upgrade_progress_output("انتقال آمار سایت", $total_rows, $fetched_rows, $start, "install.php?op=tags", "install.php?op=statistics&start=$new_start", 36, $run_per_step);
 }
 
 function upgrade_tags($start)
@@ -2207,7 +2147,7 @@ function upgrade_tags($start)
 	$new_start = $start+$run_per_step;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال کلمات کلیدی", $total_rows, $fetched_rows, $start, "install.php?op=articles", "install.php?op=tags&start=$new_start", 72, $run_per_step);
+	upgrade_progress_output("انتقال کلمات کلیدی", $total_rows, $fetched_rows, $start, "install.php?op=articles", "install.php?op=tags&start=$new_start", 42, $run_per_step);
 }
 
 function upgrade_articles($start)
@@ -2217,7 +2157,13 @@ function upgrade_articles($start)
 	if(!$cache->isCached('install_options'))
 	{
 		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
-	}	
+	}
+	
+	$install_options = $cache->retrieve('install_options');
+	$install_options = phpnuke_unserialize($install_options);
+	
+	$old_site_path = $install_options['admininfo']['old_site_path'];
+	
 	$run_per_step = 500;
 	// update nuke_articles
 	$db->query("set names 'latin1'");
@@ -2226,23 +2172,6 @@ function upgrade_articles($start)
 	$meta_keys = array();
 	
 	$default_cols = array("sid","aid","title","time","hometext","bodytext","newslevel","news_group","newsurl","comments","counter","topic","informant","notes","ihome","alanguage","acomm","haspoll","pollID","score","ratings","rating_ip","position","story_pass","topic_link");
-	
-	$stories_cols = $cache->retrieve("stories_table_cols");
-	
-	if($stories_cols != '')
-		$stories_cols = phpnuke_unserialize($stories_cols);
-
-	if(empty($stories_cols))
-	{
-		$structure = $db->query("DESCRIBE `".OLD_DB."`.`".OLD_DB_PREFIX."_stories`");
-		$str_rows = $structure->results();
-		foreach($str_rows as $key => $val)
-		{
-			if(!in_array($val['Field'], $default_cols))
-				$stories_cols[$val['Field']] = $val;
-		}
-		$cache->store('stories_table_cols', phpnuke_serialize($stories_cols));
-	}
 	
 	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:$run_per_step;
 		
@@ -2275,18 +2204,28 @@ function upgrade_articles($start)
 				
 				$post_url = trim(sanitize(str2url($newsurl)), "-");
 				$post_url = get_unique_post_slug(POSTS_TABLE, "sid", $row['sid'], "post_url", $post_url, 'publish');
+				
+				$post_image = '';
+				$old_post_image = "$old_site_path/files/News/".$row['sid'].".jpg";
+				$new_post_image = "files/Articles/".$row['sid'].".jpg";
+				if(file_exists($old_post_image))
+				{
+					if(copy($old_post_image, $new_post_image))
+						$post_image = $new_post_image;
+				}
+				
 				if($row['notes'] != '') 
 					$row['notes'] = str_replace(":", ",", $row['notes']);
 				$row['comments'] = ($row['comments'] < 0) ? 0:$row['comments'];
 				$row['ihome'] = ($row['ihome'] == 0) ? 1:0;
 				$row['acomm'] = ($row['acomm'] == 0) ? 1:0;
 				
-				$insert_query[] = array($row['sid'], 'publish', 'article', $row['aid'],$row['title'],$row['time'],$row['hometext'],$row['bodytext'],$post_url,$row['comments'],$row['counter'],$row['topic'],$row['informant'],$row['notes'],$row['ihome'],$row['alanguage'],$row['acomm'],$row['position'],$row['story_pass'],$row['topic_link'],$row['newslevel'],$row['score'],$row['ratings']);
+				$insert_query[] = array($row['sid'], 'publish', 'Articles', $row['aid'],$row['title'],$row['time'],$row['hometext'],$row['bodytext'],$post_url,$row['comments'],$row['counter'],$row['topic'],$row['informant'],$row['notes'],$row['ihome'],$row['alanguage'],$row['acomm'],$row['position'],$row['story_pass'],$row['topic_link'],$row['newslevel'],$row['score'],$row['ratings'],$post_image);
 			}
 			
 			$db->query("set names '$pn_dbcharset'");
 			
-			$new_cols = array("sid","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings");
+			$new_cols = array("sid","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings","post_image");
 			
 			if(isset($insert_query) && !empty($insert_query))
 				$db->table(POSTS_TABLE)->multiinsert($new_cols,$insert_query);
@@ -2340,7 +2279,7 @@ function upgrade_articles($start)
 	$new_start = $start+$transfer_counter;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال مطالب", $total_rows, $fetched_rows, $start, "install.php?op=staticpages", "install.php?op=articles&start=$new_start&transfer_counter=$transfer_counter", 80, $transfer_counter);
+	upgrade_progress_output("انتقال مطالب", $total_rows, $fetched_rows, $start, "install.php?op=staticpages", "install.php?op=articles&start=$new_start&transfer_counter=$transfer_counter", 48, $transfer_counter);
 }
 
 function upgrade_staticpages($start)
@@ -2350,15 +2289,21 @@ function upgrade_staticpages($start)
 	if(!$cache->isCached('install_options'))
 	{
 		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
-	}	
+	}
+		
+	$cat_result = $db->table(CATEGORIES_TABLE)
+						->where('module', 'Statics')
+						->select(['catid']);
+						
+	if($cat_result->count() > 0)
+		$statics_cat = $cat_result->results()[0]['catid'];
+	
 	$run_per_step = 500;
 	// update nuke_articles
 	$db->query("set names 'latin1'");
 	$insert_query = array();
 	
 	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:$run_per_step;
-	
-	$last_article_sid = $cache->retrieve('last_article_sid');
 
 	$default_admin = $cache->retrieve('default_admin', false);
 	
@@ -2372,6 +2317,7 @@ function upgrade_staticpages($start)
 		if(!empty($rows))
 		{
 			$total_rows_set = false;
+			$timer = 1;
 			foreach($rows as $row)
 			{
 				if(!$total_rows_set)
@@ -2381,20 +2327,17 @@ function upgrade_staticpages($start)
 					$total_rows_set = true;
 				}
 				
-				$last_article_sid++;
-				$row['pid'] = $last_article_sid;
-				
 				$post_url = trim(sanitize(str2url($row['title'])), "-");
-				$post_url = get_unique_post_slug(POSTS_TABLE, "sid", $row['pid'], "post_url", $post_url, 'publish');
+				$post_url = get_unique_post_slug(POSTS_TABLE, "sid", $pid, "post_url", $post_url, 'publish', false, "AND post_type = 'Statics'");
 				if($row['notes'] != '') 
 					$row['notes'] = str_replace(":", ",", $row['notes']);
 				$row['comments'] = ($row['comments'] < 0) ? 0:$row['comments'];
 				$row['ihome'] =  1;
 				$row['acomm'] = 1;
+				$cat_link = $statics_cat;
 				
-				$row['status'] = ($row['active'] == 1) ? "publish":"pending";
-				
-				$insert_query[] = array($row['pid'], $row['status'], 'static', $default_admin,$row['title'],_NOWTIME,'',$row['text'],$post_url,$row['comments'],$row['counter'],1,$default_admin,$row['notes'],$row['ihome'],$row['alanguage'],$row['acomm'],1,'',1,0,0,0);
+				$insert_query[] = array($row['pid'], 'publish', 'Statics', $default_admin,$row['title'],(_NOWTIME+$timer),'',$row['text'],$post_url,$row['comments'],$row['counter'],$cat_link,$default_admin,$row['notes'],$row['ihome'],$row['alanguage'],$row['acomm'],1,'',$cat_link,0,0,0);
+				$timer++;
 			}
 			
 			$db->query("set names '$pn_dbcharset'");
@@ -2442,11 +2385,849 @@ function upgrade_staticpages($start)
 		die();
 	}
 	
-	$cache->store('last_article_sid', $db->lastInsertid());
 	$new_start = $start+$transfer_counter;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال صفحات ثابت", $total_rows, $fetched_rows, $start, "install.php?op=forum", "install.php?op=staticpages&start=$new_start&transfer_counter=$transfer_counter", 80, $transfer_counter);
+	upgrade_progress_output("انتقال صفحات ثابت", $total_rows, $fetched_rows, $start, "install.php?op=gallery", "install.php?op=staticpages&start=$new_start&transfer_counter=$transfer_counter", 54, $transfer_counter);
+}
+
+function upgrade_gallery($start)
+{
+	global $db, $nuke_configs, $cache, $pn_dbcharset, $pn_dbname, $gallery_insert;
+	
+	if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+	
+	$install_options = $cache->retrieve('install_options');
+	$install_options = phpnuke_unserialize($install_options);
+	
+	$default_admin = $cache->retrieve('default_admin', false);
+	$old_site_path = $install_options['admininfo']['old_site_path'];
+	
+	if(!file_exists("files/Gallery/"))
+		mkdir("files/Gallery/", 0777);
+	
+	$gallery_cat = 0;
+	$gallery_insert = isset($gallery_insert) ? intval($gallery_insert):0;
+	
+	$cat_result = $db->table(CATEGORIES_TABLE)
+						->where('module', 'Gallery')
+						->select(['catid']);
+						
+	if($cat_result->count() > 0)
+		$gallery_cat = $cat_result->results()[0]['catid'];
+
+	$run_per_step = 20;
+	// update Gallery
+	$db->query("set names 'latin1'");
+	$insert_query = array();
+	if($cache->isCached("gallery_posts") && $start == 0 && $gallery_insert!= 1)
+		$cache->erase('gallery_posts');
+		
+	$gallery_posts = ($cache->isCached('gallery_posts')) ? $cache->retrieve('gallery_posts', false):array();
+	
+	$result = $db->query("SELECT g.id_cat, g.categories as title, g.catpic as post_image, gp.dateadd as time, gp.picdec as hometext, gp.pictname, gp.picname, gp.count as counter,(SELECT COUNT(g2.id_cat) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_mtgalcat` as g2 LEFT JOIN `".OLD_DB."`.`".OLD_DB_PREFIX."_mtgalpic` as gp2 ON g2.id_cat = gp2.id_cat ) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_mtgalcat` as g LEFT JOIN `".OLD_DB."`.`".OLD_DB_PREFIX."_mtgalpic` as gp ON g.id_cat = gp.id_cat ORDER BY g.id_cat ASC LIMIT $start, $run_per_step");
+	$fetched_rows = intval($result->count());
+
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+
+		if(!empty($rows))
+		{
+			$total_rows_set = false;
+			foreach($rows as $row)
+			{
+				if(!$total_rows_set)
+				{
+					$cache->store('total_rows', intval($row['total_rows']));
+					unset($row['total_rows']);
+					$total_rows_set = true;
+				}
+				$id_cat = $row['id_cat'];
+				
+				if(!isset($gallery_posts[$id_cat]))
+				{
+					$gallery_posts[$id_cat]['title'] = $row['title'];
+					$gallery_posts[$id_cat]['cat_id'] = $gallery_cat;
+					$gallery_posts[$id_cat]['counter'] = 0;
+					$gallery_posts[$id_cat]['download'] = array();
+					$post_url = trim(sanitize(str2url($row['title'])), "-");
+					$gallery_posts[$id_cat]['post_url'] = get_unique_post_slug(POSTS_TABLE, "sid", '', "post_url", $post_url, 'publish', false, "AND post_type = 'Gallery'");
+					
+					if(!file_exists("files/Gallery/".$id_cat.""))
+						mkdir("files/Gallery/".$id_cat."", 0777);
+						
+					$old_post_image = "$old_site_path/modules/MT-Gallery/images/".$row['post_image']."";
+					$new_post_image = "files/Gallery/".$id_cat."/".$row['post_image']."";
+					if(file_exists($old_post_image))
+					{
+						if(copy($old_post_image, $new_post_image))
+						{
+							$gallery_posts[$id_cat]['post_image'] = $new_post_image;
+						}
+					}
+					$gallery_posts[$id_cat]['time'] = (isset($row['time'])) ? $row['time']:_NOWTIME;
+					$gallery_posts[$id_cat]['hometext'] = $row['hometext'];
+				}
+				$old_image_path = "$old_site_path/modules/MT-Gallery/images/".$row['pictname']."";
+				$new_image_path = "files/Gallery/".$id_cat."/".$row['pictname']."";
+				if(file_exists($old_image_path) && !is_dir($old_image_path))
+				{
+					if(copy($old_image_path, $new_image_path))
+					{
+						$gallery_posts[$id_cat]['counter']+=$row['counter'];
+						$gallery_posts[$id_cat]['download'][] = array(
+							$row['picname'],
+							$new_image_path,
+							filesize($new_image_path),
+							'',
+							'images'
+						);
+					}
+				}
+			}
+			
+			$cache->store('gallery_posts', $gallery_posts);
+		}
+	}
+	
+	if(isset($gallery_insert) && $gallery_insert== 1 && isset($gallery_posts) && !empty($gallery_posts))
+	{
+		foreach($gallery_posts as $imported_id => $row)
+			$insert_query[] = array('NULL','publish','Gallery',$default_admin,$row['title'],$row['time'],$row['hometext'],'',$row['post_url'],0,$row['counter'],$row['cat_id'],$default_admin,'',1,'',1,1,'',$row['cat_id'],0,0,0, ((isset($row['download']) && !empty($row['download'])) ? phpnuke_serialize($row['download']):""), $imported_id);
+			
+		$db->query("set names '$pn_dbcharset'");
+		$new_cols = array("sid","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings", 'download', 'imported_id');
+		
+		if(isset($insert_query) && !empty($insert_query))
+		{
+			$db->table(POSTS_TABLE)->multiinsert($new_cols,$insert_query);
+			
+			$cache->erase('gallery_posts');
+		}
+			
+		upgrade_progress_output("انتقال گالری تصاویر", 100, 0, 0, "install.php?op=downloads", "", 60, 100);
+		die();
+	}
+	
+	$new_start = $start+$run_per_step;
+	$total_rows = $cache->retrieve('total_rows');
+	
+	upgrade_progress_output("انتقال گالری تصاویر", $total_rows, $fetched_rows, $start, "install.php?op=gallery&gallery_insert=1", "install.php?op=gallery&start=$new_start", 60, $run_per_step);
+}
+
+function upgrade_downloads($start)
+{
+	global $db, $nuke_configs, $cache, $transfer_counter, $pn_dbcharset, $pn_dbname;
+	
+	if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+	
+	$download_cats = array();
+	
+	$cat_result = $db->table(CATEGORIES_TABLE)
+						->where('module', 'Downloads')
+						->select(['catid', 'parent_id', 'imported_id']);
+	if($cat_result->count() > 0)
+	{
+		$cat_rows = $cat_result->results();
+		foreach($cat_rows as $cat_row)
+		{
+			$download_cats[$cat_row['imported_id']] = array('catid' => $cat_row['catid'], 'parent_id' => $cat_row['parent_id']);
+		}
+	}	
+	
+	$run_per_step = 500;
+	// update nuke_articles
+	$db->query("set names 'latin1'");
+	$insert_query = array();
+	
+	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:$run_per_step;
+	
+	$last_article_sid = $cache->retrieve('last_article_sid');
+
+	$default_admin = $cache->retrieve('default_admin', false);
+	
+	$result = $db->query("SELECT *, (SELECT COUNT(lid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_downloads_downloads`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_downloads_downloads` ORDER BY lid ASC LIMIT $start, $transfer_counter");
+	$fetched_rows = intval($result->count());
+
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+
+		if(!empty($rows))
+		{
+			$total_rows_set = false;
+			foreach($rows as $row)
+			{
+				if(!$total_rows_set)
+				{
+					$cache->store('total_rows', intval($row['total_rows']));
+					unset($row['total_rows']);
+					$total_rows_set = true;
+				}
+				
+				$cat_link = (isset($download_cats[$row['cid']]['catid'])) ? $download_cats[$row['cid']]['catid']:0;
+				
+				$post_url = trim(sanitize(str2url($row['title'])), "-");
+				$post_url = get_unique_post_slug(POSTS_TABLE, "sid", '', "post_url", $post_url, 'publish', false, "AND post_type = 'downloads'");
+				$download = array();
+				$download[] = array('فایل',$row['url'],$row['filesize'], "ویرایش ".(($row['version'] != 0) ? $row['version']:1), 'files');
+				
+				$insert_query[] = array($row['lid'], 'publish', 'Downloads', $default_admin,$row['title'],$row['date'],$row['description'],'',$post_url,0,$row['hits'],$cat_link,$default_admin,'',1,'',1,1,'',$cat_link,0,0,0, phpnuke_serialize($download));
+			}
+			
+			$db->query("set names '$pn_dbcharset'");
+			
+			$new_cols = array("imported_id","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings","download");
+			
+			if(isset($insert_query) && !empty($insert_query))
+				$db->table(POSTS_TABLE)->multiinsert($new_cols,$insert_query);
+		}
+	}
+	
+	$errors = $db->getErrors('last');
+	if(isset($errors['message']) && ($errors['message'] == "MySQL server has gone away" || stristr($errors['message'], "max_allowed_packet")))
+	{
+		upgrade_header(7, 95);
+		echo"
+		<form role=\"form\" class=\"form-horizontal\" id=\"nukeform\" action=\"install.php?op=downloads".((isset($start) && $start != 0) ? "&start=$start":"")."\" method=\"post\">
+			<div class=\"wizard-card-container\" style=\"height: 326px;\">
+				<div class=\"wizard-card\" data-cardname=\"group\">
+					<h3>بروزرسانی سیستم</h3>
+					<div class=\"wizard-error\">
+						<div class=\"alert alert-danger\">	<strong>خطا :</strong> حجم اطلاعات شما بالا می باشد و سرور قادر به انتقال تعداد $transfer_counter مطلب در هر بار نمی باشد. لطفاً تعداد انتقال را با توجه به حجم مطالبتان پایین بیاورید. .</div>
+					</div>
+					<div class=\"wizard-input-section\">
+						<div class=\"form-group\">
+							<label class=\"control-label col-sm-4\" for=\"transfer_counter\">تعداد مطلب قابل انتقال:</label>
+							<div class=\"col-sm-8\">
+								<input type=\"text\" class=\"form-control\" id=\"transfer_counter\" name=\"transfer_counter\" value=\"$transfer_counter\" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class=\"wizard-footer\">
+				<div class=\"wizard-buttons-container\">
+					<div class=\"btn-group-single pull-left\">
+						<a href=\"javascript:history.go(-1)\"><button class=\"btn wizard-back\" type=\"button\">قبلی</button></a>
+						<input class=\"btn wizard-next btn-primary\" type=\"submit\" value=\"بعدی\" />
+					</div>
+				</div>
+			</div>
+			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" />
+		</form>";
+		upgrade_footer();
+		die();
+	}
+	
+	$new_start = $start+$transfer_counter;
+	$total_rows = $cache->retrieve('total_rows');
+	
+	upgrade_progress_output("انتقال فایلهای بخش دانلود", $total_rows, $fetched_rows, $start, "install.php?op=pages", "install.php?op=downloads&start=$new_start&transfer_counter=$transfer_counter", 66, $transfer_counter);
+}
+
+function upgrade_pages($start)
+{
+	global $db, $nuke_configs, $cache, $transfer_counter, $pn_dbcharset, $pn_dbname;
+	
+	if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+	
+	$pages_cats = array();
+	
+	$cat_result = $db->table(CATEGORIES_TABLE)
+						->where('module', 'Pages')
+						->select(['catid', 'parent_id', 'imported_id']);
+	if($cat_result->count() > 0)
+	{
+		$cat_rows = $cat_result->results();
+		foreach($cat_rows as $cat_row)
+		{
+			$pages_cats[$cat_row['imported_id']] = array('catid' => $cat_row['catid'], 'parent_id' => $cat_row['parent_id']);
+		}
+	}
+	
+	$run_per_step = 100;
+	// update nuke_articles
+	$db->query("set names 'latin1'");
+	$insert_query = array();
+	
+	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:$run_per_step;
+	
+	$last_article_sid = $cache->retrieve('last_article_sid');
+
+	$default_admin = $cache->retrieve('default_admin', false);
+	
+	$result = $db->query("SELECT *, (SELECT COUNT(pid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_pages`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_pages` ORDER BY pid ASC LIMIT $start, $transfer_counter");
+	$fetched_rows = intval($result->count());
+
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+
+		if(!empty($rows))
+		{
+			$total_rows_set = false;
+			foreach($rows as $row)
+			{
+				if(!$total_rows_set)
+				{
+					$cache->store('total_rows', intval($row['total_rows']));
+					unset($row['total_rows']);
+					$total_rows_set = true;
+				}
+				
+				$cat_link = (isset($pages_cats[$row['cid']]['catid'])) ? $pages_cats[$row['cid']]['catid']:0;
+				
+				$post_url = trim(sanitize(str2url($row['title'])), "-");
+				$post_url = get_unique_post_slug(POSTS_TABLE, "sid", '', "post_url", $post_url, 'publish', false, "AND post_type = 'pages'");
+				
+				$hometext = $row['subtitle']."<br />".$row['page_header'];
+				$bodytext = $row['text']."<br />".$row['page_footer']."<br />";
+				$tags = str_replace(":",",", $row['signature']);
+								
+				$insert_query[] = array($row['pid'], 'publish', 'Pages', $default_admin,$row['title'],$row['date'],$hometext,$bodytext,$post_url,0,$row['counter'],$cat_link,$default_admin,$tags,1,'',1,1,'',$cat_link,0,0,0);
+			}
+			
+			$db->query("set names '$pn_dbcharset'");
+			
+			$new_cols = array("imported_id","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings");
+			
+			if(isset($insert_query) && !empty($insert_query))
+				$db->table(POSTS_TABLE)->multiinsert($new_cols,$insert_query);
+		}
+	}
+	
+	$errors = $db->getErrors('last');
+	if(isset($errors['message']) && ($errors['message'] == "MySQL server has gone away" || stristr($errors['message'], "max_allowed_packet")))
+	{
+		upgrade_header(7, 95);
+		echo"
+		<form role=\"form\" class=\"form-horizontal\" id=\"nukeform\" action=\"install.php?op=pages".((isset($start) && $start != 0) ? "&start=$start":"")."\" method=\"post\">
+			<div class=\"wizard-card-container\" style=\"height: 326px;\">
+				<div class=\"wizard-card\" data-cardname=\"group\">
+					<h3>بروزرسانی سیستم</h3>
+					<div class=\"wizard-error\">
+						<div class=\"alert alert-danger\">	<strong>خطا :</strong> حجم اطلاعات شما بالا می باشد و سرور قادر به انتقال تعداد $transfer_counter مطلب در هر بار نمی باشد. لطفاً تعداد انتقال را با توجه به حجم مطالبتان پایین بیاورید. .</div>
+					</div>
+					<div class=\"wizard-input-section\">
+						<div class=\"form-group\">
+							<label class=\"control-label col-sm-4\" for=\"transfer_counter\">تعداد مطلب قابل انتقال:</label>
+							<div class=\"col-sm-8\">
+								<input type=\"text\" class=\"form-control\" id=\"transfer_counter\" name=\"transfer_counter\" value=\"$transfer_counter\" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class=\"wizard-footer\">
+				<div class=\"wizard-buttons-container\">
+					<div class=\"btn-group-single pull-left\">
+						<a href=\"javascript:history.go(-1)\"><button class=\"btn wizard-back\" type=\"button\">قبلی</button></a>
+						<input class=\"btn wizard-next btn-primary\" type=\"submit\" value=\"بعدی\" />
+					</div>
+				</div>
+			</div>
+			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" />
+		</form>";
+		upgrade_footer();
+		die();
+	}
+	
+	$new_start = $start+$transfer_counter;
+	$total_rows = $cache->retrieve('total_rows');
+	
+	upgrade_progress_output("انتقال مقالات", $total_rows, $fetched_rows, $start, "install.php?op=faqs", "install.php?op=pages&start=$new_start&transfer_counter=$transfer_counter", 72, $transfer_counter);
+}
+
+function upgrade_faqs($start)
+{
+	global $db, $nuke_configs, $cache, $transfer_counter, $pn_dbcharset, $pn_dbname;
+	
+	if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+	
+	$faqs_cats = array();
+	
+	$cat_result = $db->table(CATEGORIES_TABLE)
+						->where('module', 'Faqs')
+						->select(['catid', 'parent_id', 'imported_id']);
+	if($cat_result->count() > 0)
+	{
+		$cat_rows = $cat_result->results();
+		foreach($cat_rows as $cat_row)
+		{
+			$faqs_cats[$cat_row['imported_id']] = array('catid' => $cat_row['catid'], 'parent_id' => $cat_row['parent_id']);
+		}
+	}
+	
+	$run_per_step = 100;
+	// update nuke_articles
+	$db->query("set names 'latin1'");
+	$insert_query = array();
+	
+	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:$run_per_step;
+	
+	$last_article_sid = $cache->retrieve('last_article_sid');
+
+	$default_admin = $cache->retrieve('default_admin', false);
+	
+	$result = $db->query("SELECT *, (SELECT COUNT(id) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_faqanswer`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_faqanswer` ORDER BY id ASC LIMIT $start, $transfer_counter");
+	$fetched_rows = intval($result->count());
+
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+
+		if(!empty($rows))
+		{
+			$total_rows_set = false;
+			$timer = 1;
+			foreach($rows as $row)
+			{
+				if(!$total_rows_set)
+				{
+					$cache->store('total_rows', intval($row['total_rows']));
+					unset($row['total_rows']);
+					$total_rows_set = true;
+				}
+				
+				$cat_link = (isset($faqs_cats[$row['id_cat']]['catid'])) ? $faqs_cats[$row['id_cat']]['catid']:0;
+				
+				$post_url = trim(sanitize(str2url($row['question'])), "-");
+				$post_url = get_unique_post_slug(POSTS_TABLE, "sid", '', "post_url", $post_url, 'publish', false, "AND post_type = 'faqs'");
+				
+				$hometext = mb_word_wrap(strip_tags($row['answer']), 200, '...');
+				$bodytext = $row['answer'];
+								
+				$insert_query[] = array($row['id'], 'publish', 'Faqs', $default_admin,$row['question'],(_NOWTIME+$timer),$hometext,$bodytext,$post_url,0,0,$cat_link,$default_admin,'',1,'',1,1,'',$cat_link,0,0,0);
+				$timer++;
+			}
+			
+			$db->query("set names '$pn_dbcharset'");
+			
+			$new_cols = array("imported_id","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings");
+			
+			if(isset($insert_query) && !empty($insert_query))
+				$db->table(POSTS_TABLE)->multiinsert($new_cols,$insert_query);
+		}
+	}
+	
+	$errors = $db->getErrors('last');
+	if(isset($errors['message']) && ($errors['message'] == "MySQL server has gone away" || stristr($errors['message'], "max_allowed_packet")))
+	{
+		upgrade_header(7, 95);
+		echo"
+		<form role=\"form\" class=\"form-horizontal\" id=\"nukeform\" action=\"install.php?op=faqs".((isset($start) && $start != 0) ? "&start=$start":"")."\" method=\"post\">
+			<div class=\"wizard-card-container\" style=\"height: 326px;\">
+				<div class=\"wizard-card\" data-cardname=\"group\">
+					<h3>بروزرسانی سیستم</h3>
+					<div class=\"wizard-error\">
+						<div class=\"alert alert-danger\">	<strong>خطا :</strong> حجم اطلاعات شما بالا می باشد و سرور قادر به انتقال تعداد $transfer_counter مطلب در هر بار نمی باشد. لطفاً تعداد انتقال را با توجه به حجم مطالبتان پایین بیاورید. .</div>
+					</div>
+					<div class=\"wizard-input-section\">
+						<div class=\"form-group\">
+							<label class=\"control-label col-sm-4\" for=\"transfer_counter\">تعداد مطلب قابل انتقال:</label>
+							<div class=\"col-sm-8\">
+								<input type=\"text\" class=\"form-control\" id=\"transfer_counter\" name=\"transfer_counter\" value=\"$transfer_counter\" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class=\"wizard-footer\">
+				<div class=\"wizard-buttons-container\">
+					<div class=\"btn-group-single pull-left\">
+						<a href=\"javascript:history.go(-1)\"><button class=\"btn wizard-back\" type=\"button\">قبلی</button></a>
+						<input class=\"btn wizard-next btn-primary\" type=\"submit\" value=\"بعدی\" />
+					</div>
+				</div>
+			</div>
+			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" />
+		</form>";
+		upgrade_footer();
+		die();
+	}
+	
+	$new_start = $start+$transfer_counter;
+	$total_rows = $cache->retrieve('total_rows');
+	
+	upgrade_progress_output("انتقال سؤالات رایج", $total_rows, $fetched_rows, $start, "install.php?op=comments", "install.php?op=faqs&start=$new_start&transfer_counter=$transfer_counter", 78, $transfer_counter);
+}
+
+function upgrade_comments($start = 0)
+{
+	global $db, $nuke_configs, $cache, $pn_dbcharset, $module;
+	
+	/*if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+	*/
+	$modules_comments = array(
+		"stories_comments" => array(
+			"new_table" => POSTS_TABLE,
+			"module_desc" => "نظرات مطالب",
+			"module_id" => "sid",
+			"module_pid" => "pid",
+			"module_cid" => "sid",
+			"module_name" => "Articles",
+			"module_table" => "stories",
+			"module_title" => "title",
+			"subquery" => "SELECT sid FROM ".POSTS_TABLE." WHERE sid = t.sid AND post_type = 'Articles'",
+			"progress_link" => "install.php?op=comments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=pages_comments",
+		),
+		"pages_comments" => array(
+			"new_table" => POSTS_TABLE,
+			"module_desc" => "نظرات مقالات",
+			"module_id" => "pageid",
+			"module_pid" => "prid",
+			"module_cid" => "pid",
+			"module_name" => "Pages",
+			"module_table" => "pages",
+			"module_title" => "title",
+			"subquery" => "SELECT sid FROM ".POSTS_TABLE." WHERE imported_id = t.pageid AND post_type = 'Pages'",
+			"progress_link" => "install.php?op=comments&module=pages_comments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=products_comments",
+		),
+		"products_comments" => array(
+			"new_table" => POSTS_TABLE,
+			"module_desc" => "نظرات محصولات",
+			"module_id" => "sid",
+			"module_pid" => "pid",
+			"module_cid" => "sid",
+			"module_name" => "Products",
+			"module_table" => "products",
+			"module_title" => "title",
+			"subquery" => "SELECT sid FROM ".POSTS_TABLE." WHERE imported_id = t.sid AND post_type = 'Products'",
+			"progress_link" => "install.php?op=comments&module=products_comments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=pollcomments",
+		),
+		"pollcomments" => array(
+			"new_table" => SURVEYS_TABLE,
+			"module_desc" => "نظرات نظرسنجی ها",
+			"module_id" => "pollID",
+			"module_pid" => "pid",
+			"module_cid" => "pollID",
+			"module_name" => "Surveys",
+			"module_table" => "poll_desc",
+			"module_title" => "pollTitle",
+			"subquery" => "s.pollID",
+			"progress_link" => "install.php?op=comments&module=pollcomments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments&module=staticpages_comments",
+		),
+		"staticpages_comments" => array(
+			"new_table" => POSTS_TABLE,
+			"module_desc" => "نظرات صفحات ثابت",
+			"module_id" => "staticid",
+			"module_pid" => "prid",
+			"module_cid" => "pid",
+			"module_name" => "Statics",
+			"module_table" => "staticpages",
+			"module_title" => "title",
+			"subquery" => "SELECT sid FROM ".POSTS_TABLE." WHERE imported_id = t.staticid AND post_type = 'Statics'",
+			"progress_link" => "install.php?op=comments&module=staticpages_comments&start={NEW_START}",
+			"finish_link" => "install.php?op=comments_parents",
+		),
+	);
+	
+	$module = (isset($module) && $module != '' && $module != 'stories_comments') ? $module:"stories_comments";
+	
+	$new_table = $modules_comments[$module]['new_table'];
+	$module_desc = $modules_comments[$module]['module_desc'];
+	$module_id = $modules_comments[$module]['module_id'];
+	$module_pid = $modules_comments[$module]['module_pid'];
+	$module_cid = $modules_comments[$module]['module_cid'];
+	$subquery = $modules_comments[$module]['subquery'];
+	$module_name = $modules_comments[$module]['module_name'];
+	$module_table = $modules_comments[$module]['module_table'];
+	$module_title = $modules_comments[$module]['module_title'];
+	$finish_link = $modules_comments[$module]['finish_link'];
+	$progress_link = $modules_comments[$module]['progress_link'];
+	
+	$comments_config = array();
+	$run_per_step = 500;
+	// update nuke_comments
+	$db->query("set names 'latin1'");
+	$result1 = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_comments_config` WHERE code = '1'");
+	if(intval($result1->count()) > 0)
+	{
+		$rows1 = $result1->results();
+		foreach($rows1 as $row1)
+		{
+			if(preg_match("#name#isU", $row1['name']))
+				$comments_config[$row1['cfid']] = 'name';
+				
+			if(preg_match("#email#isU", $row1['name']))
+				$comments_config[$row1['cfid']] = 'email';
+				
+			if(preg_match("#website#isU", $row1['name']))
+				$comments_config[$row1['cfid']] = 'url';
+				
+			if(preg_match("#url#isU", $row1['name']))
+				$comments_config[$row1['cfid']] = 'url';
+		}
+	}
+
+	$fields = array();
+	$result2 = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."_fildes`");
+	if(intval($result2->count()) > 0)
+	{
+		$rows2 = $result2->results();
+		foreach($rows2 as $row2)
+		{
+			if(!isset($comments_config[$row2['cfid']]))
+				continue;
+			$fields[$row2['tid']][$comments_config[$row2['cfid']]] = $row2['cfvalue'];
+		}
+	}
+
+	$insert_query = array();
+	$result = $db->query("SELECT t.*, t.$module_pid as pid, s.$module_title as post_title, ($subquery) as new_post_id, (SELECT COUNT(tid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module."` as t LEFT JOIN `".OLD_DB."`.`".OLD_DB_PREFIX."_".$module_table."` as s ON s.$module_cid = t.$module_id ORDER BY tid ASC LIMIT $start, $run_per_step");
+	$fetched_rows = intval($result->count());
+
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+		$all_rows = array();
+		$total_rows_set = false;
+		foreach($rows as $row)
+		{
+			if(!$total_rows_set)
+			{
+				$cache->store('total_rows', intval($row['total_rows']));
+				unset($row['total_rows']);
+				$total_rows_set = true;
+			}
+			$all_rows[$row['tid']] = $row;
+		}
+		
+		unset($rows);
+		
+		if(!empty($all_rows))
+		{
+			foreach($all_rows as $row)
+			{
+				$insert_query[$row['tid']] = array(
+					'pid' => $row['pid'], 
+					'main_parent' => 0, 
+					'module' => $module_name,
+					"post_id" => $row['new_post_id'],
+					'post_title' => $row['post_title'],
+					'date' => $row['date'],
+					'name' => ((isset($fields[$row['tid']]['name']) && $fields[$row['tid']]['name'] != '') ? $fields[$row['tid']]['name']:$row['name']),
+					'email' => ((isset($fields[$row['tid']]['email']) && $fields[$row['tid']]['email'] != '') ? $fields[$row['tid']]['email']:((isset($row['email'])) ? $row['email']:"")),
+					'url' => ((isset($fields[$row['tid']]['url']) && $fields[$row['tid']]['url'] != '') ? $fields[$row['tid']]['url']:$row['url']),
+					'host_name' => $row['host_name'],
+					'comment' => $row['comment'],
+					'score' => $row['score'],
+					'reason' => $row['reason'],
+					'act' => $row['act'],
+					'imported_id' => $row['tid']
+				);
+				
+			}
+		}
+		
+		$db->query("set names '$pn_dbcharset'");
+		if(isset($insert_query) && !empty($insert_query))
+			$db->table(COMMENTS_TABLE)->multiinsert(array("pid","main_parent","module","post_id","post_title","date","name","email","url","ip","comment","score","reason","status","imported_id"),$insert_query);
+	}
+	
+	$new_start = $start+$run_per_step;
+	$total_rows = $cache->retrieve('total_rows');
+	
+	$progress_link = str_replace("{NEW_START}", $new_start, $progress_link);
+	
+	upgrade_progress_output("انتقال $module_desc", $total_rows, $fetched_rows, $start, $finish_link, $progress_link, 84, $run_per_step);
+}
+
+function upgrade_comments_parents($start = 0)
+{
+	global $db, $nuke_configs, $cache, $pn_dbcharset, $module;
+	
+	if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+	
+	$module = (isset($module) && $module != '') ? ucfirst($module):"Articles";
+	
+	$run_per_step = 10000;
+	// update nuke_comments pids
+	$update_query = array();
+	$result = $db->query("SELECT c.cid, (SELECT cid FROM ".COMMENTS_TABLE." WHERE imported_id = c.pid AND module = '$module') as pid, (SELECT COUNT(cid) FROM ".COMMENTS_TABLE." WHERE pid != '0' AND module = '$module') as total_rows FROM ".COMMENTS_TABLE." as c WHERE c.pid != '0' AND c.module = '$module' ORDER BY cid ASC LIMIT $start, $run_per_step");
+	$fetched_rows = intval($result->count());
+
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+		$total_rows_set = false;
+		
+		if(!empty($rows))
+		{
+			foreach($rows as $row)
+			{
+				if(!$total_rows_set)
+				{
+					$cache->store('total_rows', intval($row['total_rows']));
+					unset($row['total_rows']);
+					$total_rows_set = true;
+				}
+				
+				$cid = $row['cid'];
+				$pid = $row['pid'];
+				
+				$update_query[$cid] = "WHEN cid = '$cid' THEN '$pid'";
+			}
+		}
+		
+		if(isset($update_query) && !empty($update_query))
+			$db->query("UPDATE ".COMMENTS_TABLE." SET pid = CASE
+			".implode("\n", $update_query)."
+			END
+			WHERE module = '$module' AND cid IN (".implode(",", array_keys($update_query)).")");
+	}
+	
+	$new_start = $start+$run_per_step;
+	$total_rows = $cache->retrieve('total_rows');
+	$progress_link = "install.php?op=comments_parents&start=$new_start";
+	$finish_link = "install.php?op=comments_parents";
+	
+	switch($module)
+	{
+		default:
+			$progress_link .= "";
+			$finish_link .= "&module=pages";
+		break;
+		case"Pages":
+			$progress_link .= "&module=pages";
+			$finish_link .= "&module=products";
+		break;
+		case"Products":
+			$progress_link .= "&module=products";
+			$finish_link .= "&module=surveys";
+		break;
+		case"Surveys":
+			$progress_link .= "&module=surveys";
+			$finish_link .= "&module=statics";
+		break;
+		case"Statics":
+			$progress_link .= "&module=statics";
+			$finish_link = "install.php?op=comments_main_parent";
+		break;
+	}
+	
+	upgrade_progress_output("اصلاح نظرات تو در تو", $total_rows, $fetched_rows, $start, $finish_link, $progress_link, 90, $run_per_step);
+}
+
+function get_main_parent($cid)
+{
+	global $db;
+	
+	$result = $db->table(COMMENTS_TABLE)
+				->where('cid',$cid)
+				->select(['pid']);
+	if($result->count() > 0)
+	{
+		$pid = $result->results()[0]['pid'];
+		if($pid == 0)
+			return $cid;
+		else
+			return get_main_parent($pid);
+	}
+}
+
+function upgrade_comments_main_parent($start = 0)
+{
+	global $db, $nuke_configs, $cache, $pn_dbcharset, $module;
+	
+	if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+		
+	$module = (isset($module) && $module != '') ? ucfirst($module):"Articles";
+	
+	$run_per_step = 10000;
+	// update nuke_comments pids
+	$update_query = array();
+	$result = $db->query("SELECT cid, pid, (SELECT COUNT(cid) FROM ".COMMENTS_TABLE." WHERE pid != '0' AND module = '$module') as total_rows FROM ".COMMENTS_TABLE." as c WHERE c.pid != '0' AND c.module = '$module' ORDER BY cid ASC LIMIT $start, $run_per_step");
+	$fetched_rows = intval($result->count());
+
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+		$total_rows_set = false;
+		
+		if(!empty($rows))
+		{
+			foreach($rows as $row)
+			{
+				if(!$total_rows_set)
+				{
+					$cache->store('total_rows', intval($row['total_rows']));
+					unset($row['total_rows']);
+					$total_rows_set = true;
+				}
+				
+				$cid = $row['cid'];
+				$pid = $row['pid'];
+				$main_parent = get_main_parent($pid);
+				
+				$update_query[$cid] = "WHEN cid = '$cid' THEN '$main_parent'";
+			}
+		}
+		
+		if(isset($update_query) && !empty($update_query))
+			$db->query("UPDATE ".COMMENTS_TABLE." SET main_parent = CASE
+			".implode("\n", $update_query)."
+			END
+			WHERE module = '$module' AND cid IN (".implode(",", array_keys($update_query)).")");
+	}
+	
+	$new_start = $start+$run_per_step;
+	$total_rows = $cache->retrieve('total_rows');
+	$progress_link = "install.php?op=comments_main_parent&start=$new_start";
+	$finish_link = "install.php?op=comments_main_parent";
+	
+	switch($module)
+	{
+		default:
+			$progress_link .= "";
+			$finish_link .= "&module=pages";
+		break;
+		case"Pages":
+			$progress_link .= "&module=pages";
+			$finish_link .= "&module=products";
+		break;
+		case"Products":
+			$progress_link .= "&module=products";
+			$finish_link .= "&module=surveys";
+		break;
+		case"Surveys":
+			$progress_link .= "&module=surveys";
+			$finish_link .= "&module=statics";
+		break;
+		case"Statics":
+			$progress_link .= "&module=statics";
+			$finish_link = "install.php?op=forum";
+		break;
+	}
+	
+	upgrade_progress_output("اصلاح نظرات تو در تو", $total_rows, $fetched_rows, $start, $finish_link, $progress_link, 90, $run_per_step);
 }
 
 function upgrade_forum()
@@ -2460,304 +3241,330 @@ function upgrade_forum()
 	
 	$install_options = $cache->retrieve('install_options');
 	$install_options = phpnuke_unserialize($install_options);
-	$have_forum = (isset($install_options['db_info']['db_have_forum']) && $install_options['db_info']['db_have_forum'] == 1) ? true:false;
-	$transfer_users = false;
 	
-	// Get a listing of all tables
-	//$tables_result = $db->query("SHOW TABLES FROM `".OLD_DB."`");
-	$tables_result = $db->query("SELECT TABLE_NAME FROM `information_schema`.`TABLES` WHERE TABLE_SCHEMA =  '".OLD_DB."'");
-
-	if(!empty($tables_result))
+	$have_forum = (isset($install_options['db_info']['db_have_forum']) && $install_options['db_info']['db_have_forum'] == 1) ? true:false;
+	$transfer_users = (isset($install_options['db_info']['db_have_forum']) && $install_options['db_info']['db_have_forum'] == 2) ? true:false;
+		
+	$old_users_table_name = "`".OLD_DB."`.`".OLD_DB_PREFIX."_users`";
+	$new_users_table_name = ($have_forum) ? ("`".$install_options['db_info']['db_forumname']."`.`".(($install_options['db_info']['db_forumprefix'] != OLD_DB_PREFIX.'_bb3') ? $install_options['db_info']['db_forumprefix']."_users":OLD_DB_PREFIX."_bb3users")."`"):USERS_TABLE;
+	
+	if(!$transfer_users)
 	{
-		if($have_forum)
+		// Get a listing of all tables
+		//$tables_result = $db->query("SHOW TABLES FROM `".OLD_DB."`");
+		$tables_result = $db->query("SELECT TABLE_NAME FROM `information_schema`.`TABLES` WHERE TABLE_SCHEMA =  '".OLD_DB."'");
+
+		if(!empty($tables_result))
 		{
-			// Loop through all tables
-			foreach ($tables_result as $row)
+			if($have_forum)
 			{
-				//$forumtable = $row['Tables_in_'.OLD_DB];
-				$forumtable = $row['TABLE_NAME'];
+				// Loop through all tables
+				foreach ($tables_result as $row)
+				{
+					//$forumtable = $row['Tables_in_'.OLD_DB];
+					$forumtable = $row['TABLE_NAME'];
+					
+					if(!preg_match("#".OLD_DB_PREFIX."_bb3#isU", $forumtable))
+						continue;
+					
+					$db->query("DROP TABLE IF EXISTS `".$install_options['db_info']['db_forumname']."`.`$forumtable`");
+					
+					$query = $db->query("SHOW CREATE TABLE `".OLD_DB."`.`$forumtable`");
+					$query_results = $query->results();
+					$query_result = $query_results[0];
+					
+					if($install_options['db_info']['db_forumprefix'] != OLD_DB_PREFIX.'_bb3')
+						$new_forumtable = str_replace(OLD_DB_PREFIX.'_bb3', $install_options['db_info']['db_forumprefix']."_", $forumtable);
+					
+					$sql = str_replace("CREATE TABLE `$forumtable`", "CREATE TABLE `".$install_options['db_info']['db_forumname']."`.`$new_forumtable`", $query_result['Create Table']);
+					$sql = preg_replace(
+						array(
+							"#latin1([a-z0-9A-Z\_+]*)#i",
+							"#utf8([a-z0-9A-Z\_+]*)#i",
+						),
+						"latin1_general_ci",
+						$sql
+					);
+					$sql = str_replace(
+						array("DEFAULT CHARSET=latin1_general_ci","CHARACTER SET latin1_general_ci"),
+						array("DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci",''),
+						$sql
+					);
+					$db->query($sql);
+					
+					if($new_forumtable == $install_options['db_info']['db_forumprefix']."_search_wordmatch" || $new_forumtable == $install_options['db_info']['db_forumprefix']."_search_wordlist")
+						continue;
+					
+					$db->query("set names '$pn_dbcharset'");
+					$db->query("INSERT INTO `".$install_options['db_info']['db_forumname']."`.`$new_forumtable` SELECT * FROM `".OLD_DB."`.`$forumtable`\n");
+				}
 				
-				if(!preg_match("#".OLD_DB_PREFIX."_bb3#isU", $forumtable))
-					continue;
-				
-				$db->query("DROP TABLE IF EXISTS `".$install_options['db_info']['db_forumname']."`.`$forumtable`");
-				
-				$query = $db->query("SHOW CREATE TABLE `".OLD_DB."`.`$forumtable`");
-				$query_results = $query->results();
-				$query_result = $query_results[0];
-				
-				if($install_options['db_info']['db_forumprefix'] != OLD_DB_PREFIX.'_bb3')
-					$new_forumtable = str_replace(OLD_DB_PREFIX.'_bb3', $install_options['db_info']['db_forumprefix']."_", $forumtable);
-				
-				$sql = str_replace("CREATE TABLE `$forumtable`", "CREATE TABLE `".$install_options['db_info']['db_forumname']."`.`$new_forumtable`", $query_result['Create Table']);
-				$db->query($sql);
+				$db->query("DROP TABLE IF EXISTS $new_users_table_name");
+			
+				// update users table
+				$users_query = $db->query("SHOW CREATE TABLE $old_users_table_name");
+				$users_query_results = $users_query->results();
+				$users_query_result = $users_query_results[0];
+				$users_sql = str_replace("CREATE TABLE `".OLD_DB_PREFIX."_users`", "CREATE TABLE $new_users_table_name", $users_query_result['Create Table']);
+				$users_sql = preg_replace(
+					array(
+						"#latin1([a-z0-9A-Z\_+]*)#i",
+						"#utf8([a-z0-9A-Z\_+]*)#i",
+					),
+					"latin1_general_ci",
+					$users_sql
+				);
+				$users_sql = str_replace(
+					array("DEFAULT CHARSET=latin1_general_ci","CHARACTER SET latin1_general_ci"),
+					array("DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci",''),
+					$users_sql
+				);
+				$db->query($users_sql);
 				
 				$db->query("set names '$pn_dbcharset'");
-				$db->query("INSERT INTO `".$install_options['db_info']['db_forumname']."`.`$new_forumtable` SELECT * FROM `".OLD_DB."`.`$forumtable`");
+				$db->query("INSERT INTO $new_users_table_name SELECT * FROM $old_users_table_name");
+				// update users table
+				
+				$db->query("ALTER TABLE `".$install_options['db_info']['db_forumname']."`.`".$install_options['db_info']['db_forumprefix']."_profile_fields_data` ADD `pf_user_phone` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT ''"); 
+				$db->query("ALTER TABLE ".$new_users_table_name." ADD `user_credit` bigint(20) UNSIGNED NOT NULL DEFAULT '0'"); 
+				
+				$db->query("UPDATE `".$install_options['db_info']['db_forumname']."`.`".$install_options['db_info']['db_forumprefix']."_config` SET config_value = '0' WHERE config_name = 'server_port'");
+				
+				$db->query("TRUNCATE TABLE `".$install_options['db_info']['db_forumname']."`.`".$install_options['db_info']['db_forumprefix']."_modules`");
+				$db->query("INSERT INTO `".$install_options['db_info']['db_forumname']."`.`".$install_options['db_info']['db_forumprefix']."_modules` (`module_id`, `module_enabled`, `module_display`, `module_basename`, `module_class`, `parent_id`, `left_id`, `right_id`, `module_langname`, `module_mode`, `module_auth`) VALUES
+				(1, 1, 1, '', 'acp', 0, 1, 64, 'ACP_CAT_GENERAL', '', ''),
+				(2, 1, 1, '', 'acp', 1, 4, 17, 'ACP_QUICK_ACCESS', '', ''),
+				(3, 1, 1, '', 'acp', 1, 18, 41, 'ACP_BOARD_CONFIGURATION', '', ''),
+				(4, 1, 1, '', 'acp', 1, 42, 49, 'ACP_CLIENT_COMMUNICATION', '', ''),
+				(5, 1, 1, '', 'acp', 1, 50, 63, 'ACP_SERVER_CONFIGURATION', '', ''),
+				(6, 1, 1, '', 'acp', 0, 65, 84, 'ACP_CAT_FORUMS', '', ''),
+				(7, 1, 1, '', 'acp', 6, 66, 71, 'ACP_MANAGE_FORUMS', '', ''),
+				(8, 1, 1, '', 'acp', 6, 72, 83, 'ACP_FORUM_BASED_PERMISSIONS', '', ''),
+				(9, 1, 1, '', 'acp', 0, 85, 110, 'ACP_CAT_POSTING', '', ''),
+				(10, 1, 1, '', 'acp', 9, 86, 99, 'ACP_MESSAGES', '', ''),
+				(11, 1, 1, '', 'acp', 9, 100, 109, 'ACP_ATTACHMENTS', '', ''),
+				(12, 1, 1, '', 'acp', 0, 111, 166, 'ACP_CAT_USERGROUP', '', ''),
+				(13, 1, 1, '', 'acp', 12, 112, 145, 'ACP_CAT_USERS', '', ''),
+				(14, 1, 1, '', 'acp', 12, 146, 153, 'ACP_GROUPS', '', ''),
+				(15, 1, 1, '', 'acp', 12, 154, 165, 'ACP_USER_SECURITY', '', ''),
+				(16, 1, 1, '', 'acp', 0, 167, 216, 'ACP_CAT_PERMISSIONS', '', ''),
+				(17, 1, 1, '', 'acp', 16, 170, 179, 'ACP_GLOBAL_PERMISSIONS', '', ''),
+				(18, 1, 1, '', 'acp', 16, 180, 191, 'ACP_FORUM_BASED_PERMISSIONS', '', ''),
+				(19, 1, 1, '', 'acp', 16, 192, 201, 'ACP_PERMISSION_ROLES', '', ''),
+				(20, 1, 1, '', 'acp', 16, 202, 215, 'ACP_PERMISSION_MASKS', '', ''),
+				(21, 1, 1, '', 'acp', 0, 217, 230, 'ACP_CAT_STYLES', '', ''),
+				(22, 1, 1, '', 'acp', 21, 218, 221, 'ACP_STYLE_MANAGEMENT', '', ''),
+				(23, 1, 1, '', 'acp', 21, 222, 229, 'ACP_STYLE_COMPONENTS', '', ''),
+				(24, 1, 1, '', 'acp', 0, 231, 250, 'ACP_CAT_MAINTENANCE', '', ''),
+				(25, 1, 1, '', 'acp', 24, 232, 241, 'ACP_FORUM_LOGS', '', ''),
+				(26, 1, 1, '', 'acp', 24, 242, 249, 'ACP_CAT_DATABASE', '', ''),
+				(27, 1, 1, '', 'acp', 0, 251, 276, 'ACP_CAT_SYSTEM', '', ''),
+				(28, 1, 1, '', 'acp', 27, 252, 255, 'ACP_AUTOMATION', '', ''),
+				(29, 1, 1, '', 'acp', 27, 256, 267, 'ACP_GENERAL_TASKS', '', ''),
+				(30, 1, 1, '', 'acp', 27, 268, 275, 'ACP_MODULE_MANAGEMENT', '', ''),
+				(31, 1, 1, '', 'acp', 0, 277, 288, 'ACP_CAT_DOT_MODS', '', ''),
+				(32, 1, 1, 'attachments', 'acp', 3, 19, 20, 'ACP_ATTACHMENT_SETTINGS', 'attach', 'acl_a_attach'),
+				(33, 1, 1, 'attachments', 'acp', 11, 101, 102, 'ACP_ATTACHMENT_SETTINGS', 'attach', 'acl_a_attach'),
+				(34, 1, 1, 'attachments', 'acp', 11, 103, 104, 'ACP_MANAGE_EXTENSIONS', 'extensions', 'acl_a_attach'),
+				(35, 1, 1, 'attachments', 'acp', 11, 105, 106, 'ACP_EXTENSION_GROUPS', 'ext_groups', 'acl_a_attach'),
+				(36, 1, 1, 'attachments', 'acp', 11, 107, 108, 'ACP_ORPHAN_ATTACHMENTS', 'orphan', 'acl_a_attach'),
+				(37, 1, 1, 'ban', 'acp', 15, 155, 156, 'ACP_BAN_EMAILS', 'email', 'acl_a_ban'),
+				(38, 1, 1, 'ban', 'acp', 15, 157, 158, 'ACP_BAN_IPS', 'ip', 'acl_a_ban'),
+				(39, 1, 1, 'ban', 'acp', 15, 159, 160, 'ACP_BAN_USERNAMES', 'user', 'acl_a_ban'),
+				(40, 1, 1, 'bbcodes', 'acp', 10, 87, 88, 'ACP_BBCODES', 'bbcodes', 'acl_a_bbcode'),
+				(41, 1, 1, 'board', 'acp', 3, 21, 22, 'ACP_BOARD_SETTINGS', 'settings', 'acl_a_board'),
+				(42, 1, 1, 'board', 'acp', 3, 23, 24, 'ACP_BOARD_FEATURES', 'features', 'acl_a_board'),
+				(43, 1, 1, 'board', 'acp', 3, 25, 26, 'ACP_AVATAR_SETTINGS', 'avatar', 'acl_a_board'),
+				(44, 1, 1, 'board', 'acp', 3, 27, 28, 'ACP_MESSAGE_SETTINGS', 'message', 'acl_a_board'),
+				(45, 1, 1, 'board', 'acp', 10, 89, 90, 'ACP_MESSAGE_SETTINGS', 'message', 'acl_a_board'),
+				(46, 1, 1, 'board', 'acp', 3, 29, 30, 'ACP_POST_SETTINGS', 'post', 'acl_a_board'),
+				(47, 1, 1, 'board', 'acp', 3, 31, 32, 'ACP_SIGNATURE_SETTINGS', 'signature', 'acl_a_board'),
+				(48, 1, 1, 'board', 'acp', 3, 33, 34, 'ACP_FEED_SETTINGS', 'feed', 'acl_a_board'),
+				(49, 1, 1, 'board', 'acp', 3, 35, 36, 'ACP_REGISTER_SETTINGS', 'registration', 'acl_a_board'),
+				(50, 1, 1, 'board', 'acp', 4, 43, 44, 'ACP_AUTH_SETTINGS', 'auth', 'acl_a_server'),
+				(51, 1, 1, 'board', 'acp', 4, 45, 46, 'ACP_EMAIL_SETTINGS', 'email', 'acl_a_server'),
+				(52, 1, 1, 'board', 'acp', 5, 51, 52, 'ACP_COOKIE_SETTINGS', 'cookie', 'acl_a_server'),
+				(53, 1, 1, 'board', 'acp', 5, 53, 54, 'ACP_SERVER_SETTINGS', 'server', 'acl_a_server'),
+				(54, 1, 1, 'board', 'acp', 5, 55, 56, 'ACP_SECURITY_SETTINGS', 'security', 'acl_a_server'),
+				(55, 1, 1, 'board', 'acp', 5, 57, 58, 'ACP_LOAD_SETTINGS', 'load', 'acl_a_server'),
+				(56, 1, 1, 'bots', 'acp', 29, 257, 258, 'ACP_BOTS', 'bots', 'acl_a_bots'),
+				(57, 1, 1, 'captcha', 'acp', 3, 37, 38, 'ACP_VC_SETTINGS', 'visual', 'acl_a_board'),
+				(58, 1, 0, 'captcha', 'acp', 3, 39, 40, 'ACP_VC_CAPTCHA_DISPLAY', 'img', 'acl_a_board'),
+				(59, 1, 1, 'database', 'acp', 26, 243, 244, 'ACP_BACKUP', 'backup', 'acl_a_backup'),
+				(60, 1, 1, 'database', 'acp', 26, 245, 246, 'ACP_RESTORE', 'restore', 'acl_a_backup'),
+				(61, 1, 1, 'disallow', 'acp', 15, 161, 162, 'ACP_DISALLOW_USERNAMES', 'usernames', 'acl_a_names'),
+				(62, 1, 1, 'email', 'acp', 29, 259, 260, 'ACP_MASS_EMAIL', 'email', 'acl_a_email && cfg_email_enable'),
+				(63, 1, 1, 'forums', 'acp', 7, 67, 68, 'ACP_MANAGE_FORUMS', 'manage', 'acl_a_forum'),
+				(64, 1, 1, 'groups', 'acp', 14, 147, 148, 'ACP_GROUPS_MANAGE', 'manage', 'acl_a_group'),
+				(65, 1, 1, 'icons', 'acp', 10, 93, 94, 'ACP_ICONS', 'icons', 'acl_a_icons'),
+				(66, 1, 1, 'icons', 'acp', 10, 95, 96, 'ACP_SMILIES', 'smilies', 'acl_a_icons'),
+				(67, 1, 1, 'inactive', 'acp', 13, 115, 116, 'ACP_INACTIVE_USERS', 'list', 'acl_a_user'),
+				(68, 1, 1, 'jabber', 'acp', 4, 47, 48, 'ACP_JABBER_SETTINGS', 'settings', 'acl_a_jabber'),
+				(69, 1, 1, 'language', 'acp', 29, 261, 262, 'ACP_LANGUAGE_PACKS', 'lang_packs', 'acl_a_language'),
+				(70, 1, 1, 'logs', 'acp', 25, 233, 234, 'ACP_ADMIN_LOGS', 'admin', 'acl_a_viewlogs'),
+				(71, 1, 1, 'logs', 'acp', 25, 235, 236, 'ACP_MOD_LOGS', 'mod', 'acl_a_viewlogs'),
+				(72, 1, 1, 'logs', 'acp', 25, 237, 238, 'ACP_USERS_LOGS', 'users', 'acl_a_viewlogs'),
+				(73, 1, 1, 'logs', 'acp', 25, 239, 240, 'ACP_CRITICAL_LOGS', 'critical', 'acl_a_viewlogs'),
+				(74, 1, 1, 'main', 'acp', 1, 2, 3, 'ACP_INDEX', 'main', ''),
+				(75, 1, 1, 'modules', 'acp', 30, 269, 270, 'ACP', 'acp', 'acl_a_modules'),
+				(76, 1, 1, 'modules', 'acp', 30, 271, 272, 'UCP', 'ucp', 'acl_a_modules'),
+				(77, 1, 1, 'modules', 'acp', 30, 273, 274, 'MCP', 'mcp', 'acl_a_modules'),
+				(78, 1, 1, 'permission_roles', 'acp', 19, 193, 194, 'ACP_ADMIN_ROLES', 'admin_roles', 'acl_a_roles && acl_a_aauth'),
+				(79, 1, 1, 'permission_roles', 'acp', 19, 195, 196, 'ACP_USER_ROLES', 'user_roles', 'acl_a_roles && acl_a_uauth'),
+				(80, 1, 1, 'permission_roles', 'acp', 19, 197, 198, 'ACP_MOD_ROLES', 'mod_roles', 'acl_a_roles && acl_a_mauth'),
+				(81, 1, 1, 'permission_roles', 'acp', 19, 199, 200, 'ACP_FORUM_ROLES', 'forum_roles', 'acl_a_roles && acl_a_fauth'),
+				(82, 1, 1, 'permissions', 'acp', 16, 168, 169, 'ACP_PERMISSIONS', 'intro', 'acl_a_authusers || acl_a_authgroups || acl_a_viewauth'),
+				(83, 1, 0, 'permissions', 'acp', 20, 203, 204, 'ACP_PERMISSION_TRACE', 'trace', 'acl_a_viewauth'),
+				(84, 1, 1, 'permissions', 'acp', 18, 181, 182, 'ACP_FORUM_PERMISSIONS', 'setting_forum_local', 'acl_a_fauth && (acl_a_authusers || acl_a_authgroups)'),
+				(85, 1, 1, 'permissions', 'acp', 18, 183, 184, 'ACP_FORUM_PERMISSIONS_COPY', 'setting_forum_copy', 'acl_a_fauth && acl_a_authusers && acl_a_authgroups && acl_a_mauth'),
+				(86, 1, 1, 'permissions', 'acp', 18, 185, 186, 'ACP_FORUM_MODERATORS', 'setting_mod_local', 'acl_a_mauth && (acl_a_authusers || acl_a_authgroups)'),
+				(87, 1, 1, 'permissions', 'acp', 17, 171, 172, 'ACP_USERS_PERMISSIONS', 'setting_user_global', 'acl_a_authusers && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
+				(88, 1, 1, 'permissions', 'acp', 13, 117, 118, 'ACP_USERS_PERMISSIONS', 'setting_user_global', 'acl_a_authusers && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
+				(89, 1, 1, 'permissions', 'acp', 18, 187, 188, 'ACP_USERS_FORUM_PERMISSIONS', 'setting_user_local', 'acl_a_authusers && (acl_a_mauth || acl_a_fauth)'),
+				(90, 1, 1, 'permissions', 'acp', 13, 119, 120, 'ACP_USERS_FORUM_PERMISSIONS', 'setting_user_local', 'acl_a_authusers && (acl_a_mauth || acl_a_fauth)'),
+				(91, 1, 1, 'permissions', 'acp', 17, 173, 174, 'ACP_GROUPS_PERMISSIONS', 'setting_group_global', 'acl_a_authgroups && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
+				(92, 1, 1, 'permissions', 'acp', 14, 149, 150, 'ACP_GROUPS_PERMISSIONS', 'setting_group_global', 'acl_a_authgroups && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
+				(93, 1, 1, 'permissions', 'acp', 18, 189, 190, 'ACP_GROUPS_FORUM_PERMISSIONS', 'setting_group_local', 'acl_a_authgroups && (acl_a_mauth || acl_a_fauth)'),
+				(94, 1, 1, 'permissions', 'acp', 14, 151, 152, 'ACP_GROUPS_FORUM_PERMISSIONS', 'setting_group_local', 'acl_a_authgroups && (acl_a_mauth || acl_a_fauth)'),
+				(95, 1, 1, 'permissions', 'acp', 17, 175, 176, 'ACP_ADMINISTRATORS', 'setting_admin_global', 'acl_a_aauth && (acl_a_authusers || acl_a_authgroups)'),
+				(96, 1, 1, 'permissions', 'acp', 17, 177, 178, 'ACP_GLOBAL_MODERATORS', 'setting_mod_global', 'acl_a_mauth && (acl_a_authusers || acl_a_authgroups)'),
+				(97, 1, 1, 'permissions', 'acp', 20, 205, 206, 'ACP_VIEW_ADMIN_PERMISSIONS', 'view_admin_global', 'acl_a_viewauth'),
+				(98, 1, 1, 'permissions', 'acp', 20, 207, 208, 'ACP_VIEW_USER_PERMISSIONS', 'view_user_global', 'acl_a_viewauth'),
+				(99, 1, 1, 'permissions', 'acp', 20, 209, 210, 'ACP_VIEW_GLOBAL_MOD_PERMISSIONS', 'view_mod_global', 'acl_a_viewauth'),
+				(100, 1, 1, 'permissions', 'acp', 20, 211, 212, 'ACP_VIEW_FORUM_MOD_PERMISSIONS', 'view_mod_local', 'acl_a_viewauth'),
+				(101, 1, 1, 'permissions', 'acp', 20, 213, 214, 'ACP_VIEW_FORUM_PERMISSIONS', 'view_forum_local', 'acl_a_viewauth'),
+				(102, 1, 1, 'php_info', 'acp', 29, 263, 264, 'ACP_PHP_INFO', 'info', 'acl_a_phpinfo'),
+				(103, 1, 1, 'profile', 'acp', 13, 121, 122, 'ACP_CUSTOM_PROFILE_FIELDS', 'profile', 'acl_a_profile'),
+				(104, 1, 1, 'prune', 'acp', 7, 69, 70, 'ACP_PRUNE_FORUMS', 'forums', 'acl_a_prune'),
+				(105, 1, 1, 'prune', 'acp', 15, 163, 164, 'ACP_PRUNE_USERS', 'users', 'acl_a_userdel'),
+				(106, 1, 1, 'ranks', 'acp', 13, 123, 124, 'ACP_MANAGE_RANKS', 'ranks', 'acl_a_ranks'),
+				(107, 1, 1, 'reasons', 'acp', 29, 265, 266, 'ACP_MANAGE_REASONS', 'main', 'acl_a_reasons'),
+				(108, 1, 1, 'search', 'acp', 5, 59, 60, 'ACP_SEARCH_SETTINGS', 'settings', 'acl_a_search'),
+				(109, 1, 1, 'search', 'acp', 26, 247, 248, 'ACP_SEARCH_INDEX', 'index', 'acl_a_search'),
+				(110, 1, 1, 'send_statistics', 'acp', 5, 61, 62, 'ACP_SEND_STATISTICS', 'send_statistics', 'acl_a_server'),
+				(111, 1, 1, 'styles', 'acp', 22, 219, 220, 'ACP_STYLES', 'style', 'acl_a_styles'),
+				(112, 1, 1, 'styles', 'acp', 23, 223, 224, 'ACP_TEMPLATES', 'template', 'acl_a_styles'),
+				(113, 1, 1, 'styles', 'acp', 23, 225, 226, 'ACP_THEMES', 'theme', 'acl_a_styles'),
+				(114, 1, 1, 'styles', 'acp', 23, 227, 228, 'ACP_IMAGESETS', 'imageset', 'acl_a_styles'),
+				(115, 1, 1, 'update', 'acp', 28, 253, 254, 'ACP_VERSION_CHECK', 'version_check', 'acl_a_board'),
+				(116, 1, 1, 'users', 'acp', 13, 113, 114, 'ACP_MANAGE_USERS', 'overview', 'acl_a_user'),
+				(117, 1, 0, 'users', 'acp', 13, 125, 126, 'ACP_USER_FEEDBACK', 'feedback', 'acl_a_user'),
+				(118, 1, 0, 'users', 'acp', 13, 127, 128, 'ACP_USER_WARNINGS', 'warnings', 'acl_a_user'),
+				(119, 1, 0, 'users', 'acp', 13, 129, 130, 'ACP_USER_PROFILE', 'profile', 'acl_a_user'),
+				(120, 1, 0, 'users', 'acp', 13, 131, 132, 'ACP_USER_PREFS', 'prefs', 'acl_a_user'),
+				(121, 1, 0, 'users', 'acp', 13, 133, 134, 'ACP_USER_AVATAR', 'avatar', 'acl_a_user'),
+				(122, 1, 0, 'users', 'acp', 13, 135, 136, 'ACP_USER_RANK', 'rank', 'acl_a_user'),
+				(123, 1, 0, 'users', 'acp', 13, 137, 138, 'ACP_USER_SIG', 'sig', 'acl_a_user'),
+				(124, 1, 0, 'users', 'acp', 13, 139, 140, 'ACP_USER_GROUPS', 'groups', 'acl_a_user && acl_a_group'),
+				(125, 1, 0, 'users', 'acp', 13, 141, 142, 'ACP_USER_PERM', 'perm', 'acl_a_user && acl_a_viewauth'),
+				(126, 1, 0, 'users', 'acp', 13, 143, 144, 'ACP_USER_ATTACH', 'attach', 'acl_a_user'),
+				(127, 1, 1, 'words', 'acp', 10, 97, 98, 'ACP_WORDS', 'words', 'acl_a_words'),
+				(128, 1, 1, 'users', 'acp', 2, 5, 6, 'ACP_MANAGE_USERS', 'overview', 'acl_a_user'),
+				(129, 1, 1, 'groups', 'acp', 2, 7, 8, 'ACP_GROUPS_MANAGE', 'manage', 'acl_a_group'),
+				(130, 1, 1, 'forums', 'acp', 2, 9, 10, 'ACP_MANAGE_FORUMS', 'manage', 'acl_a_forum'),
+				(131, 1, 1, 'logs', 'acp', 2, 11, 12, 'ACP_MOD_LOGS', 'mod', 'acl_a_viewlogs'),
+				(132, 1, 1, 'bots', 'acp', 2, 13, 14, 'ACP_BOTS', 'bots', 'acl_a_bots'),
+				(133, 1, 1, 'php_info', 'acp', 2, 15, 16, 'ACP_PHP_INFO', 'info', 'acl_a_phpinfo'),
+				(134, 1, 1, 'permissions', 'acp', 8, 73, 74, 'ACP_FORUM_PERMISSIONS', 'setting_forum_local', 'acl_a_fauth && (acl_a_authusers || acl_a_authgroups)'),
+				(135, 1, 1, 'permissions', 'acp', 8, 75, 76, 'ACP_FORUM_PERMISSIONS_COPY', 'setting_forum_copy', 'acl_a_fauth && acl_a_authusers && acl_a_authgroups && acl_a_mauth'),
+				(136, 1, 1, 'permissions', 'acp', 8, 77, 78, 'ACP_FORUM_MODERATORS', 'setting_mod_local', 'acl_a_mauth && (acl_a_authusers || acl_a_authgroups)'),
+				(137, 1, 1, 'permissions', 'acp', 8, 79, 80, 'ACP_USERS_FORUM_PERMISSIONS', 'setting_user_local', 'acl_a_authusers && (acl_a_mauth || acl_a_fauth)'),
+				(138, 1, 1, 'permissions', 'acp', 8, 81, 82, 'ACP_GROUPS_FORUM_PERMISSIONS', 'setting_group_local', 'acl_a_authgroups && (acl_a_mauth || acl_a_fauth)'),
+				(139, 1, 1, '', 'mcp', 0, 1, 10, 'MCP_MAIN', '', ''),
+				(140, 1, 1, '', 'mcp', 0, 11, 18, 'MCP_QUEUE', '', ''),
+				(141, 1, 1, '', 'mcp', 0, 19, 32, 'MCP_REPORTS', '', ''),
+				(142, 1, 1, '', 'mcp', 0, 33, 38, 'MCP_NOTES', '', ''),
+				(143, 1, 1, '', 'mcp', 0, 39, 48, 'MCP_WARN', '', ''),
+				(144, 1, 1, '', 'mcp', 0, 49, 56, 'MCP_LOGS', '', ''),
+				(145, 1, 1, '', 'mcp', 0, 57, 64, 'MCP_BAN', '', ''),
+				(146, 1, 1, 'ban', 'mcp', 145, 58, 59, 'MCP_BAN_USERNAMES', 'user', 'acl_m_ban'),
+				(147, 1, 1, 'ban', 'mcp', 145, 60, 61, 'MCP_BAN_IPS', 'ip', 'acl_m_ban'),
+				(148, 1, 1, 'ban', 'mcp', 145, 62, 63, 'MCP_BAN_EMAILS', 'email', 'acl_m_ban'),
+				(149, 1, 1, 'logs', 'mcp', 144, 50, 51, 'MCP_LOGS_FRONT', 'front', 'acl_m_ || aclf_m_'),
+				(150, 1, 1, 'logs', 'mcp', 144, 52, 53, 'MCP_LOGS_FORUM_VIEW', 'forum_logs', 'acl_m_,$"."id'),
+				(151, 1, 1, 'logs', 'mcp', 144, 54, 55, 'MCP_LOGS_TOPIC_VIEW', 'topic_logs', 'acl_m_,$"."id'),
+				(152, 1, 1, 'main', 'mcp', 139, 2, 3, 'MCP_MAIN_FRONT', 'front', ''),
+				(153, 1, 1, 'main', 'mcp', 139, 4, 5, 'MCP_MAIN_FORUM_VIEW', 'forum_view', 'acl_m_,$"."id'),
+				(154, 1, 1, 'main', 'mcp', 139, 6, 7, 'MCP_MAIN_TOPIC_VIEW', 'topic_view', 'acl_m_,$"."id'),
+				(155, 1, 1, 'main', 'mcp', 139, 8, 9, 'MCP_MAIN_POST_DETAILS', 'post_details', 'acl_m_,$"."id || (!$"."id && aclf_m_)'),
+				(156, 1, 1, 'notes', 'mcp', 142, 34, 35, 'MCP_NOTES_FRONT', 'front', ''),
+				(157, 1, 1, 'notes', 'mcp', 142, 36, 37, 'MCP_NOTES_USER', 'user_notes', ''),
+				(158, 1, 1, 'pm_reports', 'mcp', 141, 20, 21, 'MCP_PM_REPORTS_OPEN', 'pm_reports', 'aclf_m_report'),
+				(159, 1, 1, 'pm_reports', 'mcp', 141, 22, 23, 'MCP_PM_REPORTS_CLOSED', 'pm_reports_closed', 'aclf_m_report'),
+				(160, 1, 1, 'pm_reports', 'mcp', 141, 24, 25, 'MCP_PM_REPORT_DETAILS', 'pm_report_details', 'aclf_m_report'),
+				(161, 1, 1, 'queue', 'mcp', 140, 12, 13, 'MCP_QUEUE_UNAPPROVED_TOPICS', 'unapproved_topics', 'aclf_m_approve'),
+				(162, 1, 1, 'queue', 'mcp', 140, 14, 15, 'MCP_QUEUE_UNAPPROVED_POSTS', 'unapproved_posts', 'aclf_m_approve'),
+				(163, 1, 1, 'queue', 'mcp', 140, 16, 17, 'MCP_QUEUE_APPROVE_DETAILS', 'approve_details', 'acl_m_approve,$"."id || (!$"."id && aclf_m_approve)'),
+				(164, 1, 1, 'reports', 'mcp', 141, 26, 27, 'MCP_REPORTS_OPEN', 'reports', 'aclf_m_report'),
+				(165, 1, 1, 'reports', 'mcp', 141, 28, 29, 'MCP_REPORTS_CLOSED', 'reports_closed', 'aclf_m_report'),
+				(166, 1, 1, 'reports', 'mcp', 141, 30, 31, 'MCP_REPORT_DETAILS', 'report_details', 'acl_m_report,$"."id || (!$"."id && aclf_m_report)'),
+				(167, 1, 1, 'warn', 'mcp', 143, 40, 41, 'MCP_WARN_FRONT', 'front', 'aclf_m_warn'),
+				(168, 1, 1, 'warn', 'mcp', 143, 42, 43, 'MCP_WARN_LIST', 'list', 'aclf_m_warn'),
+				(169, 1, 1, 'warn', 'mcp', 143, 44, 45, 'MCP_WARN_USER', 'warn_user', 'aclf_m_warn'),
+				(170, 1, 1, 'warn', 'mcp', 143, 46, 47, 'MCP_WARN_POST', 'warn_post', 'acl_m_warn && acl_f_read,$"."id'),
+				(171, 1, 1, '', 'ucp', 0, 1, 12, 'UCP_MAIN', '', ''),
+				(172, 1, 1, '', 'ucp', 0, 13, 22, 'UCP_PROFILE', '', ''),
+				(173, 1, 1, '', 'ucp', 0, 23, 30, 'UCP_PREFS', '', ''),
+				(174, 1, 1, '', 'ucp', 0, 31, 42, 'UCP_PM', '', ''),
+				(175, 1, 1, '', 'ucp', 0, 43, 48, 'UCP_USERGROUPS', '', ''),
+				(176, 1, 1, '', 'ucp', 0, 49, 54, 'UCP_ZEBRA', '', ''),
+				(177, 1, 1, 'attachments', 'ucp', 171, 10, 11, 'UCP_MAIN_ATTACHMENTS', 'attachments', 'acl_u_attach'),
+				(178, 1, 1, 'groups', 'ucp', 175, 44, 45, 'UCP_USERGROUPS_MEMBER', 'membership', ''),
+				(179, 1, 1, 'groups', 'ucp', 175, 46, 47, 'UCP_USERGROUPS_MANAGE', 'manage', ''),
+				(180, 1, 1, 'main', 'ucp', 171, 2, 3, 'UCP_MAIN_FRONT', 'front', ''),
+				(181, 1, 1, 'main', 'ucp', 171, 4, 5, 'UCP_MAIN_SUBSCRIBED', 'subscribed', ''),
+				(182, 1, 1, 'main', 'ucp', 171, 6, 7, 'UCP_MAIN_BOOKMARKS', 'bookmarks', 'cfg_allow_bookmarks'),
+				(183, 1, 1, 'main', 'ucp', 171, 8, 9, 'UCP_MAIN_DRAFTS', 'drafts', ''),
+				(184, 1, 0, 'pm', 'ucp', 174, 32, 33, 'UCP_PM_VIEW', 'view', 'cfg_allow_privmsg'),
+				(185, 1, 1, 'pm', 'ucp', 174, 34, 35, 'UCP_PM_COMPOSE', 'compose', 'cfg_allow_privmsg'),
+				(186, 1, 1, 'pm', 'ucp', 174, 36, 37, 'UCP_PM_DRAFTS', 'drafts', 'cfg_allow_privmsg'),
+				(187, 1, 1, 'pm', 'ucp', 174, 38, 39, 'UCP_PM_OPTIONS', 'options', 'cfg_allow_privmsg'),
+				(188, 1, 0, 'pm', 'ucp', 174, 40, 41, 'UCP_PM_POPUP_TITLE', 'popup', 'cfg_allow_privmsg'),
+				(189, 1, 1, 'prefs', 'ucp', 173, 24, 25, 'UCP_PREFS_PERSONAL', 'personal', ''),
+				(190, 1, 1, 'prefs', 'ucp', 173, 26, 27, 'UCP_PREFS_POST', 'post', ''),
+				(191, 1, 1, 'prefs', 'ucp', 173, 28, 29, 'UCP_PREFS_VIEW', 'view', ''),
+				(192, 1, 1, 'profile', 'ucp', 172, 14, 15, 'UCP_PROFILE_PROFILE_INFO', 'profile_info', ''),
+				(193, 1, 1, 'profile', 'ucp', 172, 16, 17, 'UCP_PROFILE_SIGNATURE', 'signature', ''),
+				(194, 1, 1, 'profile', 'ucp', 172, 18, 19, 'UCP_PROFILE_AVATAR', 'avatar', 'cfg_allow_avatar && (cfg_allow_avatar_local || cfg_allow_avatar_remote || cfg_allow_avatar_upload || cfg_allow_avatar_remote_upload)'),
+				(195, 1, 1, 'profile', 'ucp', 172, 20, 21, 'UCP_PROFILE_REG_DETAILS', 'reg_details', ''),
+				(196, 1, 1, 'zebra', 'ucp', 176, 50, 51, 'UCP_ZEBRA_FRIENDS', 'friends', ''),
+				(197, 1, 1, 'zebra', 'ucp', 176, 52, 53, 'UCP_ZEBRA_FOES', 'foes', ''),
+				(198, 1, 1, 'board', 'acp', 10, 91, 92, 'ACP_POST_SETTINGS', 'post', 'acl_a_board')");
+				
+				$config_data = "<?php
+	// phpBB 3.0.x auto-generated configuration file
+	// Do not change anything in this file!
+	".'$'."dbms = 'mysqli';
+	".'$'."dbhost = 'localhost';
+	".'$'."dbport = '';
+	".'$'."dbname = '".$install_options['db_info']['db_forumname']."';
+	".'$'."dbuser = '".$install_options['db_info']['db_username']."';
+	".'$'."dbpasswd = '".$install_options['db_info']['db_password']."';
+	".'$'."table_prefix = '".$install_options['db_info']['db_forumprefix']."_';
+	".'$'."phpbb_adm_relative_path = 'adm/';
+	".'$'."acm_type = 'phpbb\\cache\\driver\\file';
+
+	@define('PHPBB_INSTALLED', true);
+	// @define('PHPBB_DISPLAY_LOAD_TIME', true);
+	@define('PHPBB_ENVIRONMENT', 'production');
+	// @define('DEBUG_CONTAINER', true);
+
+	".'$'."queryString = ".'$'."_SERVER['QUERY_STRING'];
+	if ((stristr(".'$'."queryString,'%20union%20')) OR (stristr(".'$'."queryString,'%2f%2a')) OR (stristr(".'$'."queryString,'%2f*')) OR (stristr(".'$'."queryString,'/*')) OR (stristr(".'$'."queryString,'*/union/*')) OR (stristr(".'$'."queryString,'c2nyaxb0')) OR (stristr(".'$'."queryString,'+union+'))  OR ((stristr(".'$'."queryString,'cmd=')) AND (!stristr(".'$'."queryString,'&cmd'))) OR ((stristr(".'$'."queryString,'exec')) AND (!stristr(".'$'."queryString,'execu'))) OR (stristr(".'$'."queryString,'concat'))) {
+	die('Illegal Operation');
+	}
+	?>";
+				if(isset($install_options['db_info']['db_forumpath']) && $install_options['db_info']['db_forumpath'] != '' && file_exists($install_options['db_info']['db_forumpath']."/config.php"))
+				{
+					$fp = fopen($install_options['db_info']['db_forumpath']."/config.php", 'w');
+					fputs($fp, $config_data);
+					fclose($fp);
+				}
 			}
-		}
-		
-		$old_users_table_name = "`".OLD_DB."`.`".OLD_DB_PREFIX."_users`";
-		
-		$new_users_table_name = ($have_forum) ? ("`".$install_options['db_info']['db_forumname']."`.`".(($install_options['db_info']['db_forumprefix'] != OLD_DB_PREFIX.'_bb3') ? $install_options['db_info']['db_forumprefix']."_users":OLD_DB_PREFIX."_bb3users")."`"):USERS_TABLE;		
-		
-		$db->query("set names 'latin1'");
-		
-		if($have_forum)
-		{
-			$db->query("DROP TABLE IF EXISTS $new_users_table_name");
-		
-			$users_query = $db->query("SHOW CREATE TABLE $old_users_table_name");
-			$users_query_results = $users_query->results();
-			$users_query_result = $users_query_results[0];
-			$users_sql = str_replace("CREATE TABLE `".OLD_DB_PREFIX."_users`", "CREATE TABLE $new_users_table_name", $users_query_result['Create Table']);
-			$db->query($users_sql);
-					
-			$db->query("set names '$pn_dbcharset'");
-			$db->query("INSERT INTO $new_users_table_name SELECT * FROM $old_users_table_name");
-	
-			$db->query("ALTER TABLE `".$install_options['db_info']['db_forumname']."`.`".$install_options['db_info']['db_forumprefix']."_bb3profile_fields_data` ADD `pf_user_phone` varchar(255) COLLATE utf8_bin NOT NULL"); 
-			$db->query("ALTER TABLE ".$new_users_table_name." ADD `user_credit` bigint(20) UNSIGNED NOT NULL DEFAULT '0'"); 
-		}
-		else
-			$transfer_users = true;
-		
-		$db->query("TRUNCATE TABLE `".$install_options['db_info']['db_forumname']."`.`".$install_options['db_info']['db_forumprefix']."_modules`");
-		$db->query("INSERT INTO `".$install_options['db_info']['db_forumname']."`.`".$install_options['db_info']['db_forumprefix']."_modules` (`module_id`, `module_enabled`, `module_display`, `module_basename`, `module_class`, `parent_id`, `left_id`, `right_id`, `module_langname`, `module_mode`, `module_auth`) VALUES
-		(1, 1, 1, '', 'acp', 0, 1, 64, 'ACP_CAT_GENERAL', '', ''),
-		(2, 1, 1, '', 'acp', 1, 4, 17, 'ACP_QUICK_ACCESS', '', ''),
-		(3, 1, 1, '', 'acp', 1, 18, 41, 'ACP_BOARD_CONFIGURATION', '', ''),
-		(4, 1, 1, '', 'acp', 1, 42, 49, 'ACP_CLIENT_COMMUNICATION', '', ''),
-		(5, 1, 1, '', 'acp', 1, 50, 63, 'ACP_SERVER_CONFIGURATION', '', ''),
-		(6, 1, 1, '', 'acp', 0, 65, 84, 'ACP_CAT_FORUMS', '', ''),
-		(7, 1, 1, '', 'acp', 6, 66, 71, 'ACP_MANAGE_FORUMS', '', ''),
-		(8, 1, 1, '', 'acp', 6, 72, 83, 'ACP_FORUM_BASED_PERMISSIONS', '', ''),
-		(9, 1, 1, '', 'acp', 0, 85, 110, 'ACP_CAT_POSTING', '', ''),
-		(10, 1, 1, '', 'acp', 9, 86, 99, 'ACP_MESSAGES', '', ''),
-		(11, 1, 1, '', 'acp', 9, 100, 109, 'ACP_ATTACHMENTS', '', ''),
-		(12, 1, 1, '', 'acp', 0, 111, 166, 'ACP_CAT_USERGROUP', '', ''),
-		(13, 1, 1, '', 'acp', 12, 112, 145, 'ACP_CAT_USERS', '', ''),
-		(14, 1, 1, '', 'acp', 12, 146, 153, 'ACP_GROUPS', '', ''),
-		(15, 1, 1, '', 'acp', 12, 154, 165, 'ACP_USER_SECURITY', '', ''),
-		(16, 1, 1, '', 'acp', 0, 167, 216, 'ACP_CAT_PERMISSIONS', '', ''),
-		(17, 1, 1, '', 'acp', 16, 170, 179, 'ACP_GLOBAL_PERMISSIONS', '', ''),
-		(18, 1, 1, '', 'acp', 16, 180, 191, 'ACP_FORUM_BASED_PERMISSIONS', '', ''),
-		(19, 1, 1, '', 'acp', 16, 192, 201, 'ACP_PERMISSION_ROLES', '', ''),
-		(20, 1, 1, '', 'acp', 16, 202, 215, 'ACP_PERMISSION_MASKS', '', ''),
-		(21, 1, 1, '', 'acp', 0, 217, 230, 'ACP_CAT_STYLES', '', ''),
-		(22, 1, 1, '', 'acp', 21, 218, 221, 'ACP_STYLE_MANAGEMENT', '', ''),
-		(23, 1, 1, '', 'acp', 21, 222, 229, 'ACP_STYLE_COMPONENTS', '', ''),
-		(24, 1, 1, '', 'acp', 0, 231, 250, 'ACP_CAT_MAINTENANCE', '', ''),
-		(25, 1, 1, '', 'acp', 24, 232, 241, 'ACP_FORUM_LOGS', '', ''),
-		(26, 1, 1, '', 'acp', 24, 242, 249, 'ACP_CAT_DATABASE', '', ''),
-		(27, 1, 1, '', 'acp', 0, 251, 276, 'ACP_CAT_SYSTEM', '', ''),
-		(28, 1, 1, '', 'acp', 27, 252, 255, 'ACP_AUTOMATION', '', ''),
-		(29, 1, 1, '', 'acp', 27, 256, 267, 'ACP_GENERAL_TASKS', '', ''),
-		(30, 1, 1, '', 'acp', 27, 268, 275, 'ACP_MODULE_MANAGEMENT', '', ''),
-		(31, 1, 1, '', 'acp', 0, 277, 288, 'ACP_CAT_DOT_MODS', '', ''),
-		(32, 1, 1, 'attachments', 'acp', 3, 19, 20, 'ACP_ATTACHMENT_SETTINGS', 'attach', 'acl_a_attach'),
-		(33, 1, 1, 'attachments', 'acp', 11, 101, 102, 'ACP_ATTACHMENT_SETTINGS', 'attach', 'acl_a_attach'),
-		(34, 1, 1, 'attachments', 'acp', 11, 103, 104, 'ACP_MANAGE_EXTENSIONS', 'extensions', 'acl_a_attach'),
-		(35, 1, 1, 'attachments', 'acp', 11, 105, 106, 'ACP_EXTENSION_GROUPS', 'ext_groups', 'acl_a_attach'),
-		(36, 1, 1, 'attachments', 'acp', 11, 107, 108, 'ACP_ORPHAN_ATTACHMENTS', 'orphan', 'acl_a_attach'),
-		(37, 1, 1, 'ban', 'acp', 15, 155, 156, 'ACP_BAN_EMAILS', 'email', 'acl_a_ban'),
-		(38, 1, 1, 'ban', 'acp', 15, 157, 158, 'ACP_BAN_IPS', 'ip', 'acl_a_ban'),
-		(39, 1, 1, 'ban', 'acp', 15, 159, 160, 'ACP_BAN_USERNAMES', 'user', 'acl_a_ban'),
-		(40, 1, 1, 'bbcodes', 'acp', 10, 87, 88, 'ACP_BBCODES', 'bbcodes', 'acl_a_bbcode'),
-		(41, 1, 1, 'board', 'acp', 3, 21, 22, 'ACP_BOARD_SETTINGS', 'settings', 'acl_a_board'),
-		(42, 1, 1, 'board', 'acp', 3, 23, 24, 'ACP_BOARD_FEATURES', 'features', 'acl_a_board'),
-		(43, 1, 1, 'board', 'acp', 3, 25, 26, 'ACP_AVATAR_SETTINGS', 'avatar', 'acl_a_board'),
-		(44, 1, 1, 'board', 'acp', 3, 27, 28, 'ACP_MESSAGE_SETTINGS', 'message', 'acl_a_board'),
-		(45, 1, 1, 'board', 'acp', 10, 89, 90, 'ACP_MESSAGE_SETTINGS', 'message', 'acl_a_board'),
-		(46, 1, 1, 'board', 'acp', 3, 29, 30, 'ACP_POST_SETTINGS', 'post', 'acl_a_board'),
-		(47, 1, 1, 'board', 'acp', 3, 31, 32, 'ACP_SIGNATURE_SETTINGS', 'signature', 'acl_a_board'),
-		(48, 1, 1, 'board', 'acp', 3, 33, 34, 'ACP_FEED_SETTINGS', 'feed', 'acl_a_board'),
-		(49, 1, 1, 'board', 'acp', 3, 35, 36, 'ACP_REGISTER_SETTINGS', 'registration', 'acl_a_board'),
-		(50, 1, 1, 'board', 'acp', 4, 43, 44, 'ACP_AUTH_SETTINGS', 'auth', 'acl_a_server'),
-		(51, 1, 1, 'board', 'acp', 4, 45, 46, 'ACP_EMAIL_SETTINGS', 'email', 'acl_a_server'),
-		(52, 1, 1, 'board', 'acp', 5, 51, 52, 'ACP_COOKIE_SETTINGS', 'cookie', 'acl_a_server'),
-		(53, 1, 1, 'board', 'acp', 5, 53, 54, 'ACP_SERVER_SETTINGS', 'server', 'acl_a_server'),
-		(54, 1, 1, 'board', 'acp', 5, 55, 56, 'ACP_SECURITY_SETTINGS', 'security', 'acl_a_server'),
-		(55, 1, 1, 'board', 'acp', 5, 57, 58, 'ACP_LOAD_SETTINGS', 'load', 'acl_a_server'),
-		(56, 1, 1, 'bots', 'acp', 29, 257, 258, 'ACP_BOTS', 'bots', 'acl_a_bots'),
-		(57, 1, 1, 'captcha', 'acp', 3, 37, 38, 'ACP_VC_SETTINGS', 'visual', 'acl_a_board'),
-		(58, 1, 0, 'captcha', 'acp', 3, 39, 40, 'ACP_VC_CAPTCHA_DISPLAY', 'img', 'acl_a_board'),
-		(59, 1, 1, 'database', 'acp', 26, 243, 244, 'ACP_BACKUP', 'backup', 'acl_a_backup'),
-		(60, 1, 1, 'database', 'acp', 26, 245, 246, 'ACP_RESTORE', 'restore', 'acl_a_backup'),
-		(61, 1, 1, 'disallow', 'acp', 15, 161, 162, 'ACP_DISALLOW_USERNAMES', 'usernames', 'acl_a_names'),
-		(62, 1, 1, 'email', 'acp', 29, 259, 260, 'ACP_MASS_EMAIL', 'email', 'acl_a_email && cfg_email_enable'),
-		(63, 1, 1, 'forums', 'acp', 7, 67, 68, 'ACP_MANAGE_FORUMS', 'manage', 'acl_a_forum'),
-		(64, 1, 1, 'groups', 'acp', 14, 147, 148, 'ACP_GROUPS_MANAGE', 'manage', 'acl_a_group'),
-		(65, 1, 1, 'icons', 'acp', 10, 93, 94, 'ACP_ICONS', 'icons', 'acl_a_icons'),
-		(66, 1, 1, 'icons', 'acp', 10, 95, 96, 'ACP_SMILIES', 'smilies', 'acl_a_icons'),
-		(67, 1, 1, 'inactive', 'acp', 13, 115, 116, 'ACP_INACTIVE_USERS', 'list', 'acl_a_user'),
-		(68, 1, 1, 'jabber', 'acp', 4, 47, 48, 'ACP_JABBER_SETTINGS', 'settings', 'acl_a_jabber'),
-		(69, 1, 1, 'language', 'acp', 29, 261, 262, 'ACP_LANGUAGE_PACKS', 'lang_packs', 'acl_a_language'),
-		(70, 1, 1, 'logs', 'acp', 25, 233, 234, 'ACP_ADMIN_LOGS', 'admin', 'acl_a_viewlogs'),
-		(71, 1, 1, 'logs', 'acp', 25, 235, 236, 'ACP_MOD_LOGS', 'mod', 'acl_a_viewlogs'),
-		(72, 1, 1, 'logs', 'acp', 25, 237, 238, 'ACP_USERS_LOGS', 'users', 'acl_a_viewlogs'),
-		(73, 1, 1, 'logs', 'acp', 25, 239, 240, 'ACP_CRITICAL_LOGS', 'critical', 'acl_a_viewlogs'),
-		(74, 1, 1, 'main', 'acp', 1, 2, 3, 'ACP_INDEX', 'main', ''),
-		(75, 1, 1, 'modules', 'acp', 30, 269, 270, 'ACP', 'acp', 'acl_a_modules'),
-		(76, 1, 1, 'modules', 'acp', 30, 271, 272, 'UCP', 'ucp', 'acl_a_modules'),
-		(77, 1, 1, 'modules', 'acp', 30, 273, 274, 'MCP', 'mcp', 'acl_a_modules'),
-		(78, 1, 1, 'permission_roles', 'acp', 19, 193, 194, 'ACP_ADMIN_ROLES', 'admin_roles', 'acl_a_roles && acl_a_aauth'),
-		(79, 1, 1, 'permission_roles', 'acp', 19, 195, 196, 'ACP_USER_ROLES', 'user_roles', 'acl_a_roles && acl_a_uauth'),
-		(80, 1, 1, 'permission_roles', 'acp', 19, 197, 198, 'ACP_MOD_ROLES', 'mod_roles', 'acl_a_roles && acl_a_mauth'),
-		(81, 1, 1, 'permission_roles', 'acp', 19, 199, 200, 'ACP_FORUM_ROLES', 'forum_roles', 'acl_a_roles && acl_a_fauth'),
-		(82, 1, 1, 'permissions', 'acp', 16, 168, 169, 'ACP_PERMISSIONS', 'intro', 'acl_a_authusers || acl_a_authgroups || acl_a_viewauth'),
-		(83, 1, 0, 'permissions', 'acp', 20, 203, 204, 'ACP_PERMISSION_TRACE', 'trace', 'acl_a_viewauth'),
-		(84, 1, 1, 'permissions', 'acp', 18, 181, 182, 'ACP_FORUM_PERMISSIONS', 'setting_forum_local', 'acl_a_fauth && (acl_a_authusers || acl_a_authgroups)'),
-		(85, 1, 1, 'permissions', 'acp', 18, 183, 184, 'ACP_FORUM_PERMISSIONS_COPY', 'setting_forum_copy', 'acl_a_fauth && acl_a_authusers && acl_a_authgroups && acl_a_mauth'),
-		(86, 1, 1, 'permissions', 'acp', 18, 185, 186, 'ACP_FORUM_MODERATORS', 'setting_mod_local', 'acl_a_mauth && (acl_a_authusers || acl_a_authgroups)'),
-		(87, 1, 1, 'permissions', 'acp', 17, 171, 172, 'ACP_USERS_PERMISSIONS', 'setting_user_global', 'acl_a_authusers && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
-		(88, 1, 1, 'permissions', 'acp', 13, 117, 118, 'ACP_USERS_PERMISSIONS', 'setting_user_global', 'acl_a_authusers && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
-		(89, 1, 1, 'permissions', 'acp', 18, 187, 188, 'ACP_USERS_FORUM_PERMISSIONS', 'setting_user_local', 'acl_a_authusers && (acl_a_mauth || acl_a_fauth)'),
-		(90, 1, 1, 'permissions', 'acp', 13, 119, 120, 'ACP_USERS_FORUM_PERMISSIONS', 'setting_user_local', 'acl_a_authusers && (acl_a_mauth || acl_a_fauth)'),
-		(91, 1, 1, 'permissions', 'acp', 17, 173, 174, 'ACP_GROUPS_PERMISSIONS', 'setting_group_global', 'acl_a_authgroups && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
-		(92, 1, 1, 'permissions', 'acp', 14, 149, 150, 'ACP_GROUPS_PERMISSIONS', 'setting_group_global', 'acl_a_authgroups && (acl_a_aauth || acl_a_mauth || acl_a_uauth)'),
-		(93, 1, 1, 'permissions', 'acp', 18, 189, 190, 'ACP_GROUPS_FORUM_PERMISSIONS', 'setting_group_local', 'acl_a_authgroups && (acl_a_mauth || acl_a_fauth)'),
-		(94, 1, 1, 'permissions', 'acp', 14, 151, 152, 'ACP_GROUPS_FORUM_PERMISSIONS', 'setting_group_local', 'acl_a_authgroups && (acl_a_mauth || acl_a_fauth)'),
-		(95, 1, 1, 'permissions', 'acp', 17, 175, 176, 'ACP_ADMINISTRATORS', 'setting_admin_global', 'acl_a_aauth && (acl_a_authusers || acl_a_authgroups)'),
-		(96, 1, 1, 'permissions', 'acp', 17, 177, 178, 'ACP_GLOBAL_MODERATORS', 'setting_mod_global', 'acl_a_mauth && (acl_a_authusers || acl_a_authgroups)'),
-		(97, 1, 1, 'permissions', 'acp', 20, 205, 206, 'ACP_VIEW_ADMIN_PERMISSIONS', 'view_admin_global', 'acl_a_viewauth'),
-		(98, 1, 1, 'permissions', 'acp', 20, 207, 208, 'ACP_VIEW_USER_PERMISSIONS', 'view_user_global', 'acl_a_viewauth'),
-		(99, 1, 1, 'permissions', 'acp', 20, 209, 210, 'ACP_VIEW_GLOBAL_MOD_PERMISSIONS', 'view_mod_global', 'acl_a_viewauth'),
-		(100, 1, 1, 'permissions', 'acp', 20, 211, 212, 'ACP_VIEW_FORUM_MOD_PERMISSIONS', 'view_mod_local', 'acl_a_viewauth'),
-		(101, 1, 1, 'permissions', 'acp', 20, 213, 214, 'ACP_VIEW_FORUM_PERMISSIONS', 'view_forum_local', 'acl_a_viewauth'),
-		(102, 1, 1, 'php_info', 'acp', 29, 263, 264, 'ACP_PHP_INFO', 'info', 'acl_a_phpinfo'),
-		(103, 1, 1, 'profile', 'acp', 13, 121, 122, 'ACP_CUSTOM_PROFILE_FIELDS', 'profile', 'acl_a_profile'),
-		(104, 1, 1, 'prune', 'acp', 7, 69, 70, 'ACP_PRUNE_FORUMS', 'forums', 'acl_a_prune'),
-		(105, 1, 1, 'prune', 'acp', 15, 163, 164, 'ACP_PRUNE_USERS', 'users', 'acl_a_userdel'),
-		(106, 1, 1, 'ranks', 'acp', 13, 123, 124, 'ACP_MANAGE_RANKS', 'ranks', 'acl_a_ranks'),
-		(107, 1, 1, 'reasons', 'acp', 29, 265, 266, 'ACP_MANAGE_REASONS', 'main', 'acl_a_reasons'),
-		(108, 1, 1, 'search', 'acp', 5, 59, 60, 'ACP_SEARCH_SETTINGS', 'settings', 'acl_a_search'),
-		(109, 1, 1, 'search', 'acp', 26, 247, 248, 'ACP_SEARCH_INDEX', 'index', 'acl_a_search'),
-		(110, 1, 1, 'send_statistics', 'acp', 5, 61, 62, 'ACP_SEND_STATISTICS', 'send_statistics', 'acl_a_server'),
-		(111, 1, 1, 'styles', 'acp', 22, 219, 220, 'ACP_STYLES', 'style', 'acl_a_styles'),
-		(112, 1, 1, 'styles', 'acp', 23, 223, 224, 'ACP_TEMPLATES', 'template', 'acl_a_styles'),
-		(113, 1, 1, 'styles', 'acp', 23, 225, 226, 'ACP_THEMES', 'theme', 'acl_a_styles'),
-		(114, 1, 1, 'styles', 'acp', 23, 227, 228, 'ACP_IMAGESETS', 'imageset', 'acl_a_styles'),
-		(115, 1, 1, 'update', 'acp', 28, 253, 254, 'ACP_VERSION_CHECK', 'version_check', 'acl_a_board'),
-		(116, 1, 1, 'users', 'acp', 13, 113, 114, 'ACP_MANAGE_USERS', 'overview', 'acl_a_user'),
-		(117, 1, 0, 'users', 'acp', 13, 125, 126, 'ACP_USER_FEEDBACK', 'feedback', 'acl_a_user'),
-		(118, 1, 0, 'users', 'acp', 13, 127, 128, 'ACP_USER_WARNINGS', 'warnings', 'acl_a_user'),
-		(119, 1, 0, 'users', 'acp', 13, 129, 130, 'ACP_USER_PROFILE', 'profile', 'acl_a_user'),
-		(120, 1, 0, 'users', 'acp', 13, 131, 132, 'ACP_USER_PREFS', 'prefs', 'acl_a_user'),
-		(121, 1, 0, 'users', 'acp', 13, 133, 134, 'ACP_USER_AVATAR', 'avatar', 'acl_a_user'),
-		(122, 1, 0, 'users', 'acp', 13, 135, 136, 'ACP_USER_RANK', 'rank', 'acl_a_user'),
-		(123, 1, 0, 'users', 'acp', 13, 137, 138, 'ACP_USER_SIG', 'sig', 'acl_a_user'),
-		(124, 1, 0, 'users', 'acp', 13, 139, 140, 'ACP_USER_GROUPS', 'groups', 'acl_a_user && acl_a_group'),
-		(125, 1, 0, 'users', 'acp', 13, 141, 142, 'ACP_USER_PERM', 'perm', 'acl_a_user && acl_a_viewauth'),
-		(126, 1, 0, 'users', 'acp', 13, 143, 144, 'ACP_USER_ATTACH', 'attach', 'acl_a_user'),
-		(127, 1, 1, 'words', 'acp', 10, 97, 98, 'ACP_WORDS', 'words', 'acl_a_words'),
-		(128, 1, 1, 'users', 'acp', 2, 5, 6, 'ACP_MANAGE_USERS', 'overview', 'acl_a_user'),
-		(129, 1, 1, 'groups', 'acp', 2, 7, 8, 'ACP_GROUPS_MANAGE', 'manage', 'acl_a_group'),
-		(130, 1, 1, 'forums', 'acp', 2, 9, 10, 'ACP_MANAGE_FORUMS', 'manage', 'acl_a_forum'),
-		(131, 1, 1, 'logs', 'acp', 2, 11, 12, 'ACP_MOD_LOGS', 'mod', 'acl_a_viewlogs'),
-		(132, 1, 1, 'bots', 'acp', 2, 13, 14, 'ACP_BOTS', 'bots', 'acl_a_bots'),
-		(133, 1, 1, 'php_info', 'acp', 2, 15, 16, 'ACP_PHP_INFO', 'info', 'acl_a_phpinfo'),
-		(134, 1, 1, 'permissions', 'acp', 8, 73, 74, 'ACP_FORUM_PERMISSIONS', 'setting_forum_local', 'acl_a_fauth && (acl_a_authusers || acl_a_authgroups)'),
-		(135, 1, 1, 'permissions', 'acp', 8, 75, 76, 'ACP_FORUM_PERMISSIONS_COPY', 'setting_forum_copy', 'acl_a_fauth && acl_a_authusers && acl_a_authgroups && acl_a_mauth'),
-		(136, 1, 1, 'permissions', 'acp', 8, 77, 78, 'ACP_FORUM_MODERATORS', 'setting_mod_local', 'acl_a_mauth && (acl_a_authusers || acl_a_authgroups)'),
-		(137, 1, 1, 'permissions', 'acp', 8, 79, 80, 'ACP_USERS_FORUM_PERMISSIONS', 'setting_user_local', 'acl_a_authusers && (acl_a_mauth || acl_a_fauth)'),
-		(138, 1, 1, 'permissions', 'acp', 8, 81, 82, 'ACP_GROUPS_FORUM_PERMISSIONS', 'setting_group_local', 'acl_a_authgroups && (acl_a_mauth || acl_a_fauth)'),
-		(139, 1, 1, '', 'mcp', 0, 1, 10, 'MCP_MAIN', '', ''),
-		(140, 1, 1, '', 'mcp', 0, 11, 18, 'MCP_QUEUE', '', ''),
-		(141, 1, 1, '', 'mcp', 0, 19, 32, 'MCP_REPORTS', '', ''),
-		(142, 1, 1, '', 'mcp', 0, 33, 38, 'MCP_NOTES', '', ''),
-		(143, 1, 1, '', 'mcp', 0, 39, 48, 'MCP_WARN', '', ''),
-		(144, 1, 1, '', 'mcp', 0, 49, 56, 'MCP_LOGS', '', ''),
-		(145, 1, 1, '', 'mcp', 0, 57, 64, 'MCP_BAN', '', ''),
-		(146, 1, 1, 'ban', 'mcp', 145, 58, 59, 'MCP_BAN_USERNAMES', 'user', 'acl_m_ban'),
-		(147, 1, 1, 'ban', 'mcp', 145, 60, 61, 'MCP_BAN_IPS', 'ip', 'acl_m_ban'),
-		(148, 1, 1, 'ban', 'mcp', 145, 62, 63, 'MCP_BAN_EMAILS', 'email', 'acl_m_ban'),
-		(149, 1, 1, 'logs', 'mcp', 144, 50, 51, 'MCP_LOGS_FRONT', 'front', 'acl_m_ || aclf_m_'),
-		(150, 1, 1, 'logs', 'mcp', 144, 52, 53, 'MCP_LOGS_FORUM_VIEW', 'forum_logs', 'acl_m_,$id'),
-		(151, 1, 1, 'logs', 'mcp', 144, 54, 55, 'MCP_LOGS_TOPIC_VIEW', 'topic_logs', 'acl_m_,$id'),
-		(152, 1, 1, 'main', 'mcp', 139, 2, 3, 'MCP_MAIN_FRONT', 'front', ''),
-		(153, 1, 1, 'main', 'mcp', 139, 4, 5, 'MCP_MAIN_FORUM_VIEW', 'forum_view', 'acl_m_,$id'),
-		(154, 1, 1, 'main', 'mcp', 139, 6, 7, 'MCP_MAIN_TOPIC_VIEW', 'topic_view', 'acl_m_,$id'),
-		(155, 1, 1, 'main', 'mcp', 139, 8, 9, 'MCP_MAIN_POST_DETAILS', 'post_details', 'acl_m_,$id || (!$id && aclf_m_)'),
-		(156, 1, 1, 'notes', 'mcp', 142, 34, 35, 'MCP_NOTES_FRONT', 'front', ''),
-		(157, 1, 1, 'notes', 'mcp', 142, 36, 37, 'MCP_NOTES_USER', 'user_notes', ''),
-		(158, 1, 1, 'pm_reports', 'mcp', 141, 20, 21, 'MCP_PM_REPORTS_OPEN', 'pm_reports', 'aclf_m_report'),
-		(159, 1, 1, 'pm_reports', 'mcp', 141, 22, 23, 'MCP_PM_REPORTS_CLOSED', 'pm_reports_closed', 'aclf_m_report'),
-		(160, 1, 1, 'pm_reports', 'mcp', 141, 24, 25, 'MCP_PM_REPORT_DETAILS', 'pm_report_details', 'aclf_m_report'),
-		(161, 1, 1, 'queue', 'mcp', 140, 12, 13, 'MCP_QUEUE_UNAPPROVED_TOPICS', 'unapproved_topics', 'aclf_m_approve'),
-		(162, 1, 1, 'queue', 'mcp', 140, 14, 15, 'MCP_QUEUE_UNAPPROVED_POSTS', 'unapproved_posts', 'aclf_m_approve'),
-		(163, 1, 1, 'queue', 'mcp', 140, 16, 17, 'MCP_QUEUE_APPROVE_DETAILS', 'approve_details', 'acl_m_approve,$id || (!$id && aclf_m_approve)'),
-		(164, 1, 1, 'reports', 'mcp', 141, 26, 27, 'MCP_REPORTS_OPEN', 'reports', 'aclf_m_report'),
-		(165, 1, 1, 'reports', 'mcp', 141, 28, 29, 'MCP_REPORTS_CLOSED', 'reports_closed', 'aclf_m_report'),
-		(166, 1, 1, 'reports', 'mcp', 141, 30, 31, 'MCP_REPORT_DETAILS', 'report_details', 'acl_m_report,$id || (!$id && aclf_m_report)'),
-		(167, 1, 1, 'warn', 'mcp', 143, 40, 41, 'MCP_WARN_FRONT', 'front', 'aclf_m_warn'),
-		(168, 1, 1, 'warn', 'mcp', 143, 42, 43, 'MCP_WARN_LIST', 'list', 'aclf_m_warn'),
-		(169, 1, 1, 'warn', 'mcp', 143, 44, 45, 'MCP_WARN_USER', 'warn_user', 'aclf_m_warn'),
-		(170, 1, 1, 'warn', 'mcp', 143, 46, 47, 'MCP_WARN_POST', 'warn_post', 'acl_m_warn && acl_f_read,$id'),
-		(171, 1, 1, '', 'ucp', 0, 1, 12, 'UCP_MAIN', '', ''),
-		(172, 1, 1, '', 'ucp', 0, 13, 22, 'UCP_PROFILE', '', ''),
-		(173, 1, 1, '', 'ucp', 0, 23, 30, 'UCP_PREFS', '', ''),
-		(174, 1, 1, '', 'ucp', 0, 31, 42, 'UCP_PM', '', ''),
-		(175, 1, 1, '', 'ucp', 0, 43, 48, 'UCP_USERGROUPS', '', ''),
-		(176, 1, 1, '', 'ucp', 0, 49, 54, 'UCP_ZEBRA', '', ''),
-		(177, 1, 1, 'attachments', 'ucp', 171, 10, 11, 'UCP_MAIN_ATTACHMENTS', 'attachments', 'acl_u_attach'),
-		(178, 1, 1, 'groups', 'ucp', 175, 44, 45, 'UCP_USERGROUPS_MEMBER', 'membership', ''),
-		(179, 1, 1, 'groups', 'ucp', 175, 46, 47, 'UCP_USERGROUPS_MANAGE', 'manage', ''),
-		(180, 1, 1, 'main', 'ucp', 171, 2, 3, 'UCP_MAIN_FRONT', 'front', ''),
-		(181, 1, 1, 'main', 'ucp', 171, 4, 5, 'UCP_MAIN_SUBSCRIBED', 'subscribed', ''),
-		(182, 1, 1, 'main', 'ucp', 171, 6, 7, 'UCP_MAIN_BOOKMARKS', 'bookmarks', 'cfg_allow_bookmarks'),
-		(183, 1, 1, 'main', 'ucp', 171, 8, 9, 'UCP_MAIN_DRAFTS', 'drafts', ''),
-		(184, 1, 0, 'pm', 'ucp', 174, 32, 33, 'UCP_PM_VIEW', 'view', 'cfg_allow_privmsg'),
-		(185, 1, 1, 'pm', 'ucp', 174, 34, 35, 'UCP_PM_COMPOSE', 'compose', 'cfg_allow_privmsg'),
-		(186, 1, 1, 'pm', 'ucp', 174, 36, 37, 'UCP_PM_DRAFTS', 'drafts', 'cfg_allow_privmsg'),
-		(187, 1, 1, 'pm', 'ucp', 174, 38, 39, 'UCP_PM_OPTIONS', 'options', 'cfg_allow_privmsg'),
-		(188, 1, 0, 'pm', 'ucp', 174, 40, 41, 'UCP_PM_POPUP_TITLE', 'popup', 'cfg_allow_privmsg'),
-		(189, 1, 1, 'prefs', 'ucp', 173, 24, 25, 'UCP_PREFS_PERSONAL', 'personal', ''),
-		(190, 1, 1, 'prefs', 'ucp', 173, 26, 27, 'UCP_PREFS_POST', 'post', ''),
-		(191, 1, 1, 'prefs', 'ucp', 173, 28, 29, 'UCP_PREFS_VIEW', 'view', ''),
-		(192, 1, 1, 'profile', 'ucp', 172, 14, 15, 'UCP_PROFILE_PROFILE_INFO', 'profile_info', ''),
-		(193, 1, 1, 'profile', 'ucp', 172, 16, 17, 'UCP_PROFILE_SIGNATURE', 'signature', ''),
-		(194, 1, 1, 'profile', 'ucp', 172, 18, 19, 'UCP_PROFILE_AVATAR', 'avatar', 'cfg_allow_avatar && (cfg_allow_avatar_local || cfg_allow_avatar_remote || cfg_allow_avatar_upload || cfg_allow_avatar_remote_upload)'),
-		(195, 1, 1, 'profile', 'ucp', 172, 20, 21, 'UCP_PROFILE_REG_DETAILS', 'reg_details', ''),
-		(196, 1, 1, 'zebra', 'ucp', 176, 50, 51, 'UCP_ZEBRA_FRIENDS', 'friends', ''),
-		(197, 1, 1, 'zebra', 'ucp', 176, 52, 53, 'UCP_ZEBRA_FOES', 'foes', ''),
-		(198, 1, 1, 'board', 'acp', 10, 91, 92, 'ACP_POST_SETTINGS', 'post', 'acl_a_board')");
-		
-		if(isset($install_options['db_info']['db_have_forum']) && $install_options['db_info']['db_have_forum'] != 0)
-		{
-		$config_data = "<?php
-// phpBB 3.0.x auto-generated configuration file
-// Do not change anything in this file!
-".'$'."dbms = 'mysqli';
-".'$'."dbhost = 'localhost';
-".'$'."dbport = '';
-".'$'."dbname = '".$install_options['db_info']['db_forumname']."';
-".'$'."dbuser = '".$install_options['db_info']['db_username']."';
-".'$'."dbpasswd = '".$install_options['db_info']['db_password']."';
-".'$'."table_prefix = '".$install_options['db_info']['db_forumprefix']."_';
-".'$'."phpbb_adm_relative_path = 'adm/';
-".'$'."acm_type = 'phpbb\\cache\\driver\\file';
-
-@define('PHPBB_INSTALLED', true);
-// @define('PHPBB_DISPLAY_LOAD_TIME', true);
-@define('PHPBB_ENVIRONMENT', 'production');
-// @define('DEBUG_CONTAINER', true);
-
-".'$'."queryString = ".'$'."_SERVER['QUERY_STRING'];
-if ((stristr(".'$'."queryString,'%20union%20')) OR (stristr(".'$'."queryString,'%2f%2a')) OR (stristr(".'$'."queryString,'%2f*')) OR (stristr(".'$'."queryString,'/*')) OR (stristr(".'$'."queryString,'*/union/*')) OR (stristr(".'$'."queryString,'c2nyaxb0')) OR (stristr(".'$'."queryString,'+union+'))  OR ((stristr(".'$'."queryString,'cmd=')) AND (!stristr(".'$'."queryString,'&cmd'))) OR ((stristr(".'$'."queryString,'exec')) AND (!stristr(".'$'."queryString,'execu'))) OR (stristr(".'$'."queryString,'concat'))) {
-die('Illegal Operation');
-}
-?>";
-		if(isset($install_options['db_info']['db_forumpath']) && $install_options['db_info']['db_forumpath'] != '' && file_exists($install_options['db_info']['db_forumpath']."/config.php"))
-		{
-			$fp = fopen($install_options['db_info']['db_forumpath']."/config.php", 'w');
-			fputs($fp, $config_data);
-			fclose($fp);
-		}
 		}
 	}
 	
-	upgrade_progress_output("انتقال جداول تالار", 100, 100, 0, "install.php?op=".(($transfer_users) ? "users":"final")."", "", 90, 1000);
+	upgrade_progress_output("انتقال جداول تالار", 100, 100, 0, "install.php?op=".(($transfer_users) ? "users":"final")."", "", 99, 1000);
 }
 
 function upgrade_users($start)
@@ -2792,20 +3599,20 @@ function upgrade_users($start)
 			
 			$status = ($row['user_type'] == 0 || $row['user_type'] == 3) ? 1:0;
 			
-			$insert_query[] = array($row['user_id'], $status, $row['group_id'],$row['user_ip'],$row['user_regdate'],$row['username'],$row['username_clean'], '',$row['user_email'],$row['user_birthday'],$row['user_lastvisit'],$row['user_lastpage'],$row['user_inactive_reason'],$row['user_inactive_time'],$row['user_lang'],$row['user_allow_viewonline'],$row['user_avatar'],$row['user_avatar_type'],$row['user_sig'],$row['user_from'],$row['user_website'],$row['user_interests'],$row['newsletter'],$row['points'],$row['femail']);
+			$insert_query[] = array($row['user_id'], $status, 2,$row['user_ip'],$row['user_regdate'],$row['username'],$row['username_clean'], '',$row['user_email'],$row['user_birthday'],$row['user_lastvisit'],$row['user_lastpage'],$row['user_inactive_reason'],$row['user_inactive_time'],$row['user_lang'],$row['user_allow_viewonline'],$row['user_avatar'],$row['user_avatar_type'],$row['user_sig'],$row['user_from'],$row['user_website'],$row['user_interests'],$row['newsletter'],$row['points'],$row['femail'], 0);
 		}
 		
-		$cols = array("user_id","user_status","group_id","user_ip","user_regdate","username","user_realname","user_password","user_email","user_birthday","user_lastvisit","user_lastpage","user_inactive_reason","user_inactive_time","user_lang","user_allow_viewonline","user_avatar","user_avatar_type","user_sig","user_address","user_website","user_interests","user_newsletter","user_points","user_femail");		
-		
+		$cols = array("user_id","user_status","group_id","user_ip","user_regdate","username","user_realname","user_password","user_email","user_birthday","user_lastvisit","user_lastpage","user_inactive_reason","user_inactive_time","user_lang","user_allow_viewonline","user_avatar","user_avatar_type","user_sig","user_address","user_website","user_interests","user_newsletter","user_points","user_femail","user_credit");		
+
 		$db->query("set names '$pn_dbcharset'");
 		if(isset($insert_query) && !empty($insert_query))
-			$db->table(USERS_TABLE)->multiinsert(array("tag_id","tag","counter"), $insert_query);
+			$db->table(USERS_TABLE)->multiinsert($cols, $insert_query);
 	}
 	
 	$new_start = $start+$run_per_step;
 	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال کاربران", $total_rows, $fetched_rows, $start, "install.php?op=final", "install.php?op=users&start=$new_start", 72, $run_per_step);
+	upgrade_progress_output("انتقال کاربران", $total_rows, $fetched_rows, $start, "install.php?op=final", "install.php?op=users&start=$new_start", 99, $run_per_step);
 }
 
 function upgrade_final()
@@ -2828,7 +3635,7 @@ function upgrade_final()
 		$db->table(POSTS_TABLE)
 			->insert(array(
 				'status' => 'publish',
-				'post_type' => 'article',
+				'post_type' => 'Articles',
 				'aid' => $install_options['admininfo']['aid'],
 				'title' => 'مطلب ابتدایی',
 				'time' => _NOWTIME,
@@ -3016,10 +3823,14 @@ function upgrade_final()
 		
 		// add new uncategorized
 		$default_cat = array(
-			array(1,1,'Articles','uncategorized','a:2:{s:7:"english";s:13:"uncategorized";s:5:"farsi";s:19:"بدون موضوع";}')
+			array(1,1,'Articles','uncategorized','a:2:{s:7:"english";s:13:"uncategorized";s:5:"farsi";s:19:"بدون موضوع";}','uncategorized'),
+			array(2,1,'Downloads','uncategorized','a:2:{s:7:"english";s:13:"uncategorized";s:5:"farsi";s:19:"بدون موضوع";}','uncategorized'),
+			array(3,1,'Pages','uncategorized','a:2:{s:7:"english";s:13:"uncategorized";s:5:"farsi";s:19:"بدون موضوع";}','uncategorized'),
+			array(4,1,'Gallery','uncategorized','a:2:{s:7:"english";s:13:"uncategorized";s:5:"farsi";s:19:"بدون موضوع";}','uncategorized'),
+			array(5,1,'Faqs','uncategorized','a:2:{s:7:"english";s:13:"uncategorized";s:5:"farsi";s:19:"بدون موضوع";}','uncategorized'),
 		);
 		$db->table(CATEGORIES_TABLE)
-			->multiinsert(array('catid','type','module','catname','cattext'),$default_cat);
+			->multiinsert(array('catid','type','module','catname','cattext','catdesc'),$default_cat);
 		
 		// add new poll
 		$db->table(SURVEYS_TABLE)
@@ -3155,11 +3966,12 @@ function upgrade_final()
 		$rename_error = "<br />فایل و پوشه install قابل تغییر نام نیستند. لطفاً ابتدا این فایل و پوشه را حذف یا تغییر نام دهید و سپس به بخشهای دیگر بروید";
 	}	
 	
-	upgrade_progress_output("تکمیل ".(($install_options['mode'] == 'install') ? "نصب":"بروزرسانی").$rename_error, 1, 1, 0, "", "", 100, 1000);
-	
 	$cache->flush_caches();
 	define("IN_FLUSH", true);
 	cache_system('all');
+	
+	upgrade_progress_output("تکمیل ".(($install_options['mode'] == 'install') ? "نصب":"بروزرسانی").$rename_error, 1, 1, 0, "", "", 100, 1000);
+	
 	die();
 
 }

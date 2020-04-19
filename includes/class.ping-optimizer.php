@@ -20,58 +20,45 @@ class PingOptimizer
 
 	function __construct()
 	{
-		global $nuke_configs, $db;
+		global $nuke_configs, $db, $cache;
 		
-		$this->current_date = _NOWTIME;
 		$this->ping_sites   = $nuke_configs['ping_sites'];
 		$this->active_pings	= $nuke_configs['active_pings'];
-		$this->future_pings = ($nuke_configs['future_pings'] != '') ? phpnuke_unserialize($nuke_configs['future_pings']):array();
 		$this->options      = ($nuke_configs['ping_options'] != '') ? phpnuke_unserialize($nuke_configs['ping_options']):array('limit_ping' => 0, 'limit_number' => 1, 'limit_time' => 15);
-		
-		if( !is_array($this->future_pings))
+		if($cache->isCached("future_pings"))
 		{
-			$this->future_pings = array();
+			$future_pings = $cache->retrieve("future_pings");
+			$this->future_pings = ($future_pings != '') ? phpnuke_unserialize($cache->retrieve("future_pings")):array();
 		}
-		if( !$this->future_ping_time = $nuke_configs['future_ping_time'])
+		else
 		{
-			$this->future_ping_time = _NOWTIME;
+			$this->future_pings = array('update_time' => _NOWTIME, 'posts' => array());
+			$cache->store("future_pings", $this->future_pings);
 		}
 		
 		if($this->ping_sites != '')
 			$this->ping_sites = explode("\n", str_replace("\r", "", $this->ping_sites));
-		// Check if ping limit reached and Duplicate results in log
-		// Fixed the bug WP pinging all the time
-		$this->excessive_pinging = 0;
-		
-		if($this->options['limit_ping'] == 1)
+			
+		$last_pings_update = (isset($this->future_pings['update_time'])) ? $this->future_pings['update_time']:_NOWTIME;
+
+		if((_NOWTIME-$last_pings_update) > ($this->options['limit_time'] * 60))
 		{
-			$last_ping_time	= $nuke_configs['last_ping_time'];
-			$curr_time		= _NOWTIME;
-			$limit_time		= $this->options['limit_time'] * 60;
-			$limit_number	= $this->options['limit_number'];
-			
-			$ping_num		= $nuke_configs['ping_num'];
-			if($last_ping_time <= 0) $last_ping_time = $curr_time;
-			
-			if(($limit_time >= ($curr_time - $last_ping_time)) && ($ping_num >= $limit_number))
-				$this->excessive_pinging = 1;
-			else
-				if($ping_num >= $limit_number)
-					update_configs('ping_num',0);
+			$this->phpnuke_FuturePing();
 		}
 	}
 	
-	function set_defaults($id, $data)
+	function set_defaults($module_name, $id, $data)
 	{
+		$this->_Module	= $module_name;
 		$this->_ID		= $id;
 		$this->_data	= $data;
+		$this->_data['module_name']	= $module_name;
 	}
 	
 	function phpnuke_PingServices($post_id_title)
 	{
 		global $nuke_configs;
 		
-		$this->already_pinged = array();
 		$this->_post_title = $post_id_title;
 		$this->_post_url = '';
 			
@@ -94,7 +81,6 @@ class PingOptimizer
 			foreach ($services as $service)
 				$this->phpnuke_SendXmlrpc($service);
 		}
-		unset($this->already_pinged);
 		set_time_limit(60);
 	}
 	
@@ -112,30 +98,26 @@ class PingOptimizer
 		$client->debug = false;
 		$nukeurl = rtrim($nuke_configs['nukeurl'], '/') . '/';
 		$check_title = $this->_post_title = $this->_post_title ;
-		$feedlink = ($nuke_configs['gtset'] == 1) ? "rss/":"index.php?modname=Feed&mode=rss";
+		$feedlink = LinkToGT("index.php?modname=Feed&mode=rss".((isset($this->_data['module_name']) && $this->_data['module_name'] != '') ? strtolower($this->_data['module_name']):""));
 		$check_url = ($this->_post_url != '') ? $this->_post_url : $feedlink;
 
-		if(!in_array($server,$this->already_pinged))
-		{
-			$this->already_pinged[] = $server;
-			///$this->_post_title = $this->_post_title.'###'.$check_url;///
-			// the extendedPing format should be "blog name", "blog url", "check url" (post url), and "feed url",
-			// but it would seem as if the standard has been mixed up. It's therefore good to repeat the feed url.
-			//Replaced below line to solve extended ping problem
-			//if($client->query('weblogUpdates.extendedPing', get_settings('blogname'), $nukeurl, $check_url, get_bloginfo('rss2_url'))) { 
-			if($client->query('weblogUpdates.extendedPing', $check_title, $check_url, $feedlink))
+		///$this->_post_title = $this->_post_title.'###'.$check_url;///
+		// the extendedPing format should be "blog name", "blog url", "check url" (post url), and "feed url",
+		// but it would seem as if the standard has been mixed up. It's therefore good to repeat the feed url.
+		//Replaced below line to solve extended ping problem
+		//if($client->query('weblogUpdates.extendedPing', get_settings('blogname'), $nukeurl, $check_url, get_bloginfo('rss2_url'))) { 
+		if($client->query('weblogUpdates.extendedPing', $check_title, $check_url, $feedlink))
+			add_log(sprintf(_SUCCESS_PING_LOG, "<a href=\"".$this->_post_url."\">".$this->_post_title."</a>", $server), 1, '', $this->_poster_ip, $this->_poster);
+		else
+			if($client->query('weblogUpdates.ping', $nuke_configs['sitename'], $nukeurl))
 				add_log(sprintf(_SUCCESS_PING_LOG, "<a href=\"".$this->_post_url."\">".$this->_post_title."</a>", $server), 1, '', $this->_poster_ip, $this->_poster);
 			else
-				if($client->query('weblogUpdates.ping', $nuke_configs['sitename'], $nukeurl))
-					add_log(sprintf(_SUCCESS_PING_LOG, "<a href=\"".$this->_post_url."\">".$this->_post_title."</a>", $server), 1, '', $this->_poster_ip, $this->_poster);
-				else
-					add_log(sprintf(_ERROR_PING_LOG, "<a href=\"".$this->_post_url."\">".$this->_post_title."</a>", $server, $client->error->message), 1, '', $this->_poster_ip, $this->_poster);
-		}
+				add_log(sprintf(_ERROR_PING_LOG, "<a href=\"".$this->_post_url."\">".$this->_post_title."</a>", $server, $client->error->message), 1, '', $this->_poster_ip, $this->_poster);
 	}
 	
 	function phpnuke_Ping()
 	{
-		global $nuke_configs;
+		global $nuke_configs, $cache;
 		if($this->ping_sites != "")
 		{
 			if($this->active_pings == 1)
@@ -143,24 +125,24 @@ class PingOptimizer
 				if($this->_data['status'] == 'publish' || $this->_data['status'] == 'future')
 				{
 					$post_id_title = intval($this->_ID).'~#'.filter($this->_data['title'], "nohtml");
-					// if post_date is greater than current time/date then its a future post (don't ping it)			
+					// if post_date is greater than current time/date then its a future post (don't ping it)
+
 					if($this->_data['time'] > _NOWTIME)
 					{
-						$this->future_pings[$this->_ID] = $this->_data; 
-						update_configs('future_pings', $this->future_pings);
+						$this->future_pings['posts'][$this->_Module][$this->_ID] = $this->_data; 
+						$cache->store('future_pings', $this->future_pings);
 					}
 					else if($this->_data["status"] == 'publish' && $this->_data['title'] != '')
-					{	
-						if($this->excessive_pinging != 1)
+					{
+						if(isset($this->options['limit_ping']) && $this->options['limit_ping'] == 1)
 						{
-							$this->phpnuke_PingServices($post_id_title);
-							update_configs('last_ping_time',_NOWTIME);
-							update_configs('ping_num', $nuke_configs['ping_num']+1);
+							$this->future_pings['posts'][$this->_Module][$this->_ID] = $this->_data; 
+							$cache->store('future_pings', $this->future_pings);
 						}
 						else
 						{
-							$this->future_pings[$this->_ID] = $this->_data; 
-							update_configs('future_pings', $this->future_pings);
+							die("Aaaaa");
+							$this->phpnuke_PingServices($post_id_title);
 						}
 					}
 				}
@@ -170,61 +152,53 @@ class PingOptimizer
 	
 	function phpnuke_FuturePing()
 	{
-		global $nuke_configs;
+		global $nuke_configs, $cache;
 		
 		// future ping list is empty
-		if(count($this->future_pings) <= 0)
-			return true;
-		
-		// Check last updated date and update it if more than 15 min, and ping if any future post's time elasped
-		$_now_time = _NOWTIME;
-		$_prev_time  = $this->future_ping_time;
-		$elapsed_min = ($_now_time-$_prev_time)/(60);
-		$do_ping = 0;
-		
-		/// if last update/ping time more than 5 minutes
-		if($elapsed_min > 5)
-		{
-			if(is_array($this->future_pings))
+		if(!empty($this->future_pings['posts']))
+		{		
+			$i = 0;
+			foreach($this->future_pings['posts'] as $module_name => $pingdata)
 			{
-				foreach($this->future_pings as $id => $_data)
+				foreach($pingdata as $id => $_data)
 				{
 					// if future published post later has been changed to draft or other status
 					// then delete it from the ping list (It will be automatically be pinged when its status changes to publish)
-					if($_data['status'] != 'publish' && $_data['status'] != 'future')
-						unset($this->future_pings[$id]); 
-					if($_data["time"] <= $_now_time && ($_data['status'] == 'publish' || $_data['status'] == 'future'))
-					{		
-						unset($this->future_pings[$id]);
-						$do_ping = 1;
-						$post_title = $_data['title'];
-						$this->_ID = $id;
-						$this->_data = $_data;
+					if(($_data['status'] != 'publish' && $_data['status'] != 'future') || $_data["time"] > _NOWTIME)
+						continue;
+					if($_data["time"] <= _NOWTIME && ($_data['status'] == 'publish' || $_data['status'] == 'future'))
+					{
+						if($i <= $this->options['limit_number'])
+						{
+							unset($this->future_pings['posts'][$module_name][$id]);
+							$this->future_pings['update_time'] = _NOWTIME;
+							$cache->store("future_pings", $this->future_pings);
+							
+							$post_title = $_data['title'];
+							$this->_ID = $id;
+							$this->_data = $_data;
+							
+							$post_id_title = $id.'~#'.$post_title;
+							$this->phpnuke_PingServices($post_id_title);
+						}
+						else
+							break 2;
 					}
+					$i++;
 				}
-			}
-			update_configs("future_pings", $this->future_pings);
-			update_configs('future_ping_time', $_now_time);
-			if($do_ping == 1)
-			{
-				$post_id_title = $post_id.'~#'.$post_title;
-				$this->phpnuke_PingServices($post_id_title);
 			}
 		}
 	}
 	
-	function phpnuke_FuturePingDelete($id)
+	function phpnuke_FuturePingDelete($module_folder, $id)
 	{ 
-		global $nuke_configs;
+		global $nuke_configs, $cache;
 		
-		if(count($this->future_pings) <= 0)
-			return $id;
-		if(isset($this->future_pings[$id]))
-		{		
-			unset($this->future_pings[$id]);
-			update_configs('future_pings', $this->future_pings);
+		if(!empty($this->future_pings) && isset($this->future_pings['posts'][$module_folder][$id]))
+		{
+			unset($this->future_pings['posts'][$module_folder][$id]);
+			$cache->store("future_pings", $this->future_pings);
 		}
-		return $id;
 	}
 }
 

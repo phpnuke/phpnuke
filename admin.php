@@ -65,7 +65,7 @@ if ((isset($aid)) && (isset($pwd)) && (isset($op)) && ($op == "login"))
 		else
 			$code_accepted = true;
 
-		if($code_accepted)
+		if($code_accepted && isset($nuke_authors_cacheData[$aid]) && !empty($nuke_authors_cacheData[$aid]))
 		{
 			$rpwd = $nuke_authors_cacheData[$aid]['pwd'];
 			$admlanguage = addslashes($nuke_authors_cacheData[$aid]['admlanguage']);
