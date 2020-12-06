@@ -23,7 +23,7 @@ function show_copyright() {
     echo "<body bgcolor=\"#FFFFFF\" link=\"#000000\" alink=\"#000000\" vlink=\"#000000\">\n";
     echo "<div style=\"text-align: center;\">\n";
     echo "<font size=\"2\" face=\"Arial, Helvetica\"><span style=\"font-weight: bold;\">Module Copyright &copy; Information</span><br>";
-    echo "$mod_name module for <a href=\"http://phpnuke.org\" target=\"new\">PHP-Nuke</a><br>[<a href=\"javascript:void(0)\" onClick=javascript:self.close()>Close Window</a>]</font>\n";
+    echo "$mod_name module for <a href=\"https://www.phpnuke.ir\" target=\"new\">PHP-Nuke</a><br>[<a href=\"javascript:void(0)\" onClick=javascript:self.close()>Close Window</a>]</font>\n";
     echo "</div>\n";
     echo "<hr>\n";
     echo "<font size=\"2\" face=\"Arial, Helvetica\">";
