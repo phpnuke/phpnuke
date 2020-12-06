@@ -5,7 +5,7 @@
 /* ===========================                                          */
 /*                                                                      */
 /* Copyright (c) 2002 by Francisco Burzi                                */
-/* https://www.phpnuke.ir                                                   */
+/* http://phpnuke.org                                                   */
 /*                                                                      */
 /* This program is free software. You can redistribute it and/or modify */
 /* it under the terms of the GNU General Public License as published by */
@@ -429,8 +429,8 @@ function show_microdata_as_json(&$meta_tags)
 # YOU'RE NOT ALLOWED TO REMOVE NOR EDIT THIS. #
 ###############################################
 
-// IF YOU REALLY NEED TO REMOVE IT AND HAVE MY WRITTEN AUTHORIZATION CHECK: https://www.phpnuke.ir/index.php?modname=Commercial_License
+// IF YOU REALLY NEED TO REMOVE IT AND HAVE MY WRITTEN AUTHORIZATION CHECK: http://phpnuke.org/index.php?modname=Commercial_License
 // PLAY FAIR AND SUPPORT THE DEVELOPMENT, PLEASE!
 
-//echo "<meta name=\"GENERATOR\" content=\"PHP-Nuke - Copyright by https://www.phpnuke.ir\">\n";
+//echo "<meta name=\"GENERATOR\" content=\"PHP-Nuke - Copyright by http://phpnuke.org\">\n";
 ?>

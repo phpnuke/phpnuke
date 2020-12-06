@@ -5,7 +5,7 @@
 # ============================================
 #
 # Copyright (c) 2006 by Francisco Burzi
-# https://www.phpnuke.ir
+# http://phpnuke.org
 #
 # This program is free software. You can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -100,12 +100,12 @@ $AllowableHTML = array("img"=>2,"tr"=>1,"td"=>2,"table"=>2,"div"=>2,"p"=>2,"hr"=
 $CensorList = array("fuck","cunt","fucker","fucking","pussy","cock","c0ck","cum","twat","clit","bitch","fuk","fuking","motherfucker");
 
 //***************************************************************
-// IF YOU WANT TO LEGALY REMOVE ANY COPYRIGHT NOTICES PLAY FAIR AND CHECK: https://www.phpnuke.ir/modules.php?name=Commercial_License
+// IF YOU WANT TO LEGALY REMOVE ANY COPYRIGHT NOTICES PLAY FAIR AND CHECK: http://phpnuke.org/modules.php?name=Commercial_License
 // COPYRIGHT NOTICES ARE GPL SECTION 2(c) COMPLIANT AND CAN'T BE REMOVED WITHOUT PHP-NUKE'S AUTHOR WRITTEN AUTHORIZATION
 // THE USE OF COMMERCIAL LICENSE MODE FOR PHP-NUKE HAS BEEN APPROVED BY THE FSF (FREE SOFTWARE FOUNDATION)
 // YOU CAN REQUEST INFORMATION ABOUT THIS TO GNU.ORG REPRESENTATIVE. THE EMAIL THREAD REFERENCE IS #213080
 // YOU'RE NOT AUTHORIZED TO CHANGE THE FOLLOWING VARIABLE'S VALUE UNTIL YOU ACQUIRE A COMMERCIAL LICENSE
-// (https://www.phpnuke.ir/modules.php?name=Commercial_License)
+// (http://phpnuke.org/modules.php?name=Commercial_License)
 //***************************************************************
 $commercial_license = 0;
 

@@ -5,7 +5,7 @@
 /* ============================================                         */
 /*                                                                      */
 /* Copyright (c) 2006 by Francisco Burzi                                */
-/* https://www.phpnuke.ir                                                   */
+/* http://phpnuke.org                                                   */
 /*                                                                      */
 /* This program is free software. You can redistribute it and/or modify */
 /* it under the terms of the GNU General Public License as published by */
@@ -37,7 +37,7 @@ function footmsg()
 	if (!empty($foot3))
 		$footmsg .= $foot3."<br>\n";
 	// DO NOT REMOVE THE FOLLOWING COPYRIGHT LINE. YOU'RE NOT ALLOWED TO REMOVE NOR EDIT THIS.
-	// IF YOU REALLY NEED TO REMOVE IT AND HAVE MY WRITTEN AUTHORIZATION CHECK: https://www.phpnuke.ir/index.php?modname=Commercial_License
+	// IF YOU REALLY NEED TO REMOVE IT AND HAVE MY WRITTEN AUTHORIZATION CHECK: http://phpnuke.org/index.php?modname=Commercial_License
 	// PLAY FAIR AND SUPPORT THE DEVELOPMENT, PLEASE!
 	if ($commercial_license == 1)
 		$footmsg .= $total_time."<br>\n</span>\n";

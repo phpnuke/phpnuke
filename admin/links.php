@@ -5,7 +5,7 @@
 /* ===========================										  */
 /*																	  */
 /* Copyright (c) 2006 by Francisco Burzi								*/
-/* https://www.phpnuke.ir												   */
+/* http://phpnuke.org												   */
 /*																	  */
 /* This program is free software. You can redistribute it and/or modify */
 /* it under the terms of the GNU General Public License as published by */
