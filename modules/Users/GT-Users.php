@@ -1,4 +1,12 @@
 <?php
+/**
+*
+* This file is part of the PHP-NUKE Software package.
+*
+* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
+* @license GNU General Public License, version 2 (GPL-2.0)
+*
+*/
 
 $rewrite_rule["users"] = array(
 	"users/(register|login|logout|reset\-password|check\-register\-fields|edit\-user|get\-user_avatar|userinfo|delete\-cookies)/$" => array("function" => 'return "index.php?modname=Users&op=".str_replace("-","_", $match[1])."";'),
