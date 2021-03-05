@@ -4,7 +4,6 @@ Disallow:
 User-agent: *
 Disallow: /admin.php
 Disallow: /admin/
-Disallow: /db/
 Disallow: /images/
 Disallow: /includes/
 Disallow: /install/
