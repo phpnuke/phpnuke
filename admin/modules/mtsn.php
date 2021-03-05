@@ -1,19 +1,12 @@
 <?PHP
-
-/************************************************************************/
-/* PHP-NUKE: Web Portal System                                          */
-/* ===========================                                          */
-/*                                                                      */
-/* Copyright (c) 2017 by MashhadTeam                                    */
-/* http://www.phpnuke.ir                                                */
-/*                                                                      */
-/* This program is free software. You can redistribute it and/or modify */
-/* it under the terms of the GNU General Public License as published by */
-/* the Free Software Foundation; either version 2 of the License.       */
-/************************************************************************/
-/*********************************************************/
-/* MTSN - MashhadTeam Secure Nuke  [Security Is First]   */
-/*********************************************************/
+/**
+*
+* This file is part of the PHP-NUKE Software package.
+*
+* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
+* @license GNU General Public License, version 2 (GPL-2.0)
+*
+*/
 
 if (!defined('ADMIN_FILE'))
 {

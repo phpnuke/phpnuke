@@ -1,7 +1,20 @@
 <?php
+<<<<<<< HEAD
 
 // 8.4.3 installer
 // 8.3.7 to 8.4.3 upgrader
+=======
+/**
+*
+* This file is part of the PHP-NUKE Software package.
+*
+* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
+* @license GNU General Public License, version 2 (GPL-2.0)
+*
+*/
+// 8.4.2 installer
+// 8.3.7 to 8.4.2 upgrader
+>>>>>>> 30b720fad12bd907b6d29c587f7deeb07aa3b9e7
 
 if(version_compare(PHP_VERSION, '5.4.0', "<"))
 {

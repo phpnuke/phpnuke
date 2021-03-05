@@ -1,9 +1,17 @@
 <?php
+/**
+*
+* This file is part of the PHP-NUKE Software package.
+*
+* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
+* @license GNU General Public License, version 2 (GPL-2.0)
+*
+*/
+
 /*
 text to image converter
 daftlogic 
 www.daftlogic.com
-package phpnuke
 */
 
 if(!defined('NUKE_FILE'))

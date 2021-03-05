@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /////////////////////////////////////////////////////////////////
 /// getID3() by James Heinrich <info@getid3.org>               //
 //  available at https://github.com/JamesHeinrich/getID3       //
@@ -27,6 +28,34 @@ if(!defined('NUKE_FILE'))
 	exit;
 }
 
+=======
+/**
+*
+* This file is part of the PHP-NUKE Software package.
+*
+* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
+* @license GNU General Public License, version 2 (GPL-2.0)
+*
+*/
+
+/////////////////////////////////////////////////////////////////////////////////
+/// getID3() by James Heinrich <info@getid3.org>                               //
+//  available at http://getid3.sourceforge.net                                 //
+//            or http://www.getid3.org                                         //
+//          also https://github.com/JamesHeinrich/getID3                       //
+/////////////////////////////////////////////////////////////////////////////////
+///                                                                            //
+// extension.cache.sqlite3.php - part of getID3()                              //
+// Please see readme.txt for more information                                  //
+//                                                                            ///
+/////////////////////////////////////////////////////////////////////////////////
+///                                                                            //
+// MySQL extension written by Allan Hansen <ahØartemis*dk>                     //
+// Table name mod by Carlo Capocasa <calroØcarlocapocasa*com>                  //
+// MySQL extension was reworked for SQLite3 by Karl G. Holz <newaeonØmac*com>  //
+//                                                                            ///
+/////////////////////////////////////////////////////////////////////////////////
+>>>>>>> 30b720fad12bd907b6d29c587f7deeb07aa3b9e7
 /**
 * This is a caching extension for getID3(). It works the exact same
 * way as the getID3 class, but return cached information much faster
