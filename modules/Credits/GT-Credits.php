@@ -1,12 +1,4 @@
 <?php
-/**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
 
 $rewrite_rule["credits"] = array(
 	"credits/delete-filters(/(in-admin)+)?/?$" => 'index.php?modname=Credits&op=delete_all_filters&in_admin=$2',

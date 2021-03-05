@@ -1,14 +1,5 @@
 <?php
 /**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
-
-/**
  * ----------------------------------------------------------------------
  *  
  * Copyright (c) 2006-2013 Khaled Al-Sham'aa.

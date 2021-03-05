@@ -1,10 +1,10 @@
 <?php
 /**
 *
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
+* @package phpnuke
+* @version $Id$
+* @copyright (c) 2014 phpnuke Group
+* @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
 */
 

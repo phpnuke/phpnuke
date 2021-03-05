@@ -1,15 +1,4 @@
-<<<<<<< HEAD
 <?php
-=======
-<?/**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
->>>>>>> 30b720fad12bd907b6d29c587f7deeb07aa3b9e7
 
 /////////////////////////////////////////////////////////////////
 /// getID3() by James Heinrich <info@getid3.org>               //

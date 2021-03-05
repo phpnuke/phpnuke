@@ -1,11 +1,14 @@
 <?php
 /**
 *
-* This file is part of the PHP-NUKE Software package.
+* @package utf
+* @version $Id$
+* @copyright (c) 2016 phpnuke Group
+* @license http://opensource.org/licenses/gpl-license.php GNU Public License
 *
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
+*/
+
+/**
 */
 
 if(!defined('NUKE_FILE'))

@@ -1,12 +1,4 @@
 <?php
-/**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
 
 /**
  * @title            Session Class
@@ -16,6 +8,7 @@
  * @url              https://www.phpclasses.org/package/9644-PHP-Store-and-retrieve-data-in-cookies-or-PHP-sessions.html#usage
  * @copyright        (c) 2012-2016, Pierre-Henry Soria. All Rights Reserved.
  * @license          GNU General Public License 3 or later <http://www.gnu.org/licenses/gpl.html>
+ * @package          phpnuke 8.4
  */
 
 if(!defined('NUKE_FILE'))

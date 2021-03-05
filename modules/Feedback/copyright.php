@@ -1,12 +1,9 @@
 <?php
-/**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
+/***********************************************************/
+/* Jonathan Estrella (kiedis.axl@gmail.com)			*/
+/* http://slaytanic.tk / http://metalrebelde.net.tc		*/
+/* Copyright © 2004-2006 by Jonathan Estrella		*/
+/***********************************************************/
 
 $module_name = basename(dirname(__FILE__));
 $mod_name = "Ajax Feedback";

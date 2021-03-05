@@ -1,13 +1,16 @@
 <?PHP
-/**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-* Protect and Secure Your PHP-NUKE With MTSN v.4.3.0 (2014)
-*/
+/****************************************************************
+*****************************************************************
+Protect and Secure Your PHP-NUKE With MTSN v.4.3.0 (2014)
+Mashhad Team Secure Nuke
+Powered By MashhadTeam.com [PHPNUKE.IR]
+Email : mashhadteam@gmail.com
+CopyRight By www.PHPNuke.ir
+AmirHossein Moazzami (Zero-F)
+Mahmoud Namvar [iman64]
+
+****************************************************************
+****************************************************************/
 
 if(!defined('NUKE_FILE'))
 {

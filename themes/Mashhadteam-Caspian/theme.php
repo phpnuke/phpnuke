@@ -1,13 +1,9 @@
 <?php
-/**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
 
+/************************************************************/
+/* Theme for PHPNUKE 8.4	                                */
+/* http://www.phpnuke.ir                                    */
+/************************************************************/
 
 if (!defined('NUKE_FILE')) {
 	die ("You can't access this file directly...");

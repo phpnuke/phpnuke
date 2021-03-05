@@ -1,12 +1,4 @@
 <?php
-/**
-*
-* This file is part of the PHP-NUKE Software package.
-*
-* @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
 
 // error_reporting(E_ALL); ini_set('display_errors', 1); // uncomment this line for debugging
 
