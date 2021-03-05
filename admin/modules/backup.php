@@ -191,8 +191,9 @@ if (check_admin_permission($filename)) {
 	
 	function database()
 	{
-		global $db, $pagetitle, $admin_file, $DB_obj, $nuke_configs, $visitor_ip;
-		$pagetitle = _DATABASEMANAGE;
+		global $db, $hooks, $admin_file, $DB_obj, $nuke_configs, $visitor_ip;
+		
+		$hooks->add_filter("set_page_title", function(){return array("database" => _DATABASEMANAGE);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();
@@ -353,9 +354,10 @@ if (check_admin_permission($filename)) {
 
 	function operation($mode, $tables)
 	{
-		global $db, $pagetitle, $aid, $DB_obj, $admin_file;
+		global $db, $hooks, $aid, $DB_obj, $admin_file;
 		$type = strtoupper(substr($mode,0,-2));
-		$pagetitle = _DATABASEMANAGE." - "._OPERATION." ".$type;
+		
+		$hooks->add_filter("set_page_title", function() use($type){return array("operation" => _DATABASEMANAGE." - "._OPERATION." ".$type);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= Showdbcc();

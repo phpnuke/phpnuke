@@ -20,11 +20,11 @@ if ( !defined('BLOCK_FILE') ) {
     die();
 }
 
-global $nuke_configs, $db, $block_global_contents;
+global $nuke_configs, $db;
 
 $params = array();
 
-$querylang = "WHERE status = 'publish' AND post_type = 'Articles'";
+$querylang = "WHERE status = 'publish' AND post_type = 'Articles' AND ihome = '1'";
 
 if ($nuke_configs['multilingual'] == 1) {
     $querylang .= " AND (alanguage=:currentlang OR alanguage=:alanguage)";

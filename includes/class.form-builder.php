@@ -202,6 +202,7 @@ class PhpFormBuilder {
 			}
 			$output .= '>';
 		}
+		
 		// Iterate through the input queue and add input HTML
 		foreach ( $this->inputs as $filed_key => $val ) :
 			$min_max_range = $element = $end = $attr = $field = $label_html = '';
@@ -261,7 +262,7 @@ class PhpFormBuilder {
 						} else if ( $val['selected'] === $opt_value ) {
 							$opt_insert = ' selected';
 						}
-						$end .= '<option value="' . $opt_value . '"' . $opt_insert . '>' . $opt_text . '</option>';
+						$end .= '<option id="'.$opt_id.'" value="' . $opt_value . '"' . $opt_insert . '>' . $opt_text . '</option>';
 					}
 					$end .= '</select>';
 					break;

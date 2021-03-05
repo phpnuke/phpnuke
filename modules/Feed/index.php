@@ -21,31 +21,19 @@ $module_name = basename(dirname(__FILE__));
 
 define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
-function get_feed_data($module_args)
-{
-	global $nuke_configs;
-	
-	$feeds_data = array();
-	
-	$module_feed_function = (isset($module_args['main_module'])) ? ((is_active($module_args['main_module'])) ? strtolower($module_args['main_module'])."_feed":"articles_feed"):"articles_feed";
-	$post_type = (isset($module_args['main_module']) && $module_args['main_module'] != 'Articles') ? $module_args['main_module']:'Articles';
-	
-	if(function_exists($module_feed_function))
-		$feeds_data = $module_feed_function($module_args, $post_type);
-	
-	return $feeds_data;
-}
-
 function feed($module_link = 'Articles', $mode = 'ATOM')
 {
-	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $nuke_authors_cacheData;
+	global $db, $hooks, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs;
 
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+	
 	if(!in_array(strtolower($mode), array('atom','rss1','rss2')))
 		$mode = 'atom';
 	
 	$module_args = parse_GT_link($module_link);
 	
-	$feeds_data = get_feed_data($module_args[0]);
+	$feeds_data = array();
+	$feeds_data = $hooks->apply_filters("get_feed_data", $feeds_data, $module_args);
 
 	include INCLUDE_PATH.'/rss/Item.php';
 	include INCLUDE_PATH.'/rss/Feed.php';
@@ -149,7 +137,7 @@ function feed($module_link = 'Articles', $mode = 'ATOM')
 
 function sitemap()
 {
-	global $db, $nuke_configs, $mode, $is_index, $module, $year, $month;
+	global $db, $nuke_configs, $hooks, $mode, $is_index, $module, $year, $month;
 
 	$is_index				= (isset($is_index)) ? intval($is_index):0;
 	$year					= (isset($year)) ? $year:0;
@@ -259,6 +247,7 @@ function sitemap()
 				}
 			}
 		}
+		$contents = $hooks->apply_filters("sitemap_misc", $contents);
 	}
 	elseif($mode == "modules")
 	{
@@ -307,6 +296,7 @@ function sitemap()
 				}
 			}
 		}
+		$contents = $hooks->apply_filters("sitemap_modules", $contents, $module);
 	}
 	else
 	{
@@ -362,6 +352,7 @@ function sitemap()
 				</sitemap>';
 			}
 		}
+		$contents = $hooks->apply_filters("sitemap_others", $contents);
 	}
 	$contents .='</'.$maintag.'>';
 	

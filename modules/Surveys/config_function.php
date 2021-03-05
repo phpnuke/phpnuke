@@ -325,31 +325,80 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 	return $contents;
 }
 
-$nuke_configs_links_function[$this_module_name] = "surveys_link";
-$nuke_configs_comments_table[$this_module_name] = array('pollID', SURVEYS_TABLE);
+function get_surveys_link($post_link, $module, $post_id)
+{
+	$post_link = ($post_link == '' && in_array($module, array("Surveys"))) ? surveys_link($post_id, '', '', '', '', $module):$post_link;
+	
+	if(is_array($post_link))
+		$post_link = $post_link[1];
+	
+	return $post_link;
+}
+$hooks->add_filter("get_post_link", 'get_surveys_link', 10);
 
-$alerts_messages['surveys_comments'] = array(
-	"prefix"	=> "cs",
-	"by"		=> "cid",
-	"table"		=> COMMENTS_TABLE,
-	"where"		=> "module = 'Surveys' AND status = '0'",
-	"color"		=> "green",
-	"text"		=> "_NEW_POLLS_COMMENT_ALARM",
-);
+function surveys_have_comments($all_modules_comments)
+{
+	$all_modules_comments = array_merge($all_modules_comments, array(
+		"Surveys" => _SURVEYS
+	));
+	
+	return $all_modules_comments;
+}
+$hooks->add_filter("modules_have_comments", 'surveys_have_comments', 10);
 
-$nuke_configs_statistics_data[$this_module_name] = array(
-	"total_surveys" => array(
-		"title"				=> "_SURVEYS",
-		"table"				=> SURVEYS_TABLE,
-		"count"				=> "pollID",
-		"as"				=> "total_surveys",
-		"where"				=> "status = '1'",
-	),
-);
+function surveys_comments_table_data($module_table_data)
+{
+	$nuke_configs_comments_table['Surveys'] = array('pollID', SURVEYS_TABLE);
+	$module_table_data = array_merge($module_table_data, $nuke_configs_comments_table);
+	
+	return $module_table_data;
+}
+$hooks->add_filter("modules_comments_table_data", 'surveys_comments_table_data', 10);
 
-$nuke_modules_boxes_parts[$this_module_name] = array(
-	"index" => "_INDEX",
-	"results" => "_RESULTS",
-);
+function surveys_alert_messages($alerts_messages)
+{
+	$alerts_messages = array_merge($alerts_messages, array(
+		"surveys_comments" => array(
+			"prefix"	=> "cs",
+			"by"		=> "cid",
+			"table"		=> COMMENTS_TABLE,
+			"where"		=> "module = 'Surveys' AND status = '0'",
+			"color"		=> "green",
+			"text"		=> _NEW_POLLS_COMMENT_ALARM,
+		)
+	));
+	
+	return $alerts_messages;
+}
+$hooks->add_filter("admin_alert_messages", 'surveys_alert_messages', 10);
+
+
+function surveys_statistics_data($modules_statistics_data)
+{
+	$modules_statistics_data['Surveys'] = array(
+		"total_surveys" => array(
+			"title"				=> _SURVEYS,
+			"table"				=> SURVEYS_TABLE,
+			"count"				=> "pollID",
+			"as"				=> "total_surveys",
+			"where"				=> "status = '1'",
+		),
+	);
+	
+	return $modules_statistics_data;
+}
+$hooks->add_filter("modules_statistics_data", 'surveys_statistics_data', 10);
+
+function surveys_boxes_parts($nuke_modules_boxes_parts)
+{
+	$nuke_modules_boxes_parts['Surveys'] = array(
+		"index" => _INDEX,
+		"results" => _RESULTS,
+	);
+	
+	return $nuke_modules_boxes_parts;
+}
+
+$hooks->add_filter("modules_boxes_parts", "surveys_boxes_parts", 10);
 
 ?>

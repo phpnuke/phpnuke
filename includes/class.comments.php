@@ -32,12 +32,17 @@ class phpnuke_comments
 	private $total_rows = 0;
 	private $comments_rows = array();
 	private $scores_data = array();
+	private $users_data = array();
 	private $all_parent_comments = array();
 	private $all_post_comments = array();
 
-    public function __construct($comments_data)
+    public function __construct()
     {
-		global $nuke_configs, $comment_op, $comment_form_fields;
+		global $nuke_configs, $comment_op, $comment_form_fields, $hooks;
+		
+		$comments_data = array();
+		$comments_data = $hooks->apply_filters("global_contents", $comments_data);
+		
         $this->module_name		= filter($comments_data['module_name'], "nohtml");
         $this->post_title		= filter($comments_data['post_title'], "nohtml");
         $this->post_id			= intval($comments_data['post_id']);
@@ -48,11 +53,8 @@ class phpnuke_comments
 		$this->Req_URIs			= $nuke_configs['REQUESTURL'];
 		$this->Req_URIs_2		= LinkToGT($this->Req_URIs.((isset($_GET['page']) && intval($_GET['page']) != 0) ? "comment-page-".intval($_GET['page'])."/":""));
 		$this->comments_configs = phpnuke_unserialize(stripslashes($nuke_configs['comments']));
-		if($nuke_configs['have_forum'] == 1)
-		{
-			$this->forum_groups_cacheData = get_cache_file_contents('nuke_forum_groups');
-		}
-		
+		$this->forum_groups_cacheData = get_cache_file_contents('nuke_forum_groups');
+
 		if(isset($comment_op) && $comment_op == "post_comments")
 			$this->output .= $this->post_comments($comment_form_fields);
     }
@@ -86,12 +88,15 @@ class phpnuke_comments
 			}			
 
 			$where = array();
+			$main_parents = array();
+			$all_userids = array();
+			$total_rows = 0;
 			$where[] = "c.module = :module";
 			$where[] = "c.post_id = :post_id";
 			
 			$query_params[':module'] = $this->module_name;
 			$query_params[':post_id'] = $this->post_id;
-			$query_params[':username'] = $userinfo['username'];
+			$query_params[':username'] = (isset($userinfo['username']) && isset($userinfo['is_registered']) && $userinfo['is_registered'] == 1) ? $userinfo['username']:'';
 			if(!is_admin())
 				$where[] = "(c.status = '1' OR c.username = :username OR c.ip = :visitor_ip)";
 
@@ -105,43 +110,30 @@ class phpnuke_comments
 				$order_limit = " LIMIT $start_at, ".$this->comments_configs['item_per_page']."";
 			}
 			
-			$total_rows_query = ", COUNT(tc.cid) as total_rows";
-			$total_rows_left = "LEFT JOIN ".COMMENTS_TABLE." AS tc ON ".str_replace("c.", "tc.", implode(" AND ", $where))." AND tc.pid = '0'";
+			$result = $db->query("SELECT c.cid, (SELECT COUNT(cid) FROM ".COMMENTS_TABLE." WHERE ".str_replace("c.", "", implode(" AND ", $where))." AND pid = '0') as total_rows FROM ".COMMENTS_TABLE." AS c WHERE c.pid = '0' AND ".implode(" AND ", $where)." ORDER BY c.last_replay_time". (($this->comments_configs['order_by'] == 1) ? " DESC":" ASC")." $order_limit", $query_params);
 			
-			$first_where = "c.pid = '0'";
-			
-			$query_all = "SELECT c.*, 
-				IF(c.username IS NULL OR c.username = '', '', (SELECT CONCAT_WS(',', ".$users_system->user_fields['group_id'].", ".$users_system->user_fields['user_avatar'].", ".$users_system->user_fields['user_avatar_type'].", ".$users_system->user_fields['user_email'].") FROM ".$users_system->users_table." WHERE ".$users_system->user_fields['username']." = c.username)) as user_data,
+			if($result->count() > 0)
+			{
+				$rows = $result->results();
+				foreach($rows as $row)
+				{
+					if($total_rows == 0)
+						$total_rows = $row['total_rows'];
+					$main_parents[] = intval($row['cid']);					
+				}
+				
+				$result2 = $db->query("SELECT c.*, 
 				(SELECT 1 FROM ".COMMENTS_TABLE." WHERE pid= c.cid LIMIT 1) as replies,
 				(SELECT 1 FROM ".REPORTS_TABLE." WHERE post_id= c.cid AND module='comments' LIMIT 1) as reported
-				{TOTAL_ROWS_QUERY}
 				FROM ".COMMENTS_TABLE." AS c 
-				{TOTAL_ROWS_LEFT}
-				WHERE {FIRST_WHERE} AND ".implode(" AND ", $where)." 
-				GROUP BY c.cid
-				ORDER BY c.cid". (($this->comments_configs['order_by'] == 1) ? " DESC":" ASC")."{ORDER_LIMIT}";
-			
-			$result = $db->query(str_replace(array('{TOTAL_ROWS_QUERY}','{TOTAL_ROWS_LEFT}','{FIRST_WHERE}','{ORDER_LIMIT}'),array($total_rows_query,$total_rows_left,$first_where,$order_limit), $query_all), $query_params);
-
-			if($db->count() > 0)
-			{
-				$this->comments_rows = $result->results();
-				foreach ($this->comments_rows as $row)
-				{
-					$this->total_rows = $row['total_rows'];
-					$all_cids[] = $row['cid'];
-				}
-
-				$sub_comments = array();
-				$result2 = $db->query(str_replace(array('{TOTAL_ROWS_QUERY}','{TOTAL_ROWS_LEFT}','{FIRST_WHERE}','{ORDER_LIMIT}'),array('','',"c.main_parent IN (".implode(",", $all_cids).")",''), $query_all), $query_params);
+				WHERE (c.cid IN (".implode(",", $main_parents).") OR c.main_parent IN(".implode(",", $main_parents).")) AND ".implode(" AND ", $where)." 
+				ORDER BY c.last_replay_time". (($this->comments_configs['order_by'] == 1) ? " DESC":" ASC")."", $query_params);
 				
-				if($result2->count() > 0)
+				$all_comments = $result2->results();
+				foreach ($all_comments as $row)
 				{
-					$sub_comments = $result2->results();
-					foreach ($sub_comments as $row)
-					{
-						$all_cids[] = $row['cid'];
-					}
+					$all_cids[] = $row['cid'];
+					$all_userids[] = $row['user_id'];					
 				}
 				
 				// get comments scores
@@ -162,9 +154,41 @@ class phpnuke_comments
 						);
 					}
 				}
-				// get posts scores
 				
-				$this->comments_rows = array_merge($this->comments_rows, $sub_comments);
+				if(!empty($all_userids))
+				{
+					$all_userids = array_unique($all_userids);
+					foreach($all_userids as $key => $user_id)
+					{
+						if($user_id == 0)
+						{
+							unset($all_userids[$key]);
+							break;
+						}
+					}
+					if(!empty($all_userids))
+					{
+						// get users data 
+						$result = $db->query("SELECT 
+						".$users_system->user_fields['user_id']." as user_id, ".$users_system->user_fields['group_id']." as group_id, ".$users_system->user_fields['user_avatar']." as user_avatar, ".$users_system->user_fields['user_avatar_type']." as user_avatar_type, ".$users_system->user_fields['user_email']." as user_email FROM ".$users_system->users_table." WHERE ".$users_system->user_fields['user_id']." IN (".implode(",", $all_userids).")");
+						
+						if(!empty($result))
+						{
+							$users_data = $result->results();
+							foreach($users_data as $users_val)
+							{
+								$this->users_data[$users_val['user_id']] = array(
+									'group_id' => intval($users_val['group_id']),
+									'user_avatar' => $users_val['user_avatar'],
+									'user_avatar_type' => $users_val['user_avatar_type'],
+									'user_email' => $users_val['user_email']
+								);
+							}
+						}
+						// get users data 
+					}
+				}
+				$this->comments_rows = $all_comments;
 			}
 			
 			$this->output .= "
@@ -208,10 +232,10 @@ class phpnuke_comments
 			{
 				if($post_comment['pid'] != $pid) continue;
 			
-				$user_data = (isset($post_comment['user_data']) && $post_comment['user_data'] != '') ? explode(",", $post_comment['user_data']):array();
-				$post_comment['user_avatar'] = (isset($user_data[1]) && !empty($user_data[1])) ? $user_data[1]:'';
-				$post_comment['user_avatar_type'] = (isset($user_data[2]) && !empty($user_data[2])) ? $user_data[2]:'';
-				$post_comment['user_email'] = (isset($user_data[3]) && !empty($user_data[3])) ? $user_data[3]:'';
+				$post_comment['group_id'] = (isset($this->users_data['group_id']) && $this->users_data['group_id'] != '') ? intval($this->users_data['group_id']):0;
+				$post_comment['user_avatar'] = (isset($this->users_data['user_avatar']) && $this->users_data['user_avatar'] != '') ? $this->users_data['user_avatar']:'';
+				$post_comment['user_avatar_type'] = (isset($this->users_data['user_avatar_type']) && $this->users_data['user_avatar_type'] != '') ? $this->users_data['user_avatar_type']:'';
+				$post_comment['user_email'] = (isset($this->users_data['user_email']) && $this->users_data['user_email'] != '') ? $this->users_data['user_email']:'';
 				
 				$post_comment['deact'] = ((is_admin() || $post_comment['ip'] == $visitor_ip) AND $post_comment['status'] == 0) ? "<p align=\"center\" style=\"color:#FF0000;\"><b>"._INACTIVE."</b></p>":"";
 				
@@ -219,10 +243,10 @@ class phpnuke_comments
 				
 				$post_comment['comment'] = smilies_parse(stripslashes($post_comment['comment']));
 				
-				if($nuke_configs['have_forum'] == 1 && isset($user_data[0]) && isset($this->forum_groups_cacheData[$user_data[0]]))
+				if($post_comment['group_id'] != 0 && isset($this->forum_groups_cacheData[$post_comment['group_id']]))
 				{
-					$post_comment['user_colour'] = $this->forum_groups_cacheData[$user_data[0]]['group_colour'];
-					$post_comment['user_group_name'] = $this->forum_groups_cacheData[$user_data[0]]['group_name'];
+					$post_comment['user_colour'] = $this->forum_groups_cacheData[$post_comment['group_id']]['group_colour'];
+					$post_comment['user_group_name'] = $this->forum_groups_cacheData[$post_comment['group_id']]['group_name'];
 				}
 				else
 				{
@@ -230,7 +254,7 @@ class phpnuke_comments
 					$post_comment['user_group_name'] = "GUESTS";
 				}
 				
-				$post_comment['user_colour'] = ($nuke_configs['have_forum'] == 1 && $post_comment['user_colour'] != '') ? "#".str_replace("#","",$post_comment['user_colour']):"#000000";
+				$post_comment['user_colour'] = ($post_comment['user_colour'] != '') ? "#".str_replace("#","",$post_comment['user_colour']):"#000000";
 
 				$post_comment['date'] = nuketimes($post_comment['date'], false, false, false, 1);
 				$post_comment['replies'] = intval($post_comment['replies']);
@@ -274,7 +298,7 @@ class phpnuke_comments
 		<div class=\"clear\"></div>
 		\n\n<!-- COMMENTS FORM START -->\n
 		<a name=\"commenteditor\"></a>
-		<form class=\"form-horizontal\" style=\"margin:10px;\" role=\"form\" name = 'comments' action=\"".$this->Req_URIs_2."#commenteditor\" method=\"post\">
+		<form class=\"form-horizontal\" style=\"margin:10px;\" role=\"form\" name = 'comments' action=\"".$this->Req_URIs_2."\" method=\"post\">
 			<div class=\"col-sm-2\"></div><div class=\"col-sm-10\" style=\"margin-bottom:8px;\" id=\"reply_to_html\"></div>";
 			if(isset($this->comments_configs['inputs']['name_act']) && $this->comments_configs['inputs']['name_act'] == 1 && (!$is_user || (isset($this->comments_configs['inputs']['name_enter']) && $this->comments_configs['inputs']['name_enter'] == 1)))
 			{
@@ -477,6 +501,7 @@ class phpnuke_comments
 							'post_id' => $this->post_id, 
 							'post_title' => $this->post_title, 
 							'date' => $time, 
+							'last_replay_time' => $time, 
 							'name' => $comment_form_fields['name'], 
 							'username' => $username, 
 							'email' => $comment_form_fields['email'], 
@@ -485,19 +510,22 @@ class phpnuke_comments
 							'comment' => $comment_form_fields['comment'], 
 							'status' => $status
 						]);
+					$cid = $db->lastInsertId();
+					
+					if($status == 1)
+						$db->query("UPDATE ".COMMENTS_TABLE." SET last_replay_time='$time' WHERE cid = '".$comment_form_fields['reply_main_parent']."'");
 						
 					$db->query("UPDATE ".$this->db_table." SET comments=comments+1 WHERE ".$this->db_id." = '".$this->post_id."'");
 					
 					// notifications
 						///send comment with sms to admins or members
-						if(is_active("Sms") && isset($this->comments_configs['notify']['sms']) && $this->comments_configs['notify']['sms'] == 1)
+						if(isset($nuke_configs['sms']) && $nuke_configs['sms'] == 1 && isset($this->comments_configs['notify']['sms']) && $this->comments_configs['notify']['sms'] == 1)
 						{
-							require_once('modules/Sms/includes/sms.class.php');
 							$comment = @preg_replace("/<[^>]+\>/i", "", strip_tags($comment_form_fields['comment']));
 							$sms_text = mb_substr($comment,0,100);
-							$sms_obj = new sms_obj();
-							$sms_obj->text = $sms_text;
-							$sms_obj->Send();
+							$nuke_configs['pn_sms'] = (isset($nuke_configs['pn_sms'])) ? $nuke_configs['pn_sms']:"";
+							$pn_sms = ($nuke_configs['pn_sms'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['pn_sms'])):array();
+							pn_sms("send", explode(",", $pn_sms['recipients']), $sms_text);
 						}
 						///send comment with sms to admins or members
 						
@@ -517,6 +545,7 @@ class phpnuke_comments
 					}
 					
 					phpnuke_db_error();
+					redirect_to($this->Req_URIs_2."#comment-$cid");
 				}
 				else
 				{

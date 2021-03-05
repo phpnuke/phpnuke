@@ -1782,6 +1782,7 @@ a:hover.back-login	{
 	line-height:55px;
 	text-align: center;
 	height:58px;
+	position:relative;
 }
 
 .blocks-sortable-item-inbox {
@@ -1857,7 +1858,9 @@ a:hover.back-login	{
 }
 
 .blocks-tools{
-	float:left;
+	position:absolute;
+	left:0;
+	top:0;
 	display:none;
 	margin:15px 0 0 10px;
 }
@@ -1889,11 +1892,16 @@ a:hover.back-login	{
 }
 
 #update_result{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
 	padding-top:20px;
 	height:40px;
 	font-weight:bold;
 	text-align:center;
 	display:none;
+	background:#eee;
 }
 
 #update_result.success{
@@ -1912,7 +1920,7 @@ a:hover.back-login	{
 	height:16px;
 	display:inline-block;
 	padding-right:20px;
-	background: url('../../../images/loadingAnimation.gif') no-repeat;
+	background: url('../../../images/ajax-loader.gif') no-repeat;
 	background-position: right;
 }
 

@@ -26,8 +26,9 @@ if (check_admin_permission($filename))
 {
 	function upgrade($start_upgrade)
 	{
-		global $db, $admin_file, $nuke_configs, $pagetitle;
-		$pagetitle = _CMS_UPGRADE;
+		global $db, $admin_file, $nuke_configs, $hooks;
+		
+		$hooks->add_filter("set_page_title", function(){return array("upgrade" => _CMS_UPGRADE);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		

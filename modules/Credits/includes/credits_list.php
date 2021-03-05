@@ -242,4 +242,5 @@ $contents .= "
 	});
 </script>";
 $contents .= CloseTable();
+$contents = $hooks->apply_filters("credits_list_contents", $contents);
 ?>

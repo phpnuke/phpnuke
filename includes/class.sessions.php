@@ -106,7 +106,7 @@ class pn_Sessions {
         if (empty($this->sDomain)) {
             $sDomain = (($_SERVER['SERVER_PORT'] != '80') && ($_SERVER['SERVER_PORT'] != '443')) ?  $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] : $_SERVER['SERVER_NAME'];
 			
-            $this->sDomain = (filter_var($sDomain, FILTER_VALIDATE_IP) === true) ? $sDomain:'.' . str_replace('www.', '', $sDomain);
+            $this->sDomain = (filter_var($sDomain, FILTER_VALIDATE_IP)) ? $sDomain:'.' . str_replace('www.', '', $sDomain);
         }
         return $this->sDomain;
     }

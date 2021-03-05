@@ -89,12 +89,12 @@ if (check_admin_permission($filename))
 
 	function nav_menus()
 	{
-		global $db, $pagetitle, $nuke_nav_menus_cacheData, $admin_file, $nuke_configs;
+		global $db, $hooks, $nuke_nav_menus_cacheData, $admin_file, $nuke_configs;
 		
 		$contents = '';
 		$contents .= GraphicAdmin();
 		
-		$pagetitle = _NAVS_ADMIN;
+		$hooks->add_filter("set_page_title", function(){return array("nav_menus" => _NAVS_ADMIN);});
 		
 		$contents .= "<div align=\"center\" style=\"margin:20px 0;\">[ <a href=\"".$admin_file.".php?op=nav_menus_admin\">"._ADD_NEW_NAV."</a> ]</div>";
 		
@@ -157,7 +157,7 @@ if (check_admin_permission($filename))
 	
 	function nav_menus_admin($nav_id=0, array $nav_fields, array $nav_menu_fields, $mode='add_nav')
 	{
-		global $db, $admin_file, $nuke_configs, $pagetitle, $theme_setup;
+		global $db, $admin_file, $nuke_configs, $hooks, $theme_setup;
 		
 		$nav_id = intval($nav_id);
 		$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
@@ -274,6 +274,7 @@ if (check_admin_permission($filename))
 				
 			if(isset($nav_fields['final_items']))
 			{
+				$nav_fields['final_items'] = objectToArray(json_decode($nav_fields['final_items']));
 				$db->sql_query("UPDATE ".NAV_MENUS_TABLE." SET nav_title = '".$nav_fields['general_title']."', lang_nav_title = '".addslashes(phpnuke_serialize($nav_fields['lang_titles']))."', nav_location = '".$nav_fields['nav_location']."', status = '".$nav_fields['nav_status']."', date = '"._NOWTIME."' WHERE nav_id = '$nav_id'");
 				
 				$unnested_nav_fields = array_flatten($nav_fields['final_items'], 0, 'nid', 'pid', 'children', array('remove','title','url','target','xfn','href','classes', 'styles', 'status'), array());
@@ -514,6 +515,7 @@ if (check_admin_permission($filename))
 		$contents .= GraphicAdmin();
 		
 		$pagetitle = ($nav_id == 0) ? _ADD_NEW_NAV:sprintf(_EDIT_NAV, $nav_title);
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("nav_menus_admin" => $pagetitle);});
 		
 		$contents .= "<div align=\"center\" style=\"margin:20px 0;\">[ <a href=\"".$admin_file.".php?op=nav_menus\">"._NAVS_ADMIN."</a> ]</div>";
 		

@@ -23,7 +23,7 @@ define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 function statistics()
 {
-	global $db, $module_name, $nuke_configs, $users_system, $custom_theme_setup;
+	global $db, $module_name, $nuke_configs, $users_system, $hooks;
 	$contents = '';	
 	$now_time = _NOWTIME;
 	
@@ -162,8 +162,9 @@ function statistics()
 	}
 	$os_chart_data = "[".implode(",\n", $os_chart_data)."]";
 	
-	$nuke_statistics_data = $nuke_configs['statistics_data'];
-	
+	$nuke_statistics_data = array();
+	$nuke_statistics_data = $hooks->apply_filters("modules_statistics_data", $nuke_statistics_data);
+			
 	$rows_title = array(
 		"total_users" => _USERS,
 		"total_authors" => _AUTHORS,
@@ -193,6 +194,8 @@ function statistics()
 	if($statistics_result->count() > 0)
 		$all_rows = $statistics_result->results()[0];
 
+	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name, $main_chart_data, $browsers_chart_data, $os_chart_data)
+	{
 		$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/style.css\">";
 		
 		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/amcharts.js\"></script>";
@@ -211,19 +214,34 @@ function statistics()
 			pie_chart('os_chart', os_chart_data, 'os', 'value');
 		});
 		</script>";
-	
-	$custom_theme_setup = array_merge_recursive($custom_theme_setup, array(
-		"default_css" => $default_css,
-		"defer_js" => $defer_js
-	));
-	
-	$custom_theme_setup_replace = false;
+		$theme_setup = array_merge_recursive($theme_setup, array(
+			"default_css" => $default_css,
+			"defer_js" => $defer_js
+		));
+		return $theme_setup;
+	}, 10);
 
 	$meta_tags = array(
 		"title" 				=> _VIEWERS_STATISTICS,
 		"description" 			=> _STATISTICS_DESCRIPTION,
 		"keywords" 				=> ''._VIEWERS_STATISTICS.', statistics'
 	);
+	$meta_tags = $hooks->apply_filters("select_statistics_header_meta", $meta_tags);
+		
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents){
+		$breadcrumbs['statistics'] = array(
+			"name" => _VIEWERS_STATISTICS,
+			"link" => LinkToGT("index.php?modname=Statistics"),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);	
+	unset($meta_tags);
 	
 	include("header.php");
 
@@ -281,6 +299,9 @@ function statistics()
 			".CloseTable()."
 		</div>";
 	}
+	
+	$contents = $hooks->apply_filters("main_statistics", $contents);
+	
 	$html_output .= show_modules_boxes($module_name, "advanced", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 
 	include("footer.php");
@@ -288,7 +309,7 @@ function statistics()
 
 function advanced_statistics($year=0, $month=0, $day=0)
 {
-	global $db, $module_name, $nuke_configs, $users_system;
+	global $db, $module_name, $nuke_configs, $users_system, $hooks;
 
 	$contents = '';
 	$today_unixtime = mktime(0,0,0, date("m"), date("d"), date("Y"));
@@ -495,6 +516,25 @@ function advanced_statistics($year=0, $month=0, $day=0)
 	}
 	
 	$script_array = (!empty($script_array)) ? "<script>$(document).ready(function(){".implode("\n", $script_array)."\n});</script>":"";
+		
+	$breadcrumb_data = array();
+	if($mode == "all")
+		$breadcrumb_data[] = array(_ADVANCED_STATISTICS, LinkToGT("index.php?modname=$module_name&op=advanced_statistics"));
+	if($mode == "yearly")
+	{
+		$breadcrumb_data[] = array($this_year, LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$this_year"));
+	}
+	if($mode == "monthly")
+	{
+		$breadcrumb_data[] = array($this_year, LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$this_year"));
+		$breadcrumb_data[] = array(get_month_name($this_month), LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$this_year&month=$month"));
+	}
+	if($mode == "daily")
+	{
+		$breadcrumb_data[] = array($this_year, LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$this_year"));
+		$breadcrumb_data[] = array(get_month_name($this_month), LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$this_year&month=$month"));
+		$breadcrumb_data[] = array(_DAY." ".$this_day, LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$this_year&month=$month&day=$this_day"));
+	}
 	
 	if($mode == "all")
 	{
@@ -520,27 +560,57 @@ function advanced_statistics($year=0, $month=0, $day=0)
 		$back_link = "<a href=\"".LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$year&month=$month")."\">"._SHOW_STATISTICS." ".get_month_name($month)." $year</a>";
 	}
 	
-	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/style.css\">";
-	
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/amcharts.js\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/serial.js\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/pie.js\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/themes/light.js\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/plugins/responsive/responsive.min.js\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/charts.js\"></script>";
-	$defer_js[] = $script_array;
-	
-	$custom_theme_setup = array(
-		"default_css" => $default_css,
-		"defer_js" => $defer_js
-	);
-	$custom_theme_setup_replace = false;
+	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name, $script_array)
+	{
+			$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/style.css\">";
+			
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/amcharts.js\"></script>";
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/serial.js\"></script>";
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/pie.js\"></script>";
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/themes/light.js\"></script>";
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/plugins/responsive/responsive.min.js\"></script>";
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/charts.js\"></script>";
+			$defer_js[] = $script_array;
+			
+		$theme_setup = array_merge_recursive($theme_setup, array(
+			"default_css" => $default_css,
+			"defer_js" => $defer_js
+		));
+		return $theme_setup;
+	}, 10);
 
 	$meta_tags = array(
 		"title" 				=> ""._VIEWERS_STATISTICS." $visits_time_text",
 		"description" 			=> _SٍEPRATE_STATISTICS,
 		"keywords" 				=> ''._VIEWERS_STATISTICS.', statistics, '._YEARLY_VISITS.', '._MONTHLY_VISITS.', '._DAILY_VISITS.''
 	);
+	$meta_tags = $hooks->apply_filters("select_statistics_adv_header_meta", $meta_tags, $visits_time_text);
+		
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);	
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($breadcrumb_data){
+	
+		$breadcrumbs['statistics'] = array(
+			"name" => _VIEWERS_STATISTICS,
+			"link" => LinkToGT("index.php?modname=Statistics"),
+			"itemtype" => "WebPage"
+		);
+		
+		foreach($breadcrumb_data as $key => $breadcrumb)
+		{
+			$breadcrumbs["statistics_$key"] = array(
+				"name" => $breadcrumb[0],
+				"link" => $breadcrumb[1],
+				"itemtype" => "WebPage"
+			);
+		}
+		
+		return $breadcrumbs;
+	}, 10);
 	
 	include("header.php");
 
@@ -563,8 +633,10 @@ function advanced_statistics($year=0, $month=0, $day=0)
 			</div>
 			".CloseTable()."
 		</div>";
+		
 		if($mode == "all")
 		{
+			
 			$contents .="<div class=\"col-md-12\">
 			".OpenTable(""._VIEWERS_STATISTICS." / "._ENTRIES."")."
 				<div id=\"years_chart\" style=\"direction:ltr;width: 100%; height: 400px;\"></div>
@@ -596,6 +668,9 @@ function advanced_statistics($year=0, $month=0, $day=0)
 			</div>";
 		}
 	}
+	
+	$contents = $hooks->apply_filters("advanced_statistics", $contents);
+	
 	$html_output .= show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	
 	include("footer.php");	

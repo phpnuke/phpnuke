@@ -1,7 +1,7 @@
 <?php
 
-// 8.4.2 installer
-// 8.3.7 to 8.4.2 upgrader
+// 8.4.3 installer
+// 8.3.7 to 8.4.3 upgrader
 
 if(version_compare(PHP_VERSION, '5.4.0', "<"))
 {
@@ -62,8 +62,10 @@ else
 			extract($$method);
 	}
 	
-	require_once("config.php");
 	require_once("includes/functions.php");
+	require_once("config.php");
+	require_once("includes/class.Hooks.php");
+	$hooks = Hooks::getInstance();
 	require_once("includes/class.sessions.php");
 	require_once("includes/class.cache.php");
 
@@ -71,7 +73,7 @@ else
 	// setup 'default' cache
 	$cache = new Cache();
 	require_once("includes/constants.php");
-	include_once('db/Database.php');
+	include_once('includes/class.Database.php');
 	// Request URL Redirect To Nuke Url
 	$Req_Protocol 	= strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === FALSE ? 'http' : 'https';
 	$Req_Host     	= $_SERVER['HTTP_HOST'];
@@ -147,7 +149,7 @@ function upgrade_header($step = 1, $progress = 0)
 	echo"<!DOCTYPE html>
 <html lang=\"en\">
 <head>
-	<title>نصب نيوک فارسي 8.4.2</title>
+	<title>نصب نيوک فارسي 8.4.3</title>
 	<meta charset=\"UTF-8\">
 	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
 	<link href=\"includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\">
@@ -2494,21 +2496,23 @@ function upgrade_gallery($start)
 		}
 	}
 	
-	if(isset($gallery_insert) && $gallery_insert== 1 && isset($gallery_posts) && !empty($gallery_posts))
+	if(isset($gallery_insert) && $gallery_insert== 1)
 	{
-		foreach($gallery_posts as $imported_id => $row)
-			$insert_query[] = array('NULL','publish','Gallery',$default_admin,$row['title'],$row['time'],$row['hometext'],'',$row['post_url'],0,$row['counter'],$row['cat_id'],$default_admin,'',1,'',1,1,'',$row['cat_id'],0,0,0, ((isset($row['download']) && !empty($row['download'])) ? phpnuke_serialize($row['download']):""), $imported_id);
-			
-		$db->query("set names '$pn_dbcharset'");
-		$new_cols = array("sid","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings", 'download', 'imported_id');
-		
-		if(isset($insert_query) && !empty($insert_query))
+		if(isset($gallery_posts) && !empty($gallery_posts))
 		{
-			$db->table(POSTS_TABLE)->multiinsert($new_cols,$insert_query);
+			foreach($gallery_posts as $imported_id => $row)
+				$insert_query[] = array('NULL','publish','Gallery',$default_admin,$row['title'],$row['time'],$row['hometext'],'',$row['post_url'],0,$row['counter'],$row['cat_id'],$default_admin,'',1,'',1,1,'',$row['cat_id'],0,0,0, ((isset($row['download']) && !empty($row['download'])) ? phpnuke_serialize($row['download']):""), $imported_id);
+				
+			$db->query("set names '$pn_dbcharset'");
+			$new_cols = array("sid","status","post_type","aid","title","time","hometext","bodytext","post_url","comments","counter","cat","informant","tags","ihome","alanguage","allow_comment","position","post_pass","cat_link","permissions","score","ratings", 'download', 'imported_id');
 			
-			$cache->erase('gallery_posts');
-		}
-			
+			if(isset($insert_query) && !empty($insert_query))
+			{
+				$db->table(POSTS_TABLE)->multiinsert($new_cols,$insert_query);
+				
+				$cache->erase('gallery_posts');
+			}
+		}	
 		upgrade_progress_output("انتقال گالری تصاویر", 100, 0, 0, "install.php?op=downloads", "", 60, 100);
 		die();
 	}
@@ -3223,11 +3227,64 @@ function upgrade_comments_main_parent($start = 0)
 		break;
 		case"Statics":
 			$progress_link .= "&module=statics";
-			$finish_link = "install.php?op=forum";
+			$finish_link = "install.php?op=comments_replies_time";
 		break;
 	}
 	
 	upgrade_progress_output("اصلاح نظرات تو در تو", $total_rows, $fetched_rows, $start, $finish_link, $progress_link, 90, $run_per_step);
+}
+
+function upgrade_comments_replies_time($start = 0)
+{
+	global $db, $nuke_configs, $cache, $pn_dbcharset, $module;
+	
+	if(!$cache->isCached('install_options'))
+	{
+		steps_error("اطلاعات ارسالی از بخش اطلاعات دیتابیس ناقص است", 7, 95);
+	}
+	
+	$run_per_step = 1000;
+	// update nuke_comments
+	$result = $db->query("SELECT c.cid, c.`date`, (SELECT `date` FROM ".COMMENTS_TABLE." WHERE main_parent = c.cid ORDER BY `date` DESC LIMIT 1) as last_replay_time, (SELECT COUNT(cid) FROM `".COMMENTS_TABLE."` WHERE pid = '0') as total_rows FROM ".COMMENTS_TABLE." AS c WHERE c.pid = '0' ORDER BY c.cid ASC LIMIT $start, $run_per_step");
+	$fetched_rows = intval($result->count());
+	$when_query = array();
+	if($fetched_rows > 0)
+	{
+		$rows = $result->results();
+		$all_rows = array();
+		$total_rows_set = false;
+		foreach($rows as $row)
+		{
+			if(!$total_rows_set)
+			{
+				$cache->store('total_rows', intval($row['total_rows']));
+				unset($row['total_rows']);
+				$total_rows_set = true;
+			}
+		
+			$cid = $row['cid'];
+			$date = $row['date'];
+			$last_replay_time = (intval($row['last_replay_time']) > 0) ? $row['last_replay_time']:$date;
+			
+			$when_query[$row['cid']] = "WHEN cid = '$cid' THEN '$last_replay_time'";
+		}
+		
+		if(!empty($when_query))
+		{
+			$cids = array_keys($when_query);
+			$cids = implode(", ", $cids);
+			$when_query = implode("\n", $when_query);
+			$db->query("UPDATE ".COMMENTS_TABLE." SET last_replay_time = CASE 
+				$when_query
+			END
+			WHERE cid IN($cids)");
+		}
+	}
+	
+	$new_start = $start+$run_per_step;
+	$total_rows = $cache->retrieve('total_rows');
+	
+	upgrade_progress_output("اصلاح ترتیب نمایش نظرات", $total_rows, $fetched_rows, $start, "install.php?op=forum", "install.php?op=comments_replies_time&start=$new_start", 90, $run_per_step);
 }
 
 function upgrade_forum()
@@ -3664,7 +3721,8 @@ function upgrade_final()
 			array(9, 'comments', 'block-comments.php'),
 			array(10, 'surveys', 'block-surveys.php'),
 			array(11, 'Last comments', 'block-Last_comments.php'),
-			array(12, 'credits', 'block-Credits.php')
+			array(12, 'credits', 'block-Credits.php'),
+			array(12, 'invitation', 'block-invitation.php')
 		);
 		
 		$db->table(BLOCKS_TABLE)
@@ -3932,7 +3990,7 @@ function upgrade_final()
 
 	// add configs data
 	$install_options['siteinfo']['nukeurl'] = (isset($install_options['siteinfo']['nukeurl'])) ? $install_options['siteinfo']['nukeurl']:$Req_URL;
-	$install_options['siteinfo']['sitename'] = (isset($install_options['siteinfo']['sitename'])) ? $install_options['siteinfo']['sitename']:"PhpNuke 8.4.2";
+	$install_options['siteinfo']['sitename'] = (isset($install_options['siteinfo']['sitename'])) ? $install_options['siteinfo']['sitename']:"PhpNuke 8.4.3";
 	$install_options['db_info']['db_have_forum'] = (isset($install_options['db_info']['db_have_forum'])) ? $install_options['db_info']['db_have_forum']:0;
 	$install_options['db_info']['db_forumcms'] = (isset($install_options['db_info']['db_forumcms'])) ? $install_options['db_info']['db_forumcms']:"";
 	$install_options['db_info']['db_forumprefix'] = (isset($install_options['db_info']['db_forumprefix'])) ? $install_options['db_info']['db_forumprefix']:"";
@@ -3940,7 +3998,7 @@ function upgrade_final()
 	$install_options['db_info']['db_forumpath'] = (isset($install_options['db_info']['db_forumpath'])) ? $install_options['db_info']['db_forumpath']:"";
 	
 	$config_data = array(
-		"WHEN config_name = 'Version_Num' THEN '8.4.2'", 
+		"WHEN config_name = 'Version_Num' THEN '8.4.3'", 
 		"WHEN config_name = 'lock_siteurl' THEN '".((isset($install_options['db_info']['nukeurl'])) ? 1:0)."'", 
 		"WHEN config_name = 'nukeurl' THEN '".$install_options['siteinfo']['nukeurl']."'", 
 		"WHEN config_name = 'sitename' THEN '".$install_options['siteinfo']['sitename']."'", 

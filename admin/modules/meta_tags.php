@@ -25,9 +25,9 @@ if (check_admin_permission($filename))
 {
 	function seo()
 	{
-		global $pagetitle, $db, $admin, $admin_file, $mode, $nuke_configs;
+		global $hooks, $db, $admin, $admin_file, $mode, $nuke_configs;
 
-		$pagetitle = _SEO_ADMIN;
+		$hooks->add_filter("set_page_title", function(){return array("seo" => _SEO_ADMIN);});
 		
 		$site_meta_tags = stripslashes($nuke_configs['site_meta_tags']);
 		$site_description = stripslashes($nuke_configs['site_description']);
@@ -116,7 +116,15 @@ if (check_admin_permission($filename))
 			</tr>
 		</table>		
 		
-		</td></tr>";		
+		</td>
+		</tr>
+		<tr>
+			<th style=\"width:200px\">"._BREADCRUMB_CAT."</th><td>";
+			$check1 = ($nuke_configs['breadcrumb_cat'] == 1) ? "checked":"";
+			$check2 = ($nuke_configs['breadcrumb_cat'] == 0) ? "checked":"";
+			$contents .= "<input data-label=\"" . _YES . "\" type=\"radio\" class=\"styled\" name=\"config_fields[breadcrumb_cat]\" value=\"1\" $check1> &nbsp; <input data-label=\"" . _NO . "\" type=\"radio\" class=\"styled\" name=\"config_fields[breadcrumb_cat]\" value=\"0\" $check2>
+			</td>
+		</tr>";		
 		
 		$contents .= "<input type='hidden' name='op' value='saveseo'><input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> "
 		."<tr><td></td><td><input class=\"form-submit\" type='submit' value='" . _SAVECHANGES . "'></form></td></tr></table>";
@@ -188,8 +196,10 @@ if (check_admin_permission($filename))
 
 		foreach($nuke_categories_cacheData as $module_name => $cat_data)
 		{
+			if(!is_active($module_name))
+				continue;
 			$new_module = '';
-			$contents .= "<tr><th rowspan=\"".(sizeof($cat_data)+2)."\">"._MODULE_FEED." $module_name</th><td></tr>";
+			$contents .= "<tr><th rowspan=\"".(sizeof($cat_data)+1)."\">"._MODULE_FEED." $module_name</th><td></tr>";
 
 			foreach($cat_data as $catid => $catdata)
 			{
@@ -268,6 +278,7 @@ if (check_admin_permission($filename))
 	function saveseo($config_fields)
 	{
 		global $db, $admin_file;
+		$breadcrumb_cat = intval($config_fields['breadcrumb_cat']);
 		$userurl = intval($config_fields['userurl']);
 		$gtset = intval($config_fields['gtset']);
 		$site_meta_tags = addslashes($config_fields['site_meta_tags']);
@@ -281,11 +292,12 @@ if (check_admin_permission($filename))
 		$db->query("UPDATE ".CONFIG_TABLE." SET config_value = CASE 
 			WHEN config_name = 'gtset' THEN ?
 			WHEN config_name = 'userurl' THEN ?
+			WHEN config_name = 'breadcrumb_cat' THEN ?
 			WHEN config_name = 'site_description' THEN ?
 			WHEN config_name = 'site_keywords' THEN ?
 			WHEN config_name = 'site_meta_tags' THEN ?
 		END
-		WHERE config_name IN('gtset', 'userurl', 'site_description', 'site_keywords', 'site_meta_tags')", [$gtset, $userurl, $site_description, $site_keywords, $site_meta_tags]);
+		WHERE config_name IN('gtset', 'userurl', 'breadcrumb_cat', 'site_description', 'site_keywords', 'site_meta_tags')", [$gtset, $userurl, $breadcrumb_cat, $site_description, $site_keywords, $site_meta_tags]);
 		
 		cache_system('nuke_configs');
 		add_log(_SEOSAVELOG, 1);

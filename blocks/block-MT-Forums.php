@@ -20,15 +20,20 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $nuke_configs, $block_global_contents, $users_system, $custom_theme_setup;
+global $db, $nuke_configs, $users_system, $hooks;
 
 $content = "";
 $latest_topics = $users_system->MTForumBlock();
-$custom_theme_setup = array_merge_recursive($custom_theme_setup, array(
-	"defer_js" => array(
-		"<script type=\"text/javascript\" language=\"javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/MTForum.js\"></script>"
-	)
-));
+
+$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+{
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"defer_js" => array(
+			"<script type=\"text/javascript\" language=\"javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/MTForum.js\"></script>"
+		)
+	));
+	return $theme_setup;
+}, 10);
 
 $content .= "
 <div id=\"MTForumBlock\">

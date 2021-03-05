@@ -17,7 +17,7 @@ if(!defined('NUKE_FILE'))
 	die ("You can't access this file directly...");
 }
 
-global $db, $nuke_banned_ip_cacheData, $visitor_ip;
+$nuke_banned_ip_cacheData = get_cache_file_contents('nuke_mtsn_ipban');
 
 if(isset($nuke_banned_ip_cacheData) && is_array($nuke_banned_ip_cacheData) && !empty($nuke_banned_ip_cacheData))
 {
@@ -52,6 +52,7 @@ if(isset($nuke_banned_ip_cacheData) && is_array($nuke_banned_ip_cacheData) && !e
 	}
 }
 
+$pn_Bots = new CrawlerDetect();
 if($nuke_configs['mtsn_ddos_filter'] == 1 || !$pn_Bots->isCrawler())
 {
 	$mtsn_requests_pages = isset($nuke_configs['mtsn_requests_pages']) ? intval($nuke_configs['mtsn_requests_pages']):7;

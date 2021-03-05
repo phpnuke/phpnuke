@@ -29,8 +29,9 @@ if (check_admin_permission($filename))
 {
 	function mtsn_admin()
 	{
-		global $db, $admin_file, $pagetitle, $nuke_configs;
-		$pagetitle = _MTSNADMIN;
+		global $db, $admin_file, $hooks, $nuke_configs;
+		
+		$hooks->add_filter("set_page_title", function(){return array("mtsn_admin" => _MTSNADMIN);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();
@@ -334,7 +335,7 @@ if (check_admin_permission($filename))
 
 	function ip_ban_page($id=0,$ipsearch=array(), $ipsearch2, $ipaddress='')
 	{
-		global $db, $admin_file, $pagetitle, $nuke_configs;
+		global $db, $admin_file, $hooks, $nuke_configs;
 
 		$result = $db->table(MTSN_IPBAN_TABLE)
 						->order_by(['id' => 'ASC'])
@@ -364,6 +365,7 @@ if (check_admin_permission($filename))
 			$expire = ($expire != 0) ? nuketimes($expire, false, false, false, 1):0;
 			$pagetitle .= " - "._EDIT_IP." : <span dir=\"ltr\">$ipaddress</span>";
 		}
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("ip_ban_page" => $pagetitle);});
 		
 		$status_sel1 = ($status == 1) ? "selected":"";
 		$status_sel2 = ($status == 0) ? "selected":"";
@@ -595,8 +597,9 @@ if (check_admin_permission($filename))
 
 	function addnewip($ipaddress, $reason, $status, $expire, $edited_id)
 	{
-		global $db, $aid, $admin_file, $visitor_ip;
-		$pagetitle = _ADD_IP;
+		global $db, $aid, $hooks, $admin_file, $visitor_ip;
+		
+		$hooks->add_filter("set_page_title", function(){return array("addnewip" => _ADD_IP);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();

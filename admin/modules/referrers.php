@@ -26,8 +26,9 @@ if (check_admin_permission($filename))
 {
 	function hreferrer()
 	{
-		global $db, $admin_file, $nuke_configs, $pagetitle;
-		$pagetitle = _REFERRERS_ADMIN;
+		global $db, $admin_file, $nuke_configs, $hooks;
+		
+		$hooks->add_filter("set_page_title", function(){return array("hreferrer" => _REFERRERS_ADMIN);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();

@@ -20,13 +20,14 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $nuke_configs, $block_global_contents, $HijriCalendar;
+global $db, $nuke_configs, $HijriCalendar;
 
 $content = "";
 	
 $content .= "<div class=\"text-center\"><font class=\"content\">"._SELECTMONTH2VIEW."</font><br><br></div>";
 $result = $db->table(POSTS_TABLE)
 				->where('post_type', 'Articles')
+				->where('ihome', '1')
 				->order_by(['time' => 'DESC'])
 				->select();
 $content .= "<ul>";

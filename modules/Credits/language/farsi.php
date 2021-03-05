@@ -63,6 +63,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_CREDITS_GATEWAY_ONLINE" => "آنلاین",
 	"_CREDITS_GATEWAY_OFFLINE" => "غیر آنلاین",
 	"_CREDITS_TOTAL_TRANSACTIONS" => "تعداد تراکنشها",
+	"_CREDITS_FORM" => "صفحه پرداخت",
 	"_CREDITS_LIST" => "لیست تراکنشها",
 	"_CREDITS_VIEW_DETAILS" => "مشاهده جزئیات تراکنش",
 	"_CREDITS_SETTINGS" => "تنظیمات سیستم اعتبارات",

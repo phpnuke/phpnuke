@@ -39,7 +39,7 @@ if (check_admin_permission($module_name, false, true))
 		
 	function surveys($status='', $search_query = '', $order_by = '', $sort='DESC')
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs;
+		global $db, $hooks, $admin_file, $nuke_configs;
 
 		$nuke_surveys_cacheData = change_poll_status();
 		
@@ -61,7 +61,7 @@ if (check_admin_permission($module_name, false, true))
 			break;
 		}
 		
-		$pagetitle = ""._SURVEYS_ADMIN." - ".$post_status;
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("surveys" => $pagetitle);});
 		
 		$link_to_more = "";
 		$publish_now = "";
@@ -254,7 +254,7 @@ if (check_admin_permission($module_name, false, true))
 	
 	function surveys_admin($pollID = 0, $mode = "new", $submit, $surveys_fields=array())
 	{
-		global $db, $aid, $visitor_ip, $pagetitle, $admin_file, $nuke_configs, $PnValidator, $module_name, $nuke_authors_cacheData;
+		global $db, $aid, $visitor_ip, $hooks, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
 		$nuke_surveys_cacheData = change_poll_status();
 		
@@ -265,6 +265,8 @@ if (check_admin_permission($module_name, false, true))
 		// determine radminsuper & article_aid & article_status
 		if($mode == "delete" || $mode == 'edit' || $mode == 'publish_now')
 		{
+			$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+		
 			$radminsuper = intval($nuke_authors_cacheData[$aid]['radminsuper']);
 			$radminsurvey = ($aid == $nuke_surveys_cacheData[$pollID]['aid']) ? true:false;
 			$result2 = $db->table(SURVEYS_TABLE)
@@ -412,8 +414,8 @@ if (check_admin_permission($module_name, false, true))
 			}
 			else
 			{
+				$hooks->add_filter("set_page_title", function() {return array("surveys_admin" => _ADD_NEW_POLL);});
 				include("header.php");
-				$pagetitle = _ADD_NEW_POLL;
 				$html_output .= GraphicAdmin();
 				$html_output .= surveys_menu();
 				$html_output .= OpenAdminTable();
@@ -611,6 +613,7 @@ if (check_admin_permission($module_name, false, true))
 		$end_time	= ($end_time != '') ? nuketimes($end_time, false, false, false, 1):"";
 
 		$pagetitle = ($mode == "new") ? _ADD_NEW_POLL:_POLL_EDIT;
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("surveys_admin" => $pagetitle);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= surveys_menu();
@@ -817,7 +820,7 @@ if (check_admin_permission($module_name, false, true))
 	$sort = (isset($sort)) ? filter($sort, "nohtml"):'';
 	$search_query = (isset($search_query)) ? filter($search_query, "nohtml"):'';
 	$submit = (isset($submit)) ? filter($submit, "nohtml"):'';
-	$surveys_fields = (isset($surveys_fields)) ? $surveys_fields:array();
+	$surveys_fields = request_var('surveys_fields' , array(), '_POST');
 	$pollID = (isset($pollID)) ? intval($pollID):0;
 	
 	switch($op) {

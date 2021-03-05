@@ -45,8 +45,15 @@ function parse_search_link($matches)
 	return $return;
 }
 
-$nuke_modules_boxes_parts[$this_module_name] = array(
-	"index" => "_INDEX",
-);
+function search_boxes_parts($nuke_modules_boxes_parts)
+{
+	$nuke_modules_boxes_parts['Search'] = array(
+		"index" => _INDEX,
+	);
+	
+	return $nuke_modules_boxes_parts;
+}
+
+$hooks->add_filter("modules_boxes_parts", "search_boxes_parts", 10);
 
 ?>

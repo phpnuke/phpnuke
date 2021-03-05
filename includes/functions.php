@@ -117,6 +117,16 @@ function get_client_ip()
 		return 'UNKNOWN';
 }
 
+function send_headers()
+{
+	global $hooks;
+	
+	$headers = $hooks->apply_filters("site_headers", array());
+	
+	foreach($headers as $header_key => $header_val)
+		header("$header_key: $header_val");
+}
+
 // cache functions
 function cache_system($mode = "", $extra_code=array())
 {
@@ -461,8 +471,26 @@ function cache_system($mode = "", $extra_code=array())
 				unset($results);
 			}
 			
+			$results = $db->table(POSTS_META_TABLE)
+						->where('meta_part', 'module_boxes')
+						->select();
+			$nuke_modules_boxes = array();
+			
+			if($db->count() > 0)
+			{
+				foreach($results as $row)
+				{
+					$meta_key = $row['meta_key'];
+					unset($row['meta_key']);
+					$nuke_modules_boxes[$meta_key] = $row;
+				}
+				unset($results);
+			}
+			
 			$nuke_modules_cacheData = (!empty($nuke_modules)) ? $nuke_modules:array();
 			$cache->store('nuke_modules', $nuke_modules_cacheData);
+			$nuke_modules_boxes_cacheData = (!empty($nuke_modules_boxes)) ? $nuke_modules_boxes:array();
+			$cache->store('nuke_modules_boxes', $nuke_modules_boxes_cacheData);
 			/*file_put_contents("cache/cache_nuke_modules.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_modules_cacheData);*/
 		}
 		
@@ -879,7 +907,7 @@ function add_configs( $config_name, $config_value = '')
 // captcha functions
 function makePass($cid, $custum_options = array(), $google_recaptcha = false)
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;
 	
 	$security_code = array("image" => "", "input" => "");
 	
@@ -934,12 +962,17 @@ function makePass($cid, $custum_options = array(), $google_recaptcha = false)
 		$security_code['image'] = "<img src=\"".$nuke_configs['nukeurl']."index.php?captcha=true&sid=".md5(uniqid(_NOWTIME))."&id=$cid&language=".$nuke_configs['currentlang']."&height=".$options['height']."\" onclick=\"document.getElementById('capchaimage".$cid."').src = '".$nuke_configs['nukeurl']."index.php?captcha=true&sid=' + Math.random()+'&id=$cid&language=".$nuke_configs['currentlang']."&height=".$options['height']."'; return false\" ".$img_attrs." />";
 		$security_code['input'] = "<input name=\"security_code\" type=\"text\" ".$input_attrs." /><input name=\"security_code_id\" type=\"hidden\" value=\"$cid\">";
 	}
+	
+	$security_code = $hooks->apply_filters("make_pass_filter", $security_code, $cid, $custum_options, $google_recaptcha);
+	
 	return($security_code);
 }
 
 function code_check($security_code, $security_code_id, $google_recaptcha = false)
 {
-	global $nuke_configs, $visitor_ip;
+	global $nuke_configs, $visitor_ip, $hooks;
+	
+	$hooks->do_action("code_check_action", $security_code, $security_code_id, $google_recaptcha);
 	
 	$g_recaptcha = ($nuke_configs['google_recaptcha_sitekey'] != '' && $nuke_configs['google_recaptcha_secretkey'] != '' && ($nuke_configs['seccode_type'] == 2 || $google_recaptcha)) ? true:false;
 	
@@ -1016,7 +1049,7 @@ function code_check($security_code, $security_code_id, $google_recaptcha = false
 // permissions functions
 function is_admin($admin_id = '')
 {
-    global $nuke_authors_cacheData, $admin; 
+    global $admin; 
     if (!$admin) { return 0; }
 
     $aid = $admin[0];
@@ -1034,17 +1067,21 @@ function is_admin($admin_id = '')
 
 function is_an_admin($admin_id = '')
 {
-    global $nuke_authors_cacheData, $admin; 
+    global $admin; 
 	
 	if(isset($admin_id) && $admin_id != '')
 	{
+		$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 		return (isset($nuke_authors_cacheData[$admin_id])) ? true:false;
 	}
 }
 
 function is_God($admin_id='')
 {
-    global $nuke_authors_cacheData, $admin;
+    global $admin;
+	
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+	
 	if($admin_id == '')
 	{
 		if(!is_admin()) return false;
@@ -1084,21 +1121,23 @@ function is_user($username='')
 
 function is_in_group($group_id = 0, $other_userinfo=array())
 {
-	global $nuke_points_groups_cacheData, $userinfo;
+	global $userinfo;
      if (is_user())
 	 {
-          $points = (!empty($other_userinfo) && isset($other_userinfo['points'])) ? intval($other_userinfo['points']):intval($userinfo['points']);
-          $grp = intval($nuke_points_groups_cacheData[$group_id]['points']);
-          if (($points >= 0 AND $points >= $grp) OR $group_id == 0)
-		  {
+		$nuke_points_groups_cacheData = get_cache_file_contents('nuke_points_groups');
+		$points = (!empty($other_userinfo) && isset($other_userinfo['points'])) ? intval($other_userinfo['points']):intval($userinfo['points']);
+		$grp = intval($nuke_points_groups_cacheData[$group_id]['points']);
+		if (($points >= 0 AND $points >= $grp) OR $group_id == 0)
+		{
         	return 1;
-          }
+		}
      }
      return 0;
 }
 
 function get_groups_permissions()
 {
+	global $hooks;
 	$nuke_forum_groups_cacheData = get_cache_file_contents('nuke_forum_groups');
 	$permissions = array(
 		"0" => _ALLVISITORS,// all visitors
@@ -1118,12 +1157,15 @@ function get_groups_permissions()
 			$permissions = array_merge($permissions, array($group_id => $group_info['group_name']));
 		}
 	}
+	
+	$permissions = $hooks->apply_filters("get_all_permissions", $permissions, $nuke_forum_groups_cacheData);
+	
 	return $permissions;
 }
 
 function phpnuke_permissions_check($permissions)
 {
-	global $userinfo, $pn_Bots, $users_system;
+	global $userinfo, $users_system, $hooks;
 	
 	$allow_to_view = false;
 	$disallow_message_arr = array();
@@ -1143,6 +1185,8 @@ function phpnuke_permissions_check($permissions)
 		$allow_to_view = true;
 	}
 	
+	$pn_Bots = new CrawlerDetect();
+
 	if(is_array($permissions) && empty($permissions) && is_God())
 		$allow_to_view = true;
 		
@@ -1161,6 +1205,9 @@ function phpnuke_permissions_check($permissions)
 	
 	$disallow_message = $disallow_message.((!empty($disallow_message_arr)) ? implode(" "._AND." ", $disallow_message_arr):"").".".$disallow_message_gr;
 	
+	$allow_to_view = $hooks->apply_filters("permissions_allow_to_view", $allow_to_view, $permissions);
+	$disallow_message = $hooks->apply_filters("permissions_disallow_message", $disallow_message, $permissions);
+	
 	return array($allow_to_view, $disallow_message);
 }
 
@@ -1169,17 +1216,19 @@ function phpnuke_permissions_check($permissions)
 // outputs functions
 function title($text)
 {
+	global $hooks;
 	$contents = '';
 	$contents .= (defined("ADMIN_FILE")) ? OpenAdminTable():OpenTable();
 	$contents .= "<div class=\"text-center\"><span class=\"title\"><strong>$text</strong></span></div>";
 	$contents .= (defined("ADMIN_FILE")) ? CloseAdminTable():CloseTable();
 	$contents .= "<br>";
+	$contents = $hooks->apply_filters("title_filter", $contents, $text);
 	return $contents;
 }
 
 function info_box($graphic, $message)
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;
 	$contents = '';
 	// Function to generate a message box with a graphic inside
 	// $graphic value can be whichever: warning, caution, tip, note.
@@ -1197,6 +1246,7 @@ function info_box($graphic, $message)
 		</table>";
 		$contents .= CloseTable();
 	}
+	$contents = $hooks->apply_filters("info_box_filter", $contents, $graphic, $message);
 		
 	return $contents;
 }
@@ -1215,6 +1265,7 @@ function simple_output($message)
 // db functions
 function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_status = '', $ajax=false, $where = '')
 {
+	global $hooks;
 	$slug = sanitize(str2url($slug));
 	if (in_array($post_status, array( 'draft', 'pending' )))
 	{
@@ -1246,6 +1297,7 @@ function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_
 		$slug = $alt_post_name;
 	}
 	$slug = trim($slug, "-");
+	$slug = $hooks->apply_filters("unique_post_slug", $slug, $table, $id_name, $id_value, $field, $slug, $post_status, $ajax, $where);
 	if($ajax)
 		die($slug);
 	return $slug;
@@ -1253,7 +1305,7 @@ function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_
 
 function phpnuke_db_error()
 {
-	global $db;
+	global $db, $hooks;
 	$errors = $db->getErrors();
 	$error_result = "";
 	if(is_admin() && is_array($errors) && !empty($errors))
@@ -1264,6 +1316,7 @@ function phpnuke_db_error()
 			$error_result .= "<br /><br />"._DBERROR_CODE." : ".$val['code']."<br /><br />"._DBERROR_MSG." : ".$val['message']."<br /><br />"._DBERROR_QUERY." : <pre><code>".$val['query']."</code></pre>";
 		}
 		$error_result .= "</p>";
+		$error_result = $hooks->apply_filters("db_error_filter", $error_result);
 		die($error_result);
 	}
 }
@@ -1274,6 +1327,8 @@ function is_active($module)
 {
     global $db;
     static $save;
+	if(in_array($module, array("Articles","Statics","Pages","Faqs","Gallery","Downloads")))
+		$module = "Articles";
     if (is_array($save)) {
         if (isset($save[$module])) return ($save[$module]);
         return 0;
@@ -1290,7 +1345,7 @@ function is_active($module)
 
 function is_index_file($module_name)
 {
-	global $nuke_modules_cacheData;
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 	
 	foreach($nuke_modules_cacheData as $mid => $module_info)
 	{
@@ -1305,21 +1360,33 @@ function is_index_file($module_name)
 
 function show_modules_boxes($module_name, $part='index', $active_boxes=array(), $html_output="prev", $special_bids=array(), $except_bids=array())
 {
-	global $nuke_modules_cacheData, $theme_setup;
+	global $theme_setup, $hooks;
 	
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	
+	$block_global_contents = array();
+	$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
+
 	$theme_boxes_templates = $theme_setup['theme_boxes_templates'];
 	$output = "";
+	
+	if(isset($block_global_contents['module_boxes']) && $block_global_contents['module_boxes'] != '')
+	{
+		$all_module_boxes = phpnuke_unserialize(stripslashes($block_global_contents['module_boxes']));
+	}
+	else
+	{
+		$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
 		
-	$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
-	
-	if(in_array($module_name, array("Downloads","Pages","Gallery","Faqs","Static")) && !isset($nuke_modules_cacheData_by_title[$module_name]))
-		$nuke_modules_cacheData_by_title[$module_name] = $nuke_modules_cacheData_by_title['Articles'];
-	
-	$all_module_boxes = ($nuke_modules_cacheData_by_title[$module_name]['module_boxes'] != '') ? phpnuke_unserialize(stripslashes($nuke_modules_cacheData_by_title[$module_name]['module_boxes'])):array();
-	
+		if(in_array($module_name, array("Downloads","Pages","Gallery","Faqs","Static")) && !isset($nuke_modules_cacheData_by_title[$module_name]))
+			$nuke_modules_cacheData_by_title[$module_name] = $nuke_modules_cacheData_by_title['Articles'];
+		
+		$all_module_boxes = ($nuke_modules_cacheData_by_title[$module_name]['module_boxes'] != '') ? phpnuke_unserialize(stripslashes($nuke_modules_cacheData_by_title[$module_name]['module_boxes'])):array();
+	}
 	$all_module_boxes = (isset($all_module_boxes[$part])) ? explode("|", $all_module_boxes[$part]):array();
 	
 	$all_boxes = array('','','','','','');
+	
 	foreach($all_module_boxes as $key => $module_boxes)
 	{
 		$module_boxes = explode(",", $module_boxes);
@@ -1486,21 +1553,21 @@ function bulid_meta_fields($meta_part = 'Articles', $data)
 
 function insert_update_meta_fields($data, $id = 0, $meta_part = "Articles")
 {
-	global $db, $nuke_meta_keys_parts, $nuke_configs;
+	global $db, $nuke_configs;
 	$contents = '';
 	$id = intval($id);
 	if($id == 0)
 		return;
 	
-	if(isset($nuke_meta_keys_parts[$meta_part]) && !empty($nuke_meta_keys_parts[$meta_part]))
+	if(isset($data) && is_array($data) && !empty($data))
 	{
-		$meta_keys = array_keys($nuke_meta_keys_parts[$meta_part]);
+		$meta_keys = array_keys($data);
 		
 		$insert_keys = $update_keys = $old_meta_keys = array();
 		
 		$result = $db->table(POSTS_META_TABLE)
 					->where('post_id', $id)
-					->where('meta_part', strtolower($meta_part))
+					->where('meta_part', $meta_part)
 					->select();
 		if($result->count() > 0)
 		{
@@ -1546,7 +1613,7 @@ function insert_update_meta_fields($data, $id = 0, $meta_part = "Articles")
 				$db->table(POSTS_META_TABLE)
 					->insert([
 						"post_id" => $id,
-						"meta_part" => strtolower($meta_part),
+						"meta_part" => $meta_part,
 						"meta_key" => $meta_key,
 						"meta_value" => ((!isset($data[$meta_key]) || (isset($data[$meta_key]) && ($data[$meta_key] == '' || $data[$meta_key] === null))) ? '':$data[$meta_key])
 					]);
@@ -1560,7 +1627,7 @@ function insert_update_meta_fields($data, $id = 0, $meta_part = "Articles")
 // widgets, boxess and blocks functions
 function admin_blocks_box_theme($title, $content, $theme_block)
 {
-	global $db, $align, $nuke_configs;
+	global $db, $align, $nuke_configs, $hooks;
 	$html_out = '';
 	if($theme_block == "")
 	{
@@ -1581,12 +1648,15 @@ function admin_blocks_box_theme($title, $content, $theme_block)
 	{
 		include("themes/".$nuke_configs['ThemeSel']."/blocks/themes/$theme_block");
 	}
+	
+	$html_out = $hooks->apply_filters("admin_blocks_box", $html_out, $title, $content, $theme_block);
+	
 	return $html_out;
 }
 
 function boxes($widget_id, $special_box_ids = array(), $except_box_ids = array(), $special_bids = array(), $except_block_files = array())
 {
-	global $nuke_configs, $theme_setup;
+	global $nuke_configs, $theme_setup, $hooks;
 	$theme_widgets = (isset($theme_setup['theme_widgets'])) ? $theme_setup['theme_widgets']:array();
 	$nuke_blocks_cacheData = get_cache_file_contents('nuke_blocks');
 
@@ -1618,6 +1688,9 @@ function boxes($widget_id, $special_box_ids = array(), $except_box_ids = array()
 			$widgets[$widget_id][$box_data['box_theme_priority']] = blocks($box_id,$special_bids, $except_block_files);
 			
 	}
+	
+	$widgets = $hooks->apply_filters("boxes_filter", $widgets, $widget_id, $special_box_ids, $except_box_ids, $special_bids, $except_block_files);
+	
 	if(!empty($widgets))
 	{
 		ksort($widgets[$widget_id]);
@@ -1628,7 +1701,7 @@ function boxes($widget_id, $special_box_ids = array(), $except_box_ids = array()
 
 function blocks($box_id, $special_bids = array(), $except_block_files = array())
 {
-	global $nuke_configs, $db, $admin, $user;
+	global $nuke_configs, $db, $admin, $user, $hooks;
 	$nuke_blocks_cacheData = get_cache_file_contents('nuke_blocks');
 
 	$box_blocks = (isset($nuke_blocks_cacheData['blocks_boxes'][$box_id]['blocks'])) ? $nuke_blocks_cacheData['blocks_boxes'][$box_id]['blocks']:array();
@@ -1698,12 +1771,15 @@ function blocks($box_id, $special_bids = array(), $except_block_files = array())
 	unset($nuke_blocks_cacheData);
 	unset($box_blocks);
 	unset($content);
+	
+	$contents = $hooks->apply_filters("blocks_filter", $contents, $box_id, $special_bids = array(), $except_block_files);
+	
 	return $contents;
 }
 
 function update_blocks()
 {
-	global $nuke_configs, $db, $admin, $user, $nuke_modules_cacheData;
+	global $nuke_configs, $db, $admin, $user;
 	
 	$nuke_blocks_cacheData = get_cache_file_contents('nuke_blocks');
 	
@@ -1711,6 +1787,8 @@ function update_blocks()
 	
 	if(!isset($nuke_blocks_cacheData['blocks_boxes']) || empty($nuke_blocks_cacheData['blocks_boxes']))
 		return;
+	
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 	
 	foreach($nuke_blocks_cacheData['blocks_boxes'] as $box_id => $box_data)
 	{
@@ -1923,7 +2001,7 @@ if(!function_exists("hash_equals"))
 // editor functions
 function wysiwyg_textarea($name, $value, $config = 'basic', $cols = 50, $rows = 10, $width = '100%', $height = '300px', $class = '')
 {
-    global $nuke_configs, $admin_file;
+    global $nuke_configs, $admin_file, $hooks;
     // Don't waste bandwidth by loading WYSIWYG editor for crawlers
     if ($nuke_configs['nuke_editor'] == 0 or !isset($_COOKIE))
     {
@@ -1998,6 +2076,10 @@ function wysiwyg_textarea($name, $value, $config = 'basic', $cols = 50, $rows = 
 			break;
 		}
 		
+		$toolbar = $hooks->apply_filters("wysiwyg_textarea_toolbar", $toolbar);
+		$extraPlugins = $hooks->apply_filters("wysiwyg_textarea_extraPlugins", $extraPlugins);
+		$plugins_configs = $hooks->apply_filters("wysiwyg_textarea_plugins_configs", $plugins_configs);
+		
 		$ckeditor = "<script src=\"".$nuke_configs['nukecdnurl']."includes/editors/ckeditor/ckeditor.js\"></script>
 		<textarea class=\"ckeditor$class\" cols=\"$cols\" id=\"editor_$name\" name=\"$name\" rows=\"$rows\">$value</textarea>
 		<script>
@@ -2015,6 +2097,9 @@ function wysiwyg_textarea($name, $value, $config = 'basic', $cols = 50, $rows = 
 				".((!empty($plugins_configs)) ? "".implode(",\n", $plugins_configs).",\n":"")."
 			});
 		</script>";
+		
+		$ckeditor = $hooks->apply_filters("wysiwyg_textarea", $ckeditor, $name, $value, $config, $cols, $rows, $width, $height, $class);
+		
 		return $ckeditor;
     }
 }
@@ -2276,7 +2361,7 @@ function redir($content)
 
 function codereplace($text,$sid, $title="")
 {
-	global $nuke_configs, $user, $admin;
+	global $nuke_configs, $user, $admin, $hooks;
 	if($nuke_configs['show_effect'] == 1)
 	{
 		$patterns[] = "#\<img(.*?)src=\"(.*?)\"(.*?)\>#si";
@@ -2292,12 +2377,14 @@ function codereplace($text,$sid, $title="")
 		$text = preg_replace($patterns, $replacements, $text);
 	}
 	
+	$text = $hooks->apply_filters("codereplace_filter", $text, $sid, $title);
+		
 	return $text;
 }
 
 function clean_pagination($total_rows, $entries_per_page=20, $current_page, $link_to, $tagname="", $gtset_page_name = '')
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;
 	
 	$stages = $nuke_configs['pagination_number'];
 
@@ -2409,6 +2496,7 @@ function clean_pagination($total_rows, $entries_per_page=20, $current_page, $lin
 			
 		$paginate.= "</ul>";		
 	}
+	$paginate = $hooks->apply_filters("paginate_filter", $paginate, $total_rows, $entries_per_page, $current_page, $link_to, $tagname, $gtset_page_name);
 	return $paginate;
 }
 
@@ -2531,7 +2619,7 @@ function phpnuke_auto_increment($table, $new_auto_increment = 0, $cache_file = '
 
 function add_log($message, $type = 0, $time = '', $ip = '', $log_by = '')
 {
-	global $db, $visitor_ip, $nuke_configs, $userinfo, $aid;
+	global $db, $visitor_ip, $nuke_configs, $userinfo, $aid, $hooks;
 	
 	$ip = ($ip == '') ? $visitor_ip:$ip;
 	
@@ -2564,40 +2652,55 @@ function add_log($message, $type = 0, $time = '', $ip = '', $log_by = '')
 				->where('lid', '<', $lid)
 				->where('log_type', $type)
 				->delete();
-	}	
+	}
+	
+	$hooks->do_action("add_log_action", $message, $type, $time, $ip, $log_by);
 }
 
 function correct_url($url)
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;
 	if(strpos($url,'://')) return $url;
 	if(substr($url,0,2)=='//') return 'http:'.$url;
 	if($url[0]=='/') return 'http://'.$url;
+	
+	$url = $hooks->apply_filters("correct_url_filter", $url);
 	return $url;
 }
 
 function suspend_site_show()
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;
+	
 	if($nuke_configs['suspend_site'] == 1 && !defined("ADMIN_FILE"))
 	{
 		$nuke_configs['suspend_start'] = (isset($nuke_configs['suspend_start']) && $nuke_configs['suspend_start'] != '') ? to_mktime($nuke_configs['suspend_start']):(_NOWTIME);
 		$nuke_configs['suspend_expire'] = (isset($nuke_configs['suspend_expire']) && $nuke_configs['suspend_expire'] != '') ? to_mktime($nuke_configs['suspend_expire']):(_NOWTIME+604800);
 		if(isset($nuke_configs['suspend_start']) && $nuke_configs['suspend_start'] <= _NOWTIME && $nuke_configs['suspend_expire'] > _NOWTIME)
 		{
-			foreach($nuke_configs as $key => $val)
+			$suspend_template = (isset($nuke_configs['suspend_template']) && $nuke_configs['suspend_template'] != '') ? $nuke_configs['suspend_template']:((function_exists("suspend_template")) ? suspend_template():"");
+		
+			if($suspend_template != '')
 			{
-				$upkey = strtoupper($key);
-				if(!is_array($val))
-					$nuke_configs['suspend_template'] = str_replace("{".$upkey."}", $val, $nuke_configs['suspend_template']);
+				foreach($nuke_configs as $key => $val)
+				{
+					$upkey = strtoupper($key);
+					if(!is_array($val))
+						$suspend_template = str_replace("{".$upkey."}", $val, $suspend_template);
+				}
+				$suspend_template = $hooks->apply_filters("suspend_template_filter", $suspend_template);
 			}
-			die($nuke_configs['suspend_template']);
+			die($suspend_template);
 		}
 	}
 }
 
 function redirect_to($location = null, $refresh = '')
 {
+	global $hooks;
+	
+	$hooks->do_action("redirect_to_action", $location, $refresh);
+	
 	if (!$location || $location === null)
 		$location = "index.php";
 	
@@ -2623,20 +2726,41 @@ function redirect_to($location = null, $refresh = '')
 	 }
 }
 
-function custom_theme_setup(&$theme_setup, $custom_theme_setup = array(), $theme_setup_keys = array(), $replace = false)
+function get_modules_list()
 {
-	$theme_setup_keys = (!isset($theme_setup_keys) || empty($theme_setup_keys)) ? array('default_meta', 'default_link_rel', 'default_css', 'default_js', 'defer_js'):$theme_setup_keys;
-	foreach($theme_setup_keys as $theme_setup_key)
+	$moduleslist = array();
+	$handle=opendir('modules');
+	while ($mfile = @readdir($handle))
 	{
-		$custom_theme_setup[$theme_setup_key] = isset($custom_theme_setup[$theme_setup_key]) ? $custom_theme_setup[$theme_setup_key]:array();
-		$theme_setup[$theme_setup_key] = isset($theme_setup[$theme_setup_key]) ? $theme_setup[$theme_setup_key]:array();
-		
-		if(!empty($custom_theme_setup[$theme_setup_key]))
+		if($mfile != '.' && $mfile != '..' && $mfile != '.htaccess' && $mfile != 'index.html' && $mfile != 'nexttime' && is_dir("modules/$mfile"))
 		{
-			$theme_setup[$theme_setup_key] = ($replace) ? $custom_theme_setup[$theme_setup_key]:array_merge($theme_setup[$theme_setup_key], $custom_theme_setup[$theme_setup_key]);
+			$moduleslist[] = $mfile;
 		}
 	}
+	closedir($handle);
+	sort($moduleslist);
+	return $moduleslist;
 }
+
+function get_main_module()
+{
+	$main_module = 'Articles';
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	if(isset($nuke_modules_cacheData) && !empty($nuke_modules_cacheData))
+	{
+		foreach($nuke_modules_cacheData as $nuke_modules__info)
+		{
+			if($nuke_modules__info['main_module'] == 1)
+			{
+				$main_module = $nuke_modules__info['title'];
+				break;
+			}
+		}
+	}
+	
+	return $main_module;
+}
+
 // other functions
 
 
@@ -3256,7 +3380,7 @@ function get_month_name($month)
 
 function nuketimes($time = 0, $hour=false, $min=false, $sec=false, $mode=3)
 {
-	global $nuke_configs, $HijriCalendar;
+	global $nuke_configs, $HijriCalendar, $hooks;
 	
 	$time = (intval($time) == 0) ? _NOWTIME:$time;
 	
@@ -3385,10 +3509,13 @@ function nuketimes($time = 0, $hour=false, $min=false, $sec=false, $mode=3)
 			$add_Times .= ":$time_sec";
 			
 	if(is_array($dateTimes))
-		return ($add_Times != '') ? array_merge($dateTimes, $add_Times):$dateTimes;
+		$result = ($add_Times != '') ? array_merge($dateTimes, $add_Times):$dateTimes;
 	else
-		return $dateTimes.$add_Times;
+		$result = $dateTimes.$add_Times;
 	
+	$result = $hooks->apply_filters("", $result, $time, $hour, $min, $sec, $mode);
+	
+	return $result;
 }
 
 function all_to_gregorian($year, $month, $day)
@@ -3425,9 +3552,35 @@ function correct_date_number($number)
 
 
 // ratings functions
+
+function jrating_check()
+{
+	$jrating_Response['error'] = false;
+	$jrating_Response['message'] = '';
+	if(isset($_POST['jaction']))
+	{
+		$jaction = adv_filter($_POST['jaction'], array("sanitize_string"), array("alpha_dash"));
+		if($jaction[0] == 'success')
+		{
+			if(in_array(htmlentities($jaction[1], ENT_QUOTES, 'UTF-8'),array('rating','liking')))
+			{
+				submit_ratings($jrating_Response);
+			}
+			else
+			{
+				$jrating_Response['error'] = true;
+				$jrating_Response['message'] = '"action" post data not equal to \'rating\'';
+							
+				
+				die(json_encode($jrating_Response));
+			}
+		}
+	}
+}
+
 function rating_load($score=0, $ratings=0, $likes=0, $dislikes=0, $db_table='Articles', $db_table_var="sid", $id=0, $disabled_rating = false, $c_votetype = 0)
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;
 
 	$votetype = ($c_votetype == 0) ? $nuke_configs['votetype']:$c_votetype;
 	
@@ -3440,12 +3593,20 @@ function rating_load($score=0, $ratings=0, $likes=0, $dislikes=0, $db_table='Art
 		}
 	}
 		
-	return ''.(($votetype == 1) ? '<div dir="ltr">':'').'<div class="rating-load'.(($disabled_rating) ? " jDisabled":"").'" '.(($votetype == 1) ? 'data-average="'.$average_rated.'"':'').' data-id="'.$id.'" data-score="'.$score.'" data-ratings="'.$ratings.'" data-db-table="'.$db_table.'" data-db-table-var="'.$db_table_var.'" data-c-votetype="'.$votetype.'" data-likesrate="'.$likes.",".$dislikes.'"></div>'.(($votetype == 1) ? '</div>':'').'';
+	$rating = ''.(($votetype == 1) ? '<div dir="ltr">':'').'<div class="rating-load'.(($disabled_rating) ? " jDisabled":"").'" '.(($votetype == 1) ? 'data-average="'.$average_rated.'"':'').' data-id="'.$id.'" data-score="'.$score.'" data-ratings="'.$ratings.'" data-db-table="'.$db_table.'" data-db-table-var="'.$db_table_var.'" data-c-votetype="'.$votetype.'" data-likesrate="'.$likes.",".$dislikes.'"></div>'.(($votetype == 1) ? '</div>':'').'';
+	
+	$rating = $hooks->apply_filters("rating_load_filter", $rating, $score, $ratings, $likes, $dislikes, $db_table, $db_table_var, $id, $disabled_rating, $c_votetype);
+	
+	return $rating;
+	
 }
 
 function submit_ratings($jrating_Response)
 {
-	global $db, $rate_cookie, $user, $userinfo, $idBox, $rate, $old_rate, $old_score, $db_table, $db_table_var, $c_votetype, $oldlikesrate, $visitor_ip, $pn_Cookies, $pn_prefix;
+	global $db, $rate_cookie, $user, $userinfo, $idBox, $rate, $old_rate, $old_score, $db_table, $db_table_var, $c_votetype, $oldlikesrate, $visitor_ip, $pn_Cookies, $pn_prefix, $hooks;
+	
+	$hooks->do_action("submit_ratings", $jrating_Response);
+	
 	$PnValidator = new GUMP();
 	$contents = "";
 	$rate = floatval($rate);
@@ -3562,8 +3723,10 @@ function submit_ratings($jrating_Response)
 // gtset functions
 function LinkToGT($link)
 {
-	global $nuke_configs, $nuke_modules_friendly_urls_cacheData;
+	global $nuke_configs, $hooks;
 
+	$nuke_modules_friendly_urls_cacheData = get_cache_file_contents('nuke_modules_friendly_urls');
+	
 	if($link == "index.php")
 		return $nuke_configs['nukeurl']."index.html";
 	if(isset($nuke_configs['gtset']) && $nuke_configs['gtset'] == 1 && isset($nuke_modules_friendly_urls_cacheData[0]['urlins']))
@@ -3613,14 +3776,18 @@ function LinkToGT($link)
 
 	$friendly_link = preg_replace('/(https?:\/\/)|(\/){2,}/i', "$1$2", $friendly_link);
 	
+	$friendly_link = $hooks->apply_filters("LinkToGT_filter", $friendly_link, $link);
+	
 	return $friendly_link; 
 }
 
 function parse_GT_link($REQUESTURL)
 {
-	global $nuke_configs, $nuke_modules_friendly_urls_cacheData;
+	global $nuke_configs, $hooks;
 	$parsed_vars = array();
 	$unfriendly_link = '';
+	
+	$nuke_modules_friendly_urls_cacheData = get_cache_file_contents('nuke_modules_friendly_urls');
 	
 	if ($offset = strpos($REQUESTURL,'?'))
 	{
@@ -3640,7 +3807,7 @@ function parse_GT_link($REQUESTURL)
 	if (URL_ROOT != '/' && strrpos($REQUESTURL, URL_ROOT) !== false) $REQUESTURL=substr($REQUESTURL,strlen(URL_ROOT));
 
 	$REQUESTURL = trim($REQUESTURL,'/');
-			
+
 	if ($nuke_configs['gtset'] == "1" && !file_exists($REQUESTURL))
 	{
 		$matched_rule = '';
@@ -3705,7 +3872,7 @@ function parse_GT_link($REQUESTURL)
 			unset($handle, $modules_list, $test);
 			$REQUESTURL = preg_replace("|comment-page-([0-9]{1,}+)\/|isU","", $REQUESTURL);
 		}
-		return array($parsed_vars, $REQUESTURL, $matched_rule, $unfriendly_link, $matched_query);
+		$result = array($parsed_vars, $REQUESTURL, $matched_rule, $unfriendly_link, $matched_query);
 	}
 	else
 	{
@@ -3719,25 +3886,33 @@ function parse_GT_link($REQUESTURL)
 				$i++;
 			}
 		}
-		return array($_GET, $REQUESTURL, '', $REQUESTURL, '');
+		$result = array($_GET, $REQUESTURL, '', $REQUESTURL, '');
 	}
+	$result = $hooks->apply_filters("parse_GT_link_filter", $result, $REQUESTURL);
+	
+	return $result;
 }
 
 function parse_old_links($die_404 = true)
 {
-	global $nuke_configs, $REQUESTURL, $old_site_link;
+	global $nuke_configs, $REQUESTURL, $old_site_link, $hooks;
 
-	$old_links = array(
-		"article([0-9]*)\.html",
-		"article-([0-9]*)\.html",
-	);
-	
+	$old_links = array();
+	$old_links = $hooks->apply_filters("old_links_check", $old_links);
+
 	foreach($old_links as $old_link)
 	{
-		if(preg_match("#$old_link#isU", $REQUESTURL, $match))
+		if(preg_match("#".$old_link['pattern']."#isU", $REQUESTURL, $matches))
 		{
-			$sid = $match[1];
-			redirect_to(LinkToGT(articleslink($sid)));
+			$newlink = '';
+			unset($matches[0]);
+			
+			if($old_link['replace'] != '')
+				$newlink = preg_replace("#".$old_link['pattern']."#isU", $old_link['replace'], $REQUESTURL);
+			elseif($old_link['function'] != '')
+				$newlink = call_user_func($old_link['function'], array_values($matches));
+
+			redirect_to(LinkToGT($newlink));
 			die();
 		}
 	}
@@ -3769,6 +3944,76 @@ function parse_phpnuke_main($matches)
 	$return = implode("/", $returns)."/";
 	
 	return $return;
+}
+
+function timthumb_check()
+{
+	global $timthumb_allowed, $data_image, $nuke_root;
+	$request_url = (isset($_SERVER['REQUEST_URI'])) ?  $_SERVER['REQUEST_URI']:((isset($_SERVER['SCRIPT_URL'])) ? $_SERVER['SCRIPT_URL']:"");
+	if(preg_match("#/thumbs/(.*)\.(jpg|png|bmp|gif)$#i", $request_url, $matches))
+	{
+		$timthumbs_data = parse_timthumbs_args($matches[1]);
+		$QUERY_STRING = array();
+		foreach($timthumbs_data as $timthumbs_key => $timthumbs_val)
+		{
+			$_REQUEST[$timthumbs_key] = $_GET[$timthumbs_key] = $timthumbs_val;
+			$QUERY_STRING[] = "$timthumbs_key=$timthumbs_val";
+		}
+		
+		if(!empty($QUERY_STRING))
+			$_SERVER ['QUERY_STRING'] = implode("&", $QUERY_STRING);
+
+		extract($timthumbs_data);
+		header('Content-Disposition:inline;filename="'.basename($src).'"');
+
+		$ALLOWED_SITES = array();
+		$ALLOW_ALL_EXTERNAL_SITES = false;
+		
+		if(isset($src) && $src != '')
+		{
+			$ALLOWED_SITES = (isset($timthumb_allowed) && !empty($timthumb_allowed)) ? $timthumb_allowed:false;
+			
+			if(!empty($ALLOWED_SITES))
+				$ALLOW_ALL_EXTERNAL_SITES = true;
+				
+			if(isset($data_image))
+			{
+				$metadata = read_media_metadata($src);
+					
+				require_once(INCLUDE_PATH."/class.simple_image.php");
+				header('Content-Type: '.$metadata['cover']['mime_type'].'');
+
+				$image = new SimpleImage();
+				$image->compression = (intval($q) != 0) ? $q:90;
+				$image->load(true, $metadata['cover']['data'], $metadata['cover']['mime_type']);
+				$h = isset($h) ? $h:false;
+				$w = isset($w) ? $w:false;
+				if($h && $w)
+				{
+					$image->resize($w,$h);
+				}
+				elseif($w && !$h)
+				{
+					$image->resizeToWidth($w);
+				}
+				elseif($h && !$w)
+				{
+					$image->resizeToHeight($h);
+				}
+				$image->output();
+				die();
+			}
+			else
+			{
+				if(PHPNUKE_ROOT_MAIN_PATH != '')
+					define ('LOCAL_FILE_BASE_DIRECTORY', str_replace("/".PHPNUKE_ROOT_MAIN_PATH, "", $nuke_root));
+				else
+					define ('LOCAL_FILE_BASE_DIRECTORY', $nuke_root);
+				include(INCLUDE_PATH."/class.timthumb.php");
+			}
+		}
+		die();
+	}
 }
 
 function parse_timthumbs_str($matches)
@@ -3872,6 +4117,78 @@ function parse_timthumbs_args($inputs)
 	return $timtumb_data;
 }
 
+function captcha_check()
+{
+	global $nuke_configs, $captcha, $id, $language, $height;
+	
+	if(isset($captcha) && isset($id) && $id != '')
+	{
+		require_once INCLUDE_PATH.'/captcha/securimage.php';
+
+		$img = new Securimage();
+
+		$def_id = '_NUKE_CAPTCHA';
+		
+		if(isset($id) && filter($id, "nohtml") != '')
+		{
+			$requestId = adv_filter($id, array('sanitize_string'),array('alpha_dash','required'));
+			if($requestId[0] != 'error')
+				$def_id = $requestId[1];
+		}
+		
+		$language_list = $all_languages = get_dir_list('language', 'files');
+		
+		$language = (isset($language) && in_array($language, $language_list)) ? filter($language, "nohtml"):'farsi';
+		$height = (isset($height) && intval($height) != 0) ? intval($height):50;
+		
+		if($def_id == "_forum")
+		{
+			$img->image_height = 30;
+			$img->font_ratio = 0.3;
+			$img->text_x_start = 15;
+			$img->arc_linethrough = false;
+		}
+
+		$img->code_length		= 5;
+		if(isset($nuke_configs['mtsn_captcha_charset']) && $nuke_configs['mtsn_captcha_charset'] != '')
+			$img->charset			= $nuke_configs['mtsn_captcha_charset'];
+
+		$img->noise_level		= 1;
+		$img->font_ratio		= 0.5;
+		if($language == "farsi")
+		{
+			//$img->charset			= "1234567890";
+			//$img->ttf_file        = INCLUDE_PATH.'/captcha/BKOODB_0.TTF';
+			$img->perturbation		= 0;
+		}
+		//$img->captcha_type    = Securimage::SI_CAPTCHA_MATHEMATIC; // show a simple math problem instead of text
+		//$img->case_sensitive	= true;                              // true to use case sensitve codes - not recommended
+		$img->image_height    	= $height;    // height in pixels of the image
+		$img->image_width     = $img->image_height * M_E;          // a good formula for image size based on the height
+		//$img->perturbation    = .75;                               // 1.0 = high distortion, higher numbers = more distortion
+		//$img->image_bg_color  = new Securimage_Color("#0099CC");   // image background color
+		$img->text_color      = new Securimage_Color(rand(0, 64),rand(64, 128),rand(128, 255));   // captcha text color
+		$img->num_lines       = 2;                                 // how many lines to draw over the image
+		//$img->line_color      = new Securimage_Color("#0000CC");   // color of lines over the image
+		//$img->image_type      = SI_IMAGE_JPEG;                     // render as a jpeg image
+		//$img->signature_color = new Securimage_Color(rand(0, 64),
+		//                                             rand(64, 128),
+		//                                             rand(128, 255));  // random signature color
+
+		// see securimage.php for more options that can be set
+
+		// set namespace if supplied to script via HTTP GET
+		if (!empty($def_id)) $img->setNamespace($def_id);
+
+		$img->show(INCLUDE_PATH."/captcha/backgrounds/".rand(1,10).".jpg");
+
+		//$img->show();  // outputs the image and content headers to the browser
+		// alternate use:
+		// $img->show('/path/to/background_image.jpg');
+		die();
+	}
+}
+
 if(!function_exists('get_headers'))
 {
     function get_headers($url,$format=0)
@@ -3949,7 +4266,10 @@ function notis_404($url)
 // sockets functions
 function phpnuke_get_url_contents($url, $is_file=false, $curl=true, $local_file = false)
 {
-
+	global $hooks;
+	
+	$hooks->do_action("get_url_contents", $url, $is_file, $curl, $local_file);
+	
 	$file_content = '';
 	
 	$url = ($is_file) ? $url:trim($url, "/")."/";
@@ -3987,6 +4307,8 @@ function phpnuke_get_url_contents($url, $is_file=false, $curl=true, $local_file 
 			$file_content = $respond->getContent();
 	}
 	
+	$file_content = $hooks->apply_filters("get_url_contents_after", $file_content);
+	
 	return $file_content;
 }
 
@@ -4003,6 +4325,7 @@ function get_rss_contents($url, $limit = -1)
 		$i++;
 		if($i == $limit) break;
 	}
+	$contents = $hooks->apply_filters("get_rss_contents_filter", $contents);
 	return $contents;	
 }
 // sockets functions
@@ -4025,6 +4348,7 @@ function default_topic_count_scale( $counter )
 
 function MT_Cloud_Tag( $tags, $args = '' )
 {
+	global $hooks;
 	$defaults = array(
 		'smallest' => 8, 'largest' => 22, 'unit' => 'px', 'number' => 0,
 		'format' => 'flat', 'separator' => "\n", 'orderby' => 'tag', 'order' => 'ASC',
@@ -4112,6 +4436,7 @@ function MT_Cloud_Tag( $tags, $args = '' )
 			break;
 	}
 
+	$return = $hooks->apply_filters("mt_cloud_tag_filter", $return);
 	return $return;
 }
 			
@@ -4122,6 +4447,12 @@ function update_tags($old_tags, $updated_tags = '')
 	$deleted_tags = array();
 	$new_tags = array();
 	$update_tags = array();
+	
+	if(isset($updated_tags))
+	{
+		if(!is_array($updated_tags))
+			$updated_tags = explode(",", $updated_tags);
+	}
 	
 	if(!empty($old_tags))
 	{
@@ -4215,7 +4546,9 @@ function formatBytes($size, $precision = 2, $show_unit=false)
 /* pdf genearting function by iman64 */
 function pdf_generate($author = "", $keywords = "", $subject = "", $title = "", $datetime = "", $contents="", $link = "")
 {
-	global $db, $nuke_configs;
+	global $db, $nuke_configs, $hooks;
+	
+	$hooks->do_action("pdf_generate_action", $author, $keywords, $subject, $title, $datetime, $contents, $link);
 	
 	if(file_exists(INCLUDE_PATH."/pdf/mpdf.php"))
 	{
@@ -4283,7 +4616,7 @@ function pdf_generate($author = "", $keywords = "", $subject = "", $title = "", 
 
 function report_friend_form($submit = false, $mode = 'friend', $post_id = '', $post_title = '', $module_name='', $subject='', $message='', $post_link = '', $friend_name='', $friend_email='')
 {
-	global $db, $nuke_configs, $userinfo, $visitor_ip, $inline;
+	global $db, $nuke_configs, $userinfo, $visitor_ip, $inline, $hooks;
 	$PnValidator = new GUMP();
 	$content = '';
 	if($submit)
@@ -4404,10 +4737,9 @@ function report_friend_form($submit = false, $mode = 'friend', $post_id = '', $p
 				$post_title .= " $module_post_title";
 				$module_post_id = intval($result['post_id']);
 				$module = filter($result['module'], "nohtml");
-				$post_link = (isset($nuke_configs['links_function'][$module]) && $nuke_configs['links_function'][$module] != '' && function_exists($nuke_configs['links_function'][$module])) ? $nuke_configs['links_function'][$module]($module_post_id):"";
 				
-				if(is_array($post_link))
-					$post_link = $post_link[0];
+				$post_link = '';
+				$post_link = $hooks->apply_filters("get_post_link", $post_link, $module, $module_post_id);
 			}
 		}
 		$post_link = LinkToGT($post_link);
@@ -4768,6 +5100,7 @@ function asd($array)
 
 function array_sort_by_values($array, $main_key, $valuekey, $mode="asc")
 {
+	global $hooks;
 	$new_array = array();
 	if(!empty($array))
 	{
@@ -4786,12 +5119,14 @@ function array_sort_by_values($array, $main_key, $valuekey, $mode="asc")
 		ksort($new_array);
 	else
 		krsort($new_array);
-		
+	
+	$new_array = $hooks->apply_filters("array_sort_by_values_filter", $new_array, $array, $main_key, $valuekey, $mode);
 	return $new_array;
 }
 
 function phpnuke_array_change_key($array, $main_key, $new_key)
 {
+	global $hooks;
 	$new_array = array();
 	if(!empty($array))
 	{
@@ -4808,6 +5143,7 @@ function phpnuke_array_change_key($array, $main_key, $new_key)
 			}
 		}
 	}
+	$new_array = $hooks->apply_filters("phpnuke_array_change_key_filter", $new_array, $array, $main_key, $new_key);
 	return $new_array;
 }
 
@@ -5130,6 +5466,41 @@ function get_main_childs_parent($all_rows, $pid=0, $parent_id = 'pid')
 	}
 }
 
+function breadcrumb_build($breadcrumbs = array(), $separator = ' / ')
+{
+	global $nuke_configs, $hooks;
+	$breadcrumb = '';
+
+	$block_global_contents = array();
+	$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
+	
+	if(!isset($breadcrumbs) || (isset($breadcrumbs) && empty($breadcrumbs)))
+		$breadcrumbs = $hooks->apply_filters("site_breadcrumb", $breadcrumbs, $block_global_contents);
+	
+	$breadcrumbs = array_merge(array("home" => array(
+		"name" => _HOME,
+		"link" => $nuke_configs['nukeurl'],
+		"itemtype" => "WebPage"
+	)), $breadcrumbs);
+	
+	$breadcrumb .= '<ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">';
+	$position = 1;
+	foreach($breadcrumbs as $breadcrumb_data) {
+		$breadcrumb .= '
+		<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+			<a href="'.LinkToGT($breadcrumb_data['link']).'" itemprop="item">
+				<span itemprop="name">'.$breadcrumb_data['name'].'</span>
+			</a>
+			<span itemprop="position" content="'.$position.'"></span>
+		</li>';
+		$position++;
+	}
+	$breadcrumb .= '</ul>';
+	
+	$breadcrumb = $hooks->apply_filters("breadcrumb_html", $breadcrumb, $breadcrumbs);
+	return $breadcrumb;
+}
+
 // array functions
 
 // security functions
@@ -5169,7 +5540,7 @@ function data_verification_parse($data)
 
 function get_form_token()
 {
-	global $pn_Sessions, $visitor_ip, $users_system, $nuke_configs;
+	global $pn_Sessions, $visitor_ip, $users_system, $nuke_configs, $hooks;
 	
 	$token = (isset($users_system->session_id) && !defined("ADMIN_FILE")) ? $users_system->session_id:(csrfProtector::generateAuthToken());
 
@@ -5193,6 +5564,8 @@ function get_form_token()
 		'time' => _NOWTIME,
 		'token'	=> $token,
 	);
+	
+	$csrf_token = $hooks->apply_filters("get_form_token_filter", $csrf_token);
 	
 	$pn_Sessions->set('csrf_token', phpnuke_serialize($csrf_token));
 	
@@ -5257,7 +5630,7 @@ function get_sub_categories_id($module_name, $parent_id, $nuke_categories_cacheD
 
 function category_link($module_name, $cat_title, $attrs=array(), $link_mode=1)
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;
 	if(!isset($module_name))
 		global $module_name;
 	
@@ -5297,13 +5670,19 @@ function category_link($module_name, $cat_title, $attrs=array(), $link_mode=1)
 		$catname_url = filter($nuke_categories_cacheData[$module_name][$catid]['catname_url'], "nohtml");
 		$module = filter($nuke_categories_cacheData[$module_name][$catid]['module'], "nohtml");
 		
+		if(!is_active($module))
+			continue;
+		
 		$attributes_show = str_replace(
 			array('{CAT_NAME}','{CAT_NAME_URL}','{CAT_IMAGE}','{CAT_TEXT}','{CATID}','{PARENT_ID}'), 
 			array($catname, $catname_url, filter($nuke_categories_cacheData[$module_name][$catid]['catimage'], "nohtml"), $cattext, $catid, intval($nuke_categories_cacheData[$module_name][$catid]['parent_id'])), 
 			$attributes
 		);
 		
-		$cat_link = LinkToGT(str_replace("{CAT_NAME_URL}", $cat_link, $nuke_configs['categories_link'][$module]));
+		$all_modules_categories = array();
+		$all_modules_categories = $hooks->apply_filters("modules_categories_link", $all_modules_categories);
+		
+		$cat_link = LinkToGT(str_replace("{CAT_NAME_URL}", $cat_link, $all_modules_categories[$module][1]));
 		if($link_mode == 1)
 			$cats_link_deep[] = "<a href=\"$cat_link\"".((isset($attributes_show) && $attributes_show != '') ? " $attributes_show":'').">$cattext</a>";
 		elseif($link_mode == 2)
@@ -5311,6 +5690,8 @@ function category_link($module_name, $cat_title, $attrs=array(), $link_mode=1)
 		elseif($link_mode == 3)
 			$cats_link_deep[] = $cat_link;
 	}
+	
+	$cats_link_deep = $hooks->apply_filters("category_link_filter", $cats_link_deep, $module_name, $cat_title, $attrs, $link_mode);
 	
 	return $cats_link_deep;
 }
@@ -5397,7 +5778,7 @@ class categories_list
 // nav menus functions
 function pn_nav_menu($args = array())
 {
-	global $theme_setup;
+	global $theme_setup, $hooks;
 	
 	$nuke_nav_menus = get_cache_file_contents("nuke_nav_menus");
 
@@ -5527,6 +5908,8 @@ function pn_nav_menu($args = array())
 	if ( $show_container )
 		$nav_menu .= '</' . $args->container . '>';
 
+	$nav_menu = $hooks->apply_filters("pn_nav_menu_filter", $nav_menu, $args);
+	
 	return $nav_menu;
 }
 // nav menus functions
@@ -5535,7 +5918,11 @@ function pn_nav_menu($args = array())
 // users functions
 function update_points($id,$uid=false)
 {
-    global $db, $userinfo, $users_system, $nuke_points_groups_cacheData;
+    global $db, $userinfo, $users_system, $hooks;
+	
+	$hooks->do_action("update_points_before", $id,$uid);
+	
+	$nuke_points_groups_cacheData = get_cache_file_contents('nuke_points_groups');
 	
 	$id = intval($id);
 	$points = intval($nuke_points_groups_cacheData[$id]['points']);
@@ -5560,12 +5947,15 @@ function update_points($id,$uid=false)
 				]);
 		}
 	}
+	$hooks->do_action("update_points_after", $id,$uid);
 }
 
 function phpnuke_validate_user_cookie($user, $type="user", $userinfo=array())
 {
-	global $pn_salt, $nuke_authors_cacheData;
+	global $pn_salt;
 
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+	
 	if(!isset($userinfo))
 		global $userinfo;
 		
@@ -5631,7 +6021,9 @@ function phpnuke_generate_user_cookie($type="user", $user_id=0, $username, $user
 
 function get_author($aid)
 {
-	global $nuke_authors_cacheData, $nuke_configs;
+	global $nuke_configs;
+	
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 	
 	if(isset($nuke_authors_cacheData[$aid]))
 	{
@@ -5694,8 +6086,12 @@ function last_user()
 function users_table_exists()
 {
 	global $db, $users_system, $nuke_configs;
-	$users_table = $db->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME IN ('".str_replace(array($nuke_configs['forum_db'], ".", "`"),"", $users_system->users_table)."') AND TABLE_SCHEMA='".$nuke_configs['forum_db']."'");
-	return ($users_table->count() > 0) ? true:false;
+	if($nuke_configs['have_forum'])
+	{
+    	$users_table = $db->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME IN ('".str_replace(array($nuke_configs['forum_db'], ".", "`"),"", $users_system->users_table)."') AND TABLE_SCHEMA='".$nuke_configs['forum_db']."'");
+    	return ($users_table->count() > 0) ? true:false;
+    }
+    return true;
 }
 // users functions
 
@@ -5788,6 +6184,274 @@ if (!function_exists('random_int'))//for PHP >= 5.1
 
 		return $result + $min;
 	}
+}
+function check_requests()
+{
+	global $admin, $user;
+	
+	// This block of code makes sure $admin and $user are COOKIES
+	if((isset($admin) && $admin != $pn_Cookies->get('admin')) OR (isset($user) && $user != $pn_Cookies->get('user')))
+	{
+		die("Illegal Operation");
+	}
+
+	if (!defined('ADMIN_FILE'))
+	{
+		// Die message for not allowed HTML tags
+		$htmltags = "<div class=\"text-center\"><img src=\"images/logo.gif\" title=\"logo\" alt=\"phpnuke\"><br><br><b>";
+		$htmltags .= "The html tags you attempted to use are not allowed</b><br><br>";
+		$htmltags .= "[ <a href=\"javascript:history.go(-1)\"><b>Go Back</b></a> ]</div>";
+		
+		foreach ($_GET as $sec_key => $secvalue)
+		{
+			if((@preg_match("#<[^>]*script*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*object*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*iframe*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*applet*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*meta*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*style*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*form*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*img*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*onmouseover *\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#<[^>]*body *\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("#\([^>]*\"?[^)]*\)#i", $secvalue)) ||
+			(@preg_match("#\"#i", $secvalue)) ||
+			(@preg_match("#forum_admin#i", $sec_key)) ||
+			(@preg_match("#inside_mod#i", $sec_key)))
+			{
+				die ($htmltags);
+			}
+		}
+
+		foreach ($_POST as $secvalue)
+		{
+			if ((@preg_match("<[^>]*iframe*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("<[^>]*object*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("<[^>]*applet*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("<[^>]*meta*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("<[^>]*onmouseover*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("<[^>]script*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("<[^>]*body*\"?[^>]*#i", $secvalue)) ||
+			(@preg_match("<[^>]style*\"?[^>]*#i", $secvalue)))
+			{
+				die ($htmltags);
+			}
+		}
+	}
+
+	$postString = "";
+	$postString = http_build_query($_POST);
+
+	str_replace("%09", "%20", $postString);
+	$postString_64 = base64_decode($postString);
+	if (
+		(!isset($admin) OR (isset($admin) AND !is_admin())) AND 
+		(
+			(stristr($postString,'%20union%20'))		OR 
+			(stristr($postString_64,'%20union%20'))		OR 
+			(stristr($postString,' union '))			OR 
+			(stristr($postString_64,' union '))			OR 
+			(stristr($postString,'*/union/*'))			OR 
+			(stristr($postString_64,'*/union/*'))		OR 
+			(stristr($postString,'+union+'))			OR 
+			(stristr($postString_64,'+union+'))			OR 
+			(stristr($postString,'http-equiv'))			OR 
+			(stristr($postString_64,'http-equiv'))		OR 
+			(stristr($postString,'alert('))				OR 
+			(stristr($postString_64,'alert('))			OR 
+			(stristr($postString,'javascript:'))		OR 
+			(stristr($postString_64,'javascript:'))		OR 
+			(stristr($postString,'document.cookie'))	OR 
+			(stristr($postString_64,'document.cookie'))	OR 
+			(stristr($postString,'onmouseover='))		OR 
+			(stristr($postString_64,'onmouseover='))	OR 
+			(stristr($postString,'document.location'))	OR 
+			(stristr($postString_64,'document.location'))
+		)
+	)
+	{
+		header("Location: ".LinkToGT("index.php")."");
+		die();
+	}
+	
+	// Additional security (Union, CLike, XSS)
+	//Union Tap
+	//Copyright Zhen-Xjell 2004 http://nukecops.com
+	//Beta 3 Code to prevent UNION SQL Injections
+	if(isset($_SERVER['QUERY_STRING'])){
+		if (@preg_match("/([OdWo5NIbpuU4V2iJT0n]{5}) /", rawurldecode($loc=$_SERVER['QUERY_STRING']), $matches))
+		{
+			die('Illegal Operation');
+		}
+	}
+	
+	if(!isset($admin) OR (isset($admin) AND !is_admin()))
+	{
+		$queryString = $_SERVER['QUERY_STRING'];
+		if ((($_SERVER['PHP_SELF'] != "/index.php") OR !isset($url)))
+		{
+			if (stristr($queryString,'http://')) die('Illegal Operation');
+		}
+		if (
+			(stristr($queryString,'%20union%20'))	OR 
+			(stristr($queryString,'%2f%2a'))		OR 
+			(stristr($queryString,'%2f*'))			OR 
+			(stristr($queryString,'/*'))			OR 
+			(stristr($queryString,'*/union/*'))		OR 
+			(stristr($queryString,'c2nyaxb0'))		OR 
+			(stristr($queryString,'+union+'))		OR 
+			(
+				(stristr($queryString,'cmd='))	AND 
+				(!stristr($queryString,'&cmd'))
+			)										OR 
+			(
+				(stristr($queryString,'exec'))	AND 
+				(!stristr($queryString,'execu'))
+			)										OR 
+			(stristr($queryString,'concat'))
+		)
+		{
+			die('Illegal Operation');
+		}
+		unset($queryString);
+	}	
+}
+
+function check_baseurl()
+{
+	global $nuke_configs;
+
+	// Request URL Redirect To Nuke Url
+	$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 1 : 0;
+
+	if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+	{
+		$secure = 1;
+		$server_port = 443;
+	}
+
+	$Req_Protocol 	= ($secure == 1) ? 'https' : 'http';
+	$Req_Host     	= $_SERVER['HTTP_HOST'];
+	$Req_Uri		= $_SERVER['REQUEST_URI'];
+	$Req_Path		= $_SERVER['SCRIPT_NAME'];
+	$Req_URL		= $Req_Protocol . '://' . $Req_Host . $Req_Path;
+	$Req_URI		= $Req_Protocol . '://' . $Req_Host . $Req_Uri;
+	$Req_Filename 	= substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
+	$filenamepos 	= strpos($Req_URL,$Req_Filename);
+	$Req_URL 		= substr($Req_URL,0,$filenamepos);
+	$Redirect_Url 	= substr($Req_URI,strlen($Req_URL),1000);
+
+	if(!defined("IN_INSTALL") && !defined("ADMIN_FILE"))
+	{
+		if(version_compare($nuke_configs['Version_Num'], "8.4.2", ">="))
+		{
+			if($Req_URL != $nuke_configs['nukeurl'] && $nuke_configs['lock_siteurl'] == 1)
+			{
+				header("Location: ".$nuke_configs['nukeurl'] . $Redirect_Url,TRUE,301);
+				exit;
+			}
+			else
+				$nuke_configs['nukeurl'] = $Req_URL;
+		}
+		else
+		{
+			$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '".$Req_URL."' WHERE config_name = 'nukeurl'='");
+			if($Req_Filename != 'install.php')
+			{
+				header("Location: ".LinkToGT("install.php")."",TRUE,301);
+				exit;
+			}
+		}
+	}	
+}
+
+function mtsn_check()
+{
+	global $db, $nuke_configs, $visitor_ip, $pn_Sessions;
+	if(!defined("IN_INSTALL"))
+	{
+		if (isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], "Googlebot") == FALSE )
+		{
+			if (intval($nuke_configs['mtsn_status']) == 1)
+			{
+				@mtsn();
+			}
+			$ipbanx = stripslashes($nuke_configs['mtsn_block_ip']);
+			if ($ipbanx == "1")
+			{
+				if ($visitor_ip != "127.0.0.1" AND !is_admin())
+				{
+					$ip = addslashes($visitor_ip);
+					$ip_arr = explode(".", $ip);
+					
+					$ip_block_where[] = "'$ip_arr[0].$ip_arr[1].$ip_arr[2].$ip_arr[3]'";
+					$ip_block_where[] = "'$ip_arr[0].$ip_arr[1].$ip_arr[2].*'";
+					$ip_block_where[] = "'$ip_arr[0].$ip_arr[1].*.*'";
+					$ip_block_where[] = "'$ip_arr[0].*.*.*'";
+					
+					$numrows = $db->table(MTSN_IPBAN_TABLE)
+								->where('ipaddress', '=', $ip_block_where[0])
+								->orWhere('ipaddress', '=', $ip_block_where[1])
+								->orWhere('ipaddress', '=', $ip_block_where[2])
+								->orWhere('ipaddress', '=', $ip_block_where[3])
+								->select(["id"])
+								->count();
+					if (isset($numrow) && $numrow != 0)
+					{
+						die("<br><br><div class=\"text-center\"><img src='images/mtsn/mtsn.gif' title=\"mtsn\" alt=\"phpnuke mtsn\"><br><br><b><body bgcolor='#000066' style='font-family:arial; color:#ffffff; cursor:default;'>You have been banned by the MTSN</b></div>");
+					}
+				}
+			}
+		}
+		///////////////////////////////// MTSN Code End
+
+		require_once(INCLUDE_PATH."/ipban.php");
+
+		if (intval($nuke_configs['httpref']) == 1)
+		{
+			if (isset($_SERVER['HTTP_REFERER']))
+			{
+				$referrer = $_SERVER['HTTP_REFERER'];
+				$referrer = check_html($referrer, "nohtml");
+				if (@stristr($referrer, "nuke_") && @stristr($referrer, "into") && @stristr($referrer, "from")) {
+					$referrer = "";
+				}
+				if (!empty($referrer) && !stripos_clone($referrer, "unknown") && !stripos_clone($referrer, "bookmark") && !stripos_clone($referrer, $_SERVER['HTTP_HOST']))
+				{
+					$db->table(REFERRER_TABLE)
+						->insert(array(
+							'url' => addslashes($referrer),
+							'path' => $_SERVER['REQUEST_URI'],
+							'ip' => $visitor_ip,
+							'time' => _NOWTIME,
+						));
+						
+					$numrows = $db->table(REFERRER_TABLE)
+								->select()
+								->count();
+						
+					if($numrows >= $nuke_configs['httprefmax']) {
+						$db->table(REFERRER_TABLE)
+							->order_by(array("rid" => "ASC"))
+							->limit(1,0)
+							->delete();
+					}
+					$numrows = null;
+					$referrer = null;
+				}
+			}
+		}
+	}
+}
+
+function request_var($var_name, $default='', $method="_GET")
+{
+	eval('$request_method = $'.$method.';');
+
+	if(isset($request_method[$var_name]))
+		return $request_method[$var_name];
+		
+	return $default;
 }
 
 function validateLatin($string) {
@@ -6261,7 +6925,8 @@ function minify_js($input) {
  * @return string
  */
 function mb_word_wrap($string, $max_length, $end_substitute = null, $html_linebreaks = true)
-{ 
+{
+	global $hooks;
     if($html_linebreaks) $string = preg_replace('/\<br(\s*)?\/?\>/i', "\n", $string);
     $string = strip_tags($string); //gets rid of the HTML
 
@@ -6287,6 +6952,7 @@ function mb_word_wrap($string, $max_length, $end_substitute = null, $html_linebr
     $string = mb_substr($string, 0, $max_length, 'UTF-8').$end_substitute;
     if($html_linebreaks) $string = nl2br($string);
 
+	$string = $hooks->apply_filters("mb_word_wrap_filter", $string, $max_length, $end_substitute, $html_linebreaks);
     return $string;
 }
 
@@ -6566,8 +7232,10 @@ function get_dir_list($path, $options='folders', $sort=false, $except_list = arr
 
 function get_languages_data($mode="")
 {
-	global $nuke_configs, $moduleslist, $nuke_languages_cacheData;
+	global $nuke_configs;
 
+	$moduleslist = get_modules_list();
+	
 	if($mode == "all")
 	{
 		$all_languages = get_dir_list('language', "files", true);
@@ -6609,6 +7277,7 @@ function get_languages_data($mode="")
 		}
 	}
 	
+	$nuke_languages_cacheData = get_cache_file_contents('nuke_languages');
 	if(is_array($nuke_languages_cacheData) && !empty($nuke_languages_cacheData))
 	{
 		foreach($nuke_languages_cacheData as $key => $val)

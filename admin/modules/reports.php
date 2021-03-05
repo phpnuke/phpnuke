@@ -24,7 +24,7 @@ if (check_admin_permission($filename))
 
 	function reports($module_name='', $post_id=0, $post_title='', $mode = '', $rids, $search_query = '', $order_by = '', $sort='DESC')
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs, $users_system;
+		global $db, $admin_file, $nuke_configs, $users_system, $hooks;
 		
 		if($mode == "delete")
 		{
@@ -76,10 +76,13 @@ if (check_admin_permission($filename))
 		}
 		
 		$pagetitle = ""._REPORTS."".(($module_name != '') ? " - "._MODULE." $module_name":"").(($post_title != '') ? " - "._VIEW_REPORTS_OF." « $post_title »":"");
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("reports" => $pagetitle);});
+		
 		$contents = '';
 		$contents .= GraphicAdmin();
 		
-		$all_modules_reports = array_keys($nuke_configs['links_function']);
+		$all_modules_comments = array();
+		$all_modules_comments = $hooks->apply_filters('modules_have_comments', $all_modules_comments);
 		
 		$all_modules_reports_link[] = "<option value=\"".$admin_file.".php?op=reports&module_name=comments".(($post_id != 0) ? "&post_id=$post_id":"")."\" ".(($module_name == 'comments') ? "selected":"").">"._COMMENTS."</option>";
 		
@@ -194,14 +197,9 @@ if (check_admin_permission($filename))
 					$ip = filter($row['ip'], "nohtml");
 					$ip_info = "http://whatismyipaddress.com/ip/$ip";	
 					$post_link = $row['post_link'];
-					$username_link = LinkToGT("index.php?modname=User_Account&username=$username");
+					$username_link = ($username == $ip) ? $ip_info:LinkToGT(sprintf($users_system->profile_url, '', $username));
 					if($post_link == '')
-					{
-						$post_link = (isset($nuke_configs['links_function'][$module]) && $nuke_configs['links_function'][$module] != '' && function_exists($nuke_configs['links_function'][$module])) ? $nuke_configs['links_function'][$module]($post_id):"";
-						
-						if(is_array($post_link))
-							$post_link = $post_link[0];
-					}
+						$post_link = $hooks->apply_filters("get_post_link", $post_link, $module, $post_id);
 					
 					$module_link_to = "".$admin_file.".php?op=reports&module_name=$module";
 					

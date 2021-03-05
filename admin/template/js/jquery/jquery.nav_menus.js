@@ -42,7 +42,7 @@ $(document).ready(function()
 			lang_titles[lang_name] = lang_value;
 		});
 		
-		final_items = typeof final_items === 'object' ? final_items : JSON.parse(final_items);
+		final_items = typeof final_items === 'object' ? Json.stringify(final_items) : final_items;
 		$.post(admin_file+".php",
 		{
 			op				: "nav_menus_admin",

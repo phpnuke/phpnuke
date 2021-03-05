@@ -3,9 +3,10 @@
 	"type": "phpbb-extension",
 	"description": "Shamsi Date for phpBB",
 	"homepage": "http://www.php-bb.ir",
-	"version": "1.2.0",
-	"time": "2017-07-26",
-	"license": "GPL-3.0",
+	"version": "2.0.0",
+	"keywords": ["phpbb", "shamsi-date", "شمسی", "تاریخ شمسی"],
+	"time": "2021-01-01",
+	"license": "GPL-2.0",
 	"authors": [
 		{
 			"name": "Meis2M",
@@ -15,20 +16,21 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.3"
+		"php": ">=7.1.0"
 	},
         "require-dev": {
                 "phpbb/epv": "dev-master"
         },
 	"extra": {
-		"display-name": "Shamsi Datetime for phpBB تاریخ شمسی",
+		"display-name": "تاریخ شمسی",
 		"soft-require": {
-			"phpbb/phpbb": "3.1.*@dev"
+			"phpbb/phpbb": "3.2.*@dev"
 		},
                 "version-check": {
-                "host": "version.php-bb.ir",
-                "directory": "/",
-                "filename": "shamsi-date.json"
+                "host": "phpbbfarsi.github.io",
+                "directory": "/versions",
+                "filename": "shamsi-date.json",
+				"ssl": true
             }
 	}
 }

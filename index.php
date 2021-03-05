@@ -147,7 +147,7 @@ $modpath = '';
 if (!isset($file) OR $file != $_REQUEST['file'])
 	$file = "index";	
 if (!isset($op) OR $op != $_REQUEST['op'])
-	$op = "msin";
+	$op = "main";
 	
 parse_old_links(false);
 
@@ -174,13 +174,16 @@ else
 	$modstring = strtolower($_SERVER['QUERY_STRING']);
 	if (stripos_clone($modname, "..") OR ((stripos_clone($modstring,"&file=nickpage") || stripos_clone($modstring,"&user="))))
 		header("Location: ".LinkTOGT("index.php")."");
-		
+	
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	
 	$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
-
+	unset($nuke_modules_cacheData);
 	if(isset($nuke_modules_cacheData_by_title[$modname]))
 	{
 		$mod_active			= intval($nuke_modules_cacheData_by_title[$modname]['active']);
 		$mod_permissions	= ($nuke_modules_cacheData_by_title[$modname]['mod_permissions'] != "") ? explode(",", $nuke_modules_cacheData_by_title[$modname]['mod_permissions']):array(0);
+		
 		if (($mod_active == 1) OR ($mod_active == 0 AND is_admin()) OR defined("INDEX_FILE"))
 		{
 			if(($mod_active == 0 AND !is_admin()) && !defined("INDEX_FILE"))
@@ -199,9 +202,11 @@ else
 			
 			$allow_to_view = $permission_result[0];
 			$disallow_message = $permission_result[1];
+			unset($permission_result);
 			
 			if($allow_to_view || $nuke_modules_cacheData_by_title[$modname]['main_module'] == 1 || defined("INDEX_FILE"))
 			{
+				unset($nuke_modules_cacheData_by_title);
 				if (file_exists($modpath))
 					include($modpath);
 				else

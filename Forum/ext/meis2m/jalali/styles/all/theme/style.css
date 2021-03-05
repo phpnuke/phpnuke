@@ -1,0 +1,160 @@
+@font-face {
+font-family: Vazir;
+  src: url('../../../fonts/Vazir-FD/Vazir-FD.eot'); /* IE9 Compat Modes */
+  src: url('../../../fonts/Vazir-FD/Vazir-FD.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+url('../../../fonts/Vazir-FD/Vazir-FD.woff2') format('woff2'), /* Super Modern Browsers */
+url('../../../fonts/Vazir-FD/Vazir-FD.woff') format('woff'), /* Pretty Modern Browsers */
+url('../../../fonts/Vazir-FD/Vazir-FD.ttf')  format('truetype'); /* Safari, Android, iOS */
+font-weight: normal;
+}
+
+@font-face {
+font-family: Vazir;
+  src: url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.eot'); /* IE9 Compat Modes */
+  src: url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.woff2') format('woff2'), /* Super Modern Browsers */
+url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.woff') format('woff'), /* Pretty Modern Browsers */
+url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.ttf')  format('truetype'); /* Safari, Android, iOS */
+font-weight: bold;
+}
+
+@font-face {
+font-family: Vazir;
+  src: url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.eot'); /* IE9 Compat Modes */
+  src: url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.woff2') format('woff2'), /* Super Modern Browsers */
+url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.woff') format('woff'), /* Pretty Modern Browsers */
+url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.ttf')  format('truetype'); /* Safari, Android, iOS */
+font-weight: 300;
+}
+
+body {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+h1 {
+	/* Forum name */
+	font-family: Vazir, "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+h2 {
+	/* Forum header titles */
+	font-family: Vazir, "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+h2.solo {
+	font-family: Vazir, Arial, Helvetica, sans-serif;
+}
+
+h3 {
+	/* Sub-headers (also used as post headers, but defined later) */
+	font-family: "Vazir", Arial, Helvetica, sans-serif;
+}
+
+h4 {
+	/* Forum and topic list titles */
+	font-family: Vazir, "Trebuchet MS", Verdana, Helvetica, Arial, Sans-serif;
+}
+
+.button {
+	font-family: Vazir, "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;
+}
+
+a.forumtitle {
+	font-family: Vazir, "Trebuchet MS", Helvetica, Arial, Sans-serif;
+}
+
+
+a.topictitle {
+	font-family: Vazir, "Trebuchet MS", Helvetica, Arial, Sans-serif;
+}
+
+.notification_list p.notifications_title {
+	font-family: Vazir, "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+.dropdown-extended .header {
+	font-family: Vazir, Arial, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.pagination li.active span {
+	font-family: Vazir, "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;
+}
+
+.postbody h3 {
+	/* Postbody requires a different h3 format - so change it here */
+	font-family: Vazir, "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+li.header dt, li.header dd {
+	font-family: Vazir, Arial, Helvetica, sans-serif;
+}
+
+fieldset.polls dd div {
+	font-family: Vazir, Arial, Helvetica, sans-serif;
+}
+
+fieldset.polls {
+	font-family: Vazir, "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+dl.thumbnail dd {
+	font-family: Vazir, Verdana, Arial, Helvetica, sans-serif;
+}
+
+.attachbox dt {
+	font-family: Vazir, Arial, Helvetica, sans-serif;
+}
+
+.notice {
+	font-family: Vazir, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+p.author {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+dl.faq {
+	font-family: Vazir, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.content p {
+	font-family: Vazir, "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.content {
+	font-family: Vazir, "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.postbody h3 {
+	/* Postbody requires a different h3 format - so change it here */
+	font-family: Vazir, "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+fieldset {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+input {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+select {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+select optgroup option {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+textarea {
+	font-family: Vazir, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.message-box textarea {
+	font-family: Vazir, "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
+}
+
+a.button1, input.button1, input.button3, a.button2, input.button2 {
+	font-family: Vazir, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}

@@ -1,3 +1,9 @@
 @import url("custom.css");
-/* Online image */
-.online { background-image: url("./icon_user_online.gif"); }
+
+.rtl .forabg li.header dl.row-item dt .list-inner, textarea.cke_source {
+	font-family: Vazir, "Trebuchet MS", Arial, Helvetica, sans-serif;
+	}
+	
+textarea.cke_source {
+    font-family: vazir !important;
+}

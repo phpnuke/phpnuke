@@ -19,7 +19,7 @@ class users_system{
 
 	public function __construct()
 	{
-		global $db, $nuke_configs, $pn_dbcharset;
+		global $db, $nuke_configs, $pn_dbcharset, $pn_Cookies;
 		
 		// define default user fileds of phpnuke system
 		$this->user_fields['user_id']				= "user_id";
@@ -57,7 +57,8 @@ class users_system{
 			cache_system('',$extra_cache_codes);
 		
 		$this->getuserinfo();
-		$this->online();
+		$this->session_id = '';
+		$this->session_id = $pn_Cookies->get("sid");
 	}
 	
 	public function MTForumBlock($p=1)
@@ -68,7 +69,7 @@ class users_system{
 	public function user_statistics()
 	{
 		
-		global $db, $nuke_configs, $block_global_contents, $HijriCalendar, $userinfo, $users_system, $currentpage, $cache;
+		global $db, $nuke_configs, $HijriCalendar, $userinfo, $users_system, $currentpage, $cache;
 
 		$showpms = 1; //1 to Show Private Messages data - 0 is off
 		$showmost = 1; //1 to Show Mostonline data - 0 is off
@@ -522,9 +523,26 @@ class users_system{
 	
 	public function cache_system()
 	{
-		global $db;
+		global $db, $pn_dbcharset;
 		
-		$extra_code = array();
+		$extra_code = array(
+			"general" => '',
+			"phpcodes" => array( 
+				"nuke_forum_groups" => //nuke_phpbb_groups
+					'
+					$result = $db->table("'.$this->groups_table.'")->group_by("group_id")->select();
+					if($db->count() > 0)
+					{
+						foreach($result as $nuke_forum_groups_row)
+						{
+							$extra_codes_rows[$nuke_forum_groups_row["group_id"]] = $nuke_forum_groups_row;
+						}
+					}
+				'
+			)
+		);
+		
+		return $extra_code;
 	}
 
 	function add_form_key($form_name)
@@ -565,9 +583,9 @@ class users_system{
 	
 	function online()
 	{
-		global $user, $visitor_ip, $pn_Cookies, $pn_Sessions, $db, $cache, $nuke_config, $currentpage;
+		global $user, $visitor_ip, $pn_Cookies, $pn_Sessions, $db, $cache, $nuke_configs, $currentpage;
 		
-		$past = _NOWTIME-(($nuke_config['session_timeout'] != "") ? $nuke_config['session_timeout']:3600);
+		$past = _NOWTIME-(($nuke_configs['session_timeout'] != "") ? $nuke_configs['session_timeout']:3600);
 		$session_browser = $_SERVER['HTTP_USER_AGENT'];
 		
 		$currentpage = ($currentpage != '' && $currentpage !== null) ? $currentpage:"index.php";
@@ -623,7 +641,7 @@ class users_system{
 
 	function getuserinfo($rebuild = false)
 	{
-		global $db, $user, $nuke_configs, $pn_Cookies, $pn_Sessions, $pn_Bots;
+		global $db, $user, $nuke_configs, $pn_Cookies, $pn_Sessions;
 
 		if (!$user OR empty($user))
 			return NULL;
@@ -659,6 +677,8 @@ class users_system{
 				foreach($results as $field => $value)
 					$this->data[$value['name']] = $value['value'];
 			}
+			
+			$pn_Bots = new CrawlerDetect();
 			
 			$this->data['is_registered'] = ($this->data['user_status'] == USER_NORMAL) ? true : false;
 			$this->data['is_bot'] = (!$this->data['is_registered'] && $pn_Bots->isCrawler()) ? true : false;

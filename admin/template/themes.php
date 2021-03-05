@@ -57,9 +57,6 @@ function jquery_codes_load($plugins="", $reload = false)
 function adminheader_popup($pagetitle)
 {
 	global $db, $this_place, $admin_file, $nuke_configs;
-
-	if(!isset($pagetitle))
-		global $pagetitle;
 	
 	$contents = '';
 	if(!isset($this_place))
@@ -131,13 +128,12 @@ $contents .= "<!DOCTYPE html>
 
 }
 
-function adminheader($pagetitle, $meta_tags, $has_micrometa)
+function adminheader($has_micrometa)
 {
-global $db, $this_place, $admin_file, $is_popup, $nuke_authors_cacheData, $aid, $nuke_configs, $admin_top_menus;
+global $db, $this_place, $admin_file, $is_popup, $aid, $nuke_configs, $hooks;
 
-if(!isset($pagetitle))
-	global $pagetitle;
-	
+$pagetitle = end($hooks->apply_filters("set_page_title", array()));
+
 $contents = '';
 if(defined('IS_POPUP'))
 {
@@ -152,6 +148,8 @@ if(!isset($this_place))
 }
 
 $this_place .= ($pagetitle != '') ? " - $pagetitle":'';
+
+$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 
 $admin_realname = ($nuke_authors_cacheData[$aid]['realname'] != "") ? $nuke_authors_cacheData[$aid]['realname']:$aid;
 $upload_allowed_info = phpnuke_unserialize(stripslashes($nuke_configs['upload_allowed_info']));
@@ -169,6 +167,8 @@ $args = (object) array(
 	'after'				=> '</a>', 
 );
 
+$admin_top_menus = array();
+$admin_top_menus = $hooks->apply_filters("admin_top_menus", $admin_top_menus);
 $admin_top_menus = array_flatten($admin_top_menus, 0, 'id', 'parent_id', 'children', array('title','url','icon'), array());
 
 $admin_top_menus = arrayToObject($admin_top_menus);
@@ -624,7 +624,11 @@ function themecenterbox($title, $content, $themeview=1, $themetype)
 
 function get_latest_info()
 {
-	global $db, $admin_file, $alerts_messages;
+	global $db, $admin_file, $hooks;
+	
+	$alerts_messages = array();
+	$alerts_messages = $hooks->apply_filters("admin_alert_messages", $alerts_messages);
+
 	if(is_array($alerts_messages) && !empty($alerts_messages))
 	{
 		$counter_prefix = 1;
@@ -659,6 +663,7 @@ function get_latest_info()
 			";
 		}
 	}
+	$contents = $hooks->apply_filters("admin_alert_messages_after", $contents);
 	
 	return $contents;
 }

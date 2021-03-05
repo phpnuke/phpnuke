@@ -63,19 +63,19 @@ if (stristr(htmlentities($_SERVER["PHP_SELF"]), "config.php")) {
 $pn_dbhost = "localhost";
 $pn_dbuname = "root";
 $pn_dbpass = '';
-$pn_dbname = "84";
-$pn_prefix = "nuke";
+$pn_dbname = "843";
+$pn_prefix = "n843";
 $pn_dbtype = "mysql";
 $pn_dbfetch = PDO::FETCH_ASSOC;
 $pn_dbcharset = "utf8mb4";
 
-$pn_sitekey = "A2o6xGwWOGhuBI3MRHxC8EeQNfPxTHTIKQXAKHEH";
+$pn_sitekey = "TGbgmCAGMii2Hmx7lYzUzEq8shxigLwKWrSj1csw";
 $pn_subscription_url = "";
 $pn_tipath = "images/topics/";
 $pn_cache_type = "MySQL";
 $admin_file = "admin";
-$pn_salt = 'dH*QKT(tNcXqIUa';
-$old_site_link = "http://shop.mozh.org";
+$pn_salt = 'RnEK*3odZoumPOn';
+$old_site_link = "";
 define("_MAX_CACHE_COUNTER_TIME", 3600);
 define("_MAX_CACHE_COUNTER_LINES", 1000);
 

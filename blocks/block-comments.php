@@ -20,11 +20,11 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $nuke_configs, $block_global_contents, $comments_op;
+global $db, $nuke_configs, $comments_op;
 
 $content = "";
 
-$comments = new phpnuke_comments($block_global_contents);
+$comments = new phpnuke_comments();
 $content = $comments->display_comments();
 
 ?>

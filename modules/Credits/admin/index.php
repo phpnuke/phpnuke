@@ -27,7 +27,7 @@ if (check_admin_permission($module_name, false, true))
 
 	function credits_menu()
 	{
-		global $db, $admin_file, $nuke_configs, $page;
+		global $db, $hooks, $admin_file, $nuke_configs, $page;
 		$contents = "
 		<p align=\"center\" style=\"padding:20px; 0;\">[ 
 			<a href=\"".$admin_file.".php?op=credits\">"._CREDITS_ADMIN."</a> | 
@@ -41,7 +41,8 @@ if (check_admin_permission($module_name, false, true))
 			<a href=\"".$admin_file.".php?op=credits_users_op\" class=\"mode_operation\" data-form_type=\"3\" data-mode=\"credits_form\">"._CREDITS_TRANSFER."</a> | 
 			<a href=\"".$admin_file.".php?op=credits_users_op\" class=\"mode_operation\" data-form_type=\"4\" data-mode=\"credits_form\">"._CREDITS_SUSPEND."</a> | 
 			<a href=\"".$admin_file.".php?op=credits_users_op&mode=suspend_list\">"._CREDITS_SUSPEND_LIST."</a>
-		]</p><br />";		
+		]</p><br />";
+		
 		$contents .= "<div id=\"credits-dialog\"></div>
 		<script>
 			$(\".mode_operation\").click(function(e)
@@ -73,16 +74,18 @@ if (check_admin_permission($module_name, false, true))
 				});
 			});
 		</script>";
+		
+		$contents = $hooks->apply_filters("credits_admin_menu", $contents);
 		return $contents;
 	}
 	
 	function credits($order_by = '', $sort='DESC')
 	{
-		global $db, $pagetitle, $module_name, $admin_file, $nuke_configs, $nuke_authors_cacheData, $users_system;
+		global $db, $hooks, $module_name, $admin_file, $nuke_configs, $users_system;
 			
 		$contents = '';
 				
-		$pagetitle = _CREDITS_ADMIN;
+		$hooks->add_filter("set_page_title", function() {return array("credits" => _CREDITS_ADMIN);});
 		
 		$contents .= GraphicAdmin();
 		$contents .= credits_menu();
@@ -214,6 +217,7 @@ if (check_admin_permission($module_name, false, true))
 			";
 		
 		$contents .= CloseAdminTable();
+		$contents = $hooks->apply_filters("credits_admin_main", $contents);
 		phpnuke_db_error();
 		include("header.php");
 		$html_output .= $contents;
@@ -222,7 +226,7 @@ if (check_admin_permission($module_name, false, true))
 	
 	function credits_list($status = '', $sort = 'DESC', $order_by = '')
 	{
-		global $db, $admin_file, $nuke_configs, $module_name, $pn_credits_config, $pn_Cookies, $page, $search_data;
+		global $db, $hooks, $admin_file, $nuke_configs, $module_name, $pn_credits_config, $pn_Cookies, $page, $search_data;
 		
 		$contents = '';
 		$status = ($status != '') ? intval($status):'';
@@ -290,6 +294,7 @@ if (check_admin_permission($module_name, false, true))
 		$status_desc = ($status != '') ? " ( ".$status_all[$status]." )":"";
 		
 		$pagetitle = _CREDITS_LIST.$status_desc;
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("credits_list" => $pagetitle);});
 			
 		$contents .= GraphicAdmin();
 		$contents .= credits_menu();
@@ -533,7 +538,7 @@ if (check_admin_permission($module_name, false, true))
 		
 	function credits_users_op($tid = 0, $mode = '', $sort = 'DESC', $order_by = '', $form_type)
 	{
-		global $db, $admin_file, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $page, $search_data;
+		global $db, $admin_file, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $page, $search_data, $hooks;
 		
 		$contents = '';		
 		
@@ -603,12 +608,14 @@ if (check_admin_permission($module_name, false, true))
 				</tr>
 			</table><input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> </form>";
 			$contents .=  jquery_codes_load();
+			$contents = $hooks->apply_filters("credits_admin_users_op", $contents);
 			die($contents);
 		}
 
 		if($mode == 'suspend_list')
 		{
 			$pagetitle = _CREDITS_LIST." - "._CREDITS_SUSPEND_LIST;
+			$hooks->add_filter("set_page_title", function() use($pagetitle){return array("suspend_list" => $pagetitle);});
 				
 			$contents .= GraphicAdmin();
 			$contents .= credits_menu();
@@ -721,7 +728,7 @@ if (check_admin_permission($module_name, false, true))
 	
 	function credits_admin($tid=0, $mode="view", $submit, $credits_fields=array())
 	{
-		global $db, $aid, $ya_config, $pagetitle, $admin_file, $nuke_configs, $PnValidator, $module_name, $userinfo, $pn_credits_config, $reason, $users_system;
+		global $db, $hooks, $aid, $ya_config, $admin_file, $nuke_configs, $PnValidator, $module_name, $userinfo, $pn_credits_config, $reason, $users_system;
 		
 		$tid = intval($tid);
 		$all_modes = array("view", "delete", "failed", "approve", "credits_transfer", "credits_charge", "credits_deduction", "credits_suspend", "credits_unsuspend");
@@ -1018,6 +1025,9 @@ if (check_admin_permission($module_name, false, true))
 				$sms_text = sprintf((($mode == "delete") ? _CREDIT_OFFLINE_FORM_DELETED:_CREDIT_OFFLINE_FORM_FAILED), $tid, $reason, $nowtime);
 				pn_sms('send', $row['user_phone'], $sms_text);
 			}
+			
+			$hooks->do_action("credits_admin_after_delete", $tid, $mode, $credits_fields);
+			
 			redirect_to("".$admin_file.".php?op=credits_list");
 			die();
 		}
@@ -1064,6 +1074,7 @@ if (check_admin_permission($module_name, false, true))
 				
 				phpnuke_mail($user_email, sprintf(_CREDITS_EMAIL_ADMIN_APPROVE, $nuke_configs['sitename']), $message);
 			}
+			$hooks->do_action("credits_admin_after_approve", $tid, $mode, $credits_fields);
 			redirect_to("".$admin_file.".php?op=credits_list");
 			die();
 		}
@@ -1085,6 +1096,7 @@ if (check_admin_permission($module_name, false, true))
 				$sms_text = sprintf(_CREDIT_UNSUSPEND_SMS, $tid, $username, $nowtime);
 				pn_sms('send', $user_phone, $sms_text);
 			}
+			$hooks->do_action("credits_admin_after_unsuspend", $tid, $mode, $credits_fields);
 			redirect_to("".$admin_file.".php?op=credits_users_op&mode=suspend_list");
 		}
 	}
@@ -1093,10 +1105,10 @@ if (check_admin_permission($module_name, false, true))
 	$op = (isset($op)) ? filter($op, "nohtml"):'';
 	$order_by = (isset($order_by)) ? filter($order_by, "nohtml"):'';
 	$sort = (isset($sort)) ? filter($sort, "nohtml"):'';
-	$submit = (isset($submit)) ? filter($submit, "nohtml"):'';
+	$submit = filter(request_var('submit', '', '_POST'), "nohtml");
 	$mode = (isset($mode)) ? filter($mode, "nohtml"):'new';
 	$form_type = (isset($form_type)) ? intval($form_type):1;
-	$credits_fields = (isset($credits_fields)) ? $credits_fields:array();
+	$credits_fields = request_var('credits_fields', array(), '_POST');
 	$tid = (isset($tid)) ? intval($tid):0;
 	$status = (isset($status)) ? $status:'';
 	

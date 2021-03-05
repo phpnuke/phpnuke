@@ -89,6 +89,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_YINVITED_EMAIL" => "ایمیل شما",
 	"_WRONG_CODE" => "کد دعوتنامه یا ایمیل وارد شده صحیح نمی باشد.",
 	"_REAGENT" => "معرف",
+	"_THE_FIELD_HAS_SELECTED" => "فیلد %s قبلاً انتخاب شده است",
 	"_USER_HAS_REGISTERED" => "این نام کاربری قبلاً ثبت شده است",
 	"_USER_EMAIL_HAS_SELECTED" => "این ایمیل قبلاً انتخاب شده است",
 	"_USER_BAD_EMAIL" => "ایمیل غیر مجاز است",

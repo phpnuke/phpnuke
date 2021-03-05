@@ -1,0 +1,27 @@
+#
+# @package Dynamic Meta Tags phpBB SEO
+# @version $$
+# @copyright (c) 2017 www.phpbb-seo.org
+# @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+#
+# You must indent with 4 spaces instead of 1 tab
+#
+services:
+    phpbbseo.meta.core:
+        class: phpbbseo\meta\core
+        arguments:
+            - '@config'
+            - '@template'
+            - '@user'
+            - '@symfony_request'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    phpbbseo.meta.listener:
+        class: phpbbseo\meta\event\listener
+        arguments:
+            - '@phpbbseo.meta.core'
+            - '@dbal.conn'
+            - '@?phpbbseo.usu.core'
+        tags:
+            - { name: event.listener }

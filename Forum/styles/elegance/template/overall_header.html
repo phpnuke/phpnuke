@@ -2,7 +2,7 @@
 <html dir="{S_CONTENT_DIRECTION}" lang="{S_USER_LANG}">
 <head>
 <meta charset="utf-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 {META}
 <title><!-- IF UNREAD_NOTIFICATIONS_COUNT -->({UNREAD_NOTIFICATIONS_COUNT}) <!-- ENDIF --><!-- IF not S_VIEWTOPIC and not S_VIEWFORUM -->{SITENAME} - <!-- ENDIF --><!-- IF S_IN_MCP -->{L_MCP} - <!-- ELSEIF S_IN_UCP -->{L_UCP} - <!-- ENDIF -->{PAGE_TITLE}<!-- IF S_VIEWTOPIC or S_VIEWFORUM --> - {SITENAME}<!-- ENDIF --></title>
@@ -24,6 +24,13 @@
 	<link rel="canonical" href="{U_CANONICAL}">
 <!-- ENDIF -->
 
+<!--
+	phpBB style name: elegance
+	Based on style:   prosilver
+	Original author:  Arty ( https://www.artodia.com )
+	Modified by: 	  MrGaby
+-->
+
 <!-- IF S_ALLOW_CDN -->
 <script>
 	WebFontConfig = {
@@ -43,6 +50,8 @@
 
 <link href="{T_FONT_AWESOME_LINK}" rel="stylesheet">
 <link href="{T_STYLESHEET_LINK}" rel="stylesheet">
+<link href="{T_STYLESHEET_LANG_LINK}" rel="stylesheet">
+
 
 <!-- IF S_CONTENT_DIRECTION eq 'rtl' -->
 	<link href="{T_THEME_PATH}/bidi.css?assets_version={T_ASSETS_VERSION}" rel="stylesheet">
@@ -82,7 +91,7 @@
 
 			<div id="site-description" class="site-description">
 				<a id="logo" class="logo" href="{% if U_SITE_HOME %}{{ U_SITE_HOME }}{% else %}{{ U_INDEX }}{% endif %}" title="{% if U_SITE_HOME %}{{ L_SITE_HOME }}{% else %}{{ L_INDEX }}{% endif %}">
-					<span class="site-logo"></span>
+					<img src="{T_THEME_PATH}/images/logo.png" data-src-hd="{T_THEME_PATH}/images/logo_hd.png" alt="{SITENAME}"/>
 				</a>
 				<p class="sitename">{SITENAME}</p>
 				<p>{SITE_DESCRIPTION}</p>

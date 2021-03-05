@@ -21,19 +21,79 @@ $filename = substr($filename,0,-4);
 
 if (check_admin_permission($filename))
 {
+	function get_main_parents($cids)
+	{
+		global $db, $nuke_configs;
+		
+		$main_parents = array();
+		$when_query = array();
+		
+		$cids = (is_array($cids)) ? implode(",", $cids):$cids;
+		
+		$result = $db->query("SELECT main_parent FROM ".COMMENTS_TABLE." WHERE cid IN ($cids)");
+		$fetched_rows = intval($result->count());
+		if($fetched_rows > 0)
+		{
+			$rows = $result->results();
+			foreach($rows as $row)
+				$main_parents[] = $row['main_parent'];
+		}
+		return $main_parents;		
+	}
+
+	function update_comments_replay_time($main_parents)
+	{
+		global $nuke_configs, $db;
+		
+		$when_query = array();
+
+		$main_parents = (is_array($main_parents)) ? implode(",", $main_parents):$main_parents;
+		
+		$result = $db->query("SELECT c.cid, c.`date`, (SELECT `date` FROM ".COMMENTS_TABLE." WHERE main_parent = c.cid AND status = '1' ORDER BY `date` DESC LIMIT 1) as last_replay_time FROM ".COMMENTS_TABLE." AS c WHERE c.cid IN ($main_parents)");
+
+		$fetched_rows = intval($result->count());
+		if($fetched_rows > 0)
+		{
+			$rows = $result->results();
+			
+			foreach($rows as $row)
+			{
+				$cid = $row['cid'];
+				$date = $row['date'];
+				$last_replay_time = (intval($row['last_replay_time']) > 0) ? $row['last_replay_time']:$date;
+					
+				$when_query[$row['cid']] = "WHEN cid = '$cid' THEN '$last_replay_time'";
+			}
+			
+			if(!empty($when_query))
+			{
+				$cids = array_keys($when_query);
+				$cids = implode(", ", $cids);
+				$when_query = implode("\n", $when_query);
+				$db->query("UPDATE ".COMMENTS_TABLE." SET last_replay_time = CASE 
+					$when_query
+				END
+				WHERE cid IN($cids)");
+			}
+		}
+	}
 
 	function comments($status=1, $reported=0, $module_name='', $post_id=0, $post_title='')
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs;
+		global $db, $admin_file, $nuke_configs, $users_system, $hooks;
 		$pagetitle = _COMMENTS_ADMIN.(($status == 1) ? " "._APPROVED:" "._PENDING).(($reported == 1) ? " "._REPORTED:"").(($module_name != '') ? " - "._MODULE." $module_name":"").(($post_title != '') ? " - ".sprintf(_POST_COMMENTS_VIEW, $post_title):"");
+		
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("comments" => $pagetitle);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$nuke_configs['comments'] = ($nuke_configs['comments'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['comments'])):array();
-		$all_modules_comments = array_keys($nuke_configs['links_function']);
-		foreach($all_modules_comments as $modules_comment)
+		
+		$all_modules_comments = array();
+		$all_modules_comments = $hooks->apply_filters('modules_have_comments', $all_modules_comments);
+		foreach($all_modules_comments as $modules_comment_key => $modules_comment_value)
 		{
-			$sel = ($module_name == $modules_comment) ? "selected":"";
-			$all_modules_comments_link[] = "<option value=\"".$admin_file.".php?op=comments&module_name=$modules_comment&status=$status".(($reported != 0) ? "&reported=$reported":"").(($post_id != 0) ? "&post_id=$post_id&post_title=$post_title":"")."\" $sel>$modules_comment</option>";
+			$sel = ($module_name == $modules_comment_key) ? "selected":"";
+			$all_modules_comments_link[] = "<option value=\"".$admin_file.".php?op=comments&module_name=$modules_comment_key&status=$status".(($reported != 0) ? "&reported=$reported":"").(($post_id != 0) ? "&post_id=$post_id&post_title=$post_title":"")."\" $sel>$modules_comment_value</option>";
 		}
 		$contents .= "<div align=\"center\" style=\"margin:20px 0;\">[ <a href=\"".$admin_file.".php?op=comments\">"._APPROVED_COMMENTS."</a> | <a href=\"".$admin_file.".php?op=comments&status=0\">"._PENDING_COMMENTS."</a> | <a href=\"".$admin_file.".php?op=comments&reported=1\">"._REPORTED_COMMENTS."</a> | <a href=\"".$admin_file.".php?op=settings\">"._SETTINGS."</a> ]<br /><br />"._VIEW_COMMENTS_IN_MODULE." <select onchange=\"top.location.href=this.options[this.selectedIndex].value\" class=\"styledselect-select\"><option value=\"".$admin_file.".php?op=comments\">"._ALL."</options>\n".implode("\n", $all_modules_comments_link)."</select></div>";
 		
@@ -134,11 +194,10 @@ if (check_admin_permission($filename))
 					$ip = filter($row['ip'], "nohtml");
 					$comment = stripslashes($row['comment']);
 					$ip_info = "http://whatismyipaddress.com/ip/$ip";			
-					$username_link = ($username == $ip) ? $ip_info:LinkToGT("index.php?modname=Users&username=$username");
-					$post_link = (isset($nuke_configs['links_function'][$module]) && $nuke_configs['links_function'][$module] != '' && function_exists($nuke_configs['links_function'][$module])) ? $nuke_configs['links_function'][$module]($post_id):"";
+					$username_link = ($username == $ip) ? $ip_info:LinkToGT(sprintf($users_system->profile_url, '', $username));
 					
-					if(is_array($post_link))
-						$post_link = $post_link[0];
+					$post_link = '';
+					$post_link = $hooks->apply_filters("get_post_link", $post_link, $module, $post_id);
 						
 					$current_comment_page = ($nuke_configs['comments']['item_per_page'] > 0) ? ceil($position/$nuke_configs['comments']['item_per_page']):0;
 					$comment_link = $post_link;
@@ -332,7 +391,7 @@ if (check_admin_permission($filename))
 
 	function comments_delete($cid = 0, $cids = array(), $comment_username='', $status = 1)
 	{
-		global $db, $admin_file, $nuke_configs, $nuke_configs_comments_table;
+		global $db, $admin_file, $nuke_configs, $nuke_configs_comments_table, $hooks;
 		
 		$where = '';
 		
@@ -355,18 +414,21 @@ if (check_admin_permission($filename))
 			$result = $db->table(COMMENTS_TABLE)
 						->in('cid', $deleted_cids)
 						->select(['module','post_id']);
-			if(intval($result->count()) > 0 && isset($nuke_configs_comments_table) && !empty($nuke_configs_comments_table))
+						
+			$module_table_data = array('','');
+			$module_table_data = $hooks->apply_filters("modules_comments_table_data", $module_table_data);
+			
+			if(intval($result->count()) > 0 && isset($module_table_data) && !empty($module_table_data))
 			{
-				$module_table_data = array('','');
 				$rows = $result->results();
 				foreach($rows as $row)
 				{
 					$module = $row['module'];
 					$post_ids[] = $row['post_id'];
 					
-					if(isset($nuke_configs_comments_table[$module]))
+					if(isset($module_table_data[$module]))
 					{
-						$module_table_data = $nuke_configs_comments_table[$module];
+						$module_table_data = $module_table_data[$module];
 					}
 				}
 				
@@ -381,16 +443,18 @@ if (check_admin_permission($filename))
 					}
 					
 					$db->query("UPDATE ".$module_table_data[1]." SET comments = CASE ".implode("\n", $when_query)." END WHERE ".$module_table_data[0]." IN(".implode(",", $post_ids).")");
-					
 				}
 			}
 			
 			$deleted_cids = implode(",", $deleted_cids);
+			$main_parents = get_main_parents($deleted_cids);
+			
 			$where = "(cid IN ($deleted_cids) OR pid IN($deleted_cids))";
+			$db->query("DELETE FROM ".COMMENTS_TABLE." WHERE ".$where."");
+
+			if(!empty($main_parents))
+				update_comments_replay_time($main_parents);
 		}	
-		
-		if($where != '')
-			$result = ($where != '') ? $db->query("DELETE FROM ".COMMENTS_TABLE." WHERE ".$where.""):"";
 		
 		phpnuke_auto_increment(COMMENTS_TABLE);
 		
@@ -429,6 +493,10 @@ if (check_admin_permission($filename))
 
 			$where = implode(" AND ", $where);
 			$db->query("UPDATE ".COMMENTS_TABLE." SET status = '$new_status' WHERE $where");
+
+			$main_parents = get_main_parents($status_cids);
+			if(!empty($main_parents))
+				update_comments_replay_time($main_parents);
 		}
 		
 		phpnuke_db_error();
@@ -438,8 +506,10 @@ if (check_admin_permission($filename))
 
 	function comments_reply($cid, $reply_save, $reply)
 	{
-		global $db, $admin_file, $nuke_configs, $nuke_authors_cacheData, $userinfo, $aid, $visitor_ip, $nuke_configs_comments_table;
+		global $db, $admin_file, $nuke_configs, $userinfo, $aid, $visitor_ip, $nuke_configs_comments_table;
 		$cid = intval($cid);
+		
+		$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 		
 		$row = $db->table(COMMENTS_TABLE)
 					->where("cid", $cid)
@@ -463,6 +533,7 @@ if (check_admin_permission($filename))
 					'post_id' => $row['post_id'],
 					'post_title' => $row['post_title'],
 					'date' => _NOWTIME,
+					'last_replay_time' => _NOWTIME,
 					'name' => $commenter_name,
 					'username' => $commenter_username,
 					'email' => $commenter_email,
@@ -479,7 +550,9 @@ if (check_admin_permission($filename))
 					
 			if($module_table_data[0] != '')
 				$db->query("UPDATE ".$module_table_data[1]." SET comments = comments+1 WHERE ".$module_table_data[0]." = '$post_id'");
-				
+			if($row['main_parent'] != 0)
+				$db->query("UPDATE ".COMMENTS_TABLE." SET last_replay_time='"._NOWTIME."' WHERE cid = '".$row['main_parent']."'");
+			
 			header("location: ".$admin_file.".php?op=comments");
 			die();
 		}		

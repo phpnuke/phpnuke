@@ -27,9 +27,9 @@ function CloseTable()
 	return $contents;
 }
 
-function _theme_header($meta_tags = array(), $custom_theme_setup = array(), $replace = false)
+function _theme_header()
 {
-	global $nuke_configs, $theme_setup;
+	global $db, $nuke_configs, $theme_setup, $category, $modname, $op, $hooks;
 	$local = (isset($nuke_configs['local']) && $nuke_configs['local'] != '') ? explode("-", $nuke_configs['local']):array("fa","ir");
 	
 	$contents = '';
@@ -37,54 +37,20 @@ function _theme_header($meta_tags = array(), $custom_theme_setup = array(), $rep
 	$contents .= "<html lang=\"".$local[0]."\" dir=\""._DIRECTION."\">\n";
 	$contents .= "	<head>";
 	
-	include("themes/".$nuke_configs['ThemeSel']."/meta.php");
-	
-	if(!empty($custom_theme_setup))
-	{
-		custom_theme_setup($theme_setup, $custom_theme_setup, array('default_meta', 'default_link_rel', 'default_css', 'default_js'), $replace);
-	}
-	foreach($theme_setup as $skey => $sval)
-	{
-		if(!in_array($skey, array('default_meta','default_link_rel','default_css','default_js')))
-			continue;
-		$theme_setup[$skey] = array_unique($sval);
-	}
-	
-	if(isset($theme_setup['default_meta']) && !empty($theme_setup['default_meta']))
-		foreach($theme_setup['default_meta'] as $default_meta)
-			if($default_meta != '')
-				$contents .= "\n\t\t".$default_meta;
-
-	if(isset($theme_setup['default_link_rel']) && !empty($theme_setup['default_link_rel']))
-		foreach($theme_setup['default_link_rel'] as $default_link_rel)
-			if($default_link_rel != '')
-				$contents .= "\n\t\t".$default_link_rel;
-
-	if(isset($theme_setup['default_css']) && !empty($theme_setup['default_css']))
-		foreach($theme_setup['default_css'] as $default_css)
-			if($default_css != '')
-				$contents .= "\n\t\t".$default_css;
-		
-	if(isset($theme_setup['default_js']) && !empty($theme_setup['default_js']))		
-		foreach($theme_setup['default_js'] as $default_js)
-			if($default_js != '')
-				$contents .= "\n\t\t".$default_js;
-				
-	if(!defined("_ERROR_PAGE"))
-		$contents .= show_microdata_as_json($meta_tags);
+	include(INCLUDE_PATH."/meta.php");
 	
 	$contents .= "\n\t</head>\n\t";
 	
 	return $contents;
 }
 
-function themeheader($meta_tags, $custom_theme_setup = array(), $replace = false)
+function themeheader()
 {
 	global $userinfo, $nuke_configs, $search_query, $theme_setup, $users_system;
 	
 	$caspian_configs = $theme_setup['caspian_configs'];
 	
-	$contents = _theme_header($meta_tags, $custom_theme_setup, $replace);
+	$contents = _theme_header();
 	
     $real_name = (isset($userinfo['name'])) ? mres($userinfo['name']):"";
 	$dateTime = nuketimes();
@@ -129,7 +95,7 @@ function themeheader($meta_tags, $custom_theme_setup = array(), $replace = false
 							<form class=\"navbar-form navbar-left\" role=\"search\" action=\"".LinkToGT("index.php?modname=Search")."\" method=\"post\">
 								<div class=\"form-group input-group\">
 									<input type=\"text\" class=\"form-control\" placeholder=\""._SEARCH." ...\" value=\"$search_query\" name=\"search_query\">	<span class=\"input-group-btn\">
-										<button class=\"btn btn-default\" type=\"button\">
+										<button class=\"btn btn-default\" type=\"submit\">
 											<span class=\"glyphicon glyphicon-search\"></span>
 										</button>
 									</span>
@@ -190,10 +156,11 @@ function themeheader($meta_tags, $custom_theme_setup = array(), $replace = false
 	</div>";
 	}
 	$contents .="<div class=\"container GSBody\">";
+	$contents .= breadcrumb_build();
 	return $contents;
 }
 
-function themefooter($custom_theme_setup = array(), $replace = false)
+function themefooter()
 {
 	global $db, $nuke_configs, $theme_setup, $cache;
 	
@@ -262,23 +229,18 @@ function themefooter($custom_theme_setup = array(), $replace = false)
 		</div>
 	</footer>";
 	
-	$contents .= _theme_footer($custom_theme_setup, $replace);	
+	$contents .= _theme_footer();	
 		
 	return $contents;
 }
 
-function _theme_footer($custom_theme_setup = array(), $replace = false)
+function _theme_footer()
 {
 	global $db, $nuke_configs, $theme_setup;
 	
 	$caspian_configs = $theme_setup['caspian_configs'];
 	
 	$defer_js_contents = '';
-	
-	if(!empty($custom_theme_setup))
-	{
-		custom_theme_setup($theme_setup, $custom_theme_setup, array('defer_js'), $replace);
-	}
 	
 	foreach($theme_setup as $skey => $sval)
 	{
@@ -308,7 +270,7 @@ function _theme_footer($custom_theme_setup = array(), $replace = false)
 	return $contents;
 }
 
-/*function website_index($meta_tags)
+/*function website_index()
 {
 	global $db, $nuke_configs;
 	
@@ -714,6 +676,24 @@ function die_error($error_message)
 		</div>
 	</div>';
 	include("footer.php");
+}
+
+function suspend_template()
+{
+$contents .="<!DOCTYPE html>
+<html xmlns=\"http://www.w3.org/1999/xhtml\">
+	<head>
+		<title>{SITENAME}</title>
+	</head>
+	<body>
+		<h1>Not Found</h1>
+		The requested URL /404.shtml was not found on this server.
+		<hr>
+		<i>{NUKEURL}</i>
+	</body>
+</html>";
+
+return $contents;
 }
 
 ?>

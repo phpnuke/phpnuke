@@ -27,33 +27,37 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $nuke_configs, $block_global_contents, $users_system, $custom_theme_setup;
+global $db, $nuke_configs, $users_system, $hooks;
 
 $content = "";
 
-$MTForumTabed = new MTForumTabed();
+$latest_topics = new MTForumTabed();
 
-$latest_topics = $MTForumTabed->MTForumTabed();
-$custom_theme_setup = array_merge_recursive($custom_theme_setup, array(
-	"default_css" => array(),
-	"default_js" => array(),
-	"defer_js" => array(
-		"<script type=\"text/javascript\" language=\"javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/MTForumTabed.js\"></script>",
-		"<script>
-			$(function() {
-				var new_index;
-				$(\"#forum_tabs\").tabs({
-					show: { effect: \"blind\", duration: 100 },
-					activate: function(event, ui) {
-						new_index = ui.newTab.index()+1;
-						ChangeTabedForumPage('First', new_index, '', '');
-					}
+$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+{
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"default_css" => array(),
+		"default_js" => array(),
+		"defer_js" => array(
+			"<script type=\"text/javascript\" language=\"javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/MTForumTabed.js\"></script>",
+			"<script>
+				$(function() {
+					var new_index;
+					$(\"#forum_tabs\").tabs({
+						show: { effect: \"blind\", duration: 100 },
+						activate: function(event, ui) {
+							new_index = ui.newTab.index()+1;
+							ChangeTabedForumPage('First', new_index, '', '');
+						}
+					});
+					$(\"#forum_tabs\").show(0);
 				});
-				$(\"#forum_tabs\").show(0);
-			});
-		</script>"
-	)
-));
+			</script>"
+		)
+	));
+	return $theme_setup;
+}, 10);
+
 
 $content .= "
 <div id=\"forum_tabs\" style=\"display:none;\" class=\"MTForumBlock\">
@@ -65,7 +69,7 @@ $content .= "
 		<li><a href=\"#forum_tabs-5\">"._ANNOUNCEMENTS."</a></li>
 		<li><a href=\"#forum_tabs-6\">"._SEARCH."</a></li>
 	</ul>
-	<div id=\"forum_tabs-1\"><div class=\"MTForumBlock\">$latest_topics</div></div>
+	<div id=\"forum_tabs-1\"><div class=\"MTForumBlock\">".$latest_topics->result."</div></div>
 	<div id=\"forum_tabs-2\"></div>
 	<div id=\"forum_tabs-3\"></div>
 	<div id=\"forum_tabs-4\"></div>

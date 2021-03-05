@@ -20,16 +20,23 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $module_name, $nuke_configs, $block_global_contents, $comments_op, $custom_theme_setup;
+global $db, $module_name, $nuke_configs, $block_global_contents, $comments_op, $hooks;
 
 $content = "";
 
-$custom_theme_setup = array_merge_recursive($custom_theme_setup, array(
-	"defer_js" => array(
-		"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap-progressbar.js\" type=\"text/javascript\"></script>",
-		'<script>$(document).ready(function() {$(\'.progress .progress-bar\').progressbar();});</script>'
-	)
-));
+$block_global_contents = array();
+$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
+
+$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+{
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"defer_js" => array(
+			"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap-progressbar.js\" type=\"text/javascript\"></script>",
+			'<script>$(document).ready(function() {$(\'.progress .progress-bar\').progressbar();});</script>'
+		)
+	));
+	return $theme_setup;
+}, 10);
 	
 $nuke_surveys_cacheData = change_poll_status();
  
@@ -40,7 +47,7 @@ if(!isset($pollID) || $pollID == 0)
 	
 	foreach($nuke_surveys_cacheData as $pollID => $poll_data)
 	{
-		if($block_global_contents['module_name'] == $module_name && isset($block_global_contents['post_id']) && $poll_data['post_id'] == $block_global_contents['post_id'])
+		if(isset($block_global_contents['module_name']) && $block_global_contents['module_name'] == $module_name && isset($block_global_contents['post_id']) && $poll_data['post_id'] == $block_global_contents['post_id'])
 		{
 			$this_pollID = $pollID;
 			$title .= "("._RELATEDTO." ".$block_global_contents['post_title']." )";

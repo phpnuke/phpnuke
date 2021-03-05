@@ -101,13 +101,13 @@ $contents .= "
 				</div>
 			</div>";
 			}
-			$contents .= "<div class=\"form-group\">
+			$contents .= "<div class=\"form-group\" style=\"display:none;\">
 				<label class=\"col-sm-2 control-label\">"._TITLE."</label>
 				<div class=\"col-sm-10\">
 					<input class=\"form-control\" id=\"online_credit_title\" name=\"online_credit[title]\" type=\"text\" placeholder=\""._OPTIONAL."\" value=\"".((isset($order_data['title'])) ? $order_data['title']:"")."\">
 				</div>
 			</div>
-			<div class=\"form-group\">
+			<div class=\"form-group\" style=\"display:none;\">
 				<label class=\"col-sm-2 control-label\">"._DESCRIPTIONS."</label>
 				<div class=\"col-sm-10\">
 					<textarea class=\"form-control\" id=\"online_credit_desc\" name=\"online_credit[desc]\" rows=\"7\" placeholder=\""._DESCRIPTIONS."\">".((isset($order_data['desc'])) ? $order_data['desc']:"")."</textarea>
@@ -150,13 +150,13 @@ $contents .= "
 				</div>
 			</div>";
 			}
-			$contents .= "<div class=\"form-group\">
+			$contents .= "<div class=\"form-group\" style=\"display:none;\">
 				<label class=\"col-sm-2 control-label\">"._TITLE."</label>
 				<div class=\"col-sm-10\">
 					<input class=\"form-control\" id=\"offline_credit_title\" name=\"offline_credit[title]\" type=\"text\" placeholder=\""._OPTIONAL."\" value=\"".((isset($order_data['title'])) ? $order_data['title']:"")."\">
 				</div>
 			</div>
-			<div class=\"form-group\">
+			<div class=\"form-group\" style=\"display:none;\">
 				<label class=\"col-sm-2 control-label\">"._DESCRIPTIONS."</label>
 				<div class=\"col-sm-10\">
 					<textarea class=\"form-control\" id=\"offline_credit_desc\" name=\"offline_credit[desc]\" rows=\"7\" placeholder=\""._OPTIONAL."\">".((isset($order_data['desc'])) ? $order_data['desc']:"")."</textarea>
@@ -175,54 +175,8 @@ $contents .= "
 </form>";
 $contents .= CloseTable();
 
-	
-$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
-$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.css\" rel=\"stylesheet\" type=\"text/css\">";
+$contents = $hooks->apply_filters("credits_form_contents", $contents);
 
-$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
-$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
-
-$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\" /></script>";
-$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
-$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
-
-$defer_js[] = "
-<script>
-	$(document).ready(function(){
-		$(\"#online_credit\").on('click', function(){
-			$(\"#online_form\").show();
-			$(\"#offline_form\").hide();
-		});
-		$(\"#offline_credit\").on('click', function(){
-			$(\"#offline_form\").show();
-			$(\"#online_form\").hide();
-		});
-		
-		$('.digit_group_numbers').on('focus', function(){
-			var this_num = $(this).val();
-			this_num = this_num.replace(/,/g, '').replace(' ', '').replace('"._RIAL."', '');
-			 $(this).val(this_num);
-		});
-		$('.digit_group_numbers').on('blur', function(){
-			var x = $(this).val();
-			var parts = x.toString().split(".");
-			parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, \",\").replace(' ', '').replace('"._RIAL."', '');
-			$(this).val(parts.join(\".\")+' "._RIAL."');
-		});
-		$.validate({
-			form : '#credit_form',
-			modules : 'security',
-		});
-	});
-</script>";
-
-if($nuke_configs['multilingual'] == 1)
-{
-	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
-	if($nuke_configs['datetype'] == 1)
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
-	elseif($nuke_configs['datetype'] == 2)
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
-}
+$hooks->add_filter("site_theme_headers", "credits_theme_assets", 10);
 
 ?>

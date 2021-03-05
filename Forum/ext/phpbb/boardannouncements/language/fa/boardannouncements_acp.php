@@ -45,6 +45,8 @@ $lang = array_merge($lang, array(
 	'BOARD_ANNOUNCEMENTS_USERS'				=> 'چه کسانی قادر به مشاهده اطلاعیه باشند؟',
 	'BOARD_ANNOUNCEMENTS_DISMISS'			=> 'مجوز به کاربران برای نادیده گرفتن اطلاعیه',
 
+	'BOARD_ANNOUNCEMENTS_INDEX_ONLY'			=> 'نمایش در صفحه اصلی فقط',
+
 	'BOARD_ANNOUNCEMENTS_EVERYONE'			=> 'همه',
 
 	'BOARD_ANNOUNCEMENTS_BGCOLOR'			=> 'رنگ پس زمینه اطلاعیه',

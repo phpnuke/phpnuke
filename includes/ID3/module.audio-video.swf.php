@@ -1,11 +1,11 @@
 <?php
+
 /////////////////////////////////////////////////////////////////
 /// getID3() by James Heinrich <info@getid3.org>               //
-//  available at http://getid3.sourceforge.net                 //
-//            or http://www.getid3.org                         //
-//          also https://github.com/JamesHeinrich/getID3       //
-/////////////////////////////////////////////////////////////////
-// See readme.txt for more details                             //
+//  available at https://github.com/JamesHeinrich/getID3       //
+//            or https://www.getid3.org                        //
+//            or http://getid3.sourceforge.net                 //
+//  see readme.txt for more details                            //
 /////////////////////////////////////////////////////////////////
 //                                                             //
 // module.audio-video.swf.php                                  //
@@ -14,9 +14,12 @@
 //                                                            ///
 /////////////////////////////////////////////////////////////////
 
-
 if(!defined('NUKE_FILE'))
 {
+	exit;
+}
+
+if (!defined('GETID3_INCLUDEPATH')) { // prevent path-exposing attacks that access modules directly on public webservers
 	exit;
 }
 
@@ -24,6 +27,9 @@ class getid3_swf extends getid3_handler
 {
 	public $ReturnAllTagData = false;
 
+	/**
+	 * @return bool
+	 */
 	public function Analyze() {
 		$info = &$this->getid3->info;
 
@@ -47,11 +53,10 @@ class getid3_swf extends getid3_handler
 				break;
 
 			default:
-				$info['error'][] = 'Expecting "FWS" or "CWS" at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes($info['swf']['header']['signature']).'"';
+				$this->error('Expecting "FWS" or "CWS" at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes($info['swf']['header']['signature']).'"');
 				unset($info['swf']);
 				unset($info['fileformat']);
 				return false;
-				break;
 		}
 		$info['swf']['header']['version'] = getid3_lib::LittleEndian2Int(substr($SWFfileData, 3, 1));
 		$info['swf']['header']['length']  = getid3_lib::LittleEndian2Int(substr($SWFfileData, 4, 4));
@@ -62,7 +67,7 @@ class getid3_swf extends getid3_handler
 			if ($decompressed = @gzuncompress($SWFfileData)) {
 				$SWFfileData = $SWFHead.$decompressed;
 			} else {
-				$info['error'][] = 'Error decompressing compressed SWF data ('.strlen($SWFfileData).' bytes compressed, should be '.($info['swf']['header']['length'] - 8).' bytes uncompressed)';
+				$this->error('Error decompressing compressed SWF data ('.strlen($SWFfileData).' bytes compressed, should be '.($info['swf']['header']['length'] - 8).' bytes uncompressed)');
 				return false;
 			}
 		}

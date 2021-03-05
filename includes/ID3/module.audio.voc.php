@@ -1,11 +1,11 @@
 <?php
+
 /////////////////////////////////////////////////////////////////
 /// getID3() by James Heinrich <info@getid3.org>               //
-//  available at http://getid3.sourceforge.net                 //
-//            or http://www.getid3.org                         //
-//          also https://github.com/JamesHeinrich/getID3       //
-/////////////////////////////////////////////////////////////////
-// See readme.txt for more details                             //
+//  available at https://github.com/JamesHeinrich/getID3       //
+//            or https://www.getid3.org                        //
+//            or http://getid3.sourceforge.net                 //
+//  see readme.txt for more details                            //
 /////////////////////////////////////////////////////////////////
 //                                                             //
 // module.audio.voc.php                                        //
@@ -19,10 +19,15 @@ if(!defined('NUKE_FILE'))
 	exit;
 }
 
+if (!defined('GETID3_INCLUDEPATH')) { // prevent path-exposing attacks that access modules directly on public webservers
+	exit;
+}
 
 class getid3_voc extends getid3_handler
 {
-
+	/**
+	 * @return bool
+	 */
 	public function Analyze() {
 		$info = &$this->getid3->info;
 
@@ -32,7 +37,7 @@ class getid3_voc extends getid3_handler
 
 		$magic = 'Creative Voice File';
 		if (substr($VOCheader, 0, 19) != $magic) {
-			$info['error'][] = 'Expecting "'.getid3_lib::PrintHexBytes($magic).'" at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes(substr($VOCheader, 0, 19)).'"';
+			$this->error('Expecting "'.getid3_lib::PrintHexBytes($magic).'" at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes(substr($VOCheader, 0, 19)).'"');
 			return false;
 		}
 
@@ -64,7 +69,7 @@ class getid3_voc extends getid3_handler
 
 			$BlockOffset    = $this->ftell();
 			$BlockData      = $this->fread(4);
-			$BlockType      = ord($BlockData{0});
+			$BlockType      = ord($BlockData[0]);
 			$BlockSize      = getid3_lib::LittleEndian2Int(substr($BlockData, 1, 3));
 			$ThisBlock      = array();
 
@@ -142,7 +147,7 @@ class getid3_voc extends getid3_handler
 					break;
 
 				default:
-					$info['warning'][] = 'Unhandled block type "'.$BlockType.'" at offset '.$BlockOffset;
+					$this->warning('Unhandled block type "'.$BlockType.'" at offset '.$BlockOffset);
 					$this->fseek($BlockSize, SEEK_CUR);
 					break;
 			}
@@ -169,6 +174,11 @@ class getid3_voc extends getid3_handler
 		return true;
 	}
 
+	/**
+	 * @param int $index
+	 *
+	 * @return string
+	 */
 	public function VOCcompressionTypeLookup($index) {
 		static $VOCcompressionTypeLookup = array(
 			0 => '8-bit',
@@ -179,6 +189,11 @@ class getid3_voc extends getid3_handler
 		return (isset($VOCcompressionTypeLookup[$index]) ? $VOCcompressionTypeLookup[$index] : 'Multi DAC ('.($index - 3).') channels');
 	}
 
+	/**
+	 * @param int $index
+	 *
+	 * @return string|false
+	 */
 	public function VOCwFormatLookup($index) {
 		static $VOCwFormatLookup = array(
 			0x0000 => '8-bit unsigned PCM',
@@ -193,6 +208,11 @@ class getid3_voc extends getid3_handler
 		return (isset($VOCwFormatLookup[$index]) ? $VOCwFormatLookup[$index] : false);
 	}
 
+	/**
+	 * @param int $index
+	 *
+	 * @return int|false
+	 */
 	public function VOCwFormatActualBitsPerSampleLookup($index) {
 		static $VOCwFormatLookup = array(
 			0x0000 =>  8,

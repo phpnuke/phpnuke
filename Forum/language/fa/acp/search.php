@@ -52,6 +52,8 @@ $lang = array_merge($lang, array(
 	'CONTINUE_INDEXING_EXPLAIN'				=> 'فرآیند  شاخص بندی آغاز شد،برای دسترسی به صفحه شاخص جستجو باید این فرآیند تکمیل شده و یا لغو شود.',
 	'CREATE_INDEX'							=> 'ایجاد شاخص',
 
+	'DEFAULT_SEARCH_RETURN_CHARS'			=> 'Default number of returned characters',
+	'DEFAULT_SEARCH_RETURN_CHARS_EXPLAIN'	=> 'The default number of characters that will be returned while searching. A value of 0 will return the entire post.',
 	'DELETE_INDEX'							=> 'حذف شاخص',
 	'DELETING_INDEX_IN_PROGRESS'			=> 'حذف شاخص در حال اجرا می باشد',
 	'DELETING_INDEX_IN_PROGRESS_EXPLAIN'	=> 'در حال حاضر مرجع جستجو شاخص خود را پاکسازی می کند،این فرآیند ممکن است چند دقیقه به طول انجامد.',

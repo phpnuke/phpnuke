@@ -47,38 +47,52 @@ $cache_systems['nuke_groups'] = array(
 
 function login_sign_up_theme($mode="header")
 {
-	global $db, $op, $nuke_configs, $ya_config, $module_name;
+	global $db, $op, $nuke_configs, $ya_config, $module_name, $hooks;
 	$content = '';
 	
-	$custom_theme_setup = array(
-		"default_css" => array(
+	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name)
+	{
+		$theme_setup["default_css"] = array(
 			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\">",
-			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/font-awesome.min.css\">",
+			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/vazir/style.css\" />",
+			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/fontawesome/style.css\" />",
 			"".((_DIRECTION == 'rtl') ? "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/bootstrap-rtl.css\">":"")."",
 			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/CNBYA.css\">",
-		),
-		"default_js" => array(
-			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.min.js\"></script>",
-			"<script>var phpnuke_url = '".$nuke_configs['nukeurl']."';var phpnuke_cdnurl = '".$nuke_configs['nukecdnurl']."';var phpnuke_theme = '".$nuke_configs['ThemeSel']."';var module_name = '".$module_name."';var reset_password_url = '".LinkToGT("index.php?modname=$module_name&op=reset_password")."';</script>",
-			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
-		),
-		"defer_js" => array(			
+		);
+
+		$theme_setup["default_js"] = array();
+
+		$theme_setup["defer_js"] = array(
 			"<!--[if lt IE 9]> <script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/html5shiv/dist/html5shiv.js\"></script><script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/respond/respond.min.js\"></script> <![endif]-->",
+			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.min.js\"></script>",
+			"<script>var phpnuke_url = '".$nuke_configs['nukeurl']."', phpnuke_cdnurl = '".$nuke_configs['nukecdnurl']."', phpnuke_theme = '".$nuke_configs['ThemeSel']."', nuke_lang = '".(($nuke_configs['multilingual'] == 1) ? $nuke_configs['currentlang']:$nuke_configs['language'])."', nuke_date = ".$nuke_configs['datetype'].";var theme_languages = { success_voted : '"._SUCCESS_VOTED."', try_again : '"._ERROR_TRY_AGAIN."'};var pn_csrf_token = '"._PN_CSRF_TOKEN."';var module_name = '".$module_name."';var reset_password_url = '".LinkToGT("index.php?modname=$module_name&op=reset_password")."';</script>",
+			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",			
 			"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap.min.js\"></script>",
 			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/script/script.js\"></script>",
-		),
-		"default_link_rel" => array(
+		);
+
+		$theme_setup["default_link_rel"] = array(
 			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/114x114.png\">",
 			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/72x72.png\">",
 			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"57x57\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/57x57.png\">",
 			"<link rel=\"apple-touch-icon-precomposed\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/default.png\">",
-			"<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/favicon.png\">",
-		),
-		"default_meta" => array()
-	);
+			"".((file_exists("themes/".$nuke_configs['ThemeSel']."/images/favicon.ico")) ? "<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\">":"")."",
+		);
+		
+		return $theme_setup;
+	}, 10);
+	
 	if($mode == "header")
 	{
-		$content = _theme_header($ya_config['meta_tags'], $custom_theme_setup, true);
+		$ya_config['meta_tags'] = $hooks->apply_filters("login_sign_up_header_meta", $ya_config['meta_tags']);
+			
+		$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
+		{
+			return array_merge($all_meta_tags, $ya_config['meta_tags']);
+		}, 10);		
+		unset($meta_tags);
+		
+		$content = _theme_header();
 		$content .=" 
 	<body>
 		<div class=\"container\">
@@ -121,16 +135,23 @@ function login_sign_up_theme($mode="header")
 			})
 		</script>
 		<!-- /.modal -->";
-		$content .= _theme_footer($custom_theme_setup, true);
+		$content .= _theme_footer();
 	}
 	return $content;
 }
 
 function ya_html_output($ya_config, $contents)
 {
-	global $module_name, $nuke_configs;
+	global $module_name, $nuke_configs, $hooks;
 	
-	$meta_tags = $ya_config['meta_tags'];
+	$ya_config['meta_tags'] = $hooks->apply_filters("login_sign_up_header_meta", $ya_config['meta_tags']);
+		
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
+	{
+		return array_merge($all_meta_tags, $ya_config['meta_tags']);
+	}, 10);		
+	unset($meta_tags);
+		
 	if($ya_config['login_sign_up_theme'] == 1)
 	{
 		$content = login_sign_up_theme("header");
@@ -140,24 +161,30 @@ function ya_html_output($ya_config, $contents)
 	}
 	else
 	{
-		$custom_theme_setup = array(
-			"default_css" => array(
-				"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/CNBYA_in.css\">",
-			),
-			"default_js" => array(
-				"<script>var phpnuke_url = '".$nuke_configs['nukeurl']."';var phpnuke_cdnurl = '".$nuke_configs['nukecdnurl']."';var phpnuke_theme = '".$nuke_configs['ThemeSel']."';var module_name = '".$module_name."';</script>",
-				"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
-			),
-			"default_link_rel" => array(),
-			"default_meta" => array()
-		);
-		if(isset($ya_config['custom_theme_setup']) && !empty($ya_config['custom_theme_setup']))
-			foreach($ya_config['custom_theme_setup'] as $key => $value)
-				$custom_theme_setup[$key] = array_merge($custom_theme_setup[$key], $value);
 		
-		$custom_theme_setup_replace = false;
+		$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+		{
+			$theme_setup = array_merge_recursive($theme_setup, array(
+				"default_css" => array(
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/CNBYA_in.css\">",
+				),
+				"default_js" => array(
+					"<script>var module_name = '".$module_name."';</script>",
+					"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
+				),
+				"default_link_rel" => array(),
+				"default_meta" => array()
+			));
+			
+			if(isset($ya_config['custom_theme_setup']) && !empty($ya_config['custom_theme_setup']))
+			foreach($ya_config['custom_theme_setup'] as $key => $value)
+				$theme_setup[$key] = array_merge_recursive($theme_setup[$key], $value);
+			
+			return $theme_setup;
+		}, 10);
+		
 		include("header.php");
-		unset($meta_tags);
+		
 		$html_output .= show_modules_boxes($module_name, "login_sighnup", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 		include("footer.php");
 	}
@@ -185,70 +212,65 @@ function ya_custum_userfields(&$userinfo, $user_id)
 	}
 }
 
-function _check_register_fields($field = 'username', $value = '', $retuen_num = false, $mode = 'new', $default_value = '')
+function _check_register_fields($field = 'username', $value = '', $default_value = '', $title='', $primary=true)
 {
-	global $db, $nuke_configs, $ya_config;
+	global $db, $nuke_configs, $ya_config, $userinfo;
 
-	$user_info = $db->table(USERS_TABLE)
-				->where($field, $value)
-				->select(['user_id', 'username', 'user_email', 'user_realname']);
 
-	if(intval($user_info->count()) > 0)
-		$userinfo = $user_info->results()[0];
+	$default_value = (isset($default_value) && $default_value != '') ? filter($default_value, "nohtml"):"";
+	
+	$user_data = array();
 	
 	$response = array(
-	  'valid' => false,
-	  'message' => 'Post argument is missing.'
+	  'valid' => true,
+	  'message' => ''
 	);
+		
+	$bad_mail = ($ya_config['bad_mail'] != '') ? ((is_array($ya_config['bad_mail'])) ? $ya_config['bad_mail']:explode("\n", str_replace("\r","",$ya_config['bad_mail']))):array();
+	$bad_username = ($ya_config['bad_username'] != '') ? ((is_array($ya_config['bad_username'])) ? $ya_config['bad_username']:explode("\n", str_replace("\r","",$ya_config['bad_username']))):array();
+	$bad_nick = ($ya_config['bad_nick'] != '') ? ((is_array($ya_config['bad_nick'])) ? $ya_config['bad_nick']:explode("\n", str_replace("\r","",$ya_config['bad_nick']))):array();
 	
-	if(filter($mode, 'nohtml') == 'edit' && isset($userinfo[$field]) && $userinfo[$field] == $value)
+	if($value != '' && $primary)
 	{
-		$default_value = (isset($default_value) && $default_value != '') ? filter($default_value, "nohtml"):"";
-		$response = ($default_value != '' && $default_value == $userinfo[$field]) ? true:false;
-		$message = ($response) ? '':(($field == "username") ? _USER_HAS_REGISTERED:(($field == "user_email") ? _USER_EMAIL_HAS_SELECTED:'bad value'));
-		$response = array('valid' => $response, 'message' => $message);
-		die(json_encode($response));
-	}
-	
-	$result_count = $db->table(USERS_TABLE)
-						->where($field, $value)
-						->first(['user_id']);
-	$result_count = $db->count();
+		$select_fields = array('user_id', 'username', 'user_email', 'user_realname');
+		if(!in_array($field, $select_fields))
+			$select_fields[] = $field;
+		
+		$user_info = $db->table(USERS_TABLE)
+					->where($field, $value)
+					->select($select_fields);
 
-	if(filter_var($retuen_num, FILTER_VALIDATE_BOOLEAN))
-	{
-		return ($result_count > 0) ? true:false;
-		die();
+		if(intval($user_info->count()) > 0)
+			$user_data = $user_info->results()[0];
 	}
 	
-	$message = "";
-	$result = true;
-	
-	$bad_mail = ($ya_config['bad_mail'] != '' && !is_array($ya_config['bad_mail'])) ? explode("\n", str_replace("\r","",$ya_config['bad_mail'])):array();
-	$bad_username = ($ya_config['bad_username'] != '' && !is_array($ya_config['bad_username'])) ? explode("\n", str_replace("\r","",$ya_config['bad_username'])):array();
-	$bad_nick = ($ya_config['bad_nick'] != '' && !is_array($ya_config['bad_nick'])) ? explode("\n", str_replace("\r","",$ya_config['bad_nick'])):array();
+	if(is_user() && !defined("ADMIN_FILE"))
+		$default_value = (isset($userinfo[$field])) ? $userinfo[$field]:$default_value;
+		
+	if(($value != $default_value && $default_value != '') || $default_value == '')
+	{
+		if(isset($user_data['user_id']) && intval($user_data['user_id']) != 0)
+		{
+			$response['valid'] = false;
+			$response['message'] = sprintf(_THE_FIELD_HAS_SELECTED, $title);
+		}
+	}
 	
 	if($field == "username")
 	{
 		if(in_array($value, $bad_username))
 		{
-			$message = _USER_BAD_NAME;
-			$result = false;
+			$response['message'] = _USER_BAD_NAME;
+			$response['valid'] = false;
 		}
-		elseif($result_count > 0)
-		{
-			$message = _USER_HAS_REGISTERED;
-			$result = false;
-		}
-		
 	}
 	
 	if($field == "user_realname")
 	{
 		if(in_array($value, $bad_nick))
 		{
-			$message = _USER_BAD_REALNAME;
-			$result = false;
+			$response['message'] = _USER_BAD_REALNAME;
+			$response['valid'] = false;
 		}
 	}
 	
@@ -256,19 +278,29 @@ function _check_register_fields($field = 'username', $value = '', $retuen_num = 
 	{
 		if(in_array($value, $bad_mail))
 		{
-			$message = _USER_BAD_EMAIL;
-			$result = false;
-		}
-		elseif($result_count > 0)
-		{
-			$message = _USER_EMAIL_HAS_SELECTED;
-			$result = false;
+			$response['message'] = _USER_BAD_EMAIL;
+			$response['valid'] = false;
 		}
 	}
-
-	$response = array('valid' => $result, 'message' => $message);
-	die(json_encode($response));
+	
+	$response = json_encode($response);
+	if(defined("NOAJAX_REQUEST"))
+		return $response;
+	else
+		die($response);
 }
+
+function users_infoitems($list_group_item, $user_data)
+{
+	return $list_group_item;
+}
+$hooks->add_filter("users_info_items", "users_infoitems", 10);
+
+function users_infoops($list_group_ops, $user_data)
+{
+	return $list_group_ops;
+}
+$hooks->add_filter("users_info_ops", "users_infoops", 10);
 
 function users_config()
 {
@@ -435,10 +467,17 @@ function users_config()
 
 $other_admin_configs['users_config'] = array("title" => _USERS_CONFIGS, "function" => "users_config", "God" => false);
 
-$nuke_modules_boxes_parts[$this_module_name] = array(
-	"login_signup" => "_LOGIN_SIGNUP",
-	"profile" => "_USER_PROFILE",
-	"edit" => "_EDIT",
-);
+function users_boxes_parts($nuke_modules_boxes_parts)
+{
+	$nuke_modules_boxes_parts['Users'] = array(
+		"login_signup" => _LOGIN_SIGNUP,
+		"profile" => _USER_PROFILE,
+		"edit" => _EDIT,
+	);
+	
+	return $nuke_modules_boxes_parts;
+}
+
+$hooks->add_filter("modules_boxes_parts", "users_boxes_parts", 10);
 
 ?>

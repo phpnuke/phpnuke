@@ -52,8 +52,6 @@ $lang = array_merge($lang, array(
 	'BUMPED_BY'				=> 'آخرین بالا اندازی (Bump) توسط %1$s در %2$s.',
 	'BUMP_TOPIC'			=> 'بالا انداختن (Bump کردن) ',
 
-	'CODE'					=> 'کد',
-
 	'DELETE_TOPIC'			=> 'حذف موضوع',
 	'DELETED_INFORMATION'	=> 'حذف شده توسط %1$s در تاریخ %2$s',
 	'DISAPPROVE'					=> 'تایید نشده',
@@ -101,7 +99,6 @@ $lang = array_merge($lang, array(
 
 	'QUICK_MOD'				=> 'ابزار فوري',
 	'QUICKREPLY'			=> 'پاسخ سریع',
-	'QUOTE'					=> 'نقل قول',
 
 	'REPLY_TO_TOPIC'		=> 'پاسخ به موضوع',
 	'RESTORE'				=> 'بازگردانی',

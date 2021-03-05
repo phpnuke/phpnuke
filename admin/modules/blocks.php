@@ -357,9 +357,9 @@ if (check_admin_permission($filename)) {
 
 	function BlocksAdmin()
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs, $nuke_blocks_cacheData, $nuke_headlines_cacheData, $theme_setup;
+		global $db, $hooks, $admin_file, $nuke_configs, $nuke_blocks_cacheData, $nuke_headlines_cacheData, $theme_setup;
 
-		$pagetitle = _BLOCKSADMIN;
+		$hooks->add_filter("set_page_title", function(){return array("BlocksAdmin" => _BLOCKSADMIN);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();
@@ -1496,8 +1496,9 @@ if (check_admin_permission($filename)) {
 
 	function HeadlinesAdmin()
 	{
-		global $db, $pagetitle, $admin_file, $nuke_headlines_cacheData, $nuke_configs;
-		$pagetitle = _HEADLINESADMIN;
+		global $db, $hooks, $admin_file, $nuke_headlines_cacheData, $nuke_configs;
+		
+		$hooks->add_filter("set_page_title", function(){return array("HeadlinesAdmin" => _HEADLINESADMIN);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();
@@ -1556,12 +1557,12 @@ if (check_admin_permission($filename)) {
 
 	function HeadlinesEdit($hid)
 	{
-		global $db, $pagetitle, $admin_file, $nuke_headlines_cacheData, $nuke_configs;
+		global $db, $hooks, $admin_file, $nuke_headlines_cacheData, $nuke_configs;
 		
 		$xsitename = filter($nuke_headlines_cacheData[$hid]['sitename'], "nohtml");
 		$headlinesurl = filter($nuke_headlines_cacheData[$hid]['headlinesurl'], "nohtml");
 		
-		$pagetitle = sprintf(_EDITHEADLINE_OK, $xsitename);
+		$hooks->add_filter("set_page_title", function() use($xsitename){return array("HeadlinesEdit" => sprintf(_EDITHEADLINE_OK, $xsitename));});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();

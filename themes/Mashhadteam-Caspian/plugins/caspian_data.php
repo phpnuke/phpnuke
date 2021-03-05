@@ -15,7 +15,7 @@ function cache_caspian_data()
 {
 	global $db, $nuke_configs, $cache, $caspian_configs, $theme_setup;
 	
-	if($cache->isCached("caspian_data"))
+	if($cache->isCached("ib3theme_data") && ((_NOWTIME-$cache->retrieve("caspian_data", true)) <= 3600))
 	{
 		$caspian_data = $cache->retrieve("caspian_data");
 	}
@@ -29,9 +29,9 @@ function cache_caspian_data()
 		$caspian_configs = (isset($caspian_configs) && !empty($caspian_configs)) ? $caspian_configs:$theme_setup['caspian_configs'];
 		
 		$result = $db->query("
-		(SELECT 1 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image, post_type FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'Articles' ORDER BY counter DESC LIMIT 0, 5)
+		(SELECT 1 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image, post_type FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'Articles' AND ihome = '1' ORDER BY counter DESC LIMIT 0, 5)
 		union
-		(SELECT 2 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image, post_type FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'Articles' ORDER BY comments DESC LIMIT 0, 5)
+		(SELECT 2 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image, post_type FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'Articles' AND ihome = '1' ORDER BY comments DESC LIMIT 0, 5)
 		");
 		if(intval($db->count()) > 0)
 		{

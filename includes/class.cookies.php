@@ -111,6 +111,8 @@ class pn_Cookies {
 
 		$this->prefix_name ( $name );
 
+		$secure = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $secure) ? 1 : 0;
+		
 		$ob = ini_get('output_buffering');
 
 		// Abort the method if headers have already been sent, except when output buffering has been enabled

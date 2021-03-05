@@ -24,7 +24,7 @@ if(!defined("INDEX_FILE"))
 
 function feedback($submit = '', $feedback_fields = array())
 {
-	global $db, $pagetitle, $nuke_configs, $userinfo, $module_name, $waiting, $PnValidator, $visitor_ip, $pn_Cookies, $custom_theme_setup;
+	global $db, $nuke_configs, $userinfo, $module_name, $waiting, $PnValidator, $visitor_ip, $pn_Cookies, $hooks;
 	
 	$captcha_id = "_feedback";
 
@@ -287,22 +287,20 @@ function feedback($submit = '', $feedback_fields = array())
 		}
 		
 		$json_feedback_data = json_encode($feedback_data);
-		$custom_theme_setup = array_merge_recursive($custom_theme_setup, array(
-			"defer_js" => array(
-				"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
-				"<script>var feedback_data=JSON.parse('$json_feedback_data');</script>",
-				"<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/feedback.js\"></script>",
-			)
-		));
 		
-		if($feedback_configs['map_active'] == 1)
+		$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name, $feedback_configs, $json_feedback_data)
 		{
-			$custom_theme_setup = array_merge_recursive($custom_theme_setup, array(
+			$theme_setup = array_merge_recursive($theme_setup, array(
 				"defer_js" => array(
-					"<script src=\"https://maps.googleapis.com/maps/api/js?callback=phpnukeMap&key=".$feedback_configs['google_api']."\"></script>",
+					"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
+					"<script>var feedback_data=JSON.parse('$json_feedback_data');</script>",
+					"<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/feedback.js\"></script>",
+					"".(($feedback_configs['map_active'] == 1) ? "<script src=\"https://maps.googleapis.com/maps/api/js?callback=phpnukeMap&key=".$feedback_configs['google_api']."\"></script>":"").""
 				)
 			));
-		}		
+			
+			return $theme_setup;
+		}, 10);
 		
 		$contents = '';
 		$contents .= OpenTable($nuke_configs['sitename'].":&nbsp;"._FEEDBACKTITLE);
@@ -380,23 +378,36 @@ function feedback($submit = '', $feedback_fields = array())
 	}
 		
 	$meta_tags = array(
-		"url" => LinkToGT("module.php?name=Feedback"),
+		"url" => LinkToGT("index.php?modname=Feedback"),
 		"title" => _CONTACT_US,
 		"description" => $feedback_configs['meta_description'],
 		"extra_meta_tags" => array()
 	);
+	$meta_tags = $hooks->apply_filters("feedback_header_meta", $meta_tags);
 	
-	$pagetitle = "- "._CONTACT_US."";
-		
-	include("header.php");
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
 	unset($meta_tags);
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents){
+		$breadcrumbs['feedback'] = array(
+			"name" => _CONTACT_US,
+			"link" => LinkToGT("index.php?modname=Feedback"),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
+	
+	include("header.php");
 	$html_output .= show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	include("footer.php");
 }
 
 $op = (isset($op)) ? filter($op, "nohtml"):'';
-$submit = (isset($submit)) ? filter($submit, "nohtml"):'';
-$feedback_fields = (isset($feedback_fields)) ? $feedback_fields:array();
+$submit = filter(request_var('submit', '', '_POST'), "nohtml");
+$feedback_fields = request_var('feedback_fields', array(), '_POST');
 
 switch ($op)
 {

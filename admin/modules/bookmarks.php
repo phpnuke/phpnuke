@@ -56,7 +56,7 @@ if (check_admin_permission($filename)) {
 	}
 
 	function bookmarks() {
-		global $db, $pagetitle, $admin_file;	
+		global $db, $hooks, $admin_file;	
 		
 		$result = $db->table(BOOKMARKSITE_TABLE)
 			->order_by(['bid' => 'ASC'])
@@ -71,7 +71,7 @@ if (check_admin_permission($filename)) {
 			}
 		}
 		
-		$pagetitle = _BOOKMARKS_ADMIN;
+		$hooks->add_filter("set_page_title", function(){return array("HeadlinesEdit" => _BOOKMARKS_ADMIN);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();
@@ -162,7 +162,7 @@ if (check_admin_permission($filename)) {
 	}
 
 	function editbookmark($bid) {
-		global $db, $pagetitle, $admin_file;
+		global $db, $hooks, $admin_file;
 		
 		$row = $db->table(BOOKMARKSITE_TABLE)
 			->where('bid', $bid)
@@ -177,7 +177,7 @@ if (check_admin_permission($filename)) {
 		$sel1 = ($active == 1) ? "checked":"";
 		$sel2 = ($active == 0) ? "checked":"";
 		
-		$pagetitle = sprintf(_BOOKMARK_EDIT, $title);
+		$hooks->add_filter("set_page_title", function() use($title){return array("HeadlinesEdit" => sprintf(_BOOKMARK_EDIT, $title));});
 		
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();

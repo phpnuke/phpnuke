@@ -96,7 +96,6 @@ $lang = array_merge($lang, array(
 	'FIELD_DESCRIPTION'			=> 'توضیحات فیلد',
 	'FIELD_DESCRIPTION_EXPLAIN'	=> 'توضیحات این فیلد به کاربران نمایش داده خواهد شد.',
 	'FIELD_DROPDOWN'			=> 'منوی کشویی',
-	'FIELD_GOOGLEPLUS'			=> 'Google+',
 	'FIELD_IDENT'				=> 'شناسایی فیلد',
 	'FIELD_IDENT_ALREADY_EXIST'	=> 'شناسایی فیلد انتخاب شده در حال حاض موجود می باشد،لطفا شناسایی دیگری را انتخاب کنید.',
 	'FIELD_IDENT_EXPLAIN'		=> 'شناسایی فیلد نامی است که هویت فیلد را در پایگاه داده و قالب مشخص می کند.',

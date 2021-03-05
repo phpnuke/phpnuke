@@ -38,6 +38,8 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
+	'CLI_APCU_CACHE_NOTICE'				=> 'APCu cache has to be purged through the Administration Control Panel.',
+
 	'CLI_CONFIG_CANNOT_CACHED'			=> 'تنظیم این گزینه اگر تنیظیمات پیکربندی تغییر کند که اغلب باعث تغییرات موثری در کش میشود.',
 	'CLI_CONFIG_CURRENT'				=> 'مقادیر پیکربندی حاضر, استفاده از 0 و 1 برای مقادیر عددی',
 	'CLI_CONFIG_DELETE_SUCCESS'			=> 'تنظیمات %s با موفقیت حذف شد.',

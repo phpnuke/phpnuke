@@ -90,6 +90,7 @@ $lang = array_merge($lang, array(
 	'RESULT_DAYS'			=> 'آرشیو',
 	'RESULT_SORT'			=> 'مرتب کردن نتایج براساس',
 	'RETURN_FIRST'			=> 'اولین کاراکترهای پست',
+	'RETURN_FIRST_EXPLAIN'	=> 'برای نمایش کامل پست 0 را وارد کنید.',
 	'GO_TO_SEARCH_ADV'	        => 'بازگشت به جستجوی پیشرفته',
 
 	'SEARCHED_FOR'				=> 'عبارت استفاده شده در جستجو',

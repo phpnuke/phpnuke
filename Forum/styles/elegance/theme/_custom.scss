@@ -4,3 +4,15 @@
 //	This file requires SASS compiler.
 //	You can find instructions here: http://www.artodia.com/phpbb-31-tutorials/compile-theme/
 //
+
+.stat-block {
+	@include section;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding: 4px 9px;
+	> h3:first-child {
+		@include section-heading;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+}

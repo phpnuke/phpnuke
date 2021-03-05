@@ -28,9 +28,10 @@ if (check_admin_permission($filename))
 
 	function points_groups()
 	{
-		global $db, $admin_file, $pagetitle;
+		global $db, $admin_file, $hooks;
 		
-		$pagetitle = _POINTS_GROUP_ADMIN;
+		$hooks->add_filter("set_page_title", function(){return array("points_groups" => _POINTS_GROUP_ADMIN);});
+		
 		$contents = '';
 		$contents .= GraphicAdmin();
 		
@@ -144,7 +145,7 @@ if (check_admin_permission($filename))
 
 	function group_edit($id)
 	{
-		global $db, $admin_file, $pagetitle;
+		global $db, $admin_file, $hooks;
 		
 		$id = intval($id);
 		$contents = '';
@@ -160,7 +161,7 @@ if (check_admin_permission($filename))
 		$description = filter($row['description']);
 		$points = intval($row['points']);
 
-		$pagetitle = _POINTS_GROUP_ADMIN." - ".$title;
+		$hooks->add_filter("set_page_title", function() use($title){return array("group_edit" => _POINTS_GROUP_ADMIN." - ".$title);});
 		
 		$contents .= GraphicAdmin();
 

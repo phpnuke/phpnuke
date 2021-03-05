@@ -216,8 +216,11 @@ $other_admin_configs['themes']['Mashhadteam-Caspian'] = array("title" => _CASPIA
 
 function get_caspian_posts_media()
 {
-	global $block_global_contents, $nuke_configs;
+	global $nuke_configs, $hooks;
 	
+	$block_global_contents = array();
+	$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
+
 	$all_medias = array();
 	$all_media_titles = array();
 	$all_audio_links = array();
@@ -230,59 +233,62 @@ function get_caspian_posts_media()
 	//fetch from text
 	$text = (isset($block_global_contents['bodytext'])) ? $block_global_contents['bodytext']:"";
 	
-	preg_match_all("#<a(.*)href=['|\"](.*)['|\"](.*)>(.*)</a>#isU", $text, $text_media);
-
-	if(isset($text_media[2]) && !empty($text_media[2]))
+	if($text != '')
 	{
-		$all_media_links = $text_media[2];
-		$all_media_titles = $text_media[4];
-		
-		foreach($all_media_links as $key => $media_link)
+		preg_match_all("#<a(.*)href=['|\"](.*)['|\"](.*)>(.*)</a>#isU", $text, $text_media);
+
+		if(isset($text_media[2]) && !empty($text_media[2]))
 		{
-			$media_link_name = str_replace(array("%5B","%5D","%20"),array("[","]"," "),$media_link);
-
-			$media_title_arr = explode("/", $media_link_name);
-			$media_title_full = end($media_title_arr);
+			$all_media_links = $text_media[2];
+			$all_media_titles = $text_media[4];
 			
-			$media_name_arr = explode(".", $media_link_name);
-			$ext = end($media_name_arr);
-			
-			if(!in_array($ext, ["mp3","ogg","oga","mp4","m4v"]))
-				continue;
-			
-			$media_title = strip_tags($all_media_titles[$key]);
-			$media_title = (strtolower($media_title) == "download") ? $block_global_contents['title']:$media_title;
-			$media_data = array($media_title, $media_link, $ext);
-
-			if(in_array($ext, array("mp3","ogg","oga")))
+			foreach($all_media_links as $key => $media_link)
 			{
-				$all_audio_links[$ext][] = $media_data;
+				$media_link_name = str_replace(array("%5B","%5D","%20"),array("[","]"," "),$media_link);
+
+				$media_title_arr = explode("/", $media_link_name);
+				$media_title_full = end($media_title_arr);
+				
+				$media_name_arr = explode(".", $media_link_name);
+				$ext = end($media_name_arr);
+				
+				if(!in_array($ext, ["mp3","ogg","oga","mp4","m4v"]))
+					continue;
+				
+				$media_title = strip_tags($all_media_titles[$key]);
+				$media_title = (strtolower($media_title) == "download") ? $block_global_contents['title']:$media_title;
+				$media_data = array($media_title, $media_link, $ext);
+
+				if(in_array($ext, array("mp3","ogg","oga")))
+				{
+					$all_audio_links[$ext][] = $media_data;
+				}
+				if(in_array($ext, array("mp4","m4v")))
+				{
+					$all_video_links[$ext][] = $media_data;
+				}
+				
+				$all_medias[$media_link] = $media_data;
 			}
-			if(in_array($ext, array("mp4","m4v")))
-			{
-				$all_video_links[$ext][] = $media_data;
-			}
-			
-			$all_medias[$media_link] = $media_data;
 		}
-	}
-	
-	if(!empty($all_audio_links))
-	{
-		ksort($all_audio_links);
-		$all_audio_links_arr = array_values($all_audio_links);
 		
-		$first_audio = (isset($all_audio_links_arr[0][0][1])) ? str_replace(" ","%20", $all_audio_links_arr[0][0][1]):"";
-		$first_atitle = (isset($all_audio_links_arr[0][0][0])) ? $all_audio_links_arr[0][0][0]:"";
-	}
+		if(!empty($all_audio_links))
+		{
+			ksort($all_audio_links);
+			$all_audio_links_arr = array_values($all_audio_links);
+			
+			$first_audio = (isset($all_audio_links_arr[0][0][1])) ? str_replace(" ","%20", $all_audio_links_arr[0][0][1]):"";
+			$first_atitle = (isset($all_audio_links_arr[0][0][0])) ? $all_audio_links_arr[0][0][0]:"";
+		}
 
-	if(!empty($all_video_links))
-	{
-		ksort($all_video_links);	
-		$all_video_links_arr = array_values($all_video_links);
-		
-		$first_video = (isset($all_video_links_arr[0][0][1])) ? str_replace(" ","%20", $all_video_links_arr[0][0][1]):"";
-		$first_vtitle = (isset($all_video_links_arr[0][0][0])) ? $all_video_links_arr[0][0][0]:"";
+		if(!empty($all_video_links))
+		{
+			ksort($all_video_links);	
+			$all_video_links_arr = array_values($all_video_links);
+			
+			$first_video = (isset($all_video_links_arr[0][0][1])) ? str_replace(" ","%20", $all_video_links_arr[0][0][1]):"";
+			$first_vtitle = (isset($all_video_links_arr[0][0][0])) ? $all_video_links_arr[0][0][0]:"";
+		}
 	}
 	//fetch from text
 	
@@ -329,6 +335,8 @@ function get_caspian_posts_media()
 	
 	return array($all_medias, $poster, $first_audio, $first_video, $first_atitle, $first_vtitle);
 }
+
+$hooks->add_filter("get_theme_media_function", function($theme_get_media_function){return "get_caspian_posts_media";}, 10);
 
 class caspian_nav_menus extends Walker
 {

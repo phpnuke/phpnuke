@@ -34,22 +34,37 @@ $friendly_links = array(
 	"index.php\?timthumb=true&(.*)$" => array("parse_timthumbs_str"),
 );
 
-$nuke_configs['links_function']['comments'] = '';
+function default_admin_top_menus($admin_top_menus)
+{
+	global $admin_file;
+	$admin_top_menus = array(
+		"contents" => array("id" => 'contents', "parent_id" => 0, "title" => _CONTENTS, "url" => "#", "icon" => "pencil"),
+		"categories" => array("id" => 'categories', "parent_id" => 0, "title" => _CATEGORIES, "url" => "#", "icon" => "pencil"),
+		"recives" => array("id" => 'recives', "parent_id" => 0, "title" => _RECIVESS, "url" => "#", "icon" => "pencil"),
+		"comments" => array("id" => 'comments', "parent_id" => 0, "title" => _COMMENTS, "url" => "".$admin_file.".php?op=comments", "icon" => "pencil"),
+	);
+	
+	$admin_top_menus['recives']['children'][] = array(
+		"id" => 'reports', 
+		"parent_id" => 'recives', 
+		"title" => _REPORTS, 
+		"url" => "".$admin_file.".php?op=reports", 
+		"icon" => ""
+	);
+	return $admin_top_menus;
+}
+$hooks->add_filter("admin_top_menus", 'default_admin_top_menus', 10);
 
-$admin_top_menus = array(
-	"contents" => array("id" => 'contents', "parent_id" => 0, "title" => "_CONTENTS", "url" => "#", "icon" => "pencil"),
-	"categories" => array("id" => 'categories', "parent_id" => 0, "title" => "_CATEGORIES", "url" => "#", "icon" => "pencil"),
-	"recives" => array("id" => 'recives', "parent_id" => 0, "title" => "_RECIVESS", "url" => "#", "icon" => "pencil"),
-	"comments" => array("id" => 'comments', "parent_id" => 0, "title" => "_COMMENTS", "url" => "".$admin_file.".php?op=comments", "icon" => "pencil"),
-);
-
-$admin_top_menus['recives']['children'][] = array(
-	"id" => 'reports', 
-	"parent_id" => 'recives', 
-	"title" => "_REPORTS", 
-	"url" => "".$admin_file.".php?op=reports", 
-	"icon" => ""
-);
+function default_headers($headers)
+{
+	$headers = array_merge($headers, array(
+		"Content-Type" => "text/html; charset=utf-8"
+		//"Cache-Control" => "public, max-age=2592000"
+	));
+	
+	return $headers;
+}
+$hooks->add_filter("site_headers", 'default_headers', 10);
 
 define("ADMINS_MENU_TABLE",				$pn_prefix."_admins_menu");
 define("ARTICLES_TABLE",				$pn_prefix."_posts");

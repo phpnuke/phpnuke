@@ -9,7 +9,7 @@ $button-outer-height:	$button-inner-height + $button-border-width * 2;
 	padding: $button-top-padding $button-side-padding;
 	font-size: $button-font-size;
 	font-weight: 600;
-	font-family: sans, "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;		
+	font-family: "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;		
 	line-height: $button-line-height;
 	text-align: center;
 	white-space: nowrap;
@@ -267,7 +267,7 @@ $post-dropdown-glyphs-font-size:	floor($dropdown-content-font-size / 2) * 2;
 // Browser-specific tweaks
 button::-moz-focus-inner {
 	padding: 0;
-	border: 0
+	border: 0;
 }
 
 

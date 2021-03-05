@@ -167,7 +167,7 @@
 		margin-right: -5px;
 	}
 
-	.cp-main .forabg, .cp-main .forumdb, .cp-main .post, .cp-main .panel {
+	.cp-main .forabg, .cp-main .forumbg, .cp-main .post, .cp-main .panel {
 		border-radius: 0;
 	}
 
@@ -368,7 +368,7 @@
 	}
 
 	fieldset dd, fieldset.fields1 dd, fieldset.fields2 dd {
-		margin-left: 0px;
+		margin-left: 0;
 	}
 
 	textarea, dd textarea, .message-box textarea {
@@ -492,8 +492,7 @@
 		width: auto;
 		border-width: 0 0 1px 0;
 		padding-bottom: 5px;
-		margin: 0;
-		margin-bottom: 5px;
+		margin: 0 0 5px 0;
 		min-height: 40px;
 		overflow: hidden;
 		z-index: auto !important;
@@ -624,12 +623,14 @@
 	}
 }
 
-@media (min-width: 700px) {
-	.postbody { width: 70%; }
-}
+@media (min-width: 701px) {
+	.postbody {
+		width: calc(100% - 150px - 1px - 16px);
+	}
 
-@media (min-width: 850px) {
-	.postbody { width: 76%; }
+	.postprofile {
+		width: 150px;
+	}
 }
 
 @media (min-width: 701px) and (max-width: 950px) {

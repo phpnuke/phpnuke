@@ -48,6 +48,9 @@ if (check_admin_permission($filename, true))
 			case"comments":
 				$atitle2=_COMMENTS;
 			break;
+			case"groups":
+				$atitle2=_GROUPS;
+			break;
 			case"language":
 				$atitle2=_LANGUAGE;
 			break;
@@ -69,7 +72,7 @@ if (check_admin_permission($filename, true))
 			case"patch":
 				$atitle2=sprintf(_PATCH, $nuke_configs['Version_Num']);
 			break;
-			case"referers":
+			case"referrers":
 				$atitle2=_REFERRERS;
 			break;
 			case"reports":
@@ -90,12 +93,15 @@ if (check_admin_permission($filename, true))
 	
 	function displayadmins($user_id=0)
 	{
-		global $admin, $pagetitle, $db, $users_system, $nuke_configs, $admin_file, $nuke_modules_cacheData, $nuke_admins_menu_cacheData, $nuke_authors_cacheData;
+		global $admin, $hooks, $db, $users_system, $nuke_configs, $admin_file, $nuke_admins_menu_cacheData;
+		
+		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 		
 		if(!isset($main_menus));
 			include("admin/links.php");	
-			
-		$pagetitle = _AUTHORS_AND_ADMINS;
+		
+		$hooks->add_filter("set_page_title", function(){return array("displayadmins" => _AUTHORS_AND_ADMINS);});
+		
 		$contents = '';
 		$contents .= GraphicAdmin();
 		if (is_God())
@@ -445,11 +451,16 @@ if (check_admin_permission($filename, true))
 
 	function modifyadmin($chng_aid)
 	{
-		global $admin, $pagetitle, $db, $nuke_configs, $admin_file, $nuke_modules_cacheData, $nuke_admins_menu_cacheData, $nuke_authors_cacheData;
+		global $admin, $hooks, $db, $nuke_configs, $admin_file, $nuke_admins_menu_cacheData;
+
+		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+		$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 
 		if(!isset($main_menus));
-			include("admin/links.php");		
-		$pagetitle = _EDIT_ADMIN." : $chng_aid";
+			include("admin/links.php");	
+			
+		$hooks->add_filter("set_page_title", function() use($chng_aid){return array("modifyadmin" => _EDIT_ADMIN." : $chng_aid");});
+		
 		$contents = '';
 		if (is_God())
 		{
@@ -658,7 +669,10 @@ if (check_admin_permission($filename, true))
 	
 	function updateadmin($author_fields)
 	{
-		global $admin, $aid, $db, $admin_file, $nuke_configs, $nuke_modules_cacheData, $nuke_admins_menu_cacheData, $nuke_authors_cacheData;
+		global $admin, $aid, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		
+		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+		
 		$contents = '';
 		if (is_God())
 		{
@@ -836,13 +850,17 @@ if (check_admin_permission($filename, true))
 
 	function addauthor($author_fields)
 	{
-		global $db, $aid, $pagetitle, $admin_file, $nuke_configs, $nuke_modules_cacheData, $nuke_admins_menu_cacheData;
+		global $db, $aid, $hooks, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		
+		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 		
 		if(isset($author_fields) && !empty($author_fields))
 			extract($author_fields);
 		
 		$add_aid = substr("$add_aid", 0,25);
-		$pagetitle = _ADD_ADMIN." : $add_aid";
+		
+		$hooks->add_filter("set_page_title", function() use($add_aid){return array("addauthor" => _ADD_ADMIN." : $add_aid");});
+		
 		$contents = '';
 		if (!($add_aid && $add_email && $add_pwd))
 		{
@@ -954,7 +972,9 @@ if (check_admin_permission($filename, true))
 	
 	function remove_permission($admin_id, $amid, $mid, $type)
 	{
-		global $db, $aid, $admin_file, $nuke_configs, $nuke_modules_cacheData, $nuke_admins_menu_cacheData;
+		global $db, $aid, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		
+		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 		
 		$admin_id = trim($admin_id);
 		
@@ -992,8 +1012,10 @@ if (check_admin_permission($filename, true))
 	function deladmin($del_aid)
 	{
 		csrfProtector::authorisePost(true);
-		global $db, $pagetitle, $admin_file, $nuke_configs, $nuke_modules_cacheData, $nuke_admins_menu_cacheData;
-		$pagetitle = _DELETE_ADMIN." : $del_aid";
+		global $db, $hooks, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		
+		$hooks->add_filter("set_page_title", function() use($del_aid){return array("addauthor" => _DELETE_ADMIN." : $del_aid");});
+		
 		$contents = '';
 		$del_aid = trim($del_aid);
 		$contents .= GraphicAdmin();
@@ -1009,13 +1031,17 @@ if (check_admin_permission($filename, true))
 	function deladmin2($del_aid)
 	{
 		csrfProtector::authorisePost(true);
-		global $admin, $pagetitle, $db, $admin_file, $nuke_configs, $nuke_modules_cacheData, $nuke_admins_menu_cacheData, $nuke_authors_cacheData;
-		$pagetitle = _DELETE_ADMIN." : $del_aid";
+		global $admin, $hooks, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+
+		$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+		
+		$hooks->add_filter("set_page_title", function() use($del_aid){return array("addauthor" => _DELETE_ADMIN." : $del_aid");});
 		$contents = '';
 		if (is_God())
 		{
 			$del_aid = substr("$del_aid", 0,25);
 			
+			$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 			foreach($nuke_modules_cacheData as $nuke_modules_info)
 			{
 				if($nuke_modules_info['title'] == "Articles")
@@ -1082,7 +1108,8 @@ if (check_admin_permission($filename, true))
 	
 	function assignarticles($del_aid, $newaid)
 	{
-		global $admin, $db, $admin_file, $nuke_configs, $nuke_modules_cacheData, $nuke_admins_menu_cacheData, $nuke_authors_cacheData;
+		global $admin, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		
 		$del_aid = trim($del_aid);
 		
 		$numrows = $db->table(POSTS_TABLE)
@@ -1115,7 +1142,7 @@ if (check_admin_permission($filename, true))
 	function deladminconf($del_aid)
 	{
 		csrfProtector::authorisePost(true);
-		global $admin, $db, $admin_file, $nuke_configs, $nuke_modules_cacheData, $nuke_admins_menu_cacheData, $nuke_authors_cacheData;
+		global $admin, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
 		$del_aid = trim($del_aid);
 
 		$db->table(AUTHORS_TABLE)
@@ -1149,7 +1176,7 @@ if (check_admin_permission($filename, true))
 		}
 		unset($admins);
 		
-		
+		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 		foreach($nuke_modules_cacheData as $nuke_modules_mid => $nuke_modules_info)
 		{
 			if($nuke_modules_info['admins'] != ""){

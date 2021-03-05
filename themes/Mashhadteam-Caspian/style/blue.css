@@ -51,3 +51,6 @@ footer .GSCopyright{background: #001924;}
 footer .GSCopyright a{color:#088abd !important;}
 footer .GSCopyright a:hover{color:#07699e!important;}
 /* End Footer */
+
+.dropdown-menu {background:#21507a !important;}
+.dropdown-menu li a:hover {background:#0486ca !important;}

@@ -166,10 +166,9 @@ class users_system{
 		$from 				= $Last_New * ($p-1);
 		$db->query("SET NAMES '".$this->collation."'");
 		
-		$get_last_topic_res = $db->query("SELECT t.topic_id, t.forum_id, t.topic_title, t.topic_views, t.topic_poster, t.topic_first_poster_name, t.topic_last_poster_id, t.topic_last_poster_name, t.topic_last_poster_colour, t.topic_last_post_id, t.topic_last_post_time, 
-		(SELECT COUNT(p.post_id) FROM ".$this->posts_table." AS p WHERE p.topic_id = t.topic_id) AS topic_replies
-		FROM ".$this->topics_table." AS t
-		ORDER BY topic_last_post_id DESC LIMIT $from,$Last_New"
+		$get_last_topic_res = $db->query("SELECT topic_id, forum_id, topic_title, topic_views, topic_poster, topic_first_poster_name, topic_last_poster_id, topic_last_poster_name, topic_last_poster_colour, topic_last_post_id, topic_last_post_time, topic_posts_approved
+		FROM ".$this->topics_table."
+		ORDER BY topic_last_post_time DESC LIMIT $from,$Last_New"
 		);
 		
 		$content .= '
@@ -197,7 +196,7 @@ class users_system{
 					$topic_id 			= intval($get_last_topic['topic_id']);
 					$poster_id 			= intval($get_last_topic['topic_last_poster_id']);
 					$post_time 			= nuketimes($get_last_topic['topic_last_post_time'], false, false, false, 1);
-					$topic_replies 		= intval($get_last_topic['topic_replies']);
+					$topic_replies 		= intval($get_last_topic['topic_posts_approved']);
 					$topic_views 		= intval($get_last_topic['topic_views']);
 					$first_poster 		= filter($get_last_topic['topic_first_poster_name'], "nohtml");
 					$username 			= filter($get_last_topic['topic_last_poster_name'], "nohtml");
@@ -213,7 +212,7 @@ class users_system{
 							<a href="'.$topicurl.'"><img border="0" src="'.$nuke_configs['nukeurl'].'themes/'.$nuke_configs['ThemeSel'].'/images/MTForumBlock/FBarrow.gif" />&nbsp;'.$topic_title.'</a>
 						</td>
 						<td class="hidden-xs">'.$first_poster.'</td>
-						<td class="hidden-xs">'.$topic_replies.'</td>
+						<td class="hidden-xs">'.$topic_posts_approved.'</td>
 						<td class="hidden-xs">'.$topic_views.'</td>
 						<td class="hidden-xs"><font style="color:#'.$group_colour.';">'.$username.'</font></td>
 					</tr>';
@@ -232,7 +231,7 @@ class users_system{
 	public function user_statistics()
 	{
 		
-		global $db, $nuke_configs, $block_global_contents, $HijriCalendar, $userinfo, $users_system, $currentpage, $pn_dbcharset, $cache;
+		global $db, $nuke_configs, $HijriCalendar, $userinfo, $users_system, $currentpage, $pn_dbcharset, $cache;
 
 		$showpms = 1; //1 to Show Private Messages data - 0 is off
 		$showmost = 1; //1 to Show Mostonline data - 0 is off
@@ -1586,11 +1585,12 @@ class users_system{
 		// if session id is set
 		if (!empty($this->session_id))
 		{
-			$sql = 'SELECT u.*, s.*, g.*
+			/*$sql = 'SELECT u.*, s.*, g.*
 				FROM ' . $this->sessions_table . ' s, ' . $this->users_table . ' u, ' . $this->groups_table . ' g
 				WHERE s.session_id = ?
 					AND u.user_id = s.session_user_id
-					AND g.group_id = u.group_id';
+					AND g.group_id = u.group_id';*/
+			$sql = "SELECT u.*, s.*, g.* FROM ".$this->sessions_table." AS s LEFT JOIN ".$this->users_table." AS u ON u.user_id = s.session_user_id LEFT JOIN ".$this->groups_table." AS g ON g.group_id = u.group_id WHERE s.session_id = ?";
 			$result = $db->query($sql, array($this->session_id));
 			$this->data = isset($result->results()[0]) ? $result->results()[0]:array();
 			$this->get_profile_fields($this->data['user_id']);
@@ -1804,9 +1804,9 @@ class users_system{
 			{
 				// We give bots always the same session if it is not yet expired.
 				$sql = 'SELECT u.*, s.*, g.*
-					FROM ' . $this->users_table . ' u
-					LEFT JOIN ' . $this->sessions_table . ' s ON (s.session_user_id = u.user_id)
-					LEFT JOIN ' . $this->groups_table . ' g ON (g.group_id = u.group_id)
+					FROM ' . $this->users_table . ' AS u
+					LEFT JOIN ' . $this->sessions_table . ' AS s ON (s.session_user_id = u.user_id)
+					LEFT JOIN ' . $this->groups_table . ' AS g ON (g.group_id = u.group_id)
 					WHERE u.user_id = ?';
 				$result = $db->query($sql, array((int) $bot));
 			}
@@ -2099,7 +2099,8 @@ class users_system{
 		}
 
 		// Only update session DB a minute or so after last update or if page changes
-		if ($this->time_now - $this->data['session_time'] > 60 || ($this->update_session_page && $this->data['session_page'] != $this->page['page']))
+		//if ($this->time_now - $this->data['session_time'] > 60 || ($this->update_session_page && $this->data['session_page'] != $this->page['page']))
+		if ($this->time_now - $this->data['session_time'] > 60)
 		{
 			$sql_ary = array('session_time' => $this->time_now);
 

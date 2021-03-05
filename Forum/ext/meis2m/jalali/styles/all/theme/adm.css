@@ -1,0 +1,92 @@
+@font-face {
+font-family: Vazir;
+  src: url('../../../fonts/Vazir-FD/Vazir-FD.eot'); /* IE9 Compat Modes */
+  src: url('../../../fonts/Vazir-FD/Vazir-FD.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+url('../../../fonts/Vazir-FD/Vazir-FD.woff2') format('woff2'), /* Super Modern Browsers */
+url('../../../fonts/Vazir-FD/Vazir-FD.woff') format('woff'), /* Pretty Modern Browsers */
+url('../../../fonts/Vazir-FD/Vazir-FD.ttf')  format('truetype'); /* Safari, Android, iOS */
+font-weight: normal;
+}
+
+@font-face {
+font-family: Vazir;
+  src: url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.eot'); /* IE9 Compat Modes */
+  src: url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.woff2') format('woff2'), /* Super Modern Browsers */
+url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.woff') format('woff'), /* Pretty Modern Browsers */
+url('../../../fonts/Vazir-Bold-FD/Vazir-Bold-FD.ttf')  format('truetype'); /* Safari, Android, iOS */
+font-weight: bold;
+}
+
+@font-face {
+font-family: Vazir;
+  src: url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.eot'); /* IE9 Compat Modes */
+  src: url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.woff2') format('woff2'), /* Super Modern Browsers */
+url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.woff') format('woff'), /* Pretty Modern Browsers */
+url('../../../fonts/Vazir-Light-FD/Vazir-Light-FD.ttf')  format('truetype'); /* Safari, Android, iOS */
+font-weight: 300;
+}
+
+* {
+	font-family: Vazir, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+body {
+	
+	font-family: Vazir, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+h1 {
+	font-family: Vazir, "Trebuchet MS", Helvetica, sans-serif;
+}
+
+h2, caption {
+	font-family: Vazir, "Trebuchet MS", Helvetica, sans-serif;
+}
+
+h3, h4 {
+	font-family: Vazir, "Trebuchet MS", Helvetica, sans-serif;
+}
+
+#page-header h1 {
+	font-family: Vazir, "Trebuchet MS",Helvetica,sans-serif;
+}
+
+#tabs {
+	font-family: Vazir, Arial, Helvetica, sans-serif;
+}
+
+#menu .header {
+	font-family: Vazir, Tahoma, Helvetica, sans-serif;
+}
+
+legend {
+	font-family: Vazir, Tahoma,arial,Verdana,Sans-serif;
+}
+
+input, textarea {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+optgroup, select {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+textarea {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+}
+
+dl {
+	font-family: Vazir, Verdana, Helvetica, Arial, sans-serif;
+	font-size: 1.00em;
+}
+
+a.button1, input.button1,
+a.button2, input.button2 {
+	font-family: Vazir, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+}
+
+.successbox h3, .errorbox h3 {
+	font-family: Vazir, "Lucida Grande",Verdana,Helvetica,Arial,sans-serif;
+}

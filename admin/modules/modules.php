@@ -25,7 +25,7 @@ if (check_admin_permission($filename))
 {
 	function modules()
 	{
-		global  $db, $pagetitle, $nuke_configs, $admin_file;
+		global  $db, $hooks, $nuke_configs, $admin_file;
 		$result = $db->table(MODULES_TABLE)
 						->order_by(['mid' => 'ASC'])
 						->select();
@@ -41,22 +41,11 @@ if (check_admin_permission($filename))
 			}
 		}
 		
-		$pagetitle = _MODULES_ADMIN;
+		$hooks->add_filter("set_page_title", function(){return array("modules" => _MODULES_ADMIN);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		
-		$handle=opendir('modules');
-		while ($file = readdir($handle))
-		{
-			if($file !="." && $file !=".." && is_dir("modules/$file") && file_exists("modules/$file/index.php"))
-			{
-				$moduleslist[] = $file;
-			}
-		}
-		closedir($handle);
-		$moduleslist = array_filter($moduleslist);
-		sort($moduleslist);
-		
+		$moduleslist = get_modules_list();		
 		
 		$modules_changed = false;
 		
@@ -370,7 +359,7 @@ if (check_admin_permission($filename))
 
 	function module_edit($mid, $submit='', $module_data=array())
 	{
-		global  $pagetitle, $admin_file, $db, $nuke_configs, $nuke_modules_boxes_parts;
+		global  $hooks, $admin_file, $db, $nuke_configs;
 		$mid = intval($mid);
 
 		$modules_row = $db->table(MODULES_TABLE)
@@ -408,6 +397,7 @@ if (check_admin_permission($filename))
 		}
 
 		$pagetitle = _MODULES_ADMIN." - ".sprintf(_EDITMODULETATA, $modules_row['title']);
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("module_edit" => $pagetitle);});
 			
 		if ($modules_row['main_module'] == 1) { $a = " - "._INHOME.""; } else { $a = ""; }
 		
@@ -417,7 +407,10 @@ if (check_admin_permission($filename))
 		$lang_titles = ($modules_row['lang_titles'] != "") ? phpnuke_unserialize(stripslashes($modules_row['lang_titles'])):array();
 		$mod_permissions = ($modules_row['mod_permissions'] != "") ? explode(",", $modules_row['mod_permissions']):array();
 
+		$nuke_modules_boxes_parts = array();
 		$module_parts_list = array();
+		
+		$nuke_modules_boxes_parts = $hooks->apply_filters("modules_boxes_parts", $nuke_modules_boxes_parts);
 		
 		if(isset($nuke_modules_boxes_parts[$modules_row['title']]) && is_array($nuke_modules_boxes_parts[$modules_row['title']]) && !empty($nuke_modules_boxes_parts[$modules_row['title']]))
 		{
@@ -521,9 +514,9 @@ if (check_admin_permission($filename))
 		include("footer.php");
 	}
 	
-	function module_edit_boxess($mid, $module_part='', $submit='', $module_boxes='')
+	function module_edit_boxess($mid, $module_part='', $submit='', $module_boxes='', $special_page='')
 	{
-		global  $pagetitle, $admin_file, $db, $nuke_configs;
+		global  $hooks, $admin_file, $db, $nuke_configs;
 		$mid = intval($mid);	
 		
 		$modules_row = $db->table(MODULES_TABLE)
@@ -531,21 +524,69 @@ if (check_admin_permission($filename))
 			->first();
 		
 		$all_module_boxes = $modules_row['module_boxes'];
-		$all_module_boxes = ($modules_row['module_boxes'] != '') ? phpnuke_unserialize(stripslashes($all_module_boxes)):array();
+		
+		if($special_page != '')
+		{
+			$special_page_arr = explode("_", $special_page);
+			$mresult = $db->table(POSTS_META_TABLE)
+							->where('meta_part', 'module_boxes')
+							->where('post_id', $special_page_arr[1])
+							->where('meta_key', $special_page_arr[0])
+							->select();
+			if($mresult->count() > 0)
+			{
+				$row = $mresult->results()[0];
+				$all_module_boxes = $row['meta_value'];
+			}
+		}
+		
+		$all_module_boxes = ($all_module_boxes != '') ? phpnuke_unserialize(stripslashes($all_module_boxes)):array();
 		$module_part = (isset($module_part) && $module_part != '') ? $module_part:"index";
 
 		if(isset($submit) && $submit != '' && isset($module_boxes) && $module_boxes != '')
 		{
 			$module_part = str_replace(".php","", $module_part);
 			$all_module_boxes[$module_part] = $module_boxes;
-			$all_module_boxes = phpnuke_serialize($all_module_boxes);
 			
-			$db->table(MODULES_TABLE)
-				->where('mid', $mid)
-				->update([
-					'module_boxes' => $all_module_boxes,
-				]);
-				
+			if($special_page != '')
+			{
+				$special_page_arr = explode("_", $special_page);
+				$mresult = $db->table(POSTS_META_TABLE)
+								->where('meta_part', 'module_boxes')
+								->where('post_id', $special_page_arr[1])
+								->where('meta_key', $special_page_arr[0])
+								->select();
+
+				if($mresult->count() > 0)
+				{
+					$db->table(POSTS_META_TABLE)
+						->where('meta_part', 'module_boxes')
+						->where('post_id', $special_page_arr[1])
+						->where('meta_key', $special_page_arr[0])
+						->update([
+							'meta_value' => phpnuke_serialize($all_module_boxes),
+						]);
+				}
+				else
+				{
+					$db->table(POSTS_META_TABLE)
+						->insert([
+							'meta_part' => 'module_boxes',
+							'post_id' => $special_page_arr[1],
+							'meta_key' => $special_page_arr[0],
+							'meta_value' => phpnuke_serialize($all_module_boxes),
+						]);
+				}
+			}
+			else
+			{
+				$db->table(MODULES_TABLE)
+					->where('mid', $mid)
+					->update([
+						'module_boxes' => phpnuke_serialize($all_module_boxes),
+					]);
+			}
+			
 			cache_system('nuke_modules');
 			add_log(sprintf(_EDITMODULEBOXESLAYOUTS, $modules_row['title']), 1);
 			Header("Location: ".$admin_file.".php?op=module_edit&mid=$mid");
@@ -553,8 +594,10 @@ if (check_admin_permission($filename))
 		}		
 			
 		$nuke_blocks_cacheData = get_cache_file_contents('nuke_blocks');
+		$nuke_modules_boxes_cacheData = get_cache_file_contents('nuke_modules_boxes');
 		
 		$pagetitle = _MODULES_ADMIN." - ".sprintf(_EDITMODULEBOXESLAYOUTS, $modules_row['title']);
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("module_edit_boxess" => $pagetitle);});
 
 		$module_boxes_def = (isset($all_module_boxes[$module_part])) ? $all_module_boxes[$module_part]:'';
 		
@@ -688,6 +731,7 @@ if (check_admin_permission($filename))
 		<input type='hidden' name='module_boxes' id='module_boxes' value='$module_boxes_def'>
 		<input type='hidden' name='mid' value='$mid'>
 		<input type='hidden' name='module_part' value='$module_part'>
+		<input type='hidden' name='special_page' value='$special_page'>
 		<input type='hidden' name='op' value='module_edit_boxess'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		</form></div>
@@ -762,6 +806,7 @@ if (check_admin_permission($filename))
 	$activemodule = (isset($activemodule)) ? intval($activemodule):0;
 	$module_boxes = (isset($module_boxes)) ? $module_boxes:'';
 	$module_part = (isset($module_part)) ? filter($module_part, "nohtml"):'';
+	$special_page = (isset($special_page)) ? filter($special_page, "nohtml"):'';
 	$submit = (isset($submit)) ? filter($submit, "nohtml"):'';
 	$op = (isset($op)) ? filter($op, "nohtml"):'';
 	
@@ -785,7 +830,7 @@ if (check_admin_permission($filename))
 		break;
 		
 		case "module_edit_boxess":
-			module_edit_boxess($mid, $module_part, $submit, $module_boxes);
+			module_edit_boxess($mid, $module_part, $submit, $module_boxes, $special_page);
 		break;
 	}
 }

@@ -36,13 +36,19 @@ define("_CREDIT_TRANSACTION_TRANSFER_D", 3);
 define("_CREDIT_TRANSACTION_TRANSFER_W", 4);
 define("_CREDIT_TRANSACTION_SUSPEND", 5);
 
-$default_currency = array(
-	"USD" => "_CREDITS_CUR_USD",
-	"EUR" => "_CREDITS_CUR_EUR",
-	"GBP" => "_CREDITS_CUR_GBP",
-	"AED" => "_CREDITS_CUR_AED",
-	"KWD" => "_CREDITS_CUR_KWD",
-);
+function credits_default_currency($default_currency)
+{
+	$default_currency = array_merge($default_currency, array(
+		"USD" => _CREDITS_CUR_USD,
+		"EUR" => _CREDITS_CUR_EUR,
+		"GBP" => _CREDITS_CUR_GBP,
+		"AED" => _CREDITS_CUR_AED,
+		"KWD" => _CREDITS_CUR_KWD,
+	));
+	
+	return $default_currency;
+}
+$hooks->add_filter("credits_currencies", "credits_default_currency", 10);
 
 function user_credits_blocked($user_id=0)
 {
@@ -62,7 +68,7 @@ function user_credits_blocked($user_id=0)
 
 function user_credits_allowed($user_id=0)
 {
-	global $db, $userinfo, $users_system;
+	global $db, $userinfo, $users_system, $hooks;
 	
 	$user_credit = 0;
 		
@@ -87,6 +93,9 @@ function user_credits_allowed($user_id=0)
 		return 0;
 	
 	$credits_diff = $user_credit-$total_blocked_credit[0];
+	
+	$credits_diff = $hooks->apply_filters("user_credits_allowed", $credits_diff, $user_id);
+	
 	if($credits_diff > 0)
 		return $credits_diff;
 	else
@@ -113,7 +122,7 @@ function user_credit_update($user_id, $new_credit)
 
 function credit_get_gateways_list($html=false)
 {
-	global $module_name, $pn_credits_config;
+	global $module_name, $pn_credits_config, $hooks;
 	$create_options = array();
 	
 	$gateways_list = get_dir_list("modules/$module_name/includes/gateways", 'files', true, array('.',',,','.htaccess','index.html'));
@@ -134,8 +143,6 @@ function credit_get_gateways_list($html=false)
 					$hav_gateway = true;
 					$create_options[$gateway_class->gateway_name] = array("title" => $gateway_class->gateway_title, "icon" => $gateway_class->gateway_icon);
 				}
-				else
-					$create_options[] = $gateway_class->gateway_name;
 			}
 		}
 	}
@@ -152,11 +159,14 @@ function credit_get_gateways_list($html=false)
 	}
 	else
 		$create_options = '';
+	
+	$create_options = $hooks->apply_filters("credit_get_gateways_list", $create_options, $html);
 	return $create_options;
 }
 
 function credits_get_type_desc($type)
 {
+	global $hooks;
 	$type_desc = '';
 	switch($type)
 	{
@@ -177,11 +187,14 @@ function credits_get_type_desc($type)
 		break;
 	}
 	
+	$type_desc = $hooks->apply_filters("credits_get_type_desc", $type_desc, $type);
+	
 	return $type_desc;
 }
 
 function credits_get_type_color($type)
 {
+	global $hooks;
 	$type_color = '000000';
 	
 	switch($type)
@@ -198,12 +211,14 @@ function credits_get_type_color($type)
 			$type_color = "orange";
 		break;
 	}
+	$type_color = $hooks->apply_filters("credits_get_type_color", $type_color, $type);
 	
 	return $type_color;
 }
 
 function credits_get_type_icon($type)
 {
+	global $hooks;
 	$type_icon = '+';
 	
 	switch($type)
@@ -220,13 +235,14 @@ function credits_get_type_icon($type)
 			$type_icon = "";
 		break;
 	}
+	$type_icon = $hooks->apply_filters("credits_get_type_icon", $type_icon, $type);
 	
 	return $type_icon;
 }
 
 function _credit_view($tid, $in_admin = false)
 {
-	global $db, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $search_data, $users_system;
+	global $db, $hooks, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $search_data, $users_system;
 	
 	$contents = '';
 	
@@ -325,6 +341,7 @@ function _credit_view($tid, $in_admin = false)
 		if($row['order_link'] != '')
 			$details['order_link'] = $row['order_link'];
 		
+		$details = $hooks->apply_filters("credits_view_details", $details, $tid);
 		
 		if($in_admin)
 		{
@@ -390,7 +407,7 @@ function _credit_view($tid, $in_admin = false)
 
 function _credits_list($sort = 'DESC', $order_by = '', $entries_per_page = 20, $page = 1, $in_admin = false)
 {
-	global $db, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $search_data, $status, $pn_Cookies, $users_system;
+	global $db, $hooks, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $search_data, $status, $pn_Cookies, $users_system;
 	
 	$link_to_more = "";
 	$where = array();
@@ -521,6 +538,9 @@ function _credits_list($sort = 'DESC', $order_by = '', $entries_per_page = 20, $
 		}
 	}
 	
+	$where = $hooks->apply_filters("credits_list_where", $where);
+	$params = $hooks->apply_filters("credits_list_params", $params);
+	
 	$where = array_filter($where);
 	$where = (!empty($where)) ? "WHERE ".implode(" AND ", $where):'';
 	$sort = ($sort != '' && in_array($sort, array("ASC","DESC"))) ? $sort:"DESC";
@@ -543,12 +563,14 @@ function _credits_list($sort = 'DESC', $order_by = '', $entries_per_page = 20, $
 		$total_rows = $rows[0]['total_rows'];
 	}
 	
+	$rows = $hooks->apply_filters("credits_list_rows", $rows);
+	
 	return array("rows" => $rows, "total_rows" => $total_rows, "link_to_more" => $link_to_more);
 }
 
 function credits_settings()
 {
-	global $nuke_configs, $db, $admin_file, $pn_credits_config, $default_currency;
+	global $nuke_configs, $db, $hooks, $admin_file, $pn_credits_config;
 	
 	$contents = '';
 	$pn_credits_config = (isset($pn_credits_config) && !empty($pn_credits_config)) ? $pn_credits_config:((isset($nuke_configs['pn_credits']) && $nuke_configs['pn_credits'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['pn_credits'])):array());
@@ -616,6 +638,8 @@ function credits_settings()
 		);
 	}
 	
+	$default_currency = $hooks->apply_filters("credits_currencies", array());
+	
 	foreach($all_currencies as $key => $currency_data)
 	{
 		$remove = (isset($default_currency[$currency_data['code']])) ? "":"&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>";
@@ -662,6 +686,8 @@ function credits_settings()
 			});
 		});
 	</script>";
+	
+	$contents = $hooks->apply_filters("credits_settings_contents", $contents);
 	die($contents);		
 }
 
@@ -686,9 +712,78 @@ function credits_currency_cal($amount, $in_currency='')
 
 $other_admin_configs['credits_settings'] = array("title" => _CREDITS_SETTINGS, "function" => "credits_settings", "God" => false);
 
-$nuke_modules_boxes_parts[$this_module_name] = array(
-	"list" => "_CREDITS_LIST",
-	"form" => "_CREDITS_FORM",
-);
+function credits_boxes_parts($nuke_modules_boxes_parts)
+{
+	$nuke_modules_boxes_parts['Credits'] = array(
+		"list" => _CREDITS_LIST,
+		"form" => _CREDITS_FORM,
+	);
+	
+	return $nuke_modules_boxes_parts;
+}
 
+$hooks->add_filter("modules_boxes_parts", "credits_boxes_parts", 10);
+
+function credits_theme_assets($theme_setup)
+{
+	global $nuke_configs, $op;
+	
+	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
+	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.css\" rel=\"stylesheet\" type=\"text/css\">";
+
+	if($op == "main")
+	{
+		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
+		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
+	}
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\" /></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
+	
+	if($op == "main")
+	{
+		$defer_js[] = "
+		<script>
+			$(document).ready(function(){
+				$(\"#online_credit\").on('click', function(){
+					$(\"#online_form\").show();
+					$(\"#offline_form\").hide();
+				});
+				$(\"#offline_credit\").on('click', function(){
+					$(\"#offline_form\").show();
+					$(\"#online_form\").hide();
+				});
+				
+				$('.digit_group_numbers').on('focus', function(){
+					var this_num = $(this).val();
+					this_num = this_num.replace(/,/g, '').replace(' ', '').replace('"._RIAL."', '');
+					 $(this).val(this_num);
+				});
+				$('.digit_group_numbers').on('blur', function(){
+					var x = $(this).val();
+					var parts = x.toString().split(".");
+					parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, \",\").replace(' ', '').replace('"._RIAL."', '');
+					$(this).val(parts.join(\".\")+' "._RIAL."');
+				});
+				$.validate({
+					form : '#credit_form',
+					modules : 'security',
+				});
+			});
+		</script>";
+	}
+	if($nuke_configs['multilingual'] == 1)
+	{
+		$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
+		if($nuke_configs['datetype'] == 1)
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
+		elseif($nuke_configs['datetype'] == 2)
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
+	}
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"default_css" => $default_css,
+		"defer_js" => $defer_js
+	));
+	return $theme_setup;
+}
 ?>

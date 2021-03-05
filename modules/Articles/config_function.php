@@ -16,7 +16,6 @@ if (!defined('CONFIG_FUNCTIONS_FILE')) {
 	die("You can't access this file directly...");
 }
 
-$articles_votetype = false;
 $this_module_name = basename(dirname(__FILE__));
 
 function articleslink_all($all_vars = array())
@@ -26,11 +25,12 @@ function articleslink_all($all_vars = array())
 
 function articleslink($sid, $title='', $post_url='', $time='', $cat_link='', $post_type='Articles', $mode='full')
 {
-	global $nuke_configs, $db, $HijriCalendar;
+	global $nuke_configs, $db, $HijriCalendar, $hooks;
 	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
-	$sid = intval($sid);
 	
-	if($title == '' OR $post_url == '' OR $time == '' OR $cat_link == '')
+	$sid = (is_array($sid)) ? intval($sid[0]):intval($sid);
+	
+	if($sid != 0 && ($title == '' OR $post_url == '' OR $time == '' OR $cat_link == ''))
 	{
 		$row = $db->table(POSTS_TABLE)
 						->where('sid', $sid)
@@ -48,11 +48,10 @@ function articleslink($sid, $title='', $post_url='', $time='', $cat_link='', $po
 	}
 	
 	$module = (isset($post_type) && $post_type != '') ? $post_type:"Articles";
-	$post_url = sanitize(str2url((($post_url != "") ? $post_url:$title)));
+	$_post_url = sanitize(str2url((($post_url != "") ? $post_url:$title)));
 	$title = sanitize(str2url($title));
 
 	$cat_link = intval($cat_link);
-	$time = $time;
 	$nutime = $time;
 	$nudate = date("Y-m-d H:i:s", $time);
 	
@@ -75,7 +74,7 @@ function articleslink($sid, $title='', $post_url='', $time='', $cat_link='', $po
 	
 	$timelink = explode("-",$timelink);
 
-	$post_url = str_replace(" ", "-", $post_url);
+	$_post_url = str_replace(" ", "-", $_post_url);
 
 	$catname_link = (isset($nuke_categories_cacheData[$module])) ? sanitize(filter(implode("/", array_reverse(get_parent_names($cat_link, $nuke_categories_cacheData[$module], "parent_id", "catname_url"))), "nohtml"), array("/")):"";
 	
@@ -85,7 +84,7 @@ function articleslink($sid, $title='', $post_url='', $time='', $cat_link='', $po
 		{
 			$nuke_configs['pages_links'][$nuke_configs['userurl']] = (isset($nuke_configs['pages_links'][$nuke_configs['userurl']])) ? $nuke_configs['pages_links'][$nuke_configs['userurl']]:1;
 			
-			$article_link = (($post_type == 'Articles') ? "":strtolower($post_type)."/")."".str_replace(array('{ID}','{YEAR}','{MONTH}','{DAY}','{CATEGORY}','{PAGEURL}'), array($sid, $timelink[2], $timelink[1], $timelink[0], $catname_link, $post_url),$nuke_configs['pages_links'][$nuke_configs['userurl']]);
+			$article_link = (($post_type == 'Articles') ? "":strtolower($post_type)."/")."".str_replace(array('{ID}','{YEAR}','{MONTH}','{DAY}','{CATEGORY}','{PAGEURL}'), array($sid, $timelink[2], $timelink[1], $timelink[0], $catname_link, $_post_url),$nuke_configs['pages_links'][$nuke_configs['userurl']]);
 		}
 		else
 			$article_link = (($post_type == 'Articles' || $post_type == '') ? "":strtolower($post_type)."/").$sid."/";
@@ -93,21 +92,24 @@ function articleslink($sid, $title='', $post_url='', $time='', $cat_link='', $po
 	else
 		$article_link = "index.php?modname=$module&op=article_show&sid=$sid".(($mode == 'full') ? "-$title":"");
 
+	$article_link = $hooks->apply_filters("post_link_gen", $article_link, $sid, $title, $post_url, $time, $cat_link, $post_type, $mode);
+		
 	return $article_link;
 }
 
-function articles_feed($module_args=array(), $post_type = 'Articles')
+function articles_feed($feed_data, $module_args=array())
 {
 	global $db, $nuke_configs, $noPermaLink;
 	
+	$new_feed_data = array();
 	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
-	$feed_data = array();
-	$module = (isset($post_type) && $post_type != '') ? $post_type:"Articles";
+
+	$module = (isset($module_args['main_module']) && $module_args['main_module'] != '') ? $module_args['main_module']:"Articles";
 	
 	$query_set = array();
 		
 	$query_set['status'] = "status = 'publish'";
-	$query_set['post_type'] = "post_type = '$post_type'";
+	$query_set['post_type'] = "post_type = '$module'";
 	
 	if ($nuke_configs['multilingual'] == 1)
 		$query_set['alanguage']	= "(alanguage='".$nuke_configs['currentlang']."' OR alanguage='')";
@@ -179,49 +181,58 @@ function articles_feed($module_args=array(), $post_type = 'Articles')
 
 			$link = articleslink($sid, $row['title'], $row['post_url'], $time, $cat_link, $post_type);
 			
-			$feed_data[$row_count]['aid'] = $aid;
-			$feed_data[$row_count]['sid'] = $sid;
-			$feed_data[$row_count]['title'] = $title;
-			$feed_data[$row_count]['link'] = LinkToGT($link);
-			$feed_data[$row_count]['comments'] = LinkToGT($link."#comments");
-			$feed_data[$row_count]['pubDate'] = $date;
-			$feed_data[$row_count]['dc:creator'] = _LASTPOSTBY." ".$informant;
-			$feed_data[$row_count]['dc:date'] = $date;
-			$feed_data[$row_count]['noPermaLink'] = parse_GT_link($link)[3];
+			$new_feed_data[$row_count]['aid'] = $aid;
+			$new_feed_data[$row_count]['sid'] = $sid;
+			$new_feed_data[$row_count]['title'] = $title;
+			$new_feed_data[$row_count]['link'] = LinkToGT($link);
+			$new_feed_data[$row_count]['comments'] = LinkToGT($link."#comments");
+			$new_feed_data[$row_count]['pubDate'] = $date;
+			$new_feed_data[$row_count]['dc:creator'] = _LASTPOSTBY." ".$informant;
+			$new_feed_data[$row_count]['dc:date'] = $date;
+			$new_feed_data[$row_count]['noPermaLink'] = parse_GT_link($link)[3];
 			if($post_image)
-				$feed_data[$row_count]['media'] = LinkToGT($post_image);
-			$feed_data[$row_count]['description'] = strip_tags($hometext);
-			$feed_data[$row_count]['content'] = $hometext;
-			$feed_data[$row_count]['language'] = $alanguage;
+				$new_feed_data[$row_count]['media'] = LinkToGT($post_image);
+			$new_feed_data[$row_count]['description'] = strip_tags($hometext);
+			$new_feed_data[$row_count]['content'] = $hometext;
+			$new_feed_data[$row_count]['language'] = $alanguage;
 			
 			if(!empty($cats))
 				foreach($cats as $cat)
 				{
 					if(isset($nuke_categories_cacheData[$module][$cat]))
-						$feed_data[$row_count]['category'][] = filter(category_lang_text($nuke_categories_cacheData[$module][$cat]['cattext']), "nohtml");
+						$new_feed_data[$row_count]['category'][] = filter(category_lang_text($nuke_categories_cacheData[$module][$cat]['cattext']), "nohtml");
 				}
 			
 			$row_count++;
 		}
 	}
 	
-	return $feed_data;
+	return array_merge($feed_data, $new_feed_data);
 }
+$hooks->add_filter("get_feed_data", "articles_feed", 10);
 
 function get_article_image($sid = 0, $article_image = '', $hometext = '', $post_type = 'Articles')
 {
+	global $hooks;
+	$_article_image = '';
 	preg_match_all('#<img(.*)src=["|\'](.*)["|\']#isU', stripslashes($hometext), $images_match);
 	if($article_image == '')
+	{
 		if(file_exists("files/$post_type/".$sid.".jpg"))
-			$article_image = "files/$post_type/".$sid.".jpg";
+			$_article_image = "files/$post_type/".$sid.".jpg";
 		else
 			if(isset($images_match[2][0]) && $images_match[2][0] != '')
-				$article_image = $images_match[2][0];
+				$_article_image = $images_match[2][0];
 			else
 				if(file_exists("images/no_image.jpg"))
-					$article_image = "images/no_image.jpg";
+					$_article_image = "images/no_image.jpg";
+	}
+	else
+		$_article_image = $article_image;
 
-	return $article_image;	
+	$_article_image = $hooks->apply_filters("get_article_image", $_article_image, $sid, $article_image, $hometext, $post_type);
+	
+	return $_article_image;	
 }
 
 if(!function_exists("articles_search"))
@@ -240,9 +251,9 @@ if(!function_exists("articles_search"))
 	}
 }
 
-function _article_select_month($in = 0, $module = 'Articles', $post_type = 'Articles')
+function _article_select_month($in = 0, $post_type = 'Articles')
 {
-	global $db, $nuke_configs, $module_name, $HijriCalendar;
+	global $db, $nuke_configs, $module_name, $HijriCalendar, $hooks;
 	
 	$contents = "";
 	$contents .= "<div class=\"text-center\"><font class=\"content\">"._SELECTMONTH2VIEW."</font><br><br></div>";
@@ -252,7 +263,7 @@ function _article_select_month($in = 0, $module = 'Articles', $post_type = 'Arti
 					->order_by(['time' => 'DESC'])
 					->select(['time']);
 
-	$module_name = (isset($module) && $module != 'Articles') ? $module:$module_name;
+	$module_name = (isset($post_type) && $post_type != 'Articles') ? $module:$module_name;
 	$contents .= "<ul>";
 	$thismonth = "";//gregorian date
 	$thisjmonth = "";//jalali date
@@ -313,7 +324,23 @@ function _article_select_month($in = 0, $module = 'Articles', $post_type = 'Arti
 			"description" => '',
 			"extra_meta_tags" => array()
 		);
+		$meta_tags = $hooks->apply_filters("select_months_header_meta", $meta_tags, $module_name);
 		
+		$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+		{
+			return array_merge($all_meta_tags, $meta_tags);
+		}, 10);		
+		unset($meta_tags);
+		
+		$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($post_type){
+			$breadcrumbs['category'] = array(
+				"name" => _STORIESARCHIVE,
+				"link" => LinkToGT("index.php?modname=".$post_type."&op=article_select_month"),
+				"itemtype" => "WebPage"
+			);
+			return $breadcrumbs;
+		}, 10);
+	
 		include("header.php");
 		$output = '';
 		$output .= title(_STORIESARCHIVE);
@@ -330,17 +357,18 @@ function _article_select_month($in = 0, $module = 'Articles', $post_type = 'Arti
 
 function article_result_parse(&$article_info = array(), $query_set = array(), $query_params = array(), $orderby = 'time', $mode = 'index')
 {
-	global $db, $nuke_authors_cacheData, $pn_Cookies, $votetype, $nuke_configs, $articles_votetype, $nuke_meta_keys_parts, $this_module_name, $visitor_ip, $userinfo;
+	global $db, $pn_Cookies, $nuke_configs, $this_module_name, $visitor_ip, $userinfo, $hooks;
 	
 	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 	
-	// AND (sc.rating_ip = '$ip' OR sc.username = '".$userinfo['username']."') was removed for all
 	$user_id = (isset($userinfo['user_id']) && isset($userinfo['is_registered']) && $userinfo['is_registered'] == 1) ? intval($userinfo['user_id']):0;
 	
 	$query_params[':user_id'] = $user_id;
 	$query_params[':visitor_ip'] = $visitor_ip;
 	
-	$votetype = ($articles_votetype) ? $articles_votetype:$nuke_configs['votetype'];
+	$votetype = $hooks->apply_filters("votetype_set", $nuke_configs['votetype']);
+	
 	$vote_where = ($user_id != 0) ? "sc.user_id = :user_id":"sc.rating_ip = :visitor_ip";
 
 	if($votetype == 1)
@@ -357,12 +385,12 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 	if(!empty($query_set))
 	{
 		$query_set								= implode(" AND ", array_filter($query_set));
-		$query_set								= ($query_set != "") ? "WHERE $query_set":"";
+		$query_set								= ($query_set != "") ? "WHERE $query_set":"";		
 		
 		$total_rows_sql = '';
 		$prev_next_sql = '';
 		$prev_next_left = '';
-		$oreder_group_by_sql = '';
+		$oreder_by_sql = '';
 		$post_ids = array();
 		$meta_datas = array();
 		$scores_data = array();
@@ -370,7 +398,7 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 		if($mode == 'index')
 		{
 			$total_rows_sql = ", (SELECT COUNT(sid) FROM ".POSTS_TABLE." ".str_replace("s.","", $query_set).") as total_rows";
-			$oreder_group_by_sql = "GROUP BY s.sid 
+			$oreder_by_sql = "
 		ORDER BY s.$orderby DESC, s.sid DESC LIMIT :start_at, :entries_per_page";
 		}
 		
@@ -397,7 +425,7 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 		FROM ".POSTS_TABLE." AS s 
 		$prev_next_left
 		$query_set
-		$oreder_group_by_sql", $query_params);
+		$oreder_by_sql", $query_params);
 
 		if(!empty($result))
 		{
@@ -407,6 +435,12 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 	else
 		$rows = $article_info;
 
+	$rows = $hooks->apply_filters("posts_rows_parse", $rows);
+	
+	$hooks->do_action("posts_rows_after", $rows, $article_info, $query_set, $query_params, $orderby, $mode);
+		
+	$post_types = array();
+	
 	foreach($rows as $row)
 	{
 		$post_ids[] = intval($row['sid']);
@@ -416,17 +450,23 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 	if(!empty($post_ids))
 	{
 		// get posts meta
-		$result = $db->query("SELECT post_id, meta_key, meta_value FROM ".POSTS_META_TABLE." WHERE post_id IN (".implode(",", $post_ids).") AND meta_part IN (".implode(",", $post_types).")");
+		$result = $db->query("SELECT post_id, meta_key, meta_value, meta_part FROM ".POSTS_META_TABLE." WHERE post_id IN (".implode(",", $post_ids).") AND ((meta_part IN (".implode(",", $post_types).")) OR (meta_part = 'module_boxes' AND meta_key = 'post'))");
 		if(!empty($result))
 		{
 			$meta_data = $result->results();
 			foreach($meta_data as $meta_data_val)
+			{
+				if($meta_data_val['meta_part'] == 'module_boxes')
+				{
+					$meta_data_val['meta_key'] = 'post_module_boxes';
+				}
 				$meta_datas[$meta_data_val['post_id']][$meta_data_val['meta_key']] = $meta_data_val['meta_value'];
+			}
 		}
 		// get posts meta
 		
 		// get posts scores
-		$result = $db->query("SELECT s.post_id, db_table, $votes_query2, (SELECT sc.id FROM ".SCORES_TABLE." as sc WHERE ($vote_where) AND s.post_id = sc.post_id AND sc.db_table = s.db_table ORDER BY sc.id ASC LIMIT 1) AS you_rated FROM ".SCORES_TABLE." as s WHERE s.post_id IN (".implode(",", $post_ids).") AND s.votetype IN ($newvotetype) AND s.db_table IN (".implode(",", $post_types).") GROUP BY s.post_id", $query_params);
+		$result = $db->query("SELECT s.post_id, s.db_table, $votes_query2, (SELECT sc.id FROM ".SCORES_TABLE." as sc WHERE ($vote_where) AND s.post_id = sc.post_id AND sc.db_table = s.db_table ORDER BY sc.id ASC LIMIT 1) AS you_rated FROM ".SCORES_TABLE." as s WHERE s.post_id IN (".implode(",", $post_ids).") AND s.votetype IN ($newvotetype) AND s.db_table IN (".implode(",", $post_types).") GROUP BY s.post_id, s.db_table", $query_params);
 		
 		if(!empty($result))
 		{
@@ -485,20 +525,6 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 		
 		if(isset($meta_datas[$article_info[$key]['sid']]) && !empty($meta_datas[$article_info[$key]['sid']]))
 			$article_info[$key] = array_merge($article_info[$key], $meta_datas[$article_info[$key]['sid']]);
-			
-		if(isset($nuke_meta_keys_parts[$article_info[$key]['post_type']]) && !empty($nuke_meta_keys_parts[$article_info[$key]['post_type']]))
-		{
-			foreach($nuke_meta_keys_parts[$article_info[$key]['post_type']] as $meta_key => $article_fields_meta_field)
-			{
-				if(isset($article_info[$key][$meta_key]) && isset($article_fields_meta_field['php_load']) && $article_fields_meta_field['php_load'] != '')
-				{
-					$continue2 = false;
-					eval($article_fields_meta_field['php_load']);
-					if($continue2)
-						continue 2;
-				}
-			}
-		}
 		
 		$article_info[$key]['likes'] = $article_info[$key]['dislikes'] = $article_info[$key]['score'] = $article_info[$key]['ratings'] = 0;
 		if(isset($scores_data[$article_info[$key]['post_type']][$article_info[$key]['sid']]) && !empty($scores_data[$article_info[$key]['post_type']][$article_info[$key]['sid']]))
@@ -565,12 +591,21 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 			}
 
 		}
-		if(isset($article_info[$key]['meta_keys']))
+		
+		$article_info[$key] = $hooks->apply_filters("post_meta_parse", $article_info[$key]);
+		if(isset($article_info[$key]['php_eval']) && $article_info[$key]['php_eval'] != '')
 		{
-			unset($article_info[$key]['meta_keys']);
-			unset($article_info[$key]['meta_values']);
+			if($article_info[$key]['php_eval'] == 'continue')
+				continue;
+			elseif($article_info[$key]['php_eval'] == 'break')
+				break;
+			else
+				eval($article_info[$key]['php_eval']);
+			
+			unset($article_info[$key]['php_eval']);
 		}
 	}
+	$article_info = $hooks->apply_filters("post_info_parse", $article_info);
 }
 
 function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name)
@@ -657,6 +692,7 @@ function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name
 
 function parse_post_gt_links($matches)
 {
+	global $hooks;
 	$output = array();
 	if(isset($matches[1]))
 	{
@@ -728,11 +764,15 @@ function parse_post_gt_links($matches)
 		}
 	}
 	unset($vars);
+	
+	$output = $hooks->apply_filters("parse_post_gt_links", $output, $matches);
+	
 	return trim(implode("/", array_filter($output)), "/")."/";
 }
 
 function parse_post_links($matches)
 {
+	global $hooks;
 	$output = array();
 	
 	if(isset($matches[1]))
@@ -815,219 +855,425 @@ function parse_post_links($matches)
 				}
 			}
 		}
-	}
+	}	
+	
+	$output = $hooks->apply_filters("parse_post_links", $output, $matches);
 	
 	return "index.php?".implode("&", array_filter($output));
 }
 
-$cache_systems['nuke_articles_categories'] = array(
-	'name'			=> "_ARTICLES_CATEGORIES",
-	"main_id"		=> 'catid',
-	'table'			=> CATEGORIES_TABLE,
-	'where'			=> "module = '$this_module_name'",
-	'order'			=> 'ASC',
-	'fetch_type'	=> \PDO::FETCH_ASSOC,
-	'first_code'	=> '',
-	'loop_code'		=> '$this_data_array[$this_main_id][\'catname_url\'] = sanitize(str2url($row[\'catname\']));',
-	'end_code'		=> '',
-	'auto_load'		=> true
-);
-
-/*
-$cache_systems[''.$pn_prefix.'_articles_configs'] = array(
-	'name' => _ARTICLES_CONFIG,
-	"main_id" => 'id',
-	'table' => ''.$pn_prefix.'_articles_configs',
-	'order' => 'ASC',
-	'fetch_type' => MYSQL_ASSOC,
-	'first_code' => '',
-	'loop_code' => '',
-	'end_code' => '',
-	'auto_load' => true
-);*/
-
-$alerts_messages['articles_comments'] = array(
-	"prefix"	=> "cs",
-	"by"		=> "cid",
-	"table"		=> COMMENTS_TABLE,
-	"where"		=> "module = 'Articles' AND status = '0'",
-	"color"		=> "green",
-	"text"		=> "_HAVE_N_NEW_COMMENTS",
-);
-
-$alerts_messages['articles_pending'] = array(
-	"prefix"	=> "ps",
-	"by"		=> "sid",
-	"table"		=> POSTS_TABLE,
-	"where"		=> "status = 'pending' AND post_type = 'Articles'",
-	"color"		=> "green",
-	"text"		=> "_HAVE_N_NEW_PENDING_ARTICLE",
-);
-
-$admin_top_menus['contents']['children'][] = array(
-	"id" => 'articles', 
-	"parent_id" => 'contents', 
-	"title" => _ARTICLES, 
-	"url" => "".$admin_file.".php?op=articles", 
-	"icon" => "",
-	"children" => array(
-		array(
-			"id" => 'articles_add', 
-			"parent_id" => 'articles', 
-			"title" => "_ADD_NEW_ARTICLE", 
-			"url" => "".$admin_file.".php?op=article_admin", 
-			"icon" => ""
+function posts_alert_messages($alerts_messages)
+{
+	$alerts_messages = array_merge($alerts_messages, array(
+		"articles_comments" => array(
+			"prefix"	=> "cs",
+			"by"		=> "cid",
+			"table"		=> COMMENTS_TABLE,
+			"where"		=> "module = 'Articles' AND status = '0'",
+			"color"		=> "green",
+			"text"		=> _HAVE_N_NEW_COMMENTS,
 		),
-		array(
-			"id" => 'articles_comments', 
-			"parent_id" => 'articles', 
-			"title" => "_ARTICLES_COMMENTS", 
-			"url" => "".$admin_file.".php?op=comments&module=Articles", 
-			"icon" => ""
-		),
-		array(
-			"id" => 'articles_categories', 
-			"parent_id" => 'articles', 
-			"title" => "_ARTICLES_CATEGORIES", 
-			"url" => "".$admin_file.".php?op=categories&module=Articles", 
-			"icon" => ""
+		"articles_pending" => array(
+			"prefix"	=> "ps",
+			"by"		=> "sid",
+			"table"		=> POSTS_TABLE,
+			"where"		=> "status = 'pending' AND post_type = 'Articles'",
+			"color"		=> "green",
+			"text"		=> _HAVE_N_NEW_PENDING_ARTICLE,
 		)
-	)
-);
-$admin_top_menus['categories']['children'][] = array(
-	"id" => 'articles_cat', 
-	"parent_id" => 'categories', 
-	"title" => "_ARTICLES_CATEGORIES", 
-	"url" => "".$admin_file.".php?op=categories&module_name=Articles", 
-	"icon" => ""
-);
-$admin_top_menus['recives']['children'][] = array(
-	"id" => 'articles_pending', 
-	"parent_id" => 'recives', 
-	"title" => "_PENDING_ARTICLES", 
-	"url" => "".$admin_file.".php?op=articles&status=pending", 
-	"icon" => ""
-);
+	));
+	
+	return $alerts_messages;
+}
+$hooks->add_filter("admin_alert_messages", 'posts_alert_messages', 10);
 
-$nuke_configs_links_function['Articles'] = $nuke_configs_links_function['Downloads'] = $nuke_configs_links_function['Pages'] =$nuke_configs_links_function['Faqs'] = $nuke_configs_links_function['Gallery'] = $nuke_configs_links_function['Statics'] = "articleslink";
-$nuke_configs_comments_table['Articles'] = $nuke_configs_comments_table['Downloads'] = $nuke_configs_comments_table['Pages'] =$nuke_configs_comments_table['Faqs'] = $nuke_configs_comments_table['Gallery'] = $nuke_configs_comments_table['Statics'] = array('sid', POSTS_TABLE);
-$nuke_configs_categories_link['Articles'] = "index.php?modname=Articles&category={CAT_NAME_URL}";
-$nuke_configs_categories_link['Downloads'] = "index.php?modname=Downloads&category={CAT_NAME_URL}";
-$nuke_configs_categories_link['Pages'] = "index.php?modname=Pages&category={CAT_NAME_URL}";
-$nuke_configs_categories_link['Faqs'] = "index.php?modname=Faqs&category={CAT_NAME_URL}";
-$nuke_configs_categories_link['Gallery'] = "index.php?modname=Gallery&category={CAT_NAME_URL}";
-$nuke_configs_categories_link['Statics'] = "index.php?modname=Statics&category={CAT_NAME_URL}";
+function posts_admin_top_menus($admin_top_menus)
+{
+	global $admin_file;
+	$admin_top_menus['contents']['children'][] = array(
+		"id" => 'articles', 
+		"parent_id" => 'contents', 
+		"title" => _ARTICLES, 
+		"url" => "".$admin_file.".php?op=articles", 
+		"icon" => "",
+		"children" => array(
+			array(
+				"id" => 'articles_add', 
+				"parent_id" => 'articles', 
+				"title" => _ADD_NEW_ARTICLE, 
+				"url" => "".$admin_file.".php?op=article_admin", 
+				"icon" => ""
+			),
+			array(
+				"id" => 'articles_comments', 
+				"parent_id" => 'articles', 
+				"title" => _ARTICLES_COMMENTS, 
+				"url" => "".$admin_file.".php?op=comments&module=Articles", 
+				"icon" => ""
+			),
+			array(
+				"id" => 'articles_categories', 
+				"parent_id" => 'articles', 
+				"title" => _ARTICLES_CATEGORIES, 
+				"url" => "".$admin_file.".php?op=categories&module=Articles", 
+				"icon" => ""
+			)
+		)
+	);
+	$admin_top_menus['contents']['children'][] = array(
+		"id" => 'positions', 
+		"parent_id" => 'contents', 
+		"title" => _POSITIONS, 
+		"url" => "".$admin_file.".php?op=positions", 
+		"icon" => "",
+		"children" => array()
+	);
 
-$nuke_configs_categories_delete['Articles']['data'] = array(
-	"table"		=> POSTS_TABLE,
-	"col_id"	=> "sid",
-	"col_cats"	=> array("cat", "cat_link"),
-	"where"		=> "post_type = 'Articles'",
-	"recache"	=> "".$pn_prefix."_articles_categories"
-);
+	$admin_top_menus['categories']['children'][] = array(
+		"id" => 'articles_cat', 
+		"parent_id" => 'categories', 
+		"title" => _ARTICLES_CATEGORIES, 
+		"url" => "".$admin_file.".php?op=categories&module_name=Articles", 
+		"icon" => ""
+	);
+	$admin_top_menus['recives']['children'][] = array(
+		"id" => 'articles_pending', 
+		"parent_id" => 'recives', 
+		"title" => _PENDING_ARTICLES, 
+		"url" => "".$admin_file.".php?op=articles&status=pending", 
+		"icon" => ""
+	);
+	
+	return $admin_top_menus;
+}
+$hooks->add_filter("admin_top_menus", 'posts_admin_top_menus', 10);
 
-$nuke_configs_search_data['All'] = $nuke_configs_search_data['Downloads'] = $nuke_configs_search_data['Pages'] = $nuke_configs_search_data['Gallery'] = $nuke_configs_search_data['Faqs'] = $nuke_configs_search_data['Statics'] = $nuke_configs_search_data['Articles'] = array(
-	"title"				=> "_ARTICLES",
-	"table"				=> POSTS_TABLE,
-	"have_comments"		=> true,
-	"category_field"	=> "cat_link",
-	"categories_field"	=> "cat",
-	"time_field"		=> "time",
-	"author_field"		=> "aid",
-	"orderby"			=> "time",
-	"where"				=> "status = 'publish' AND post_type = 'Articles'",
-	"search_in_field"	=> array("title" => "_TITLE", "hometext" => "_HOMETEXT", "bodytext" => "_BODYTEXT", "tags" => "_KEYWORDS", "post_url" => "_ARTICLE_URL"),
-	"fetch_fields"		=> array("*"),
-	"more_link"			=> "articleslink_all",
-	"search_template"	=> "articles_search",
-	"parse_result"		=> "article_result_parse",
-);
+function posts_have_comments($all_modules_comments)
+{
+	$all_modules_comments = array_merge($all_modules_comments, array(
+		"Articles" => _ARTICLES,
+		"Downloads" => _DOWNLOADS,
+		"Pages" => _PAGES,
+		"Faqs" => _FAQS,
+		"Gallery" => _GALLERY,
+		"Statics" => _STATICS
+	));
+	
+	return $all_modules_comments;
+}
+$hooks->add_filter("modules_have_comments", 'posts_have_comments', 10);
 
-$nuke_configs_search_data['All']['title'] = "_ALL";
-$nuke_configs_search_data['All']['where'] = "status = 'publish'";
-$nuke_configs_search_data['Downloads']['title'] = "_DOWNLOADS";
-$nuke_configs_search_data['Downloads']['where'] = "status = 'publish' AND post_type = 'Downloads'";
-$nuke_configs_search_data['Pages']['title'] = "_PAGESCONTENTS";
-$nuke_configs_search_data['Pages']['where'] = "status = 'publish' AND post_type = 'Pages'";
-$nuke_configs_search_data['Gallery']['title'] = "_GALLERY";
-$nuke_configs_search_data['Gallery']['where'] = "status = 'publish' AND post_type = 'Gallery'";
-$nuke_configs_search_data['Faqs']['title'] = "_FAQS";
-$nuke_configs_search_data['Faqs']['where'] = "status = 'publish' AND post_type = 'Faqs'";
-$nuke_configs_search_data['Statics']['title'] = "_STATICS";
-$nuke_configs_search_data['Statics']['where'] = "status = 'publish' AND post_type = 'Statics'";
+function get_Articles_link($post_link, $module, $post_id)
+{
+	$post_link = ($post_link == '' && in_array($module, array("Articles","Downloads","Pages","Faqs","Gallery","Statics"))) ? articleslink($post_id, '', '', '', '', $module):$post_link;
 
-$nuke_configs_statistics_data[$this_module_name] = array(
-	"total_articles" => array(
-		"title"				=> "_ARTICLES",
+	return $post_link;
+}
+$hooks->add_filter("get_post_link", 'get_Articles_link', 10);
+
+function posts_comments_table_data($module_table_data)
+{
+	$nuke_configs_comments_table['Articles'] = $nuke_configs_comments_table['Downloads'] = $nuke_configs_comments_table['Pages'] =$nuke_configs_comments_table['Faqs'] = $nuke_configs_comments_table['Gallery'] = $nuke_configs_comments_table['Statics'] = array('sid', POSTS_TABLE);
+	$module_table_data = array_merge($module_table_data, $nuke_configs_comments_table);
+	
+	return $module_table_data;
+}
+$hooks->add_filter("modules_comments_table_data", 'posts_comments_table_data', 10);
+
+function posts_categories_link($modules_categories_link)
+{
+	$modules_categories_link['Articles'] = array(_ARTICLES, "index.php?modname=Articles&category={CAT_NAME_URL}");
+	$modules_categories_link['Downloads'] = array(_DOWNLOADS, "index.php?modname=Downloads&category={CAT_NAME_URL}");
+	$modules_categories_link['Pages'] = array(_PAGES, "index.php?modname=Pages&category={CAT_NAME_URL}");
+	$modules_categories_link['Faqs'] = array(_FAQS, "index.php?modname=Faqs&category={CAT_NAME_URL}");
+	$modules_categories_link['Gallery'] = array(_GALLERY, "index.php?modname=Gallery&category={CAT_NAME_URL}");
+	$modules_categories_link['Statics'] = array(_STATICS, "index.php?modname=Statics&category={CAT_NAME_URL}");
+	
+	return $modules_categories_link;
+}
+$hooks->add_filter("modules_categories_link", 'posts_categories_link', 10);
+
+function posts_categories_delete_data($categories_delete_data, $module='Articles')
+{
+	global $pn_prefix;
+	$categories_delete_data[$module] = array(
+		"table"		=> POSTS_TABLE,
+		"col_id"	=> "sid",
+		"col_cats"	=> array("cat", "cat_link"),
+		"where"		=> "post_type = 'Articles'",
+		"recache"	=> "".$pn_prefix."_articles_categories"
+	);
+	return $categories_delete_data;
+}
+$hooks->add_filter("categories_delete_data", 'posts_categories_delete_data', 10);
+
+function posts_search_data($modules_search_data, $module='Articles')
+{
+	$modules_search_data['All'] = $modules_search_data['Downloads'] = $modules_search_data['Pages'] = $modules_search_data['Gallery'] = $modules_search_data['Faqs'] = $modules_search_data['Statics'] = $modules_search_data['Articles'] = array(
+		"title"				=> _ARTICLES,
 		"table"				=> POSTS_TABLE,
-		"count"				=> "sid",
-		"as"				=> "total_articles",
+		"have_comments"		=> true,
+		"category_field"	=> "cat_link",
+		"categories_field"	=> "cat",
+		"time_field"		=> "time",
+		"author_field"		=> "aid",
+		"orderby"			=> "time",
 		"where"				=> "status = 'publish' AND post_type = 'Articles'",
-	),
-	"total_downloads" => array(
-		"title"				=> "_DOWNLOADS",
-		"table"				=> POSTS_TABLE,
-		"count"				=> "sid",
-		"as"				=> "total_downloads",
-		"where"				=> "status = 'publish' AND post_type = 'Downloads'",
-	),
-	"total_pages" => array(
-		"title"				=> "_PAGES",
-		"table"				=> POSTS_TABLE,
-		"count"				=> "sid",
-		"as"				=> "total_pages",
-		"where"				=> "status = 'publish' AND post_type = 'Pages'",
-	),
-	"total_pages" => array(
-		"title"				=> "_GALLERY",
-		"table"				=> POSTS_TABLE,
-		"count"				=> "sid",
-		"as"				=> "total_galleries",
-		"where"				=> "status = 'publish' AND post_type = 'Gallery'",
-	),
-	"total_pages" => array(
-		"title"				=> "_FAQS",
-		"table"				=> POSTS_TABLE,
-		"count"				=> "sid",
-		"as"				=> "total_faqs",
-		"where"				=> "status = 'publish' AND post_type = 'Faqs'",
-	),
-	"total_statics" => array(
-		"title"				=> "_STATICS",
-		"table"				=> POSTS_TABLE,
-		"count"				=> "sid",
-		"as"				=> "total_faqs",
-		"where"				=> "status = 'publish' AND post_type = 'Statics'",
-	),
-	"pending_articles" => array(
-		"title"				=> "_PENDING_ARTICLES",
-		"table"				=> POSTS_TABLE,
-		"count"				=> "sid",
-		"as"				=> "pending_articles",
-		"where"				=> "status = 'publish' AND aid != informant AND informant != '' AND post_type = 'Articles'",
-	)
-);
+		"search_in_field"	=> array("title" => _TITLE, "hometext" => _HOMETEXT, "bodytext" => _BODYTEXT, "tags" => _KEYWORDS, "post_url" => _ARTICLE_URL),
+		"fetch_fields"		=> array("*"),
+		"more_link"			=> "articleslink_all",
+		"search_template"	=> "articles_search",
+		"parse_result"		=> "article_result_parse",
+	);
 
+	$modules_search_data['All']['title'] = _ALL;
+	$modules_search_data['All']['where'] = "status = 'publish'";
+	$modules_search_data['Downloads']['title'] = _DOWNLOADS;
+	$modules_search_data['Downloads']['where'] = "status = 'publish' AND post_type = 'Downloads'";
+	$modules_search_data['Pages']['title'] = _PAGESCONTENTS;
+	$modules_search_data['Pages']['where'] = "status = 'publish' AND post_type = 'Pages'";
+	$modules_search_data['Gallery']['title'] = _GALLERY;
+	$modules_search_data['Gallery']['where'] = "status = 'publish' AND post_type = 'Gallery'";
+	$modules_search_data['Faqs']['title'] = _FAQS;
+	$modules_search_data['Faqs']['where'] = "status = 'publish' AND post_type = 'Faqs'";
+	$modules_search_data['Statics']['title'] = _STATICS;
+	$modules_search_data['Statics']['where'] = "status = 'publish' AND post_type = 'Statics'";
+	return $modules_search_data;
+}
+$hooks->add_filter("modules_search_data", 'posts_search_data', 10);
 
-$nuke_rss_codes[$this_module_name] = '';
+function posts_statistics_data($modules_statistics_data)
+{
+	$modules_statistics_data['Articles'] = array(
+		"total_articles" => array(
+			"title"				=> _ARTICLES,
+			"table"				=> POSTS_TABLE,
+			"count"				=> "sid",
+			"as"				=> "total_articles",
+			"where"				=> "status = 'publish' AND post_type = 'Articles'",
+		),
+		"total_downloads" => array(
+			"title"				=> _DOWNLOADS,
+			"table"				=> POSTS_TABLE,
+			"count"				=> "sid",
+			"as"				=> "total_downloads",
+			"where"				=> "status = 'publish' AND post_type = 'Downloads'",
+		),
+		"total_pages" => array(
+			"title"				=> _PAGES,
+			"table"				=> POSTS_TABLE,
+			"count"				=> "sid",
+			"as"				=> "total_pages",
+			"where"				=> "status = 'publish' AND post_type = 'Pages'",
+		),
+		"total_pages" => array(
+			"title"				=> _GALLERY,
+			"table"				=> POSTS_TABLE,
+			"count"				=> "sid",
+			"as"				=> "total_galleries",
+			"where"				=> "status = 'publish' AND post_type = 'Gallery'",
+		),
+		"total_pages" => array(
+			"title"				=> _FAQS,
+			"table"				=> POSTS_TABLE,
+			"count"				=> "sid",
+			"as"				=> "total_faqs",
+			"where"				=> "status = 'publish' AND post_type = 'Faqs'",
+		),
+		"total_statics" => array(
+			"title"				=> _STATICS,
+			"table"				=> POSTS_TABLE,
+			"count"				=> "sid",
+			"as"				=> "total_faqs",
+			"where"				=> "status = 'publish' AND post_type = 'Statics'",
+		),
+		"pending_articles" => array(
+			"title"				=> _PENDING_ARTICLES,
+			"table"				=> POSTS_TABLE,
+			"count"				=> "sid",
+			"as"				=> "pending_articles",
+			"where"				=> "status = 'publish' AND aid != informant AND informant != '' AND post_type = 'Articles'",
+		)
+	);
+	
+	return $modules_statistics_data;
+}
 
-$nuke_modules_boxes_parts[$this_module_name] = array(
-	"index" => "_INDEX",
-	"more" => "_ARTICLE_MORE",
-	"archive" => "_STORIESARCHIVE",
-	"send_article" => "_SEND_POST",
-	"category" => "_ARTICLES_CATEGORIES",
-	"gallery_index" => "_GALLERY_INDEX",
-	"gallery_more" => "_GALLERY_MORE",
-	"downloads_index" => "_DOWNLOADS_INDEX",
-	"downloads_more" => "_DOWNLOADS_MORE",
-	"pages_index" => "_PAGES_INDEX",
-	"pages_more" => "_PAGES_MORE",
-	"faqs_index" => "_FAQS_INDEX",
-	"faqs_more" => "_FAQS_MORE",
-	"statics_index" => "_STATICS_INDEX",
-	"statics_more" => "_STATICS_MORE",
-);
+$hooks->add_filter("modules_statistics_data", 'posts_statistics_data', 10);
 
+function posts_set_post_type($all_post_types)
+{
+	$all_post_types = array_merge($all_post_types, array(
+		"Articles" => _POST_TYPE_ARTICLES,
+		"Statics" => _POST_TYPE_STATICS,
+		"Downloads" => _POST_TYPE_DOWNLOADS,
+		"Gallery" => _POST_TYPE_GALLERY,
+		"Pages" => _POST_TYPE_PAGESCONTENTS,
+		"Faqs" => _POST_TYPE_FAQS,
+	));
+	return $all_post_types;
+}
+$hooks->add_filter("set_all_post_types", "posts_set_post_type", 10);
+
+function posts_rss_codes($rss_codes)
+{
+	// nothing
+	return $rss_codes;
+}
+$hooks->add_filter("modules_rss_codes", "posts_rss_codes", 10);
+
+function posts_old_links($old_links)
+{
+	$old_links = array_merge_recursive($old_links, array(
+		array(
+			'pattern' => "article([0-9]*)\.html", 
+			'replace' => '',
+			'function' => "articleslink"
+		),
+		array(
+			'pattern' => "article-([0-9]*)\.html", 
+			'replace' => '',
+			'function' => "articleslink"
+		)
+	));
+	
+	return $old_links;
+}
+$hooks->add_filter("old_links_check", "posts_old_links", 10);
+
+function posts_boxes_parts($nuke_modules_boxes_parts)
+{
+	$nuke_modules_boxes_parts['Articles'] = array(
+		"index" => _INDEX,
+		"more" => _ARTICLE_MORE,
+		"archive" => _STORIESARCHIVE,
+		"send_article" => _SEND_POST,
+		"category" => _ARTICLES_CATEGORIES,
+		"gallery_index" => _GALLERY_INDEX,
+		"gallery_more" => _GALLERY_MORE,
+		"downloads_index" => _DOWNLOADS_INDEX,
+		"downloads_more" => _DOWNLOADS_MORE,
+		"pages_index" => _PAGES_INDEX,
+		"pages_more" => _PAGES_MORE,
+		"faqs_index" => _FAQS_INDEX,
+		"faqs_more" => _FAQS_MORE,
+		"statics_index" => _STATICS_INDEX,
+		"statics_more" => _STATICS_MORE,
+	);
+	
+	return $nuke_modules_boxes_parts;
+}
+
+$hooks->add_filter("modules_boxes_parts", "posts_boxes_parts", 10);
+
+function Articles_microdata_json($json_ld, $meta_tags, $article_info)
+{
+	global $nuke_configs;
+	
+	$graph_key = '@graph';
+	
+	$json_ld->$graph_key['Article'] = (object)[
+		"@type" => [
+			"Article",
+			"MediaObject",
+			"BlogPosting"
+		],
+		"@id" => "".$article_info['article_link']."#article",
+		"author" => (object) [
+			"@type" => "Person",
+			"@id" => "".$nuke_configs['nukeurl']."#/schema/person/".md5($article_info['aid'])."",
+			"name" => $article_info['aid']
+		],
+		"headline" => $article_info['title'],
+		"datePublished" => date('Y-m-d\TH:i:s+00:00', $article_info['time']),
+		"dateModified" => date('Y-m-d\TH:i:s+00:00', $article_info['time']),
+		"commentCount" => $article_info['comments'],
+		"mainEntityOfPage" => (object) [
+			"@type" => "WebPage",
+			"@id" => "".$article_info['article_link']."#webpage"
+		],
+		"publisher" => (object) [
+			"@type" => "Person",
+			"@id" => "".$nuke_configs['nukeurl']."#/schema/person/".md5($article_info['aid']).""
+		],
+		"image" => (object) [
+			"@type" => "ImageObject",
+			"@id" => "".$article_info['post_image']."#primaryimage",
+			"url" => "".$article_info['post_image']
+		],
+		"keywords" => str_replace(":",",", $article_info['tags']),
+		"name" => $article_info['title']
+	];
+		
+	if($article_info['ratings'] != 0)
+	{
+		$json_ld->$graph_key['Article']->aggregateRating = [
+			"@type" => "AggregateRating",
+			"bestRating" => 5,
+			"worstRating" => 0,
+			"ratingCount" => $article_info['ratings'],
+			"ratingValue" => (($article_info['ratings'] != 0) ? round($article_info['score']/$article_info['ratings'], 2):0)
+		];
+	
+		$json_ld->$graph_key['CreativeWorkSeries'] = (object) [
+			"@type" => "CreativeWorkSeries",
+			"name" => $article_info['title'],
+			"aggregateRating" => (object) [
+				"@type" => "AggregateRating",
+				"bestRating" => 5,
+				"worstRating" => 0,
+				"ratingCount" => $article_info['ratings'],
+				"ratingValue" => (($article_info['ratings'] != 0) ? round($article_info['score']/$article_info['ratings'], 2):0)
+			]
+		];
+	}
+	
+	return $json_ld;
+}
+
+function posts_breadcrumb($breadcrumb, $article_info)
+{
+	global $nuke_configs, $op, $hooks;
+	
+	$block_global_contents = array();
+	$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
+	
+	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
+	
+	if(isset($article_info['post_type']) && isset($nuke_categories_cacheData[$article_info['post_type']]) && isset($article_info['cat_link']) && $article_info['cat_link'] != 0)
+	{
+		$post_categories = $nuke_categories_cacheData[$article_info['post_type']];
+		
+		$catname_link = filter($post_categories[$article_info['cat_link']]['catname'], "nohtml");
+		
+		if(isset($article_info['cat_link']) && $catname_link != 'uncategorized' && isset($post_categories[$article_info['cat_link']]) && $nuke_configs['breadcrumb_cat'] == 1)
+		{
+			$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($article_info['cat_link'], $post_categories, "parent_id", "catname_url"))), "nohtml"), array("/"));
+			$breadcrumb[] = array(
+				"name" => category_lang_text($post_categories[$article_info['cat_link']]['cattext']),
+				"link" => LinkToGT("index.php?modname=".$article_info['post_type']."&category=$cat_title"),
+				"itemtype" => "WebPage"
+			);
+		}
+	}
+	if($op == 'article_show')
+	{
+		$breadcrumb[] = array(
+			"name" => $article_info['title'],
+			"link" => $article_info['article_link'],
+			"itemtype" => "WebPage"
+		);
+	}
+	if(isset($block_global_contents['tags']) && $block_global_contents['tags'] != '' && $op == 'article_home')
+	{
+		$breadcrumb[] = array(
+			"name" => $block_global_contents['tags'],
+			"link" => LinkToGT("index.php?modname=".$article_info['post_type']."&tags=".$block_global_contents['tags'].""),
+			"itemtype" => "WebPage"
+		);
+	}
+	
+	return $breadcrumb;
+}
 
 ?>

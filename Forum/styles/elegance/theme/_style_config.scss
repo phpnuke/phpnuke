@@ -29,14 +29,14 @@ $tabbed-navigation:						false !default;	// true or false. Toggles tabbed naviga
 //
 
 $font-size:								11px !default;	// Base font size
-$font-family:							sans, Verdana, Helvetica, Arial, sans-serif !default;	// Default font
+$font-family:							Verdana, Helvetica, Arial, sans-serif !default;	// Default font
 $line-height:							1.4 !default;	// Line height
 
 $h1-font-size:							$font-size + 10px !default;
-$h1-font-family:						sans, "Trebuchet MS", Arial, Helvetica, sans-serif !default;
+$h1-font-family:						"Trebuchet MS", Arial, Helvetica, sans-serif !default;
 
 $h2-font-size:							$font-size + 8px !default;
-$h2-font-family:						sans, "Droid Sans","Open Sans","Trebuchet MS",Helvetica,Arial,sans-serif !default;
+$h2-font-family:						"Droid Sans","Open Sans","Trebuchet MS",Helvetica,Arial,sans-serif !default;
 
 $paragraph-line-height:					1.3 !default;
 
@@ -48,7 +48,7 @@ $panel-heading-font-size:				$font-size + 6px !default;
 
 $list-heading-font-size:				$font-size + 1px !default;
 $list-heading-line-height:				$font-size + 7px !default;
-$list-heading-font-family:				sans, "Droid Sans","Open Sans","Trebuchet MS",Helvetica,Arial,sans-serif !default;
+$list-heading-font-family:				"Droid Sans","Open Sans","Trebuchet MS",Helvetica,Arial,sans-serif !default;
 
 $forum-heading-font-size:				$list-heading-font-size + 2px !default;
 $forum-heading-font-family:				$list-heading-font-family !default;
@@ -59,12 +59,12 @@ $button-line-height:					floor(($font-size + 8px) / 2) * 2 !default;	// Convert 
 $button-glyph-font-size:				floor($font-size / 2) * 2 !default;	// Convert to even number
 
 $dropdown-header-font-size:				$font-size + 2px !default;
-$dropdown-header-font-family:			sans, Arial, "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$dropdown-header-font-family:			Arial, "Helvetica Neue", Helvetica, Arial, sans-serif !default;
 $dropdown-header-line-height:			30px !default;
 
 $forum-link-font-size:					$font-size + 5px !default;
 $forum-link-line-height:				1.2 !default;
-$forum-link-font-family:				sans, "Droid Sans","Open Sans","Trebuchet MS",Helvetica,Arial,sans-serif !default;
+$forum-link-font-family:				"Droid Sans","Open Sans","Trebuchet MS",Helvetica,Arial,sans-serif !default;
 
 $forum-list-column-font-size:			$font-size + 1px !default;
 $forum-list-last-column-font-size:		$font-size !default;
@@ -79,7 +79,7 @@ $tab-line-height:						$tab-font-size * 2 + 4px !default;
 // Posts
 $post-content-font-size:				$font-size + 2px !default;	// Post content
 $post-content-line-height:				1.4 !default;
-$post-content-font-family:				sans, "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif !default;
+$post-content-font-family:				"Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif !default;
 
 $post-title-font-size:					$font-size + 5px !default;
 $post-title-line-height:				1.25 !default;
@@ -98,7 +98,7 @@ $post-profile-line-height:				$line-height !default;
 
 // Forms
 $input-button-font-size:				$font-size + 2px !default;
-$input-button-font-family:				sans, "Lucida Grande", Verdana, Helvetica, Arial, sans-serif !default;
+$input-button-font-family:				"Lucida Grande", Verdana, Helvetica, Arial, sans-serif !default;
 $bbcode-button-font-size:				$font-size + 1px !default;
 
 //
@@ -274,8 +274,8 @@ $big-button-border-radius:				4px !default;	// For big buttons and blocks like q
 
 // BBCode
 $bbcode-border-radius:					3px !default;
-$bbcode-background:						#f0f0f0 !default;
-$bbcode-background2:					#e8e8e8 !default;
+$bbcode-background:						#EBEADD !default;
+$bbcode-background2:					#EFEED9 !default;
 $bbcode-outer-border:					if($light, darken($bbcode-background, 7%), lighten($bbcode-background, 7%)) !default;
 $bbcode-inner-border:					if($light, darken($bbcode-background, 5%), lighten($bbcode-background, 5%)) !default;
 $bbcode-heading-text:					#666 !default;

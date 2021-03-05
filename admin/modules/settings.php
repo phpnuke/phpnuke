@@ -28,8 +28,10 @@ if (check_admin_permission($filename))
 
 	function settings()
 	{
-		global $admin_file, $nuke_configs, $pagetitle, $other_admin_configs;
-		$pagetitle = _GENERAL_SYSTEM_SETTINGS;
+		global $admin_file, $nuke_configs, $hooks, $other_admin_configs;
+		
+		$hooks->add_filter("set_page_title", function(){return array("settings" => _GENERAL_SYSTEM_SETTINGS);});
+		
 		$contents = '';
 		$contents .="
 		<script type=\"text/javascript\" src=\"admin/template/js/jquery/jquery.scrollabletab.js\"></script>
@@ -600,7 +602,9 @@ if (check_admin_permission($filename))
 		$contents = '';
 		if(is_God())
 		{
-			global $nuke_configs, $nuke_authors_cacheData;
+			$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+			
+			global $nuke_configs;
 			$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 			$nuke_configs['upload_pagesitems'] = ($nuke_configs['upload_pagesitems'] > 100) ? 100:$nuke_configs['upload_pagesitems'];
 			$contents .= "

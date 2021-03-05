@@ -20,11 +20,12 @@ if ( !defined('BLOCK_FILE') ) {
     die();
 }
 
-global $nuke_configs, $db, $block_global_contents, $users_system;
+global $nuke_configs, $db, $users_system;
 
 $params = array();
 $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['comments'])):array();
 	
+	$users_data = array();
 	$where = array();
 	$where_values = array();
 	$select2 = "";
@@ -37,9 +38,12 @@ $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize
 	$where_values = array_filter($where_values, function($v){
 		return $v !== false && !is_null($v) && ($v != '' || $v == '0');
 	});
+	$result = $db->query("SELECT c.cid, (SELECT COUNT(c4.cid) FROM ".COMMENTS_TABLE." AS c4 WHERE ".str_replace("c.","c4.", $where)." AND c4.cid ".(($nuke_comments_configs['order_by'] == 1) ? ">":"<")."= IF(c.main_parent =0, c.cid,c.main_parent) AND c4.pid ='0') as position FROM ".COMMENTS_TABLE." AS c WHERE $where 
+		ORDER BY c.cid DESC LIMIT 0,5", $where_values);
+	//, IF(c.username = '', '', (SELECT u.".$users_system->user_fields['group_id']." FROM ".$users_system->users_table." AS u WHERE u.".$users_system->user_fields['username']." = c.username)) as group_id
 	
 	$result = $db->query("
-		SELECT c.*, IF(c.username = '', '', (SELECT u.".$users_system->user_fields['group_id']." FROM ".$users_system->users_table." AS u WHERE u.".$users_system->user_fields['username']." = c.username)) as group_id,
+		SELECT c.*,
 		(SELECT COUNT(c4.cid) FROM ".COMMENTS_TABLE." AS c4 WHERE ".str_replace("c.","c4.", $where)." AND c4.cid ".(($nuke_comments_configs['order_by'] == 1) ? ">":"<")."= IF(c.main_parent =0, c.cid,c.main_parent) AND c4.pid ='0') as position
 		FROM ".COMMENTS_TABLE." AS c 
 		WHERE $where 
@@ -47,18 +51,53 @@ $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize
 	", $where_values);
 	
 	$content = '<ul class="list-group">';
-	if($db->count() > 0)
+	
+	if($result->count() > 0)
 	{
-		foreach($result as $row)
+		$all_comments = $result->results();
+		foreach($all_comments as $row)
+		{
+			$main_parents[$row['cid']] = intval($row['main_parent']);
+			$all_cids[] = $row['cid'];
+			$all_userids[] = $row['user_id'];					
+		}
+				
+		if(!empty($all_userids))
+		{
+			$all_userids = array_unique($all_userids);
+			foreach($all_userids as $key => $user_id)
+			{
+				if($user_id == 0)
+				{
+					unset($all_userids[$key]);
+					break;
+				}
+			}
+			if(!empty($all_userids))
+			{
+				// get users data 
+				$result = $db->query("SELECT 
+				".$users_system->user_fields['user_id']." as user_id, ".$users_system->user_fields['group_id']." as group_id FROM ".$users_system->users_table." WHERE ".$users_system->user_fields['user_id']." IN (".implode(",", $all_userids).")");
+				
+				if(!empty($result))
+				{
+					$users_data = $result->results();
+					foreach($users_data as $users_val)
+						$users_data[$users_val['user_id']]['group_id'] = intval($users_val['group_id']);
+				}
+				// get users data 
+			}
+		}
+		foreach($all_comments as $row)
 		{
 			$position = intval($row['position']);
 			$cid = intval($row['cid']);
 			$pid = intval($row['pid']);
-			$group_id = intval($row['group_id']);
 			$module = filter($row['module'], "nohtml");
 			$post_title = filter($row['post_title'], "nohtml");
 			$post_id = intval($row['post_id']);
 			$date = nuketimes($row['date'], true, true, true);
+			$user_id = intval($row['user_id']);
 			$username = filter($row['username'], "nohtml");
 			$name = filter($row['name'], "nohtml");
 			$email = filter($row['email'], "nohtml");
@@ -68,10 +107,9 @@ $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize
 			$comment = smilies_parse(mb_word_wrap(strip_tags(stripslashes($row['comment'])), 200));
 			$ip_info = "http://whatismyipaddress.com/ip/$ip";			
 			$username_link = ($username == $ip) ? $ip_info:LinkToGT(sprintf($users_system->profile_url, '', $username));
-			$post_link = (isset($nuke_configs['links_function'][$module]) && $nuke_configs['links_function'][$module] != '' && function_exists($nuke_configs['links_function'][$module])) ? $nuke_configs['links_function'][$module]($post_id):"";
 			
-			if(is_array($post_link))
-				$post_link = $post_link[0];
+			$post_link = '';
+			$post_link = $hooks->apply_filters("get_post_link", $post_link, $module, $post_id);
 				
 			$current_comment_page = ($nuke_comments_configs['item_per_page'] > 0) ? ceil($position/$nuke_comments_configs['item_per_page']):0;
 			$comment_link = $post_link;
@@ -86,19 +124,16 @@ $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize
 			$url_arr = ($url != '') ? explode("/", $url):array();
 			$clean_url = is_array($url_arr) && !empty($url_arr) ? $url_arr[2]:'';
 			
-			if($nuke_configs['have_forum'] == 1 && $group_id != 0)
+			$user_colour = "#000000";
+			$group_name = "GUESTS";
+			if($nuke_configs['have_forum'] == 1 && isset($users_data[$user_id]['group_id']) && $users_data[$user_id]['group_id'] != 0)
 			{
 				$forum_groups_cacheData = get_cache_file_contents('nuke_forum_groups');
-				if(isset($forum_groups_cacheData[$group_id]))
+				if(isset($forum_groups_cacheData[$users_data[$user_id]['group_id']]))
 				{
 					$user_colour = "#".str_replace("#","",$forum_groups_cacheData[$group_id]['group_colour']);
-					$group_name = $forum_groups_cacheData[$group_id]['group_name'];
+					$group_name = $forum_groups_cacheData[$users_data[$user_id]['group_id']]['group_name'];
 				}
-			}
-			else
-			{
-				$user_colour = "#000000";
-				$group_name = "GUESTS";
 			}
 			
 			$user_level = ($group_name == 'ADMINISTRATORS') ? "<span style=\"font-weight:bold;color:".$user_colour."\">مدير کل سايت : </span>":(($username != '') ? "کاربر سايت : ":"مهمان سايت : ");
@@ -112,7 +147,7 @@ $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize
 					$content .= "<a href=\"".LinkToGT($comment_link."#comment-$cid")."\" target=\"_blank\">"._MORE."</a>";
 				}
 				$content .= "</p>
-				در : <a href=\"".LinkToGT($post_link)."\" target=\"_blank\">$post_title </a>
+				در : <a href=\"".LinkToGT($post_link."#comment-$cid")."\" target=\"_blank\">$post_title </a>
 				</li>
 				";
 		}

@@ -42,8 +42,9 @@ if (check_admin_permission($filename))
 	
 	function cache()
 	{
-		global $admin, $db, $pagetitle, $admin_file, $cache_systems, $main_caches, $users_system;
-		$pagetitle = _CACHEADMIN;
+		global $admin, $db, $hooks, $admin_file, $cache_systems, $main_caches, $users_system;
+		
+		$hooks->add_filter("set_page_title", function(){return array("cache" => _CACHEADMIN);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= "<br>";

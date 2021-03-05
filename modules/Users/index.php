@@ -43,17 +43,12 @@ $userpage = 1;
 
 function userinfo($username='')
 {
-	global $db, $user, $users_system, $pn_Cookies, $pn_Sessions, $nuke_configs, $nuke_groups_cacheData, $ya_config, $module_name, $pagetitle, $userinfo;
+	global $db, $user, $users_system, $pn_Cookies, $pn_Sessions, $nuke_configs, $ya_config, $module_name, $userinfo, $hooks;
+	
+	$nuke_groups_cacheData = get_cache_file_contents('nuke_groups');
 	
 	$contents = '';
-	$meta_tags = $GLOBALS['block_global_contents'] = $user_data = array();
-
-	$GLOBALS['block_global_contents'] = array();
-	$GLOBALS['block_global_contents']['user_id'] = 0;
-	$GLOBALS['block_global_contents']['username'] = '';
-	$GLOBALS['block_global_contents']['module_name'] = $module_name;
-	$GLOBALS['block_global_contents']['db_table'] = '';
-	$GLOBALS['block_global_contents']['db_id'] = '';
+	$user_data = array();
 			
 	if(empty($username))
 	{
@@ -66,7 +61,7 @@ function userinfo($username='')
 		$session_time = (_NOWTIME - (intval($nuke_configs['session_timeout']) * 60));
 		$session_time = $session_time - ((int) ($session_time % 60));
 		
-		$result = $db->query("SELECT u.*, s.session_user_id as user_on_off FROM ".USERS_TABLE." AS u LEFT JOIN ".SESSIONS_TABLE." AS s ON s.session_user_id = u.user_id AND s.session_time >= ? WHERE u.username = ?", [$session_time, $username]);
+		$result = $db->query("SELECT u.*, s.session_user_id as user_on_off FROM ".USERS_TABLE." AS u LEFT JOIN ".SESSIONS_TABLE." AS s ON s.session_user_id = u.user_id AND s.session_time >= ? WHERE u.username = ? GROUP BY u.user_id", [$session_time, $username]);
 		
 		if ($db->count() == 1)
 		{
@@ -74,7 +69,7 @@ function userinfo($username='')
 
 			ya_custum_userfields($user_data, $user_data['user_id']);
 			
-			$user_data['is_your_profile'] = ((strtolower($user_data['username']) == strtolower($user[1])) && phpnuke_validate_user_cookie($user, "user", $user_data)) ? true:false;
+			$user_data['is_your_profile'] = ((isset($user[1]) && strtolower($user_data['username']) == strtolower($user[1])) && phpnuke_validate_user_cookie($user, "user", $user_data)) ? true:false;
 			
 			$user_data['user_avatar'] = $users_system->get_avatar_url($user_data, $ya_config['avatar_max_width'], $ya_config['avatar_max_height']);
 			
@@ -82,7 +77,7 @@ function userinfo($username='')
 	
 			$user_data['user_realname'] = (isset($user_data['user_realname']) && !empty($user_data['user_realname'])) ? $user_data['user_realname']:$user_data['username'];
 	
-			$user_data['user_gender'] = ($user_data['user_gender'] == 'mrs') ? _MR:_MRS;
+			$user_data['user_gender'] = ($user_data['user_gender'] == 'mrs') ? _MRS:_MR;
 			
 			$group_title = (isset($nuke_groups_cacheData[$user_data['group_id']]['group_lang_titles'])&& $nuke_groups_cacheData[$user_data['group_id']]['group_lang_titles'] != '') ? phpnuke_unserialize(stripslashes($nuke_groups_cacheData[$user_data['group_id']]['group_lang_titles'])):"";
 			$group_title = ($group_title != '') ? $group_title[$nuke_configs['currentlang']]:"";
@@ -96,13 +91,64 @@ function userinfo($username='')
 				"next" => '',
 				"extra_meta_tags" => array()
 			);
+			$meta_tags = $hooks->apply_filters("userinfo_header_meta", $meta_tags, $module_name, $username);
+				
+			$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+			{
+				return array_merge($all_meta_tags, $meta_tags);
+			}, 10);		
+			unset($meta_tags);
+
+			$user_data = $hooks->apply_filters("userinfo_data", $user_data);
 			
-			$GLOBALS['block_global_contents'] = $user_data;
-			$GLOBALS['block_global_contents']['user_id'] = $user_data['user_id'];
-			$GLOBALS['block_global_contents']['username'] = $user_data['username'];
-			$GLOBALS['block_global_contents']['module_name'] = $module_name;
-			$GLOBALS['block_global_contents']['db_table'] = USERS_TABLE;
-			$GLOBALS['block_global_contents']['db_id'] = 'user_id';
+			$hooks->add_filter("global_contents", function ($block_global_contents) use($user_data, $module_name)
+			{
+				$block_global_contents = $user_data;
+				$block_global_contents['user_id'] = $user_data['user_id'];
+				$block_global_contents['username'] = $user_data['username'];
+				$block_global_contents['module_name'] = $module_name;
+				$block_global_contents['db_table'] = USERS_TABLE;
+				$block_global_contents['db_id'] = 'user_id';
+				return $block_global_contents;
+			}, 10);	
+	
+			$list_group_ops = array();
+			
+			if($user_data['is_your_profile']){
+				$list_group_ops['settings'] = "<p class=\"text-center\"><a href=\"".LinkToGT("index.php?modname=$module_name&op=edit_user")."\">"._USER_SETTINGS."</a></p>";
+				$list_group_ops['logout'] = "<p class=\"text-center\"><a href=\"".LinkToGT("index.php?modname=$module_name&op=logout")."\">"._LOGOUT."</a></p>";
+			}
+			
+			$list_group_ops = $hooks->apply_filters("users_info_ops", $list_group_ops, $user_data);	
+	
+			$list_group_item['user_realname'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._NAME_FAMILY." : ".$user_data['user_realname']."</div>";
+			$list_group_item['username'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USERNAME." : ".$user_data['username']."</div>";
+			$list_group_item['group_title'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._GROUP_NAME." : <span style=\"color:$group_colour\">".$group_title."</span></div>";
+			$list_group_item['user_femail'] = "<a href=\"mailto:".$user_data['user_femail']."\" class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._DISPLAY_EMAIL." : ".$user_data['user_femail']."</a>";
+			$list_group_item['user_website'] = "<a href=\"".$user_data['user_website']."\" class=\"list-group-item\"><i class=\"fa fa-link\"></i> "._USER_WEBSITE."</a>";
+			$list_group_item['user_gender'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_GENDER." : ".$user_data['user_gender']."</div>";
+			$list_group_item['user_address'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_ADDRESS." : ".$user_data['user_address']."</div>";
+			if(!empty($user_data['user_birthday']))
+			{
+				$list_group_item['user_birthday'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_BIRTHDAY." : ".nuketimes($user_data['user_birthday'])."</div>";
+			}
+			$list_group_item['user_regdate'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_REGDATE." : ".nuketimes($user_data['user_regdate'])."</div>";
+			$list_group_item['user_lastvisit'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_LASTVISIT." : ".nuketimes($user_data['user_lastvisit'], true, true)."</div>";
+			if(isset($user_data['custom_fields']) && !empty($user_data['custom_fields']))
+			{
+				foreach($user_data['custom_fields'] as $custom_fields_key => $custom_fields_Value)
+				{
+					$list_group_item[$custom_fields_key] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> ".$custom_fields_Value[0]." : ".$custom_fields_Value[1]."</div>";
+				}
+			}
+			$list_group_item['user_sig'] = "
+			<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_SIGN." : ".$user_data['user_sig']."</div>";
+			$list_group_item['user_interests'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_INTERESTS." : ".$user_data['user_interests']."</div>";
+			$list_group_item['user_points'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_POINTS." : ".$user_data['user_points']."</div>";
+			if($user_data['is_your_profile'] || is_admin()){
+				$list_group_item['user_credit'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._CREDITS_REMAIN." : ".number_format($user_data['user_credit'])." "._RIAL."</div>";
+			}	
+			$users_info_items = $hooks->apply_filters("users_info_items", $list_group_item, $user_data);	
 
 			if(file_exists("themes/".$nuke_configs['ThemeSel']."/userinfo.php"))
 				include("themes/".$nuke_configs['ThemeSel']."/userinfo.php");
@@ -117,43 +163,13 @@ function userinfo($username='')
 								<div class=\"panel-heading\">"._USER_PROFILE." ".$user_data['user_realname']."</div>
 								<div class=\"panel-body\">
 									<div class=\"col-sm-3 text-center\">
-										<p><img src=\"" . (str_replace(' ', '%20', $user_data['user_avatar'])) . "\" width=\"100%\" height=\"100%\" class=\"img-circle\" title=\""._USER_AVATAR." ".$user_data['username']."\" alt=\""._USER_AVATAR." ".$user_data['username']."\" style=\"max-width:180px;\" /></p><br />";
-										if($user_data['is_your_profile']){
-											$contents .= "<p class=\"text-center\"><a href=\"".LinkToGT("index.php?modname=$module_name&op=edit_user")."\">"._USER_SETTINGS."</a></p>";
-										}
-											$contents .= "<p class=\"text-center\"><a href=\"".LinkToGT("index.php?modname=$module_name&op=logout")."\">"._LOGOUT."</a></p>";
-									$contents .= "</div>
+										<p><img src=\"" . (str_replace(' ', '%20', $user_data['user_avatar'])) . "\" width=\"100%\" height=\"100%\" class=\"img-circle\" title=\""._USER_AVATAR." ".$user_data['username']."\" alt=\""._USER_AVATAR." ".$user_data['username']."\" style=\"max-width:180px;\" /></p><br />
+											".implode("\n", $list_group_ops)."
+										</div>
 									<div class=\"col-sm-9\">
 										<div class=\"list-group\">
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._NAME_FAMILY." : ".$user_data['user_realname']."</div>
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USERNAME." : ".$user_data['username']."</div>
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._GROUP_NAME." : <span style=\"color:$group_colour\">".$group_title."</span></div>
-											<a href=\"mailto:".$user_data['user_femail']."\" class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._DISPLAY_EMAIL." : ".$user_data['user_femail']."</a>
-											<a href=\"".$user_data['user_website']."\" class=\"list-group-item\"><i class=\"fa fa-link\"></i> "._USER_WEBSITE."</a>
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_GENDER." : ".$user_data['user_gender']."</div>
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_ADDRESS." : ".$user_data['user_address']."</div>";
-											if(!empty($user_data['user_birthday']))
-											{
-												$contents .= "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_BIRTHDAY." : ".nuketimes($user_data['user_birthday'])."</div>";
-											}
-											$contents .= "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_REGDATE." : ".nuketimes($user_data['user_regdate'])."</div>
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_LASTVISIT." : ".nuketimes($user_data['user_lastvisit'], true, true)."</div>";
-											if(isset($user_data['custom_fields']) && !empty($user_data['custom_fields']))
-											{
-												foreach($user_data['custom_fields'] as $custom_fields_key => $custom_fields_Value)
-												{
-													$contents .= "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> ".$custom_fields_Value[0]." : ".$custom_fields_Value[1]."</div>";
-												}
-											}
-											$contents .= "
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_SIGN." : ".$user_data['user_sig']."</div>
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_INTERESTS." : ".$user_data['user_interests']."</div>
-											<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_POINTS." : ".$user_data['user_points']."</div>";
-											if($user_data['is_your_profile'] || is_admin()){
-											$contents .= "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._CREDITS_REMAIN." : ".number_format($user_data['user_credit'])." "._RIAL."</div>";
-										}
-											
-										$contents .= "</div>
+											".implode("\n", $users_info_items)."
+										</div>
 									</div>
 									<div class=\"col-sm-12\">
 										<div class=\"well well-sm\">
@@ -166,7 +182,6 @@ function userinfo($username='')
 						</div> 
 					</div> 
 				</div>";
-			
 		}
 		else
 		{
@@ -187,24 +202,36 @@ function userinfo($username='')
 			$contents .= CloseTable();
 		}
 	}
-
-	include("header.php");
-	unset($meta_tags);
-
-	$html_output .= show_modules_boxes($module_name, "profile", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	
-	unset($GLOBALS['block_global_contents']);
+	$contents = $hooks->apply_filters("userinfo_output", $contents, $username);
+	
+	$contents = show_modules_boxes($module_name, "profile", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($username){
+		$breadcrumbs['userinfo'] = array(
+			"name" => _USERINFO.(($username != '') ? " $username":""),
+			"link" => LinkToGT("index.php?modname=users&op=userinfo".(($username != '') ? "&username=$username":"")),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
+	
+	include("header.php");
+	$html_output .= $contents;	
 	unset($user_data);
 	include ("footer.php");
 }
 
 function login($submit = '', $username = '', $user_password = '', $remember_me = 0, $security_code = '', $security_code_id = '')
 {
-	global $db, $nuke_configs, $ya_config, $pn_Sessions, $pn_Cookies, $currentpage, $module_name, $visitor_ip;
+	global $db, $nuke_configs, $ya_config, $pn_Sessions, $pn_Cookies, $currentpage, $module_name, $visitor_ip, $users_system, $hooks;
 
 	$login_errors = array();
+	
 	if(isset($submit) && $submit != '' && $username != '' && $user_password != '')
 	{
+		$hooks->do_action("users_login_submit", $username, $user_password);
+		
 		$code_accepted = true;
 		
 		if(extension_loaded("gd") && in_array("user_login", $nuke_configs['mtsn_gfx_chk']))
@@ -216,6 +243,7 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 			$setinfo = $db->table(USERS_TABLE)
 							->where('username', $username)
 							->first();
+			$setinfo = $hooks->apply_filters("users_login_submit_result", $setinfo, $username);
 			
 			if ($db->count() == 0)
 			{
@@ -233,7 +261,7 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 				{
 					$expiration = (isset($remember_me) && $remember_me == 1) ? 2592000:false;
 
-					$pn_Sessions->destroy("userinfo");
+					$pn_Sessions->remove("userinfo");
 					
 					$user = phpnuke_generate_user_cookie("user", $setinfo['user_id'], $username, $dbpass, $expiration);
 					add_log(sprintf(_SUCCESS_LOGIN_LOG, $username), 1);
@@ -259,6 +287,10 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 					}
 					///send message with sms to admins or members
 					// notifications
+					
+					$users_system->online();
+					
+					$hooks->do_action("users_login_after");
 					
 					redirect_to($currentpage);
 					die();
@@ -312,6 +344,8 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 	elseif(isset($submit) && $submit != '' && ($username == '' || $user_password == ''))
 		$login_errors[] = _USER_OR_PASS_NOT_SENT;
 
+	$login_errors = $hooks->apply_filters("users_login_errors", $login_errors);
+		
 	if (extension_loaded("gd") AND in_array("user_login" ,$nuke_configs['mtsn_gfx_chk']))
 	{
 		$sec_code_options = array(
@@ -325,6 +359,8 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 				"class" => "code"
 			)
 		);	
+		
+		$sec_code_options = $hooks->apply_filters("users_login_seccode", $sec_code_options);
 		
 		$security_code_input = makepass("_USER_LOGIN", $sec_code_options);
 	}
@@ -342,7 +378,7 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 					<div class=\"col-md-4 col-xs-4\">
 						<div class=\"logo\"></div>
 					</div>
-					<div class=\"col-md-8 col-xs-8\">
+					<div cl.ass=\"col-md-8 col-xs-8\">
 						<h2>"._USER_LOGIN_TITLE."</h2>
 					</div>
 				</div>
@@ -385,6 +421,8 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 		</form>";
 	}
 	$contents = (!empty($login_errors)) ? "<div class=\"text-center\">".implode("<br />", $login_errors)."<br />"._GOBACK."</div>":$contents;
+	
+	$contents = $hooks->apply_filters("user_login_form", $contents);
 
 	$ya_config['meta_tags'] = array(
 		"url" => LinkToGT("index.php?modname=$module_name"),
@@ -396,12 +434,20 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 		"extra_meta_tags" => array()
 	);
 	
+	$ya_config['meta_tags'] = $hooks->apply_filters("login_header_meta", $ya_config['meta_tags'], $module_name);
+		
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
+	{
+		return array_merge($all_meta_tags, $ya_config['meta_tags']);
+	}, 10);		
+	unset($meta_tags);
+			
 	ya_html_output($ya_config, $contents);
 }
 
 function register($submit = '', $users_fields = array(), $invitation_code = '', $security_code = '', $security_code_id = '')
 {
-	global $db, $nuke_configs, $pn_Cookies, $pn_Sessions, $ya_config, $coppa_yes, $tos_yes, $invitation_code, $invited_email, $module_name, $visitor_ip, $check_num, $username;
+	global $db, $nuke_configs, $pn_Cookies, $pn_Sessions, $ya_config, $coppa_yes, $tos_yes, $invitation_code, $invited_email, $module_name, $visitor_ip, $check_num, $username, $hooks;
 	
 	if($ya_config['email_activatation'] == 1 && isset($check_num) && $check_num != '' && isset($username) && $username != '')
 	{
@@ -475,6 +521,14 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 			"extra_meta_tags" => array("<meta http-equiv=\"refresh\" content=\"5;URL='$link_to_redirect'\" />")
 		);
 		
+		$ya_config['meta_tags'] = $hooks->apply_filters("register_email_activatation_header_meta", $ya_config['meta_tags'], $module_name, $username, $check_num, $link_to_redirect);
+			
+		$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
+		{
+			return array_merge($all_meta_tags, $ya_config['meta_tags']);
+		}, 10);		
+		unset($meta_tags);
+	
 		ya_html_output($ya_config, $contents);
 	}
 	
@@ -732,6 +786,8 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 
 	if(isset($submit) && $submit != '' && !empty($users_fields) && $pn_Sessions->get('register_yes', false) == 1)
 	{
+		$hooks->do_action("users_register_submit", $username, $user_password);
+		
 		$register_errors = array();
 		$code_accepted = true;
 		
@@ -768,6 +824,9 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 				$filter_rules['user_email_cn'] = 'sanitize_email|fixtext';
 			}
 			
+			$validation_rules = $hooks->apply_filters("users_registre_validation_rules", $validation_rules);
+			$filter_rules = $hooks->apply_filters("users_registre_filter_rules", $filter_rules);			
+			
 			$PnValidator->validation_rules($validation_rules); 
 			$PnValidator->filter_rules($filter_rules);
 			
@@ -782,11 +841,12 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 			if(empty($register_errors))
 			{
 				extract($users_fields);
+				define("NOAJAX_REQUEST", true);
 				
-				if(check_register_fields('username', $username, true))
+				if(!check_register_fields('username', $username))
 					$register_errors[] = _USER_HAS_REGISTERED;
 				
-				if(check_register_fields('user_email', $user_email, true))
+				if(!check_register_fields('user_email', $user_email))
 					$register_errors[] = _USER_EMAIL_HAS_SELECTED;
 				
 				$bad_mail = ($ya_config['bad_mail'] != '' && !is_array($ya_config['bad_mail'])) ? explode("\n", str_replace("\r","",$ya_config['bad_mail'])):array();
@@ -807,6 +867,8 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 					
 				if($ya_config['doublecheckemail'] == 1 && $user_email != $user_email_cn)
 					$register_errors[] = _USER_EMAILS_NOT_EQUALED;
+				
+				$register_errors = $hooks->apply_filters("users_registre_check_fields", $register_errors, $users_fields);
 				
 				if(empty($register_errors))
 				{
@@ -831,21 +893,23 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 						$check_num = random_str(32);
 					}
 					
+					$insert_query = $hooks->apply_filters("users_register_insert_query", [
+						'user_id' => $last_user_id,
+						'group_id' => 2,
+						'username' => $username,
+						'user_email' => $user_email,
+						'user_ip' => $visitor_ip,
+						'user_realname' => $user_realname,
+						'user_password' => $hashed_user_password,
+						'user_regdate' => _NOWTIME,
+						'user_lastvisit' => _NOWTIME,
+						'check_num' => $check_num,
+						'user_status' => $user_status,
+						'user_referrer' => (($ya_config['invitation'] == 1 && $pn_Sessions->exists('invitation_referrer')) ? $pn_Sessions->get('invitation_referrer', false):0),
+					]);
+					
 					$result = $db->table(USERS_TABLE)
-									->insert([
-										'user_id' => $last_user_id,
-										'group_id' => 2,
-										'username' => $username,
-										'user_email' => $user_email,
-										'user_ip' => $visitor_ip,
-										'user_realname' => $user_realname,
-										'user_password' => $hashed_user_password,
-										'user_regdate' => _NOWTIME,
-										'user_lastvisit' => _NOWTIME,
-										'check_num' => $check_num,
-										'user_status' => $user_status,
-										'user_referrer' => (($ya_config['invitation'] == 1 && $pn_Sessions->exists('invitation_referrer')) ? $pn_Sessions->get('invitation_referrer', false):0),
-									]);
+									->insert($insert_query);
 					
 					if(!$result)
 						$register_errors[] = $db->getErrors('last')['message'];
@@ -902,6 +966,7 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 						$userinfo = $db->table(USERS_TABLE)
 									->where('username', $username)
 									->first();
+									
 						if ($db->count() == 1)
 						{
 							$expiration = 2592000;
@@ -930,6 +995,8 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 		
 		if(empty($register_errors))
 		{
+			$currentpage = $pn_Cookies->get('currentpage');
+			$currentpage = (isset($currentpage) && $currentpage != '') ? LinkToGT($currentpage):$nuke_configs['nukeurl'];
 			$contents = "
 			<form id=\"Pnform\">
 				<div class=\"title text-center\">
@@ -948,15 +1015,18 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 					</div>
 				</div>
 				<div class=\"butn\">
-					<a class=\"btn btn-default btn-block btn-lg\" href=\"".$nuke_configs['nukeurl']."\"><span class=\"glyphicon glyphicon-repeat\"></span> "._GO_TO_MAIN_PAGE."</a>
+					<a class=\"btn btn-default btn-block btn-lg\" href=\"$currentpage\"><span class=\"glyphicon glyphicon-repeat\"></span> "._GO_TO_MAIN_PAGE."</a>
 				</div>
 			</form>";
 			
+			$contents = $hooks->apply_filters("users_register_ok", $contents);
 			$pn_Sessions->remove('coppa_yes');
 			$pn_Sessions->remove('tos_yes');
 			$pn_Sessions->remove('invitation_yes');
 			$pn_Sessions->remove('invitation_code');
 			$pn_Sessions->remove('register_yes');
+			
+			$hooks->do_action("users_register_after");
 		}
 	}
 	
@@ -976,6 +1046,8 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 					"class" => "code"
 				)
 			);	
+			
+			$sec_code_options = $hooks->apply_filters("users_register_seccode", $sec_code_options);
 			
 			$security_code_input = makepass("_USER_REGISTER", $sec_code_options);
 		}
@@ -1049,8 +1121,6 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 					}
 					$contents .="
 				</div>
-				
-				
 				<div class=\"row\">
 					<div class=\"col-xs-12 col-sm-6 col-md-6\">
 						<div class=\"form-group\">
@@ -1096,6 +1166,8 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 		}
 	}
 	
+	$contents = $hooks->apply_filters("users_register_form", $contents);
+	
 	$ya_config['meta_tags'] = array(
 		"url" => LinkToGT("index.php?modname=$module_name&op=register"),
 		"title" => _REGISTER,
@@ -1105,16 +1177,25 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 		"next" => '',
 		"extra_meta_tags" => array()
 	);
-	
+	$ya_config['meta_tags'] = $hooks->apply_filters("register_header_meta", $ya_config['meta_tags'], $module_name);
+		
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
+	{
+		return array_merge($all_meta_tags, $ya_config['meta_tags']);
+	}, 10);		
+	unset($meta_tags);
+		
 	ya_html_output($ya_config, $contents);
 }
 
 function logout()
 {
-	global $pn_Cookies, $pn_Sessions, $module_name, $userinfo, $db, $currentpage, $nuke_configs;
+	global $pn_Cookies, $pn_Sessions, $module_name, $userinfo, $db, $currentpage, $nuke_configs, $hooks;
+	
+	$hooks->do_action("users_logout_before");
 	
 	$pn_Cookies->delete("user");
-	$pn_Sessions->destroy("userinfo");
+	$pn_Sessions->remove("userinfo");
 		
 	$db->table(SESSIONS_TABLE)
 		->where('session_user_id', $userinfo['user_id'])
@@ -1131,6 +1212,15 @@ function logout()
 		"next" => '',
 		"extra_meta_tags" => array("<meta http-equiv=\"refresh\" content=\"5;URL='".LinkToGT($currentpage)."'\" />")
 	);
+	$meta_tags = $hooks->apply_filters("logout_header_meta", $meta_tags, $module_name, $currentpage);
+		
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);
+	
+	$hooks->do_action("users_logout_after");
 	
 	include("header.php");
 	$html_output .= title(_YOUARELOGGEDOUT);
@@ -1173,6 +1263,9 @@ function reset_password($mode='', $credit_code='', $reset_password_username='', 
 		
 		$num_user = intval($db->count());
 	}
+	
+	$result = $hooks->apply_filters("users_reset_password_result", $result);	
+	$num_user = $hooks->apply_filters("users_reset_password_number", $num_user);
 
 	if($mode == '')
 	{
@@ -1191,6 +1284,8 @@ function reset_password($mode='', $credit_code='', $reset_password_username='', 
 					"class" => "code"
 				)
 			);	
+			
+			$sec_code_options = $hooks->apply_filters("users_reset_password", $sec_code_options);
 			
 			$security_code_input = makepass("_RESET_PASSWORD_FORM", $sec_code_options);
 		}
@@ -1239,6 +1334,9 @@ function reset_password($mode='', $credit_code='', $reset_password_username='', 
 				</div>
 			</form>
 			<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
+			
+			$contents = $hooks->apply_filters("users_reset_password_form", $contents);
+			
 			die($contents);
 	}
 	
@@ -1427,7 +1525,7 @@ function reset_password($mode='', $credit_code='', $reset_password_username='', 
 
 function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 {
-	global $db, $user, $module_name, $users_system, $pn_Cookies, $pn_Sessions, $nuke_configs, $ya_config, $userinfo;
+	global $db, $user, $module_name, $users_system, $pn_Cookies, $pn_Sessions, $nuke_configs, $ya_config, $userinfo, $hooks;
 	
 	$contents = '';
 	
@@ -1543,6 +1641,9 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 						}
 					}
 					
+					$validation_rules = $hooks->apply_filters("users_edit_validation_rules", $validation_rules);
+					$filter_rules = $hooks->apply_filters("users_edit_filter_rules", $filter_rules);
+			
 					// Get or set the filtering rules
 					$PnValidator->validation_rules($validation_rules); 
 					$PnValidator->filter_rules($filter_rules);
@@ -1555,25 +1656,27 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 					else
 						$modify_errors[] = "<p align=\"center\">".$PnValidator->get_readable_errors(true,'gump-field','gump-error-message','<br />')."</p>";
 
-						
+					$modify_errors = $hooks->apply_filters("users_edit_check_fields", $modify, $user_configs);
+					
 					if(empty($modify_errors))
 					{
 						unset($user_configs['username']);
 						extract($user_configs);
 
-						$pn_Sessions->destroy("userinfo");
+						$pn_Sessions->remove("userinfo");
 						
 						$bad_mail = ($ya_config['bad_mail'] != '' && !is_array($ya_config['bad_mail'])) ? explode("\n", str_replace("\r","",$ya_config['bad_mail'])):array();
 						$bad_username = ($ya_config['bad_username'] != '' && !is_array($ya_config['bad_username'])) ? explode("\n", str_replace("\r","",$ya_config['bad_username'])):array();
 						$bad_nick = ($ya_config['bad_nick'] != '' && !is_array($ya_config['bad_nick'])) ? explode("\n", str_replace("\r","",$ya_config['bad_nick'])):array();
+						define("NOAJAX_REQUEST", true);
 						
 						// email check
 						if($email_chenged && in_array($user_email, $bad_mail))
 							$modify_errors[] = _USER_BAD_EMAIL;
 						
-						if($email_chenged && check_register_fields('user_email', $user_email, true, false))
+						if($email_chenged && !check_register_fields('user_email', $user_email, $user_data['user_email']))
 							$modify_errors[] = _USER_EMAIL_HAS_SELECTED;
-						
+							
 						// realname check
 						if(in_array($user_realname, $bad_nick))
 							$modify_errors[] = _USER_BAD_REALNAME;
@@ -1645,7 +1748,9 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 							
 							if($hashed_user_password != '')
 								$update_fields['user_password'] = $hashed_user_password;
-							
+								
+							$update_fields = $hooks->apply_filters("users_edit_update_query", $update_fields);
+					
 							$result = $db->table(USERS_TABLE)
 											->where("user_id", $user_data['user_id'])
 											->update($update_fields);
@@ -1654,32 +1759,34 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 								$modify_errors[] = $db->getErrors('last')['message'];
 							else
 							{
-								foreach($user_configs['custom_fields'] as $custom_fields_key => $custom_fields_val)
+								if(isset($user_configs['custom_fields']) && !empty($user_configs['custom_fields']))
 								{
-									if(isset($user_configs[$custom_fields_key]))
+									foreach($user_configs['custom_fields'] as $custom_fields_key => $custom_fields_val)
 									{
-										$cs_result2 = $db->table(USERS_FIELDS_VALUES_TABLE)
-														->where('uid', $user_data['user_id'])
-														->where('fid', $fids[$custom_fields_key])
-														->first();
+										if(isset($user_configs[$custom_fields_key]))
+										{
+											$cs_result2 = $db->table(USERS_FIELDS_VALUES_TABLE)
+															->where('uid', $user_data['user_id'])
+															->where('fid', $fids[$custom_fields_key])
+															->first();
 
-										if($cs_result2->count() > 0)
-										{
-											$cs_result2['value'] = $user_configs[$custom_fields_key];
-											$cs_result2->save();								
-										}
-										else
-										{
-											$db->table(USERS_FIELDS_VALUES_TABLE)
-												->insert([
-													'uid' => $user_data['user_id'],
-													'fid' => $fids[$custom_fields_key],
-													'value' => $user_configs[$custom_fields_key],
-												]);									
+											if($cs_result2->count() > 0)
+											{
+												$cs_result2['value'] = $user_configs[$custom_fields_key];
+												$cs_result2->save();								
+											}
+											else
+											{
+												$db->table(USERS_FIELDS_VALUES_TABLE)
+													->insert([
+														'uid' => $user_data['user_id'],
+														'fid' => $fids[$custom_fields_key],
+														'value' => $user_configs[$custom_fields_key],
+													]);									
+											}
 										}
 									}
 								}
-								
 								$expiration = 2592000;
 								
 								if($user_data['user_status'] == USER_STATUS_ACTIVE && $hashed_user_password != '')
@@ -1687,6 +1794,8 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 								$users_system->getuserinfo(true);
 								
 								$edit_content = "<div class=\"text-center\">"._USER_PROFILE_UPDATED."<br /><a href=\"".LinkToGT("index.php?modname=$module_name&op=userinfo&username=".$user_data['username'])."\">"._USER_PROFILE_PAGE."</a> | <a href=\"".LinkToGT("index.php?modname=$module_name&op=edit_user")."\">"._USER_GO_TO_PROFILE_SETTINGS."</a></div>";
+								
+								$hooks->do_action("users_edit_after");
 							}
 						}
 					}
@@ -2024,39 +2133,43 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 				$contents .= _USERNAME_NOT_EXISTS;
 		}
 	}
-
-	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
-	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/fileinput.min.css\" rel=\"stylesheet\" type=\"text/css\">";
 	
-	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
-	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
-	$defer_js[] = "
-		<script>
-			var allowmailchange = ".(($ya_config['allowmailchange'] == 1) ? 'true':'false').";
-			var remote_url = '".LinkToGT("index.php?modname=$module_name&op=check_register_fields")."';
-			var pass_min = ".$ya_config['pass_min'].", pass_max = ".$ya_config['pass_max'].";
-		</script>";
-	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
-	
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
-	
-	if($nuke_configs['multilingual'] == 1)
+	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $ya_config, $module_name)
 	{
-		$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
-		if($nuke_configs['datetype'] == 1)
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
-		elseif($nuke_configs['datetype'] == 2)
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
-	}
+		$default_js = array();
+		$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
+		$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/fileinput.min.css\" rel=\"stylesheet\" type=\"text/css\">";
+		
+		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
+		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
+		$defer_js[] = "
+			<script>
+				var allowmailchange = ".(($ya_config['allowmailchange'] == 1) ? 'true':'false').";
+				var remote_url = '".LinkToGT("index.php?modname=$module_name&op=check_register_fields")."';
+				var pass_min = ".$ya_config['pass_min'].", pass_max = ".$ya_config['pass_max'].";
+			</script>";
+		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
+		
+		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\"></script>";
+		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
+		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
+		
+		if($nuke_configs['multilingual'] == 1)
+		{
+			$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
+			if($nuke_configs['datetype'] == 1)
+				$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
+			elseif($nuke_configs['datetype'] == 2)
+				$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
+		}
 	
-	$custom_theme_setup = array(
-		"default_css" => $default_css,
-		"default_js" => $default_js,
-		"defer_js" => $defer_js
-	);
-	$custom_theme_setup_replace = false;
+		$theme_setup = array_merge_recursive($theme_setup, array(
+			"default_css" => $default_css,
+			"default_js" => $default_js,
+			"defer_js" => $defer_js
+		));
+		return $theme_setup;
+	}, 10);
 	
 	$contents = OpenTable(_USER_PROFILE_EDIT.' '.$user_data['username']).$contents.CloseTable();
 	$meta_tags = array(
@@ -2068,15 +2181,30 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 		"next" => '',
 		"extra_meta_tags" => array()
 	);
+	$meta_tags = $hooks->apply_filters("edit_user_header_meta", $meta_tags, $module_name);
+		
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($user_data){
+		$breadcrumbs['userinfo'] = array(
+			"name" => _USER_PROFILE_EDIT,
+			"link" => LinkToGT("index.php?modname=users&op=edit_user"),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
 	
 	include("header.php");
 	$html_output .= show_modules_boxes($module_name, "edit", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	include ("footer.php");
 }
 
-function check_register_fields($field = 'username', $value = '', $retuen_num = false, $mode = 'new', $default_value = '')
+function check_register_fields($field = 'username', $value = '', $default_value = '', $title = '', $primary = true)
 {
-	return _check_register_fields($field, $value, $retuen_num, $mode, $default_value);
+	return _check_register_fields($field, $value, $default_value, $title, $primary);
 }
 
 function get_user_avatar($avatar)
@@ -2090,7 +2218,7 @@ function delete_cookies()
 {
 	global $pn_Cookies, $pn_Sessions, $module_name;
 	$pn_Cookies->delete("user");
-	$pn_Sessions->destroy("userinfo");
+	$pn_Sessions->remove("userinfo");
 	redirect_to(LinkToGT("index.php?modname=$module_name"));
 }
 
@@ -2112,7 +2240,7 @@ function send_invitation_code($invited_email)
 		die(json_encode($response));
 	}
 	
-	if(check_register_fields('user_email', $invited_email, true))
+	if(check_register_fields('user_email', $invited_email, ''))
 	{
 		$response['message'] = _USER_EMAIL_HAS_SELECTED;
 		die(json_encode($response));
@@ -2162,24 +2290,25 @@ $submit							= (isset($submit)) ? filter($submit, "nohtml"):"";
 $username						= (isset($username)) ? filter($username, "nohtml"):"";
 $mode							= (isset($mode)) ? filter($mode, "nohtml"):"";
 $resend							= (isset($resend)) ? (bool) $resend:false;
-$retuen_num						= (isset($retuen_num)) ? (bool) $retuen_num:false;
-$credit_code					= (isset($credit_code)) ? filter($credit_code, "nohtml"):"";
-$reset_password_username		= (isset($reset_password_username)) ? filter($reset_password_username, "nohtml"):"";
-$reset_password_user_email		= (isset($reset_password_user_email)) ? filter($reset_password_user_email, "nohtml"):"";
-$new_user_password				= (isset($new_user_password)) ? $new_user_password:array();
-$user_password					= (isset($user_password)) ? filter($user_password, "nohtml"):"";
-$security_code					= (isset($security_code)) ? filter($security_code, "nohtml"):"";
-$security_code_id				= (isset($security_code_id)) ? filter($security_code_id, "nohtml"):"";
-$invitation_code				= (isset($invitation_code)) ? filter($invitation_code, "nohtml"):"";
-$invited_email					= (isset($invited_email)) ? filter($invited_email, "nohtml"):"";
-$remember_me					= (isset($remember_me)) ? filter($remember_me, "nohtml"):"";
-$field							= (isset($field)) ? filter($field, "nohtml"):"";
+$credit_code					= filter(request_var('credit_code', '', '_POST'), "nohtml");
+$reset_password_username		= filter(request_var('reset_password_username', '', '_POST'), "nohtml");
+$reset_password_user_email		= filter(request_var('reset_password_user_email', '', '_POST'), "nohtml");
+$new_user_password				= request_var('new_user_password', array(), '_POST');
+$user_password					= filter(request_var('user_password', '', '_POST'), "nohtml");
+$security_code					= filter(request_var('security_code', '', '_POST'), "nohtml");
+$security_code_id				= filter(request_var('security_code_id', '', '_POST'), "nohtml");
+$invitation_code				= filter(request_var('invitation_code', '', '_POST'), "nohtml");
+$invited_email					= filter(request_var('invited_email', '', '_POST'), "nohtml");
+$remember_me					= filter(request_var('remember_me', '', '_POST'), "nohtml");
+$field							= filter(request_var('field', '', '_POST'), "nohtml");
 $avatar							= (isset($avatar)) ? filter($avatar, "nohtml"):"";
-$users_fields					= (isset($users_fields)) ? $users_fields:array();
-$user_configs					= (isset($user_configs)) ? $user_configs:array();
-$uploadfile						= (isset($uploadfile)) ? $uploadfile:array();
-$value							= (isset($value)) ? filter($value, "nohtml"):"";
-$default_value					= (isset($default_value)) ? filter($default_value, "nohtml"):"";
+$users_fields					= request_var('users_fields', array(), '_POST');
+$user_configs					= request_var('user_configs', array(), '_POST');
+$uploadfile						= request_var('uploadfile', array(), '_FILES');
+$value							= filter(request_var('value', '', '_POST'), "nohtml");
+$default_value					= filter(request_var('default_value', '', '_POST'), "nohtml");
+$title							= filter(request_var('title', '', '_POST'), "nohtml");
+$primary						= filter_var(request_var('primary', true, '_POST'), FILTER_VALIDATE_BOOLEAN);
 $op								= (isset($op)) ? filter($op, "nohtml"):"";
 
 switch($op)
@@ -2205,7 +2334,7 @@ switch($op)
 	break;
 	
 	case"check_register_fields":
-		check_register_fields($field, $value, $retuen_num, $mode, $default_value);
+		check_register_fields($field, $value, $default_value, $title, $primary);
 	break;
 	
 	case"get_user_avatar":

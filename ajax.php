@@ -11,7 +11,7 @@
 /* the Free Software Foundation; either version 2 of the License.       */
 /************************************************************************/
 
-@require_once("mainfile.php");
+require_once("mainfile.php");
 global $p, $users_system;
 
 switch($op)
@@ -32,22 +32,21 @@ switch($op)
 		if($code_accepted)
 		{
 			$mode = isset($mode) ? $mode:"friend";
-			$report_friend_form_name = isset($report_friend_form_name) ? $report_friend_form_name:"";
-			$report_friend_form_email = isset($report_friend_form_email) ? $report_friend_form_email:"";
-			$report_friend_form_message = isset($report_friend_form_message) ? $report_friend_form_message:"";
-			$report_friend_form_subject = isset($report_friend_form_subject) ? $report_friend_form_subject:"";
-			$report_friend_form_message = isset($report_friend_form_message) ? $report_friend_form_message:"";
-			$report_friend_form_post_title = isset($report_friend_form_post_title) ? $report_friend_form_post_title:"";
-			$report_friend_form_post_link = isset($report_friend_form_post_link) ? $report_friend_form_post_link:"";
-			$report_friend_form_post_id = isset($report_friend_form_post_id) ? $report_friend_form_post_id:"";
-			$report_friend_form_module_name = isset($report_friend_form_module_name) ? $report_friend_form_module_name:"";		
+			$report_friend_form_name = isset($report_friend_form_name) ? filter($report_friend_form_name, "nohtml"):"";
+			$report_friend_form_email = isset($report_friend_form_email) ? filter($report_friend_form_email, "nohtml"):"";
+			$report_friend_form_message = isset($report_friend_form_message) ? addslashes($report_friend_form_message):"";
+			$report_friend_form_subject = isset($report_friend_form_subject) ? filter($report_friend_form_subject, "nohtml"):"";
+			$report_friend_form_post_title = isset($report_friend_form_post_title) ? filter($report_friend_form_post_title, "nohtml"):"";
+			$report_friend_form_post_link = isset($report_friend_form_post_link) ? filter($report_friend_form_post_link, "nohtml"):"";
+			$report_friend_form_post_id = isset($report_friend_form_post_id) ? intval($report_friend_form_post_id):"";
+			$report_friend_form_module_name = isset($report_friend_form_module_name) ? filter($report_friend_form_module_name, "nohtml"):"";		
 			report_friend_form(true, $mode, $report_friend_form_post_id, $report_friend_form_post_title, $report_friend_form_module_name, $report_friend_form_subject, $report_friend_form_message, $report_friend_form_post_link, $report_friend_form_name, $report_friend_form_email);
 		}
 		else
 		{
 			$results = array(
 				'status' => 'danger',
-				'message' => 'کد امنيتي صحيح نمي باشد',
+				'message' => _BADSECURITYCODE,
 			);
 			die(json_encode($results));
 		}

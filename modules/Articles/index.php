@@ -121,8 +121,12 @@ if(!function_exists("article_more"))
 
 function articles_home($category='', $tags='', $orderby = '', $main_module = 'Articles')
 {
-	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $articles_votetype, $nuke_modules_cacheData, $nuke_authors_cacheData;
-	$link_to = "index.php?modname=".(($main_module != 'Articles') ? "$main_module":"");
+	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $hooks;
+	
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	
+	$link_to = array();
+	$link_to['modname'] = ($main_module != 'Articles') ? "$main_module":"";
 
 	$top_middle = ((isset($tags) && $tags != '') || (isset($page) && intval($page) != 0) || (isset($category) && $category != '')) ? false:true;
 
@@ -153,7 +157,7 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 			$module_name_title = _FAQS;
 		break;
 	}
-		
+	
 	if ($nuke_configs['multilingual'] == 1)
 	{
 		$module_titles = $lang_titles = ($nuke_modules_cacheData_by_title[$module_name]['lang_titles'] != "") ? phpnuke_unserialize(stripslashes($nuke_modules_cacheData_by_title[$module_name]['lang_titles'])):"";
@@ -163,14 +167,16 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 	else
 		$module_title = (($catid > 0) ? $category." - ":"").(($main_module == 'Articles') ? $nuke_modules_cacheData_by_title[$module_name]['title']:$module_name_title);
 	
+	$module_title = $hooks->apply_filters("post_module_name_title", $module_title, $main_module, $catid);
+	
 	$db->table(POSTS_TABLE)
 		->where('status', 'future')
 		->where('time', '<',  _NOWTIME)
 		->update([
 			'status' => 'publish'
-		]);		
-	
-	$votetype = ($articles_votetype) ? $articles_votetype:$nuke_configs['votetype'];
+		]);
+		
+	$hooks->do_action("future_post_publish_after");
 	
 	switch($orderby)
 	{
@@ -198,23 +204,17 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 		$query_set['status'] = "s.status = 'publish'";
 		
 	$query_set['alanguage'] = "";
-	$query_set['ihome'] = "";
+	$query_set['ihome'] = "s.ihome = '1'";
 	$query_set['cat'] = array();
 	$query_set['post_type'] = "(s.post_type = '$main_module')";
 	
 	if ($nuke_configs['multilingual'] == 1)
-	{
-		$query_set['alanguage'] = "(s.alanguage='".$nuke_configs['currentlang']."' OR s.alanguage='')";
-		
-		$query_set['ihome'] = "s.ihome = '1'";
-	}
+		$query_set['alanguage'] = "(s.alanguage='".$nuke_configs['currentlang']."' OR s.alanguage='')";		
 	
 	$all_sub_cats = array();
 
 	if ($catid > 0)
 	{
-		unset($query_set['ihome']);
-
 		$all_sub_cats = array_unique(get_sub_categories_id($main_module, $catid, $nuke_categories_cacheData, array($catid)));
 
 		$c=1;
@@ -275,28 +275,37 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 			$query_params[":tags2"] = "%$tags2%";
 			$query_params[":tags3"] = "%$tags3%";
 			
-			$link_to .= "&tags=$tags";
+			$link_to['tags'] = $tags;
 			
 			$contents .= OpenTable();
-			$contents .= "<div align=\"center\"><h1>".$tags."</h1></div>";
+			$contents .= "<div calss=\"tag-title\" align=\"center\"><h1>".$tags."</h1></div>";
 			$contents .= CloseTable();
+			$contents = $hooks->apply_filters("post_tags", $contents);
+		
+			$hooks->add_filter("global_contents", function ($block_global_contents) use($tags, $main_module)
+			{
+				$block_global_contents['post_type'] = $main_module;
+				$block_global_contents['tags'] = $tags;
+				return $block_global_contents;
+			}, 10);
 		}
 	}
-	
+	$cat_title = '';
 	if ($catid > 0)
 	{
+		$cat_contents = '';
 		$numrows_a = (isset($nuke_categories_cacheData[$main_module][$catid]) && !empty($nuke_categories_cacheData[$main_module][$catid])) ? 1:0;
 		$parent_id = intval($nuke_categories_cacheData[$main_module][$catid]['parent_id']);
 		
 		if ($numrows_a == 0)
 		{
-			$contents .= OpenTable();
-			$contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename']."</font><br><br>"._NOINFO4TOPIC."<br><br>[ <a href=\"".LinkToGT("index.php?modname=$main_module")."\">"._GOTONEWSINDEX."</a> | <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_categories")."\">"._SELECTNEWTOPIC."</a> ]</div>";
-			$contents .= CloseTable();
+			$cat_contents .= OpenTable();
+			$cat_contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename']."</font><br><br>"._NOINFO4TOPIC."<br><br>[ <a href=\"".LinkToGT("index.php?modname=$main_module")."\">"._GOTONEWSINDEX."</a> | <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_categories")."\">"._SELECTNEWTOPIC."</a> ]</div>";
+			$cat_contents .= CloseTable();
 		}
 		else
 		{
-			$contents .= OpenTable();
+			$cat_contents .= OpenTable();
 			$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($catid, $nuke_categories_cacheData[$main_module], "parent_id", "catname_url"))), "nohtml"), array("/"));
 			
 			$attrs = array(
@@ -305,7 +314,7 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 			);
 			$cats_link_deep = implode("/", category_link($main_module, $cat_title, $attrs));
 			
-			$contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename'].": $cats_link_deep</font><br><br>
+			$cat_contents .= "<div class=\"text-center\"><font class=\"title\">".$nuke_configs['sitename'].": $cats_link_deep</font><br><br>
 			<form action=\"".LinkToGT("index.php?modname=Search")."\" method=\"post\">
 			<input type=\"hidden\" name=\"search_category\" value=\"$catid\">
 			<input type=\"hidden\" name=\"search_module\" value=\"$main_module\">
@@ -336,10 +345,19 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 			}
 			$sub_cats_contents .= "</table>";
 			if($sub_cats_contents_num > 0)
-				$contents .= $sub_cats_contents; 
-			$contents .= CloseTable();
+				$cat_contents .= $sub_cats_contents; 
+			$cat_contents .= CloseTable();
 		}
-		$link_to .= "&category=$cat_title";
+		$contents = $contents.$cat_contents;
+		$contents = $hooks->apply_filters("post_subcats", $contents);
+		$link_to['category'] = $cat_title;
+		
+		$hooks->add_filter("global_contents", function ($block_global_contents) use($catid, $main_module)
+		{
+			$block_global_contents['post_type'] = $main_module;
+			$block_global_contents['cat_link'] = $catid;
+			return $block_global_contents;
+		}, 10);
 	}
 	
 	$total_rows	= 0;
@@ -351,6 +369,9 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 	$query_params[':entries_per_page'] = $entries_per_page;
 	$article_info = array();
 	
+	$query_set = $hooks->apply_filters("post_index_query_set", $query_set, $main_module);
+	$query_params = $hooks->apply_filters("post_index_query_params", $query_params, $main_module);
+	
 	article_result_parse($article_info, $query_set, $query_params, $orderby, 'index');
 	
 	$total_rows	= intval($article_info['total_rows']);
@@ -360,6 +381,7 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 	{
 		foreach ($article_info as $row)
 		{
+			$contents = $hooks->apply_filters("posts_contents_before", $contents, $row);
 			if(file_exists("themes/".$nuke_configs['ThemeSel']."/".$main_module."_index.php"))
 				include("themes/".$nuke_configs['ThemeSel']."/".$main_module."_index.php");
 			elseif(function_exists("".$main_module."_index"))
@@ -373,44 +395,75 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 			}
 			else
 				$contents .= "";
+				
+			$contents = $hooks->apply_filters("posts_contents_after", $contents, $row);
 		}
 		unset($article_info);
 	}
 
+	$link_to = $hooks->apply_filters("posts_linkto", $link_to);
+	
+	$_link_to = array();
+	foreach($link_to as $link_to_key => $link_to_val)
+	{
+		$_link_to[] = $link_to_key."=".$link_to_val;
+	}
+	
+	$_link_to = "index.php?".implode("&", $_link_to);
+	
+	$meta_url = $_link_to;
 	if (intval($page) != 0)
 	{
-		$meta_url = $link_to."&page=".intval($page)."";
-	}
+		$meta_url .= "&page=".intval($page)."";
+	}	
+	$meta_url = $hooks->apply_filters("posts_meta_url", $meta_url, $_link_to, $page);
 	
-	
+	$pagination_contents = '';
 	if($entries_per_page < $total_rows)
 	{
-		$contents .= "<div id=\"pagination\">";
-		$contents .= clean_pagination($total_rows, $entries_per_page, $current_page, $link_to);
-		$contents .= "</div>";
+		$pagination_contents .= "<div id=\"pagination\">";
+		$pagination_contents .= clean_pagination($total_rows, $entries_per_page, $current_page, $_link_to);
+		$pagination_contents .= "</div>";
 	}
+	$pagination_contents = $hooks->apply_filters("posts_paginations", $pagination_contents, $total_rows, $entries_per_page, $current_page, $_link_to);
+	
+	$contents .= $pagination_contents;
 	
 	$lastpage = ceil($total_rows/$entries_per_page);
 	
 	$meta_tags = array(
-		"url"				=> LinkToGT($link_to),
+		"url"				=> LinkToGT($meta_url),
 		"title"				=> $module_title,
 		"description"		=> '',
 		"keywords"			=> '',
-		"prev"				=> ($page < $lastpage && intval($page) != 0) ? LinkToGT($link_to."&page=".intval($page+1).""):"",
-		"next"				=> ($page > 1 && $entries_per_page < $total_rows) ? LinkToGT($link_to."&page=".intval($page-1).""):"",
+		"prev"				=> ($page < $lastpage && intval($page) != 0) ? LinkToGT($_link_to."&page=".intval($page+1).""):"",
+		"next"				=> ($page > 1 && $entries_per_page < $total_rows) ? LinkToGT($_link_to."&page=".intval($page-1).""):"",
 		"extra_meta_tags"	=> ($catid > 0) ? array(
 			"<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - $cat_title\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n"
 		):"",
 	);
 	
+	$meta_tags = $hooks->apply_filters("posts_header_meta", $meta_tags, $meta_url, $page, $lastpage, $_link_to, $entries_per_page, $catid, $total_rows, $cat_title);
+
+	$hooks->add_filter("site_breadcrumb", "posts_breadcrumb", 10);
+	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);	
+		
 	$main_module_box = (($main_module != 'Articles')) ? strtolower($main_module)."_index":"index";
 	
 	if($top_middle)
 		$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	else
 		$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","right"), $contents);
+		
+	$boxes_contents = $hooks->apply_filters("posts_contents", $boxes_contents);
 
+	$hooks->do_action("posts_before_show", $boxes_contents);
+	
 	include("header.php");
 	$html_output .= $boxes_contents;
 	include("footer.php");
@@ -418,7 +471,7 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 
 function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles')
 {
-	global $db, $module_name, $REQUESTURL, $articles_votetype, $nuke_configs, $userinfo, $articles_ratecookie, $nuke_bookmarksite_cacheData, $visitor_ip, $pn_Cookies, $nuke_authors_cacheData, $your_pass;
+	global $db, $module_name, $REQUESTURL, $nuke_configs, $userinfo, $articles_ratecookie, $visitor_ip, $pn_Cookies, $your_pass, $hooks;
 	$article_info = array();
 	$sid = intval($sid);
 
@@ -450,7 +503,9 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 	}
 	
 	$query_set[] = "s.post_type = :post_type";
-		
+	$query_set = $hooks->apply_filters("post_more_query_set", $query_set, $main_module);
+	$query_params = $hooks->apply_filters("post_more_query_params", $query_params, $main_module);
+	
 	article_result_parse($article_info, $query_set, $query_params, 'time', 'more');
 	
 	if(isset($article_info[0]))
@@ -460,6 +515,9 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 		if(intval($article_info['sid'] > 0))
 		{
 		    $true_link = trim(articleslink(intval($article_info['sid']), filter($article_info['title'], "nohtml"), filter($article_info['post_url'], "nohtml"), filter($article_info['time'], "nohtml"), intval($article_info['cat_link']), $main_module).$urlop, "/")."/";
+			
+			$hooks->do_action("post_url_conflict", $true_link, $REQUESTURL, $main_module);
+			
 			if($true_link != trim(rawurldecode($REQUESTURL), "/")."/")
 			{
 			    redirect_to($true_link);
@@ -467,7 +525,10 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 			}
 		}
 		else
+		{
+			$hooks->do_action("post_url_noexist", $article_info, $REQUESTURL, $main_module);
 			die_error("404");
+		}
 	}
 	else
 	{
@@ -498,7 +559,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 			"counter" => ["+", 1]
 		]);
 
-	$pagetitle				= $article_info['title'];
+	$pagetitle						= $hooks->apply_filters("post_more_pagetitle", $article_info['title'], $main_module);
 
 	if(empty($article_info['informant']))
 		$article_info['informant']	= _ANONYMOUS;
@@ -511,6 +572,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 	$allow_to_view					= $permission_result[0];
 	$disallow_message				= $permission_result[1];
 
+	$allow_to_view					= $hooks->apply_filters("post_more_allow_to_view", $allow_to_view, $main_module);
 	if (!$allow_to_view)
 	{
 		$article_info['bodytext']		= "<div class=\"text-center\">";
@@ -522,6 +584,8 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 	$this_article_pass = $pn_Cookies->get("this_article_pass".$article_info['sid']);
 	$this_article_pass = intval($this_article_pass);
 
+	$this_article_pass = $hooks->apply_filters("post_more_article_pass", $this_article_pass, $main_module);
+	
 	if($article_info['post_pass'] != "" && $this_article_pass != "1" && !is_admin())
 	{
 		$your_pass = (isset($your_pass)) ? filter($your_pass, "nohtml"):'';
@@ -565,6 +629,11 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 		$article_info['report_link'] = "index.php?modname=$main_module&op=article_show&mode=report&sid=".$article_info['sid']."";
 	}
 	
+	$article_info = $hooks->apply_filters("post_more_article_info", $article_info);
+	
+	$hooks->add_filter("site_breadcrumb", "posts_breadcrumb", 10);
+	$hooks->add_filter("microdata_json", "Articles_microdata_json", 10);
+	
 	$meta_tags = array(
 		"url" => $article_info['article_link'],
 		"title" => $article_info['title'],
@@ -574,17 +643,29 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 		"next" => $article_info['next_article_link'],
 		"extra_meta_tags" => array()
 	);
+	$meta_tags = $hooks->apply_filters("post_more_meta_tags", $meta_tags, $article_info);
+	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);
+	unset($meta_tags);
 	
 	switch($mode)
 	{
 		default:
-			$GLOBALS['block_global_contents'] = $article_info;
-			$GLOBALS['block_global_contents']['post_id'] = $article_info['sid'];
-			$GLOBALS['block_global_contents']['post_title'] = $article_info['title'];
-			$GLOBALS['block_global_contents']['module_name'] = $main_module;
-			$GLOBALS['block_global_contents']['allow_comments'] = $article_info['allow_comment'];
-			$GLOBALS['block_global_contents']['db_table'] = POSTS_TABLE;
-			$GLOBALS['block_global_contents']['db_id'] = 'sid';
+			$hooks->add_filter("global_contents", function ($block_global_contents) use($article_info, $main_module)
+			{
+				$block_global_contents = $article_info;
+				$block_global_contents['post_id'] = $article_info['sid'];
+				$block_global_contents['post_title'] = $article_info['title'];
+				$block_global_contents['module_name'] = $main_module;
+				$block_global_contents['allow_comments'] = $article_info['allow_comment'];
+				$block_global_contents['module_boxes'] = (isset($article_info['post_module_boxes'])) ? $article_info['post_module_boxes']:"";
+				$block_global_contents['db_table'] = POSTS_TABLE;
+				$block_global_contents['db_id'] = 'sid';
+				return $block_global_contents;
+			}, 10);			
 			
 			$contents = '';
 			if(file_exists("themes/".$nuke_configs['ThemeSel']."/".$article_info['post_type']."_more.php"))
@@ -603,12 +684,12 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 				
 			$main_module_box = (($main_module != 'Articles')) ? strtolower($main_module)."_more":"more";
 			$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+			$boxes_contents = $hooks->apply_filters("post_more_boxes_contents", $boxes_contents);
+
+			$hooks->do_action("post_more_before_show", $boxes_contents);
 			
 			include("header.php");
-			
-			unset($meta_tags);
-			
-			unset($GLOBALS['block_global_contents']);
+		
 			unset($article_info);
 			
 			$html_output .= $boxes_contents;
@@ -617,18 +698,21 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 		
 		case"friend":
 		case"report":
+			$hooks->do_action("post_report_friend_before", $article_info);
 			header("X-Robots-Tag: noindex, nofollow", true);
 			report_friend_form(false, $mode, $article_info['sid'], $article_info['title'], $main_module, '', '', $article_info['article_link'], '', '');
 			die();
 		break;
 		
 		case"pdf":
+			$hooks->do_action("post_pdf_before", $article_info);
 			header("X-Robots-Tag: noindex, nofollow", true);
 			pdf_generate($article_info['aid'], $article_info['tags'], $article_info['title'], $article_info['title'], $article_info['datetime'], $article_info['hometext']."<br /><br />".$article_info['bodytext'], $article_info['article_link']);
 			die();
 		break;
 		
-		case"print":			
+		case"print":
+			$hooks->do_action("post_print_before", $article_info);		
 			print_theme($pagetitle, $article_info);
 			die();
 		break;
@@ -637,7 +721,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 
 function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main_module = 'Articles')
 {
-	global $userinfo, $db, $user, $page, $module_name, $nuke_configs;
+	global $userinfo, $db, $user, $page, $module_name, $nuke_configs, $hooks;
 	
 	$contents = '';
 
@@ -681,19 +765,12 @@ function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main
 		$nexttime				= to_mktime("$jnyear/$jnmonth/1");
 		
 		$query_set['time']		= "s.time BETWEEN '$currenttime' AND '$nexttime'";
-		$where_between = array($currenttime, $nexttime);
 	}
 	
 	$entries_per_page			= 20;
 	$current_page				= (empty($page)) ? 1 : $page;
 	$start_at					= ($current_page * $entries_per_page) - $entries_per_page;
 	$link_to					= ($year != 0 && $month != 0 && $month_l != '') ? "index.php?modname=$main_module&op=article_archive&year=$year&month=$month&month_l=$month_l":"index.php?modname=$main_module&op=article_archive";
-	
-	$total_rows = $db->table(POSTS_TABLE)
-					->where('post_type', $main_module)
-					->whereBetween('time', $where_between)
-					->select(['sid'])
-					->count();
 					
 	if(!is_admin())
 		$query_set['status']	= "s.status = 'publish'";
@@ -829,10 +906,12 @@ function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main
 	$contents					.="<div align=\"center\">
 	[ <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_select_month")."\">"._ARCHIVESINDEX."</a>".(($mode !== 'all') ? " | <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_archive")."\">"._SHOWALLSTORIES."</a>":"")." ]</div>";
 	
+	$meta_url				= $link_to;
 	if (intval($page) != 0)
 	{
-		$meta_url				= $link_to."&page=".intval($page)."";
+		$meta_url				.= "&page=".intval($page)."";
 	}
+	$meta_url = $hooks->apply_filters("posts_archive_meta_url", $meta_url, $link_to, $page);
 	
 	$next_link					= '';
 	$prev_link					= '';
@@ -846,7 +925,7 @@ function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main
 		$prev_link				= LinkToGT($link_to."&page=".intval($page-1)."");
 
 	$meta_tags = array(
-		"url" 					=> $link_to,
+		"url" 					=> $meta_url,
 		"title" 				=> _STORIESARCHIVE."".(($month_l != '') ? " - $month_l $year":""),
 		"description" 			=> '',
 		"keywords" 				=> '',
@@ -855,7 +934,32 @@ function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main
 		"extra_meta_tags" 		=> array(
 			"<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - "._STORIESARCHIVE." - ".(($month_l != '') ? " - $month_l $year":"")."\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n"
 		)
+		
 	);
+	$meta_url = $hooks->apply_filters("posts_archive_meta_tags", $meta_tags, $prev_link, $next_link, $meta_url, $month_l, $year);
+	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);	
+	
+	$breadcrumb_title = ($mode == 'all') ? 	_SHOWALLSTORIES:("$month_l $year");
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($main_module, $meta_tags, $breadcrumb_title){
+		$breadcrumbs['archive_main'] = array(
+			"name" => _STORIESARCHIVE,
+			"link" => LinkToGT("index.php?modname=".$main_module."&op=article_select_month"),
+			"itemtype" => "WebPage"
+		);
+		
+		$breadcrumbs['archive_path'] = array(
+			"name" => str_replace("-", " ", $breadcrumb_title),
+			"link" => $meta_tags['url'],
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
+	unset($meta_tags);
 	
 	include("header.php");
 	$output = '';
@@ -867,6 +971,7 @@ function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main
 	$output .= OpenTable();
 	$output .= $contents;
 	$output .= CloseTable();
+	$output = $hooks->apply_filters("post_archive_contents", $output);
 	$html_output .= show_modules_boxes($module_name, "archive", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $output);
 	include("footer.php");
 }
@@ -878,7 +983,7 @@ function article_select_month($in = 0)
 
 function article_categories($main_module = 'Articles')
 {
-	global $userinfo, $db, $user, $page, $module_name, $nuke_configs;
+	global $userinfo, $db, $user, $page, $module_name, $nuke_configs, $hooks;
 	
 	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 	$contents 								= "";
@@ -934,7 +1039,24 @@ function article_categories($main_module = 'Articles')
 		"next" 								=> '',
 		"extra_meta_tags" 					=> array()
 	);
+	$meta_tags = $hooks->apply_filters("post_categories_meta_tags", $meta_tags, $main_module);
 	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($main_module){
+		$breadcrumbs['category'] = array(
+			"name" => _CATEGORIES,
+			"link" => LinkToGT("index.php?modname=".$main_module."&op=article_categories"),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
+	
+	$contents = $hooks->apply_filters("post_categories_contents", $contents);
 	include("header.php");
 	$html_output .= show_modules_boxes($module_name, "category", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), title($nuke_configs['sitename']." : "._ARTICLES_CATEGORIES."").$contents);
 	include("footer.php");
@@ -942,7 +1064,7 @@ function article_categories($main_module = 'Articles')
 
 function send_article($preview = '', $submit = '', $article_fields = array(), $security_code = '', $security_code_id = '', $main_module = 'Articles')
 {
-	global $db, $userinfo, $nuke_configs, $module_name, $PnValidator, $visitor_ip;
+	global $db, $userinfo, $nuke_configs, $module_name, $PnValidator, $visitor_ip, $hooks;
 	
 	$finish = false;
 	$contents = '';
@@ -1174,15 +1296,18 @@ function send_article($preview = '', $submit = '', $article_fields = array(), $s
 		$contents .= CloseTable();	
 	}
 	
-	$default_css[] = "<link href=\"includes/Ajax/jquery/jquery-checktree.css\" rel=\"stylesheet\" type=\"text/css\">";
-		
-	$defer_js[] = "<script src=\"includes/Ajax/jquery/jquery-checktree.js\"></script>";
-		
-	$custom_theme_setup = array(
-		"default_css" => $default_css,
-		"defer_js" => $defer_js
-	);
-	$custom_theme_setup_replace = false;
+	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+	{
+		$theme_setup = array_merge_recursive($theme_setup, array(
+			"default_css" => array(
+				"<link href=\"".INCLUDE_PATH."/Ajax/jquery/jquery-checktree.css\" rel=\"stylesheet\" type=\"text/css\">"
+			),
+			"defer_js" => array(
+				"<script src=\"".INCLUDE_PATH."/Ajax/jquery/jquery-checktree.js\"></script>"
+			)
+		));
+		return $theme_setup;
+	}, 10);
 	
 	$meta_tags = array(
 		"url" => LinkToGT("index.php?modname=$main_module&op=send_article"),
@@ -1191,6 +1316,22 @@ function send_article($preview = '', $submit = '', $article_fields = array(), $s
 		"keywords" => '',
 		"extra_meta_tags" => array()
 	);
+	$meta_tags = $hooks->apply_filters("post_categories_meta_tags", $meta_tags, $main_module);
+	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($main_module){
+		$breadcrumbs['send-article'] = array(
+			"name" => _SEND_POST,
+			"link" => LinkToGT("index.php?modname=$main_module&op=send_article"),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
 	
 	include ("header.php");
 	$html_output .= show_modules_boxes($module_name, "send_article", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
@@ -1208,15 +1349,17 @@ $month				= (isset($month) && intval($month) > 0) ? intval($month) : 0;
 $month_l			= isset($month_l)? filter($month_l, "nohtml") : "";
 $mode				= isset($mode)? filter($mode, "nohtml") : "";
 $post_url			= isset($post_url)? filter($post_url, "nohtml") : "";
-$article_fields		= isset($article_fields)? $article_fields : array();
+$article_fields		= request_var('article_fields', array(), "_POST");
 $preview			= isset($preview)? filter($preview, "nohtml") : "";
-$submit				= isset($submit)? filter($submit, "nohtml") : "";
-$security_code		= isset($security_code)? filter($security_code, "nohtml") : "";
-$security_code_id	= isset($security_code_id)? filter($security_code_id, "nohtml") : "";
+$submit				= filter(request_var('submit', '', "_POST"), "nohtml");
+$security_code		= filter(request_var('security_code', '', "_POST"), "nohtml");
+$security_code_id	= filter(request_var('security_code_id', '', "_POST"), "nohtml");
 $main_module		= isset($main_module)? filter($main_module, "nohtml") : "Articles";
 	
 if($year == 0 && $month == 0 && $mode != 'all' && $op == 'article_archive')
 	$op = "article_select_month";
+
+$hooks->do_action("post_operations", $main_module);
 
 switch ($op)
 {

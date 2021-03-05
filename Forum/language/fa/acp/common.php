@@ -138,7 +138,7 @@ $lang = array_merge($lang, array(
 	'ACP_MASS_EMAIL'			=> 'ایمیل دسته جمعی',
 	'ACP_MESSAGES'				=> 'پیغام ها',
 	'ACP_MESSAGE_SETTINGS'		=> 'تنظیمات پیغام های خصوصی',
-	'ACP_MODULE_MANAGEMENT'		=> 'مدیریت مازول ها',
+	'ACP_MODULE_MANAGEMENT'		=> 'مدیریت ماژول ها',
 	'ACP_MOD_LOGS'				=> 'اعمال مديرانجمن',
 	'ACP_MOD_ROLES'				=> 'نوع دسترسي مدير انجمن',
 
@@ -238,7 +238,8 @@ $lang = array_merge($lang, array(
 	'CRON_NO_SUCH_TASK'		=> 'وظیفه “%s” در سیستم cron یافت نشد.',
 	'CRON_NO_TASK'			=> 'هیچ سیستم وظیفه گر cron در قابل اجرا شدن نیست.',
 	'CRON_NO_TASKS'			=> 'سیستم وظیفه گر cron یافت نشد.',
-	'CURRENT_VERSION'		=> 'Current version',
+	'CSV_INVALID'			=>  'تنظیمات جداشده با ویرگول“%1$s” نامعتبر است. مقادیر باید فقط با کاما مشخص شوند ، نباید حاوی جداکننده های اصلی یا انتهایی باشد. ',
+	'CURRENT_VERSION'		=> 'نسخه فعلی',
 
 	'DEACTIVATE'				=> 'غیرفعال سازی',
 	'DIRECTORY_DOES_NOT_EXIST'	=> 'مسیر وارد شده “%s” ، موجود نمی باشد.',
@@ -303,7 +304,7 @@ $lang = array_merge($lang, array(
 	'RESYNC'							=> 'انطباق (syncorise)',
 
 	'RUNNING_TASK'			=> 'اجرای وظیفه: %s.',
-	'SELECT_ANONYMOUS'		=> 'اتخاب کاربر بی نام',
+	'SELECT_ANONYMOUS'		=> 'انتخاب کاربر بی نام',
 	'SELECT_OPTION'			=> 'انتخاب گزینه',
 
 	'SETTING_TOO_LOW'		=> 'داده وارد شده به “%1$s” بسیار کم است. حداقل داده مورد قبول  %2$d می باشد.',
@@ -319,6 +320,7 @@ $lang = array_merge($lang, array(
 
 	'UCP'					=> 'کنترل پنل کاربر',
 	'URL_INVALID'			=> 'آدرس های “%1$s” نا معتبرند.',
+	'URL_SCHEME_INVALID'	=> 'طرح ارائه شده “%2$s”در تنظیمات جدا شده با ویرگول “%1$s” نامعتبر است. طرح باید با یک کاراکتر لاتین و به دنبال آن حروف عددی ، خط فاصله یا نقطه شروع شود. ',
 	'USERNAMES_EXPLAIN'		=> 'هر نام کاربری را در سطر جداگانه ای قرار دهید.',
 	'USER_CONTROL_PANEL'	=> 'کنترل پنل کاربر',
 
@@ -372,9 +374,11 @@ $lang = array_merge($lang, array(
 	'ERROR_MBSTRING_ENCODING_TRANSLATION'			=> 'Transparent character encoding به طور نامناسب پیکربندی شده است',	
 	'ERROR_MBSTRING_ENCODING_TRANSLATION_EXPLAIN'	=> '<var>mbstring.encoding_translation</var> باید به 0 تنظیم شود . می توانید داده را از صفحه <samp>اطلاعات PHP</samp> کنترل کنید.',
 	'ERROR_MBSTRING_HTTP_INPUT'						=> 'HTTP input character conversion به طور نامناسب پیکربندی شده است',	
-	'ERROR_MBSTRING_HTTP_INPUT_EXPLAIN'				=> '<var>mbstring.http_input</var> باید به <samp>pass</samp> تنظیم شود. می توانید داده را از صفحه <samp>اطلاعات PHP</samp> کنترل کنید.',
+	'ERROR_MBSTRING_HTTP_INPUT_EXPLAIN'				=> '<var>mbstring.http_input</var> باید خالی بگذارید. می توانید داده را از صفحه <samp>اطلاعات PHP</samp> کنترل کنید.',
 	'ERROR_MBSTRING_HTTP_OUTPUT'					=> 'HTTP output character conversion به طور نامناسب پیکربندی شده است',	
-	'ERROR_MBSTRING_HTTP_OUTPUT_EXPLAIN'			=> '<var>mbstring.http_output</var>باید به <samp>pass</samp> تنظیم شود. می توانید داده را از صفحه <samp>اطلاعات PHP</samp> کنترل کنید.',
+ 	'ERROR_MBSTRING_HTTP_OUTPUT_EXPLAIN'			=> '<var>mbstring.http_output</var>باید خالی بگذارید. می توانید داده را از صفحه <samp>اطلاعات PHP</samp> کنترل کنید.',
+	'ERROR_DEFAULT_CHARSET'							=> 'تنظیمات پیشفرض نادرست پیکر بندی شده است.',
+	'ERROR_DEFAULT_CHARSET_EXPLAIN'					=> '<var>default_charset</var> باید به این شکل تنظیم شود. <samp>UTF-8</samp>. مقدار فعلی را اینجا بررسی کنید <samp>PHP اطلاعات</samp> page.',
 
 	'FILES_PER_DAY'		=> 'تعداد پیوست در هر روز',
 	'FORUM_STATS'		=> 'آمار تالار',
@@ -460,7 +464,7 @@ $lang = array_merge($lang, array(
 	'INACTIVE_REASON_REGISTER'		=> 'اکانت هایی که به تازگی ثبت نام کرده اند',
 	'INACTIVE_REASON_REMIND'		=> 'کاربر مجبور به فعال سازی دوباره اکانت خود خواهد شد.',
 	'INACTIVE_REASON_UNKNOWN'		=> 'نامعلوم',
-	'INACTIVE_USERS'				=> 'کاربرن غیرفعال',
+	'INACTIVE_USERS'				=> 'کاربران غیرفعال',
 	'INACTIVE_USERS_EXPLAIN'		=> 'این لیستی از کاربران ثبت نام شده می باشد که اخیرا غیرفعال هستند. می توانید این کاربران را فعال،حذف کنید و یا به آنها ایمیلی به منظور یادآوری ارسال کنید.',
 	'INACTIVE_USERS_EXPLAIN_INDEX'	=> 'این لیستی از 10 کاربر اخیر ثبت نام کرده می باشد که اکانت آن ها غیرفعال هست. لیست کامل در منوی مربوطه و یا در لینک زیر در دسترس می باشد که در آن جا می توانید این کاربران را فعال و یا حذف کنید و همچنین می توانید به آنها ایمیل یادآوری ارسال کنید.',
 
@@ -502,13 +506,13 @@ $lang = array_merge($lang, array(
 	'LOG_ACL_ADD_ADMIN_GLOBAL_A_'		=> '<strong>مدیران ویرایش و یا اضافه شدند </strong><br />» %s',
 	'LOG_ACL_ADD_MOD_GLOBAL_M_'			=> '<strong>مدیران انجمن ها ویرایش و یا اضافه شدند.</strong><br />» %s',
 
-	'LOG_ACL_ADD_USER_LOCAL_F_'			=> '<strong>دسترسی کاربران به انجمن ویرایش و یا اضافه شدند</strong> from %1$s<br />» %2$s',
-	'LOG_ACL_ADD_USER_LOCAL_M_'			=> '<strong>دسترسی کاربران به مدیریت انجمن ویرایش و یا اضافه شدند</strong> from %1$s<br />» %2$s',
-	'LOG_ACL_ADD_GROUP_LOCAL_F_'		=> '<strong>دسترسی گروه ها به انجمن ویرایش و یا اضافه شدند</strong> from %1$s<br />» %2$s',
-	'LOG_ACL_ADD_GROUP_LOCAL_M_'		=> '<strong>دسترسی گروه ها به مدیریت انجمن ویرایش و یا اضافه شدند</strong> from %1$s<br />» %2$s',
+	'LOG_ACL_ADD_USER_LOCAL_F_'			=> '<strong>دسترسی کاربران به انجمن ویرایش و یا اضافه شدند</strong> به %1$s<br />» %2$s',
+	'LOG_ACL_ADD_USER_LOCAL_M_'			=> '<strong>دسترسی کاربران به مدیریت انجمن ویرایش و یا اضافه شدند</strong> به %1$s<br />» %2$s',
+	'LOG_ACL_ADD_GROUP_LOCAL_F_'		=> '<strong>دسترسی گروه ها به انجمن ویرایش و یا اضافه شدند</strong> به %1$s<br />» %2$s',
+	'LOG_ACL_ADD_GROUP_LOCAL_M_'		=> '<strong>دسترسی گروه ها به مدیریت انجمن ویرایش و یا اضافه شدند</strong> به %1$s<br />» %2$s',
 
-	'LOG_ACL_ADD_MOD_LOCAL_M_'			=> '<strong>مدیران انجمن ویرایش و یا اضافه شدند</strong> از %1$s<br />» %2$s',
-	'LOG_ACL_ADD_FORUM_LOCAL_F_'		=> '<strong>سطوح دسترسی انجمن ویرایش و یا اضافه شدند</strong> از %1$s<br />» %2$s',
+	'LOG_ACL_ADD_MOD_LOCAL_M_'			=> '<strong>مدیران انجمن ویرایش و یا اضافه شدند</strong> برای %1$s<br />» %2$s',
+	'LOG_ACL_ADD_FORUM_LOCAL_F_'		=> '<strong>سطوح دسترسی انجمن ویرایش و یا اضافه شدند</strong> برای %1$s<br />» %2$s',
 
 	'LOG_ACL_DEL_ADMIN_GLOBAL_A_'		=> '<strong>حذف مدیران</strong><br />» %s',
 	'LOG_ACL_DEL_MOD_GLOBAL_M_'			=> '<strong>حذف مدیران انجمن ها</strong><br />» %s',

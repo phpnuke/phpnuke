@@ -70,6 +70,7 @@ class csrfProtector
 	 */
 	public static function init($length = null, $action = null)
 	{
+		global $hooks;
 		/**
 		 * if mod_csrfp already enabled, no verification, no filtering
 		 * Already done by mod_csrfp
@@ -101,7 +102,9 @@ class csrfProtector
 		}
 
 		if (self::$config['CSRFP_TOKEN'] == '')
-			self::$config['CSRFP_TOKEN'] = CSRFP_TOKEN;	
+			self::$config['CSRFP_TOKEN'] = CSRFP_TOKEN;
+			
+		self::$config['verifyGetFor'] = $hooks->apply_filters("csrf_valid_urls", self::$config['verifyGetFor']);
 
 		//authorise the incoming request
 		self::authorisePost();
@@ -189,11 +192,14 @@ class csrfProtector
 			self::$requestType = "POST";
 			$must_validate = true;
 		}
-		else if (!static::isURLallowed() || $only_get)
+		else if ($only_get)
 		{
 			$method = $_GET;
 			$must_validate = true;
 		}
+		
+		if (static::isURLallowed())
+			$must_validate = false;
 		
 		//currently for same origin only
 		if($must_validate)

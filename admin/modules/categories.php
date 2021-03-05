@@ -23,7 +23,7 @@ if (check_admin_permission($filename))
 {
 	function categories($cat_modulename='Articles', $parent_id=0)
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs;
+		global $db, $admin_file, $nuke_configs, $hooks;
 		
 		$nuke_categories_cacheData = get_cache_file_contents('nuke_categories', false, true);
 		
@@ -46,21 +46,25 @@ if (check_admin_permission($filename))
 			
 			$cats_link_deep = " - <a href=\"".$admin_file.".php?op=categories&cat_modulename=$cat_modulename\">"._MAIN_CATS."</a>/$cats_link_deep";
 		}
-		$pagetitle = sprintf(_CATS_ADMIN_PART, $cat_modulename).$cats_link_deep;
 		
-		$all_modules_categories = array_keys($nuke_configs['categories_link']);
+		$hooks->add_filter("set_page_title", function() use($cat_modulename, $cats_link_deep){return array("categories" => sprintf(_CATS_ADMIN_PART, $cat_modulename).$cats_link_deep);});
+		
+		$all_modules_categories = array();
+		$all_modules_categories = $hooks->apply_filters("modules_categories_link", $all_modules_categories);
+		
 		$all_modules_categories_content = '';
 		
-		foreach($all_modules_categories as $modules_category)
+		foreach($all_modules_categories as $modules_category_key => $modules_category_value)
 		{
-			$sel = ($cat_modulename == $modules_category) ? "selected":"";
-			$all_modules_categories_link[] = "<option value=\"".$admin_file.".php?op=categories&cat_modulename=$modules_category\" $sel>$modules_category</option>";
+			$sel = ($cat_modulename == $modules_category_key) ? "selected":"";
+			$all_modules_categories_link[] = "<option value=\"".$admin_file.".php?op=categories&cat_modulename=$modules_category_key\" $sel>".$modules_category_value[0]."</option>";
 		}
 		
 		$contents .= "<div align=\"center\" style=\"margin:20px 0;\">[ <a href=\"#\" title=\""._ADD_CAT."\" class=\"editindialog\" data-op=\"categories_admin\" data-catid=\"0\" data-cat-modulename=\"$cat_modulename\">"._ADD_CAT."</a> ]<br /><br />"._SHOW_MODULES_CAT." <select onchange=\"top.location.href=this.options[this.selectedIndex].value\" class=\"styledselect-select\">".implode("\n", $all_modules_categories_link)."</select></div>";
 		
 		$contents .= OpenAdminTable();
 		$contents .= "
+			<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>
 			<table align=\"center\" class=\"product-table\" width=\"100%\">
 			<thead>
 			<tr>
@@ -131,6 +135,7 @@ if (check_admin_permission($filename))
 		$contents .= "</div>
 		<div id=\"categories-dialog\"></div>
 		<script>
+			$(\"#categories_form\").validate();
 			$(\".editindialog\").click(function(e)
 			{
 				e.preventDefault();
@@ -224,7 +229,6 @@ if (check_admin_permission($filename))
 			}
 			
 			cache_system("nuke_categories");
-			if($module == 'Articles') cache_system("nuke_articles_categories");
 			add_log(sprintf(_CATS_ADD_EDIT_LOG, (($catid > 0) ? _EDIT:_ADD), $catname), 1);
 			header("location: ".$admin_file.".php?op=categories&cat_modulename=$module");
 			die();
@@ -250,18 +254,18 @@ if (check_admin_permission($filename))
 		}
 		$languageslists = get_dir_list('language', 'files');
 		$content="
-			<form action=\"".$admin_file.".php\" method=\"post\">
+			<form action=\"".$admin_file.".php\" method=\"post\" id=\"categories_form\">
 			<table align=\"center\" border=\"0\" width=\"100%\" class=\"id-form product-table no-border\">
 				<tr>
 					<th style=\"width:150px;\">"._TITLE."</th>
-					<td><input name=\"cat_fields[catname]\" value=\"$catname\" class=\"inp-form\" size=\"40\" type=\"text\"></td>
+					<td><input name=\"cat_fields[catname]\" value=\"$catname\" class=\"inp-form\" size=\"40\" type=\"text\" required /></td>
 				</tr>";
 			
 				if($nuke_configs['multilingual'] != 1)
 				{
 					$content .= "<tr>
 					<th>"._DISPLAY_NAME."</th>
-					<td><input name=\"cat_fields[cattext]\" value=\"$cattext\" class=\"inp-form\" size=\"40\" type=\"text\"></td>
+					<td><input name=\"cat_fields[cattext]\" value=\"$cattext\" class=\"inp-form\" size=\"40\" type=\"text\" required ></td>
 				</tr>";
 				}
 				else
@@ -276,7 +280,7 @@ if (check_admin_permission($filename))
 							<tr>
 								<th style=\"width:160px;\">"._TITLE_INLANG." : ".ucfirst($languageslist)."</th>
 								<td>
-									<input class=\"inp-form\" name=\"cat_fields[cattext][$languageslist]\" type=\"text\" value=\"".(isset($cattext_arr[$languageslist]) ? $cattext_arr[$languageslist]:"")."\">
+									<input class=\"inp-form\" required name=\"cat_fields[cattext][$languageslist]\" type=\"text\" value=\"".(isset($cattext_arr[$languageslist]) ? $cattext_arr[$languageslist]:"")."\">
 								</td>
 							</tr>";
 						}
@@ -357,14 +361,17 @@ if (check_admin_permission($filename))
 				"parent_id" => $parent_id
 			]);
 		
-		if(isset($nuke_configs['categories_delete'][$module]['function']))
-			eval($nuke_configs['categories_delete'][$module]['function']);
-		elseif(isset($nuke_configs['categories_delete'][$module]['data']))
+		$categories_delete_data = array();
+		$categories_delete_data = $hooks->apply_filters("categories_delete_data", $categories_delete_data, $module);
+		
+		$hooks->do_action("categories_delete_data_before", $module);
+		
+		if(isset($categories_delete_data[$module]))
 		{
 			$col_cats_query = array();
-			if(is_array($nuke_configs['categories_delete'][$module]['data']['col_cats']))
+			if(is_array($categories_delete_data[$module]['col_cats']))
 			{
-				foreach($nuke_configs['categories_delete'][$module]['data']['col_cats'] as $key => $col_cats)
+				foreach($categories_delete_data[$module]['col_cats'] as $key => $col_cats)
 				{
 					$col_cats_query[] = "$col_cats";
 					$col_cats_query_where[] = "FIND_IN_SET($catid, $col_cats)";
@@ -372,11 +379,11 @@ if (check_admin_permission($filename))
 			}
 			
 			$result = $db->query("SELECT 
-				".$nuke_configs['categories_delete'][$module]['data']['col_id']." as id, 
+				".$categories_delete_data[$module]['col_id']." as id, 
 				".implode(",", $col_cats_query)."
-				from ".$nuke_configs['categories_delete'][$module]['data']['table']." 
-				WHERE (".implode(" OR ", $col_cats_query_where).")".(($nuke_configs['categories_delete'][$module]['data']['where'] != '') ? " AND ".$nuke_configs['categories_delete'][$module]['data']['where']."":"")." 
-				ORDER BY ".$nuke_configs['categories_delete'][$module]['data']['col_id']." ASC
+				from ".$categories_delete_data[$module]['table']." 
+				WHERE (".implode(" OR ", $col_cats_query_where).")".(($categories_delete_data[$module]['where'] != '') ? " AND ".$categories_delete_data[$module]['where']."":"")." 
+				ORDER BY ".$categories_delete_data[$module]['col_id']." ASC
 			");
 			
 			$query_sets = array();
@@ -398,7 +405,7 @@ if (check_admin_permission($filename))
 							$cats = remove_id_in_array($catid, $cats);
 							$cats = implode(",",$cats);
 							$cats = ($cats == "") ? $uncategorized_catid:$cats;
-							$query_sets[$col_cat][] = "WHEN ".$nuke_configs['categories_delete'][$module]['data']['col_id']." = '$id' THEN ?";
+							$query_sets[$col_cat][] = "WHEN ".$categories_delete_data[$module]['col_id']." = '$id' THEN ?";
 							$query_values[] = $cats;
 							$update = true;
 						}
@@ -419,7 +426,7 @@ if (check_admin_permission($filename))
 			$query_text = implode(",", $query_text);
 			//$ids = implode(",", $ids);
 			if($update)
-				$db->query("UPDATE ".$nuke_configs['categories_delete'][$module]['data']['table']." SET $query_text WHERE ".$nuke_configs['categories_delete'][$module]['data']['col_id']." IN (?)", array_merge($query_values, $ids));
+				$db->query("UPDATE ".$categories_delete_data[$module]['table']." SET $query_text WHERE ".$categories_delete_data[$module]['col_id']." IN (?)", array_merge($query_values, $ids));
 		}
 		$db->table(CATEGORIES_TABLE)
 			->where("catid", $catid)
@@ -428,8 +435,8 @@ if (check_admin_permission($filename))
 		phpnuke_auto_increment(CATEGORIES_TABLE);
 		
 		cache_system("nuke_categories");
-		if(isset($nuke_configs['categories_delete'][$module]['data']['recache']) && $nuke_configs['categories_delete'][$module]['data']['recache'] != '')
-			cache_system($nuke_configs['categories_delete'][$module]['data']['recache']);
+		if(isset($categories_delete_data[$module]['recache']) && $categories_delete_data[$module]['recache'] != '')
+			cache_system($categories_delete_data[$module]['recache']);
 			
 		phpnuke_db_error();
 		add_log(_CAT_DELETE_LOG, 1);

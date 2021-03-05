@@ -30,7 +30,7 @@ if (check_admin_permission($module_name, false, true))
 
 	function feedbacks($mode, $fids, $search_query = '', $order_by = '', $sort='DESC')
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs;
+		global $db, $hooks, $admin_file, $nuke_configs;
 		
 		if($mode == "delete")
 		{
@@ -56,7 +56,7 @@ if (check_admin_permission($module_name, false, true))
 	
 		$contents = '';
 		
-		$pagetitle = _FEEDBACKS_ADMIN;
+		$hooks->add_filter("set_page_title", function(){return array("feedbacks" => _FEEDBACKS_ADMIN);});
 		
 		$link_to_more = "";
 		$where = array();
@@ -215,7 +215,9 @@ if (check_admin_permission($module_name, false, true))
 
 	function reply_feedback_pm($fid, $submit = '', $feedback_reply_message = '', $inline=0)
 	{
-		global $db, $admin_file, $nuke_configs, $module_name, $aid, $userinfo, $visitor_ip, $nuke_authors_cacheData;
+		global $db, $admin_file, $nuke_configs, $module_name, $aid, $userinfo, $visitor_ip;
+		
+		$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 		
 		$row = $db->table(FEEDBACKS_TABLE)
 					->where('fid', $fid)
@@ -357,7 +359,7 @@ if (check_admin_permission($module_name, false, true))
 
 	function feedbacks_config()
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs, $module_name;
+		global $db, $hooks, $admin_file, $nuke_configs, $module_name;
 		
 		$feedback_configs = (isset($nuke_configs['feedbacks']) && $nuke_configs['feedbacks'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['feedbacks'])):array(
 			'letreceive' => 1,
@@ -379,7 +381,7 @@ if (check_admin_permission($module_name, false, true))
 		
 		$contents = '';
 		
-		$pagetitle = _FEEDBACKS_ADMIN." "._SETTINGS;
+		$hooks->add_filter("set_page_title", function(){return array("feedbacks_config" => _FEEDBACKS_ADMIN." "._SETTINGS);});
 		
 		$letreceive_checked1 = ($feedback_configs['letreceive'] == 1) ? "checked":"";
 		$letreceive_checked2 = ($feedback_configs['letreceive'] == 0) ? "checked":"";
@@ -606,8 +608,8 @@ if (check_admin_permission($module_name, false, true))
 	$order_by = (isset($order_by)) ? filter($order_by, "nohtml"):'';
 	$sort = (isset($sort)) ? filter($sort, "nohtml"):'';
 	$search_query = (isset($search_query)) ? filter($search_query, "nohtml"):'';
-	$submit = (isset($submit)) ? filter($submit, "nohtml"):'';
-	$feedback_reply_message = (isset($feedback_reply_message)) ? stripslashes($feedback_reply_message):'';
+	$submit = filter(request_var('submit', '', '_POST'), "nohtml");
+	$feedback_reply_message = stripslashes(request_var('feedback_reply_message', '', '_POST'));
 	$fid = (isset($fid)) ? intval($fid):0;
 	
 	switch($op) {

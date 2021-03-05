@@ -1,11 +1,11 @@
 <?php
+
 /////////////////////////////////////////////////////////////////
 /// getID3() by James Heinrich <info@getid3.org>               //
-//  available at http://getid3.sourceforge.net                 //
-//            or http://www.getid3.org                         //
-//          also https://github.com/JamesHeinrich/getID3       //
-/////////////////////////////////////////////////////////////////
-// See readme.txt for more details                             //
+//  available at https://github.com/JamesHeinrich/getID3       //
+//            or https://www.getid3.org                        //
+//            or http://getid3.sourceforge.net                 //
+//  see readme.txt for more details                            //
 /////////////////////////////////////////////////////////////////
 //                                                             //
 // module.audio.optimfrog.php                                  //
@@ -19,11 +19,16 @@ if(!defined('NUKE_FILE'))
 	exit;
 }
 
+if (!defined('GETID3_INCLUDEPATH')) { // prevent path-exposing attacks that access modules directly on public webservers
+	exit;
+}
 getid3_lib::IncludeDependency(GETID3_INCLUDEPATH.'module.audio-video.riff.php', __FILE__, true);
 
 class getid3_optimfrog extends getid3_handler
 {
-
+	/**
+	 * @return bool
+	 */
 	public function Analyze() {
 		$info = &$this->getid3->info;
 
@@ -44,12 +49,14 @@ class getid3_optimfrog extends getid3_handler
 
 		}
 
-		$info['error'][] = 'Expecting "*RIFF" or "OFR " at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes($OFRheader).'"';
+		$this->error('Expecting "*RIFF" or "OFR " at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes($OFRheader).'"');
 		unset($info['fileformat']);
 		return false;
 	}
 
-
+	/**
+	 * @return bool
+	 */
 	public function ParseOptimFROGheader42() {
 		// for fileformat of v4.21 and older
 
@@ -77,7 +84,7 @@ class getid3_optimfrog extends getid3_handler
 		$RIFFdata = substr($RIFFdata, 0, 36).substr($RIFFdata, 44).substr($RIFFdata, 36, 8);
 
 		$getid3_temp = new getID3();
-		$getid3_temp->openfile($this->getid3->filename);
+		$getid3_temp->openfile($this->getid3->filename, $this->getid3->info['filesize'], $this->getid3->fp);
 		$getid3_temp->info['avdataoffset'] = $info['avdataoffset'];
 		$getid3_temp->info['avdataend']    = $info['avdataend'];
 		$getid3_riff = new getid3_riff($getid3_temp);
@@ -96,7 +103,9 @@ class getid3_optimfrog extends getid3_handler
 		return true;
 	}
 
-
+	/**
+	 * @return bool
+	 */
 	public function ParseOptimFROGheader45() {
 		// for fileformat of v4.50a and higher
 
@@ -133,7 +142,7 @@ class getid3_optimfrog extends getid3_handler
 							break;
 
 						default:
-							$info['warning'][] = '"'.$BlockName.'" contains more data than expected (expected 12 or 15 bytes, found '.$BlockSize.' bytes)';
+							$this->warning('"'.$BlockName.'" contains more data than expected (expected 12 or 15 bytes, found '.$BlockSize.' bytes)');
 							break;
 					}
 					$BlockData .= $this->fread($BlockSize);
@@ -257,7 +266,7 @@ class getid3_optimfrog extends getid3_handler
 
 					$thisfile_ofr_thisblock['offset'] = $BlockOffset;
 					$thisfile_ofr_thisblock['size']   = $BlockSize;
-					$info['warning'][] = 'APEtag processing inside OptimFROG not supported in this version ('.$this->getid3->version().') of getID3()';
+					$this->warning('APEtag processing inside OptimFROG not supported in this version ('.$this->getid3->version().') of getID3()');
 
 					$this->fseek($BlockSize, SEEK_CUR);
 					break;
@@ -277,7 +286,7 @@ class getid3_optimfrog extends getid3_handler
 
 					} else {
 
-						$info['warning'][] = 'Expecting block size of 16 in "MD5 " chunk, found '.$BlockSize.' instead';
+						$this->warning('Expecting block size of 16 in "MD5 " chunk, found '.$BlockSize.' instead');
 						$this->fseek($BlockSize, SEEK_CUR);
 
 					}
@@ -288,7 +297,7 @@ class getid3_optimfrog extends getid3_handler
 					$thisfile_ofr_thisblock['offset'] = $BlockOffset;
 					$thisfile_ofr_thisblock['size']   = $BlockSize;
 
-					$info['warning'][] = 'Unhandled OptimFROG block type "'.$BlockName.'" at offset '.$thisfile_ofr_thisblock['offset'];
+					$this->warning('Unhandled OptimFROG block type "'.$BlockName.'" at offset '.$thisfile_ofr_thisblock['offset']);
 					$this->fseek($BlockSize, SEEK_CUR);
 					break;
 			}
@@ -306,7 +315,7 @@ class getid3_optimfrog extends getid3_handler
 		$RIFFdata = substr($RIFFdata, 0, 36).substr($RIFFdata, 44).substr($RIFFdata, 36, 8);
 
 		$getid3_temp = new getID3();
-		$getid3_temp->openfile($this->getid3->filename);
+		$getid3_temp->openfile($this->getid3->filename, $this->getid3->info['filesize'], $this->getid3->fp);
 		$getid3_temp->info['avdataoffset'] = $info['avdataoffset'];
 		$getid3_temp->info['avdataend']    = $info['avdataend'];
 		$getid3_riff = new getid3_riff($getid3_temp);
@@ -318,7 +327,11 @@ class getid3_optimfrog extends getid3_handler
 		return true;
 	}
 
-
+	/**
+	 * @param int $SampleType
+	 *
+	 * @return string|false
+	 */
 	public static function OptimFROGsampleTypeLookup($SampleType) {
 		static $OptimFROGsampleTypeLookup = array(
 			0  => 'unsigned int (8-bit)',
@@ -336,6 +349,11 @@ class getid3_optimfrog extends getid3_handler
 		return (isset($OptimFROGsampleTypeLookup[$SampleType]) ? $OptimFROGsampleTypeLookup[$SampleType] : false);
 	}
 
+	/**
+	 * @param int $SampleType
+	 *
+	 * @return int|false
+	 */
 	public static function OptimFROGbitsPerSampleTypeLookup($SampleType) {
 		static $OptimFROGbitsPerSampleTypeLookup = array(
 			0  => 8,
@@ -353,6 +371,11 @@ class getid3_optimfrog extends getid3_handler
 		return (isset($OptimFROGbitsPerSampleTypeLookup[$SampleType]) ? $OptimFROGbitsPerSampleTypeLookup[$SampleType] : false);
 	}
 
+	/**
+	 * @param int $ChannelConfiguration
+	 *
+	 * @return string|false
+	 */
 	public static function OptimFROGchannelConfigurationLookup($ChannelConfiguration) {
 		static $OptimFROGchannelConfigurationLookup = array(
 			0 => 'mono',
@@ -361,6 +384,11 @@ class getid3_optimfrog extends getid3_handler
 		return (isset($OptimFROGchannelConfigurationLookup[$ChannelConfiguration]) ? $OptimFROGchannelConfigurationLookup[$ChannelConfiguration] : false);
 	}
 
+	/**
+	 * @param int $ChannelConfiguration
+	 *
+	 * @return int|false
+	 */
 	public static function OptimFROGchannelConfigNumChannelsLookup($ChannelConfiguration) {
 		static $OptimFROGchannelConfigNumChannelsLookup = array(
 			0 => 1,
@@ -370,13 +398,17 @@ class getid3_optimfrog extends getid3_handler
 	}
 
 
-
 	// static function OptimFROGalgorithmNameLookup($AlgorithID) {
 	//     static $OptimFROGalgorithmNameLookup = array();
 	//     return (isset($OptimFROGalgorithmNameLookup[$AlgorithID]) ? $OptimFROGalgorithmNameLookup[$AlgorithID] : false);
 	// }
 
 
+	/**
+	 * @param int $EncoderID
+	 *
+	 * @return string
+	 */
 	public static function OptimFROGencoderNameLookup($EncoderID) {
 		// version = (encoderID >> 4) + 4500
 		// system  =  encoderID & 0xF
@@ -392,6 +424,11 @@ class getid3_optimfrog extends getid3_handler
 		return $EncoderVersion.' ('.(isset($OptimFROGencoderSystemLookup[$EncoderSystemID]) ? $OptimFROGencoderSystemLookup[$EncoderSystemID] : 'undefined encoder type (0x'.dechex($EncoderSystemID).')').')';
 	}
 
+	/**
+	 * @param int $CompressionID
+	 *
+	 * @return string
+	 */
 	public static function OptimFROGcompressionLookup($CompressionID) {
 		// mode    = compression >> 3
 		// speedup = compression & 0x07
@@ -414,6 +451,11 @@ class getid3_optimfrog extends getid3_handler
 		return (isset($OptimFROGencoderModeLookup[$CompressionModeID]) ? $OptimFROGencoderModeLookup[$CompressionModeID] : 'undefined mode (0x'.str_pad(dechex($CompressionModeID), 2, '0', STR_PAD_LEFT).')');
 	}
 
+	/**
+	 * @param int $CompressionID
+	 *
+	 * @return string
+	 */
 	public static function OptimFROGspeedupLookup($CompressionID) {
 		// mode    = compression >> 3
 		// speedup = compression & 0x07

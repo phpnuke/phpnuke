@@ -44,9 +44,9 @@ if (check_admin_permission($filename))
 
 	function media_browser($ckeditor='')
 	{
-		global $db, $pagetitle, $admin_file, $aid, $nuke_configs, $default_folder, $CKEditorFuncNum;
+		global $db, $hooks, $admin_file, $aid, $nuke_configs, $default_folder, $CKEditorFuncNum;
 
-		$pagetitle = _MULTIMEDIA;
+		$hooks->add_filter("set_page_title", function(){return array("media_browser" => _MULTIMEDIA);});
 		$contents = '';
 		if($ckeditor != "")
 			define('IS_POPUP', true);
@@ -124,9 +124,10 @@ if (check_admin_permission($filename))
 
 	function media_upload($upload_dir, $ckeditor)
 	{
-		global $aid, $nuke_configs, $pagetitle;
+		global $aid, $nuke_configs, $hooks;
 		$contents = '';
-		$pagetitle = _MULTIMEDIA." - "._UPLOAD_FILE;
+		
+		$hooks->add_filter("set_page_title", function(){return array("media_browser" => _MULTIMEDIA." - "._UPLOAD_FILE);});
 		
 		$upload_allowed_info = phpnuke_unserialize(stripslashes($nuke_configs['upload_allowed_info']));
 		

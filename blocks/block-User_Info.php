@@ -17,7 +17,7 @@ if ( !defined('BLOCK_FILE') )
     die();
 }
 
-global $users_system, $userinfo, $nuke_configs, $block_global_contents;
+global $users_system, $userinfo, $nuke_configs;
 
 $statistics_contents = $users_system->user_statistics();
 
@@ -83,7 +83,10 @@ else
 		if(!empty($statistics_contents['online_members']))
 		{
 			foreach($statistics_contents['online_members'] as $online_member)
+			{
+				if($online_member['hidden']) continue;
 				$content .= "<li class=\"list-group-item\">".$online_member['where'].".&nbsp; <a href=\"".$online_member['profile']."\" style=\"color:#".str_replace("#","", $online_member['group_colour'])." !important;\">".$online_member['username']."</a> <span class=\"badge\">".$online_member['user_posts']."</span></li>";
+			}
 		}
 		$content .= "</ul>
 		<p class=\"text-center\"><span class=\"glyphicon glyphicon-refresh\"></span></p>

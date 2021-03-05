@@ -23,22 +23,30 @@ define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 function search_form($search_query='', $module = 'Articles', $author = '', $category = 0, $time = 0)
 {
-	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $nuke_authors_cacheData, $custom_theme_setup, $search_type;
+	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $hooks, $search_type;
 	
-	$search_data_configs = (isset($nuke_configs['search_data']) && is_array($nuke_configs['search_data'])) ? $nuke_configs['search_data']:array();
-	$custom_theme_setup = array_merge_recursive($custom_theme_setup, array(
-		"defer_js" => array(
-			"<script>
-				var first_module = '$module';
-				var selected_category = '$category';
-				var search_data = ".((!empty($search_data_configs)) ? json_encode($search_data_configs):"[]").";
-				var search_language = {
-					all_categories : '"._ALL_CATEGORIES."'
-				}
-			</script>",
-			"<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/search.js\"></script>"
-		)
-	));
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+	
+	$modules_search_data = array();
+	$modules_search_data = $hooks->apply_filters("modules_search_data", $modules_search_data);
+	
+	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $modules_search_data)
+	{
+		$theme_setup = array_merge_recursive($theme_setup, array(
+			"defer_js" => array(
+				"<script>
+					var first_module = '$module';
+					var selected_category = '$category';
+					var search_data = ".((!empty($modules_search_data)) ? json_encode($modules_search_data):"[]").";
+					var search_language = {
+						all_categories : '"._ALL_CATEGORIES."'
+					}
+				</script>",
+				"<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/search.js\"></script>"
+			)
+		));
+		return $theme_setup;
+	}, 10);
 
 	$st_sel1 = ($search_type == 1) ? "selected":"";
 	$st_sel2 = ($search_type == 2) ? "selected":"";
@@ -69,13 +77,13 @@ function search_form($search_query='', $module = 'Articles', $author = '', $cate
 				<option value=\"4\" $st_sel4>"._SEARCH_WITHOUT."</option>
 			</select>
 		</div>";
-		if(!empty($search_data_configs))
+		if(!empty($modules_search_data))
 		{			
 			$contents .= "
 				<label for=\"search_module\" class=\"col-sm-1 col-form-label sr-only\">"._SEARCH_IN."</label>
 				<div class=\"col-sm-2\">
 					<select name=\"search_module\" class=\"form-control\" id=\"search_module\">";
-						foreach($search_data_configs as $search_data_key => $search_data_value)
+						foreach($modules_search_data as $search_data_key => $search_data_value)
 						{
 							$sel = ($module == $search_data_key) ? " selected":"";
 							$search_data_value['title'] = (defined($search_data_value['title'])) ? constant($search_data_value['title']):$search_data_value['title'];
@@ -141,8 +149,10 @@ function search_form($search_query='', $module = 'Articles', $author = '', $cate
 
 function search_main($submit = '', $search_query='', $search_module = 'Articles', $search_author = '', $search_category = 0, $search_time = 0, $search_type = 2)
 {
-	global $db, $userinfo, $page, $module_name, $visitor_ip, $PnValidator, $nuke_configs, $nuke_authors_cacheData;
+	global $db, $userinfo, $page, $module_name, $visitor_ip, $PnValidator, $nuke_configs, $hooks;
 	$contents = '';
+	
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 	
 	$finish = false;
 	$link_to = "index.php?modname=$module_name&search_module=$search_module";
@@ -160,9 +170,10 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 		$skipWords  = (isset($nuke_configs['mtsn_skipwords']) && !empty($nuke_configs['mtsn_skipwords'])) ? array_map('trim',explode(',',$nuke_configs['mtsn_skipwords'])):array();
 		$sWords     = array();
 		
-		$search_data_configs = (isset($nuke_configs['search_data']) && is_array($nuke_configs['search_data'])) ? $nuke_configs['search_data']:array();
-		
-		$this_search_data = isset($search_data_configs[$search_module]) ? $search_data_configs[$search_module]:$search_data_configs['Articles'];
+		$modules_search_data = array();
+		$modules_search_data = $hooks->apply_filters("modules_search_data", $modules_search_data);
+	
+		$this_search_data = isset($modules_search_data[$search_module]) ? $modules_search_data[$search_module]:$modules_search_data['Articles'];
 
 		$PnValidator->validation_rules(array(
 			'search_query'	=> 'required|regex,/([^\>])+$/i'
@@ -368,6 +379,30 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 		"description" => ((isset($search_data['search_query']) && $search_data['search_query'] != '' && trim($search_data['search_query'])) ? " : ". $search_data['search_query']:""),
 		"extra_meta_tags" => array()
 	);
+	$meta_tags = $hooks->apply_filters("search_header_meta", $meta_tags, $search_data, $link_to);
+	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($search_module, $meta_tags, $search_data){
+		$breadcrumbs['search'] = array(
+			"name" => _SEARCH,
+			"link" => LinkToGT("index.php?modname=Search&search_module=$search_module"),
+			"itemtype" => "WebPage"
+		);
+		if($search_data['search_query'] != '')
+		{
+			$breadcrumbs['search-query'] = array(
+				"name" => $search_data['search_query'],
+				"link" => $meta_tags['url'],
+				"itemtype" => "WebPage"
+			);
+		}
+		return $breadcrumbs;
+	}, 10);
+	unset($meta_tags);
 	
 	include("header.php");
 	$html_output .= show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), search_form($search_data['search_query'], $search_data['module'], $search_data['author'], $search_data['category'], $search_data['time']).$contents);

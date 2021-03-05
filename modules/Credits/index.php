@@ -38,7 +38,7 @@ $pn_credits_config = (isset($pn_credits_config) && !empty($pn_credits_config)) ?
 
 function credits_list($sort = 'DESC', $order_by = '')
 {
-	global $db, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $page, $search_data, $pn_Cookies, $users_system;
+	global $db, $hooks, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $page, $search_data, $pn_Cookies, $users_system;
 	
 	$contents = '';
 	$userinfo = $users_system->getuserinfo(true);
@@ -61,7 +61,9 @@ function credits_list($sort = 'DESC', $order_by = '')
 	$link_to_more = (isset($rows_data['link_to_more']) && $rows_data['link_to_more'] != '') ? $rows_data['link_to_more']:"";
 	
 	$link_to = "index.php?modname=Credits&op=credits_list".$link_to_more;
-
+	
+	$rows_data = $hooks->apply_filters("credits_list_rows", $rows_data);
+	
 	if(isset($rows_data['rows']) && !empty($rows_data['rows']))
 	{
 		$rows = $rows_data['rows'];
@@ -90,27 +92,7 @@ function credits_list($sort = 'DESC', $order_by = '')
 	
 	$boxes_contents = show_modules_boxes($module_name, "list", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 
-	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
-	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.css\" rel=\"stylesheet\" type=\"text/css\">";
-		
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\" /></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
-	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
-	
-	if($nuke_configs['multilingual'] == 1)
-	{
-		$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
-		if($nuke_configs['datetype'] == 1)
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
-		elseif($nuke_configs['datetype'] == 2)
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
-	}
-	
-	$custom_theme_setup = array(
-		"default_css" => $default_css,
-		"defer_js" => $defer_js
-	);
-	$custom_theme_setup_replace = false;
+	$hooks->add_filter("site_theme_headers", "credits_theme_assets", 10);
 	
 	$meta_tags = array(
 		"title" => _CREDITS_ADMIN." - "._CREDITS_LIST,
@@ -118,14 +100,48 @@ function credits_list($sort = 'DESC', $order_by = '')
 		"extra_meta_tags" => array()
 	);
 	
+	$meta_tags = $hooks->apply_filters("credits_list_header_meta", $meta_tags);
+	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);
+
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents){
+		$breadcrumbs['credits'] = array(
+			"name" => _CREDITS_ADMIN,
+			"link" => LinkToGT("index.php?modname=Credits"),
+			"itemtype" => "WebPage"
+		);
+		$breadcrumbs['credits-list'] = array(
+			"name" => _CREDITS_LIST,
+			"link" => LinkToGT("index.php?modname=Credits&op=credits_list"),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
+	
 	include("header.php");
 	$html_output .= $boxes_contents;
 	include("footer.php");
 }
 
+/*$order_data = array(
+	"amount" => 20,
+	"ex_rate" => "GBP",
+	"title" => "تست برداشت از حساب اعتباری",
+	"desc" => "شرح مختصر برداشت",
+	"part" => 'vip',
+	"part_desc" => 'فروش اکانت VPN',
+	"id" => $order_id,
+	"link" => LinkToGT("index.php?modname=feedback"),
+	"reward" => 30
+);*/
+	
 function credit_edit($order_data = array())
 {
-	global $db, $nuke_configs, $pn_credits_config, $module_name, $userinfo, $users_system, $pn_Cookies, $PnValidator, $default_currency;
+	global $db, $nuke_configs, $pn_credits_config, $module_name, $userinfo, $users_system, $pn_Cookies, $PnValidator, $hooks;
 
 	$form_title = _CREDITS_ACCOUNT_CHARGE;
 	
@@ -133,20 +149,11 @@ function credit_edit($order_data = array())
 
 	$contents = '';
 	
-	/*$order_data = array(
-		"amount" => 20,
-		"ex_rate" => "GBP",
-		"title" => "تست برداشت از حساب اعتباری",
-		"desc" => "شرح مختصر برداشت",
-		"part" => 'vip',
-		"part_desc" => 'فروش اکانت VPN',
-		"id" => $order_id,
-		"link" => LinkToGT("index.php?modname=feedback"),
-		"reward" => 30
-	);*/
-	
 	if(isset($order_data) && !empty($order_data))
 	{
+		$order_data = $hooks->apply_filters("credits_order_data", $order_data);
+		$default_currency = $hooks->apply_filters("credits_currencies", array());	
+	
 		$amount = (isset($order_data['ex_rate']) && $order_data['ex_rate']!= '') ? credits_currency_cal($order_data['amount'], $order_data['ex_rate']):$order_data['amount'];
 		$amount_in_ex_rate = (isset($order_data['ex_rate']) && $order_data['ex_rate']!= '') ? "( ".$order_data['amount']." ".constant($default_currency[$order_data['ex_rate']])." )":"";
 		
@@ -202,19 +209,28 @@ function credit_edit($order_data = array())
 		include("modules/$module_name/includes/credits_form.php");
 	
 	$boxes_contents = show_modules_boxes($module_name, "form", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
-		
-	$custom_theme_setup = array(
-		"default_css" => ((isset($default_css) && !empty($default_css)) ? $default_css:""),
-		"default_js" => ((isset($default_js) && !empty($default_js)) ? $default_js:""),
-		"defer_js" => ((isset($defer_js) && !empty($defer_js)) ? $defer_js:"")
-	);
-	$custom_theme_setup_replace = false;
 
 	$meta_tags = array(
 		"title" => $form_title,
 		"description" => ""._CREDITS_ADMIN." - ".$form_title,
 		"extra_meta_tags" => array()
 	);
+	$meta_tags = $hooks->apply_filters("credits_edit_header_meta", $meta_tags, $form_title);
+	
+	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
+	{
+		return array_merge($all_meta_tags, $meta_tags);
+	}, 10);		
+	unset($meta_tags);
+	
+	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents){
+		$breadcrumbs['credits'] = array(
+			"name" => _CREDITS_ADMIN,
+			"link" => LinkToGT("index.php?modname=Credits"),
+			"itemtype" => "WebPage"
+		);
+		return $breadcrumbs;
+	}, 10);
 	
 	include("header.php");
 	$html_output .= $boxes_contents;
@@ -223,9 +239,10 @@ function credit_edit($order_data = array())
 
 function credit_create_form($order_data, $credit_method, $credit_gateway, $offline_credit, $online_credit, $offline_credit_file)
 {
-	global $db, $nuke_configs, $module_name, $userinfo, $pn_credits_config, $users_system, $default_currency;
+	global $db, $hooks, $nuke_configs, $module_name, $userinfo, $pn_credits_config, $users_system;
 	
 	$order_data = (isset($order_data) && $order_data != '' && !empty($order_data)) ? objectToArray(json_decode(str_replace("'",'"', $order_data))):"";
+	$order_data = $hooks->apply_filters("credits_order_data_form", $order_data);
 	
 	$credit_method = intval($credit_method);
 	
@@ -350,7 +367,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			}
 			
 			if(isset($pn_credits_config['notify']['email']) && $pn_credits_config['notify']['email'] == 1)
-			{				
+			{
 				$message = array(
 					"template" => array("path" => "modules/$module_name/includes/email_template/", "file" => "offline_pending.txt"),
 					"feedback_url" => LinkToGT("index.php?modname=Feedback"), 
@@ -362,6 +379,8 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 				
 				phpnuke_mail($userinfo['user_email'], sprintf(_CREDITS_EMAIL_OFFLINE_PENDING, $nuke_configs['sitename']), $message);
 			}
+			
+			$hooks->do_action("credits_after_offline_payment", $payment_data);
 			
 			if($order_data != '')
 				redirect_to($order_link);
@@ -378,6 +397,8 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 					->where('tid', $tid)
 					->update(["status" => _CREDIT_STATUS_OK, "update_time" => _NOWTIME]);
 				$user_credit = $user_credit-$amount;
+				
+				$user_credit = $hooks->apply_filters("credits_after_deposit", $user_credit, $userinfo);
 				
 				user_credit_update($userinfo['user_id'], $user_credit);
 				
@@ -411,7 +432,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 				}
 			
 				if(isset($pn_credits_config['notify']['email']) && $pn_credits_config['notify']['email'] == 1)
-				{				
+				{
 					$message = array(
 						"template" => array("path" => "modules/$module_name/includes/email_template/", "file" => "order_ok.txt"),
 						"feedback_url" => LinkToGT("index.php?modname=Feedback"), 
@@ -429,6 +450,8 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			}
 			else
 				$errors[] = _CREDITS_REMAIN_LESS_THAN_AMOUNT;
+			
+			$hooks->do_action("credits_action_after_deposit");
 			
 			redirect_to($order_link);
 		}
@@ -449,7 +472,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 
 function credit_response($tid, $credit_gateway='')
 {
-	global $db, $nuke_configs, $module_name, $userinfo, $users_system;
+	global $db, $nuke_configs, $module_name, $userinfo, $users_system, $hooks;
 	
 	$result = $db->table(TRANSACTIONS_TABLE)
 				->where('tid', $tid)
@@ -468,6 +491,7 @@ function credit_response($tid, $credit_gateway='')
 			}
 				
 			$order_data = (isset($row['order_data']) && $row['order_data'] != '' && !empty($row['order_data'])) ? phpnuke_unserialize($row['order_data']):"";
+			$order_data = $hooks->apply_filters("credits_order_data_response", $order_data);
 
 			unset($gateway_class);
 			include("modules/$module_name/includes/gateways/".$row['gateway'].".php");
@@ -478,10 +502,14 @@ function credit_response($tid, $credit_gateway='')
 				$gateway_class = new $func_name();
 				$response = $gateway_class->response($tid, $row['factor_number']);
 				
+				$response = $hooks->apply_filters("credits_response", $response, $tid, $row['factor_number']);
+				
 				if($response['result'] === true)
 				{
 					$user_credit = $userinfo['user_credit'];
 					$new_user_credit = $user_credit+$row['amount'];
+					
+					$new_user_credit = $hooks->apply_filters("credits_after_charge", $new_user_credit, $row, $userinfo);
 					
 					user_credit_update($userinfo['user_id'], $new_user_credit);
 					$userinfo = $users_system->getuserinfo(true);
@@ -502,7 +530,7 @@ function credit_response($tid, $credit_gateway='')
 					}
 					
 					if(isset($pn_credits_config['notify']['email']) && $pn_credits_config['notify']['email'] == 1)
-					{				
+					{
 						$message = array(
 							"template" => array("path" => "modules/$module_name/includes/email_template/", "file" => "online_ok.txt"),
 							"feedback_url" => LinkToGT("index.php?modname=Feedback"), 
@@ -523,6 +551,7 @@ function credit_response($tid, $credit_gateway='')
 						if($user_credits_allowed > 0)
 						{
 							$user_credit = $new_user_credit-$row['amount'];
+							$user_credit = $hooks->apply_filters("credits_before_withdrow", $user_credit, $row, $userinfo);
 							
 							user_credit_update($userinfo['user_id'], $user_credit);
 							
@@ -556,7 +585,7 @@ function credit_response($tid, $credit_gateway='')
 							}
 						
 							if(isset($pn_credits_config['notify']['email']) && $pn_credits_config['notify']['email'] == 1)
-							{				
+							{
 								$message = array(
 									"template" => array("path" => "modules/$module_name/includes/email_template/", "file" => "order_ok.txt"),
 									"feedback_url" => LinkToGT("index.php?modname=Feedback"), 
@@ -603,7 +632,7 @@ function credit_response($tid, $credit_gateway='')
 								}
 					
 								if(isset($pn_credits_config['notify']['email']) && $pn_credits_config['notify']['email'] == 1)
-								{				
+								{
 									$message = array(
 										"template" => array("path" => "modules/$module_name/includes/email_template/", "file" => "online_ok.txt"),
 										"feedback_url" => LinkToGT("index.php?modname=Feedback"), 
@@ -620,6 +649,8 @@ function credit_response($tid, $credit_gateway='')
 							}
 							$userinfo = $users_system->getuserinfo(true);
 						}
+						
+						$hooks->do_action("credits_after_response");
 						
 						redirect_to($row['order_link']);
 						die();
@@ -661,15 +692,15 @@ function delete_all_filters($in_admin)
 }
 
 $tid							= (isset($tid)) ? intval($tid):1;
-$submit							= (isset($submit)) ? filter($submit, "nohtml"):"";
+$submit							= filter(request_var('submit', '', '_POST'), "nohtml");
 $search_query					= (isset($search_query)) ? filter($search_query, "nohtml"):"";
 $page							= (isset($page)) ? intval($page):1;
 $order_by						= (isset($order_by)) ? filter($order_by, "nohtml"):"";
 $sort							= (isset($sort)) ? filter($sort, "nohtml"):"";
 $in_admin						= (isset($in_admin)) ? filter($in_admin, "nohtml"):"";
 $credit_gateway					= (isset($credit_gateway)) ? filter($credit_gateway, "nohtml"):"";
-$offline_credit_file			= (isset($offline_credit_file)) ? $offline_credit_file:array();
-$order_data						= (isset($order_data)) ? $order_data:array();
+$offline_credit_file			= request_var('offline_credit_file', array(), '_FILES');
+$order_data						= request_var('order_data', array(), '_POST');
 $search_data					= (isset($search_data)) ? $search_data:array();
 $op								= (isset($op)) ? filter($op, "nohtml"):"";
 

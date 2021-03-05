@@ -20,7 +20,7 @@ if ( !defined('BLOCK_FILE') ) {
     die();
 }
 
-global $nuke_configs, $db, $block_global_contents;
+global $nuke_configs, $db;
 
 $params = array();
 $tags = array();

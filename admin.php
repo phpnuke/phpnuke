@@ -15,7 +15,8 @@
 define('ADMIN_FILE', true);
 
 require_once("mainfile.php");
-global $admin_file, $nuke_authors_cacheData, $nuke_configs, $pn_Sessions;
+
+$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 
 if(isset($aid))
 {
@@ -142,7 +143,7 @@ elseif(in_array($op, array("mod_authors", "modifyadmin", "UpdateAuthor", "AddAut
 
 if(!isset($pagetitle))
 {
-	$pagetitle = "- "._ADMIN_PAGE."";
+	$hooks->add_filter("set_page_title", function(){return array("admin_page" => "- "._ADMIN_PAGE."");});
 }
 
 $nuke_admins_menu_cacheData = add_remove_nuke_admins_menu();
@@ -224,10 +225,12 @@ function add_remove_nuke_admins_menu()
 
 function check_admin_permission($filename, $only_god=false, $modules=false)
 {
-	global $db, $admin_file, $nuke_admins_menu_cacheData, $nuke_authors_cacheData, $nuke_modules_cacheData, $aid;
+	global $db, $admin_file, $nuke_admins_menu_cacheData, $aid;
+	
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 	
 	$has_permission = false;
-	
 	if ($nuke_authors_cacheData[$aid]['aadminsuper'] == 1 && !$modules)
 	{
 		foreach($nuke_admins_menu_cacheData as $amid => $nuke_admins_menu_info)
@@ -373,7 +376,9 @@ function login()
 
 function forget_password($mode='', $code='', $id_admin='', $admin_email='', $security_code='', $security_code_id='', $new_admin_password=array())
 {
-	global $db, $nuke_configs, $pn_salt, $admin_file, $pn_Sessions, $nuke_authors_cacheData, $pn_Cookies;
+	global $db, $nuke_configs, $pn_salt, $admin_file, $pn_Sessions, $pn_Cookies;
+	
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 	
 	define("ADMIN_LOGIN", true);
 	
@@ -619,7 +624,7 @@ function adminmenu($url, $title, $image)
 
 function ipcount()
 {
-	global $nuke_mtsn_ipban_cacheData;
+	$nuke_mtsn_ipban_cacheData = get_cache_file_contents('nuke_mtsn_ipban');
 	$numattacks = (is_array($nuke_mtsn_ipban_cacheData) && !empty($nuke_mtsn_ipban_cacheData)) ? sizeof($nuke_mtsn_ipban_cacheData):0;
 	return $numattacks;
 }
@@ -627,7 +632,7 @@ function ipcount()
 function get_latest_vershion_from_nuke($mode='')
 {
 	global $nuke_configs;
-	$file_info = phpnuke_get_url_contents("http://www.phpnuke.ir/version.html", true);
+	$file_info = phpnuke_get_url_contents("https://www.phpnuke.ir/version.html", true);
 
 	if($file_info)
 	{
@@ -664,8 +669,11 @@ function admin_tables_sortable($fields=array(), $sort = 'DESC', $link_to_more=''
 
 function GraphicAdmin()
 {
-	global $aid, $nuke_configs, $op, $admin, $db, $nuke_admins_menu_cacheData, $nuke_authors_cacheData, $nuke_modules_cacheData, $admin_file;
+	global $aid, $nuke_configs, $op, $admin, $db, $nuke_admins_menu_cacheData, $admin_file;
 
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+	
 	$radminsuper = intval($nuke_authors_cacheData[$aid]['radminsuper']);
 	$aadminsuper = intval($nuke_authors_cacheData[$aid]['aadminsuper']);
 	$nuke_admins_menu_cacheData_by_atitle = phpnuke_array_change_key($nuke_admins_menu_cacheData, 'amid', 'atitle');
@@ -709,7 +717,7 @@ function GraphicAdmin()
 		}
 		
 		$lockicon = "<img border='0' src='images/lock.png'>";
-		$infoicon = "<img border='0' src='images/123210_42185_16_checkbox_checked_todo_icon.png'>";
+		$infoicon = "<img border='0' src='images/checkbox_checked_todo_icon.png'>";
 		$contents .= "<table border='0' cellspacing='0' style='border: 0 solid #808080; ' cellpadding='0' width='100%'>
 		<tr>
 			<td  width='254' colspan='4'></td>
@@ -828,7 +836,7 @@ function GraphicAdmin()
 
 function adminMain()
 {
-	global $nuke_configs, $admin, $aid, $db, $admin_file, $sort, $nuke_authors_cacheData, $nuke_modules_cacheData, $users_system, $pn_dbname, $pn_dbcharset;
+	global $nuke_configs, $admin, $aid, $db, $admin_file, $sort, $users_system, $pn_dbname, $pn_dbcharset, $hooks;
 	define("ADMIN_MAIN",true);
 	$contents = '';
 	
@@ -1216,10 +1224,8 @@ function adminMain()
 							$module = filter($row['module'], "nohtml");
 							$message = str_replace(array("\n","\r","\t"),"", strip_tags($row['message']));
 							$post_id = intval($row['post_id']);
-							$post_link = (isset($nuke_configs['links_function'][$module]) && $nuke_configs['links_function'][$module] != '' && function_exists($nuke_configs['links_function'][$module])) ? $nuke_configs['links_function'][$module]($post_id):"";
-					
-							if(is_array($post_link))
-								$post_link = $post_link[0];
+							$post_link = '';
+							$post_link = $hooks->apply_filters("get_post_link", $post_link, $module, $post_id);
 						
 							$contents .= "<tr style=\"border-bottom:1px solid #eee;\">
 								<td style=\"padding-right:10px;\"><a href=\"$post_link\" target=\"_blank\">$subject</a></td>
@@ -1254,51 +1260,67 @@ function adminMain()
 
 function get_latest_news_from_nuke()
 {
-	global $PnValidator, $nuke_configs;
-	$file_info = phpnuke_get_url_contents("http://www.phpnuke.ir/notice.html", true);
-
-	if ($file_info)
+	global $PnValidator, $nuke_configs, $cache;
+	
+	
+	if($cache->isCached("latest_news_from_nuke") && (_NOWTIME-$cache->retrieve("latest_news_from_nuke", true)) < 3600)
 	{
-		$phpnuke_news = objectToArray(json_decode($file_info));
-		$contents = "";
-		if(is_array($phpnuke_news) && !empty($phpnuke_news))
-		{
-			foreach($phpnuke_news as $article)
-			{
-				$PnValidator->validation_rules(array(
-					'title'	=> 'required',
-					'link'	=> 'required',
-				));
-			
-				// Get or set the filtering rules
-				$PnValidator->filter_rules(array(
-					'title'		=> 'sanitize_string',
-					'link'		=> 'urldecode|strip_tags',
-				)); 
-				$article = $PnValidator->sanitize($article, array('title'), true, true);
-				$validated_data = $PnValidator->run($article);
-				if($validated_data !== FALSE)
-				{
-					$article = $validated_data;
-				}
-				$contents .= "<li><a href=\"".$article['link']."\" target=\"_blank\" rel=\"no-follow\">".$article['title']."</a></li>";
-			}
-		}
-		return $contents;
+		return $cache->retrieve("latest_news_from_nuke");
 	}
 	else
 	{
+		$latest_news_from_nuke = array();
+		
+		if($cache->isCached('latest_news_from_nuke'))
+			$cache->erase('latest_news_from_nuke');
+	
+	
+		$file_info = phpnuke_get_url_contents("https://www.phpnuke.ir/notice.html", true);
+
+		if ($file_info)
+		{
+			$phpnuke_news = objectToArray(json_decode($file_info));
+			$contents = "";
+			if(is_array($phpnuke_news) && !empty($phpnuke_news))
+			{
+				foreach($phpnuke_news as $article)
+				{
+					$PnValidator->validation_rules(array(
+						'title'	=> 'required',
+						'link'	=> 'required',
+					));
+				
+					// Get or set the filtering rules
+					$PnValidator->filter_rules(array(
+						'title'		=> 'sanitize_string',
+						'link'		=> 'urldecode|strip_tags',
+					)); 
+					$article = $PnValidator->sanitize($article, array('title'), true, true);
+					$validated_data = $PnValidator->run($article);
+					if($validated_data !== FALSE)
+					{
+						$article = $validated_data;
+					}
+					$contents .= "<li><a href=\"".$article['link']."\" target=\"_blank\" rel=\"no-follow\">".$article['title']."</a></li>";
+				}
+			}
+			$cache->store('latest_news_from_nuke', $contents);
+			return $contents;			
+		}
+		
 		return _DOWNLOAD_PHPNUKEIR_PROBLEM;
 	}
 }
 
 function show_log_list($log_type=1)
 {
-	global $db, $admin_file, $pagetitle;
+	global $db, $admin_file, $hooks;
 	$contents = '';
 	$contents .= GraphicAdmin();
 	$log_name = ($log_type == 1) ? _ADMINS:_USERS;
-	$pagetitle = "فعالیتهای $log_name";
+	
+	$hooks->add_filter("set_page_title", function() use($log_name){return array("admin_page" => "فعالیتهای $log_name");});
+	
 	$contents .= "<table width=\"100%\" class=\"product-table min_table\">
 			<tr>
 				<td colspan=\"4\" style=\"background:#eee;\" align=\"center\"><b>".sprintf(_ADMIN_USERS_ACTIONS, $log_name)."</b></td>
@@ -1348,6 +1370,8 @@ function show_log_list($log_type=1)
 	$html_output .= $contents;
 	include("footer.php");
 }
+
+unset($nuke_authors_cacheData);
 
 if($admintest)
 {	
@@ -1402,6 +1426,7 @@ if($admintest)
 			}
 			
 			require_once("admin/case.php");
+			$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 			if(isset($nuke_modules_cacheData) && is_array($nuke_modules_cacheData))
 			{
 				foreach ($nuke_modules_cacheData as $mid => $module_info)
@@ -1413,6 +1438,8 @@ if($admintest)
 					}
 				}
 			}
+			unset($module_info);
+			unset($nuke_modules_cacheData);
 		break;
 	}
 }

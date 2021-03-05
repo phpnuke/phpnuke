@@ -27,6 +27,8 @@ switch($op) {
     case "article_admin":
     case "article_publish_now":
 	case "article_change_admin":
+	case "positions":
+	case "positions_admin":
     include("modules/$module_name/admin/index.php");
     break;
 }

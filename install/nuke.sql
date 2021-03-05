@@ -292,7 +292,7 @@ INSERT INTO `{NUKEPREFIX}config` (`config_name`, `config_value`) VALUES
 ('nuke_editor', '1'),
 ('display_errors', '0'),
 ('gtset', '1'),
-('userurl', '1'),
+('userurl', '4'),
 ('align', 'rtl'),
 ('show_links', '1'),
 ('datetype', '1'),
@@ -306,18 +306,7 @@ INSERT INTO `{NUKEPREFIX}config` (`config_name`, `config_value`) VALUES
 ('suspend_site', '0'),
 ('suspend_start', ''),
 ('suspend_expire', ''),
-('suspend_template', '<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<title>{SITENAME}</title>
-	</head>
-	<body>
-		<h1>Not Found</h1>
-		The requested URL /404.shtml was not found on this server.
-		<hr>
-		<i>{NUKEURL}</i>
-	</body>
-</html>'),
+('suspend_template', ''),
 ('upload_allowed_info', ''),
 ('upload_pagesitems', '5'),
 ('pagination_number', '1'),
@@ -407,7 +396,8 @@ http://ping.feedburner.com'),
 ('sms', '0'),
 ('pn_sms', 'a:5:{s:8:"operator";s:5:"opsms";s:8:"username";s:0:"";s:8:"password";s:0:"";s:14:"default_number";s:0:"";s:10:"recipients";s:0:"";}'),
 ('csrf_token_time', '1800'),
-('statistics_refresh', '1800');
+('statistics_refresh', '1800'),
+('breadcrumb_cat', '1');
 
 -- --------------------------------------------------------
 
@@ -682,16 +672,14 @@ CREATE TABLE `{NUKEPREFIX}posts` (
   `imported_id` int(2) NOT NULL DEFAULT '0',
   PRIMARY KEY (`sid`),
   KEY `title` (`title`(191)),
-  KEY `status` (`status`),
-  KEY `post_type` (`post_type`),
-  KEY `time` (`time`),
   KEY `cat` (`cat`(191)),
   KEY `tags` (`tags`(191)),
   KEY `ihome` (`ihome`),
   KEY `alanguage` (`alanguage`),
   KEY `position` (`position`),
   KEY `cat_link` (`cat_link`),
-  KEY `post_url` (`post_url`(191)) USING BTREE
+  KEY `post_url` (`post_url`(191)) USING BTREE,
+  KEY `sspt` (`sid`,`status`,`post_type`,`time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -961,7 +949,7 @@ CREATE TABLE `{NUKEPREFIX}transactions` (
   `title` varchar(250) NOT NULL DEFAULT '',
   `description` text NOT NULL,
   `order_part` varchar(20) NOT NULL DEFAULT '',
-  `order_id` mediumint(9) NOT NULL DEFAULT '0',
+  `order_id` int(11) NOT NULL DEFAULT '0',
   `order_link` varchar(500) NOT NULL DEFAULT '',
   `order_data` text NOT NULL,
   PRIMARY KEY (`tid`),

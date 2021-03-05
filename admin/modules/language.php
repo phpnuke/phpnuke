@@ -50,11 +50,14 @@ if (check_admin_permission($filename))
 	
 	function language($new_word="", $new_word_equals="", $word_search="")
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs, $nuke_languages_cacheData, $page;
+		global $db, $hooks, $admin_file, $nuke_configs, $page;
+		
+		$nuke_languages_cacheData = get_cache_file_contents('nuke_languages');
 	
 		$pagetitle = _LANGUAGE_ADMIN;
 		
 		$pagetitle .= (isset($word_search) && $word_search != "") ? " - "._PHRASE_SEARCH." » ($word_search)":"";
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("comments" => $pagetitle);});
 		
 		if(isset($new_word) && $new_word != "" && isset($new_word_equals) && is_array($new_word_equals) && !empty($new_word_equals))
 		{
@@ -224,8 +227,10 @@ if (check_admin_permission($filename))
 	
 	function edit_language_word($word, $word_equals)
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs, $nuke_languages_cacheData;
+		global $db, $hooks, $admin_file, $nuke_configs;
 
+		$nuke_languages_cacheData = get_cache_file_contents('nuke_languages');
+		
 		if(isset($word) && $word != "" && isset($word_equals) && is_array($word_equals) && !empty($word_equals))
 		{
 			if (!array_key_exists($word,$nuke_languages_cacheData))
@@ -254,6 +259,7 @@ if (check_admin_permission($filename))
 			die();
 		}
 		$pagetitle = ""._LANGUAGE_ADMIN_EDIT." (<span dir=\"ltr\">$word</span>)";
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("comments" => $pagetitle);});
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= OpenAdminTable();
@@ -309,7 +315,7 @@ if (check_admin_permission($filename))
 	function delete_language_word($word)
 	{
 		csrfProtector::authorisePost(true);
-		global $db, $admin_file, $nuke_configs, $nuke_languages_cacheData;
+		global $db, $admin_file, $nuke_configs;
 		
 		$db->table(LANGUAGES_TABLE)
 			->where('main_word' , $word)

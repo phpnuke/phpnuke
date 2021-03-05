@@ -39,8 +39,10 @@ if (check_admin_permission($module_name, false, true))
 	
 	function users($user_status='', $search_query = '', $order_by = '', $sort='DESC')
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs, $nuke_authors_cacheData;
+		global $db, $hooks, $admin_file, $nuke_configs;
 			
+		$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+		
 		$contents = '';
 		
 		switch($user_status)
@@ -66,6 +68,7 @@ if (check_admin_permission($module_name, false, true))
 		}
 		
 		$pagetitle = _USERS_ADMIN." - ".$title_status;
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("users" => $pagetitle);});
 		
 		$link_to_more = "";
 		$where = array();
@@ -287,7 +290,7 @@ if (check_admin_permission($module_name, false, true))
 	
 	function users_admin($user_id=0, $mode="new", $submit, $users_fields=array(), $uploadfile = array())
 	{
-		global $db, $aid, $ya_config, $pagetitle, $admin_file, $nuke_configs, $PnValidator, $module_name;
+		global $db, $hooks, $aid, $ya_config, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
 		$user_id = intval($user_id);
 		
@@ -571,18 +574,19 @@ if (check_admin_permission($module_name, false, true))
 				$bad_username = ($ya_config['bad_username'] != '' && !is_array($ya_config['bad_username'])) ? explode("\n", str_replace("\r","",$ya_config['bad_username'])):array();
 				$bad_mail = ($ya_config['bad_mail'] != '' && !is_array($ya_config['bad_mail'])) ? explode("\n", str_replace("\r","",$ya_config['bad_mail'])):array();
 				$bad_nick = ($ya_config['bad_nick'] != '' && !is_array($ya_config['bad_nick'])) ? explode("\n", str_replace("\r","",$ya_config['bad_nick'])):array();
+				define("NOAJAX_REQUEST", true);
 				
 				// email check
 				if($email_chenged && in_array($user_email, $bad_mail))
 					$modify_errors[] = _USER_BAD_EMAIL;
 				
-				if($email_chenged && _check_register_fields('user_email', $user_email, true, $mode))
+				if($email_chenged && !_check_register_fields('user_email', $user_email, $userinfo['user_email']))
 					$modify_errors[] = _USER_EMAIL_HAS_SELECTED;
 				
 				// username check
 				if($username_chenged && in_array($username, $bad_username))
 					$modify_errors[] = _USER_BAD_NAME;
-				if($username_chenged && _check_register_fields('username', $username, true, $mode))
+				if($username_chenged && !_check_register_fields('username', $username, $userinfo['username']))
 					$modify_errors[] = _USER_HAS_REGISTERED;
 				
 				if(strrpos($username,' ') > 0)
@@ -739,6 +743,7 @@ if (check_admin_permission($module_name, false, true))
 		$ava_sel2 = ($userinfo['user_avatar_type'] == 'remote') ? "selected":"";
 		$ava_sel3 = ($userinfo['user_avatar_type'] == 'gravatar') ? "selected":"";
 		$pagetitle = _USER_PROFILE_EDIT." <b>".$userinfo['username']."</b>";
+		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("users" => $pagetitle);});
 		$ya_config['data_verification']['user_password']['data-validation'] = "";
 		$ya_config['data_verification']['user_password_cn']['data-validation'] = "";
 				
@@ -1104,10 +1109,10 @@ if (check_admin_permission($module_name, false, true))
 		
 	function users_groups($search_query = '')
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs;
+		global $db, $hooks, $admin_file, $nuke_configs;
 		$contents = '';
 		
-		$pagetitle = _GROUPS_ADMIN;
+		$hooks->add_filter("set_page_title", function() {return array("users_groups" => _GROUPS_ADMIN);});
 		
 		$link_to_more = "";
 		$where = array();
@@ -1246,7 +1251,7 @@ if (check_admin_permission($module_name, false, true))
 
 	function users_groups_admin($group_id=0, $mode="new", $submit, $group_fields=array())
 	{
-		global $db, $aid, $visitor_ip, $pagetitle, $admin_file, $nuke_configs, $PnValidator, $module_name;
+		global $db, $aid, $visitor_ip, $hooks, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
 		$group_id = intval($group_id);
 		
@@ -1417,8 +1422,9 @@ if (check_admin_permission($module_name, false, true))
 				}
 				else
 				{
-					include("header.php");
 					$pagetitle = ($mode == "new") ? _ADD_NEW_GROUP:_EDIT_GROUP;
+					$hooks->add_filter("set_page_title", function() use($pagetitle){return array("users_groups_admin" => $pagetitle);});
+					include("header.php");
 					$html_output .= GraphicAdmin();
 					$html_output .= users_menu();
 					$html_output .= OpenAdminTable();
@@ -1548,7 +1554,7 @@ if (check_admin_permission($module_name, false, true))
 	
 	function users_fields_admin($submit, $users_fields=array())
 	{
-		global $db, $pagetitle, $admin_file, $nuke_configs, $PnValidator, $module_name;
+		global $db, $hooks, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
 		$error = array();
 		
@@ -1585,6 +1591,8 @@ if (check_admin_permission($module_name, false, true))
 				if(isset($users_field['value']) && is_array($users_field['value']))
 					$users_field['value'] = implode(",", $users_field['value']);
 					
+				$users_field['size'] = ($users_field['size'] != '') ? intval($users_field):0;
+					
 				$db->table(USERS_FIELDS_TABLE)
 					->where('fid', $fid)
 					->update($users_field);
@@ -1606,6 +1614,8 @@ if (check_admin_permission($module_name, false, true))
 				{
 					if(isset($added_field['value']) && is_array($added_field['value']))
 						$added_field['value'] = implode(",", $added_field['value']);
+					
+					$added_field['size'] = ($added_field['size'] != '') ? intval($added_field):0;
 					
 					$db->table(USERS_FIELDS_TABLE)
 						->insert($added_field);
@@ -1716,7 +1726,7 @@ if (check_admin_permission($module_name, false, true))
 			$contents = implode("<br />", $error);
 			
 		phpnuke_db_error();
-		$pagetitle = _USERS_FIELDS_SETTING;
+		$hooks->add_filter("set_page_title", function() {return array("users_fields_admin" => _USERS_FIELDS_SETTING);});
 		include("header.php");
 		$html_output .= $contents;
 		include("footer.php");
@@ -1730,9 +1740,9 @@ if (check_admin_permission($module_name, false, true))
 	$search_query = (isset($search_query)) ? filter($search_query, "nohtml"):'';
 	$submit = (isset($submit)) ? filter($submit, "nohtml"):'';
 	$mode = (isset($mode)) ? filter($mode, "nohtml"):'new';
-	$users_fields = (isset($users_fields)) ? $users_fields:array();
-	$group_fields = (isset($group_fields)) ? $group_fields:array();
-	$uploadfile	= (isset($uploadfile)) ? $uploadfile:array();
+	$users_fields = request_var('users_fields', array(), '_POST');
+	$group_fields = request_var('group_fields', array(), '_POST');
+	$uploadfile	= request_var('uploadfile', array(), '_FILES');
 	$user_id = (isset($user_id)) ? intval($user_id):0;
 	$group_id = (isset($group_id)) ? intval($group_id):0;
 	

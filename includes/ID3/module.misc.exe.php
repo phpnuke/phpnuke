@@ -1,11 +1,11 @@
 <?php
+
 /////////////////////////////////////////////////////////////////
 /// getID3() by James Heinrich <info@getid3.org>               //
-//  available at http://getid3.sourceforge.net                 //
-//            or http://www.getid3.org                         //
-//          also https://github.com/JamesHeinrich/getID3       //
-/////////////////////////////////////////////////////////////////
-// See readme.txt for more details                             //
+//  available at https://github.com/JamesHeinrich/getID3       //
+//            or https://www.getid3.org                        //
+//            or http://getid3.sourceforge.net                 //
+//  see readme.txt for more details                            //
 /////////////////////////////////////////////////////////////////
 //                                                             //
 // module.misc.exe.php                                         //
@@ -19,10 +19,15 @@ if(!defined('NUKE_FILE'))
 	exit;
 }
 
+if (!defined('GETID3_INCLUDEPATH')) { // prevent path-exposing attacks that access modules directly on public webservers
+	exit;
+}
 
 class getid3_exe extends getid3_handler
 {
-
+	/**
+	 * @return bool
+	 */
 	public function Analyze() {
 		$info = &$this->getid3->info;
 
@@ -31,7 +36,7 @@ class getid3_exe extends getid3_handler
 
 		$magic = 'MZ';
 		if (substr($EXEheader, 0, 2) != $magic) {
-			$info['error'][] = 'Expecting "'.getid3_lib::PrintHexBytes($magic).'" at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes(substr($EXEheader, 0, 2)).'"';
+			$this->error('Expecting "'.getid3_lib::PrintHexBytes($magic).'" at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes(substr($EXEheader, 0, 2)).'"');
 			return false;
 		}
 
@@ -56,8 +61,8 @@ class getid3_exe extends getid3_handler
 		$info['exe']['mz']['memory_minimum']     = $info['exe']['mz']['raw']['min_memory_paragraphs'] * 16;
 		$info['exe']['mz']['memory_recommended'] = $info['exe']['mz']['raw']['max_memory_paragraphs'] * 16;
 
-$info['error'][] = 'EXE parsing not enabled in this version of getID3() ['.$this->getid3->version().']';
-return false;
+		$this->error('EXE parsing not enabled in this version of getID3() ['.$this->getid3->version().']');
+		return false;
 
 	}
 

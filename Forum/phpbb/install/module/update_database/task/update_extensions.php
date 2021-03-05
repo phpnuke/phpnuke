@@ -76,7 +76,7 @@ class update_extensions extends task_base
 	 *				they were added
 	 */
 	static public $default_extensions_update = [
-		'3.3.0' => ['phpbb/viglink'],
+		'3.2.0-RC2' => ['phpbb/viglink'],
      	'3.3.0' => ['arty/scss'],
      	'3.3.0' => ['boardtools/quickreply'],
      	'3.3.0' => ['gfksx/ListSubforumsInColumns'],
