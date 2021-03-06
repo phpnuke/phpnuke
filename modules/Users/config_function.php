@@ -162,7 +162,7 @@ function ya_html_output($ya_config, $contents)
 	else
 	{
 		
-		$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+		$hooks->add_filter("site_theme_headers", function ($theme_setup) use($module_name, $nuke_configs)
 		{
 			$theme_setup = array_merge_recursive($theme_setup, array(
 				"default_css" => array(

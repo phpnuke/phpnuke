@@ -1190,7 +1190,7 @@ function phpnuke_permissions_check($permissions)
 	if(is_array($permissions) && empty($permissions) && is_God())
 		$allow_to_view = true;
 		
-	if(in_array(1, $permissions) && intval($userinfo['user_id']) != 0)
+	if(in_array(1, $permissions) && isset($userinfo['user_id']) && intval($userinfo['user_id']) != 0)
 		$disallow_message_arr[] = _GUESTS;
 	if(in_array(2, $permissions) && ((isset($userinfo['user_type']) && intval($userinfo['user_type']) != 2) || !$pn_Bots->isCrawler()))
 		$disallow_message_arr[] = _SEARCH_ENGINS;

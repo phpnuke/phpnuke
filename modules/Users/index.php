@@ -1230,11 +1230,11 @@ function logout()
 
 function reset_password($mode='', $credit_code='', $reset_password_username='', $reset_password_user_email='', $security_code='', $security_code_id='', $new_user_password=array(), $resend=false)
 {
-	global $db, $nuke_configs, $ya_config, $pn_salt, $pn_Sessions, $pn_Cookies, $module_name, $visitor_ip;
+	global $db, $nuke_configs, $ya_config, $pn_salt, $pn_Sessions, $pn_Cookies, $module_name, $visitor_ip, $hooks;
 	
 	$contents = '';
 	$code_accepted = true;
-	
+	$result = array();
 	$num_user = 0;
 	
 	$reset_password_username = (isset($reset_password_username) && $reset_password_username != '') ? $reset_password_username:(($pn_Cookies->exists('reset_password_username')) ? $pn_Cookies->get('reset_password_username'):"");
@@ -2224,7 +2224,7 @@ function delete_cookies()
 
 function send_invitation_code($invited_email)
 {
-	global $db, $nuke_configs, $userinfo, $ya_config, $module_name;
+	global $db, $nuke_configs, $userinfo, $ya_config, $module_name, $hooks;
 
 	$response = array(
 	  'valid' => false,
