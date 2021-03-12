@@ -3722,7 +3722,7 @@ function upgrade_final()
 			array(10, 'surveys', 'block-surveys.php'),
 			array(11, 'Last comments', 'block-Last_comments.php'),
 			array(12, 'credits', 'block-Credits.php'),
-			array(12, 'invitation', 'block-invitation.php')
+			array(13, 'invitation', 'block-invitation.php')
 		);
 		
 		$db->table(BLOCKS_TABLE)

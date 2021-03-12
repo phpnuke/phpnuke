@@ -61,6 +61,7 @@ if (check_admin_permission($module_name, false, true))
 			break;
 		}
 		
+		$pagetitle = _SURVEYS_ADMIN." - ".(($post_status != '') ? $post_status:"");
 		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("surveys" => $pagetitle);});
 		
 		$link_to_more = "";
@@ -71,7 +72,7 @@ if (check_admin_permission($module_name, false, true))
 		if($status !== '')
 		{
 			$link_to_more .= "&status=$status";
-			$where[] = "status = ':status'";
+			$where[] = "status = :status";
 			$params[":status"] = $status;
 			if($status == 0)
 				$publish_now = "<a href=\"".$admin_file.".php?op=surveys_admin&mode=publish_now&pollID={POLLID}&csrf_token="._PN_CSRF_TOKEN."\" title=\""._PUBLISH."\" class=\"table-icon icon-5 info-tooltip\"></a>";
@@ -85,7 +86,7 @@ if (check_admin_permission($module_name, false, true))
 		}
 		
 		$where = array_filter($where);
-		$params = array_filter($params);
+		$params = array_filter($params, 'strlen');
 		$where = (!empty($where)) ? "WHERE ".implode(" AND ", $where):'';
 
 		$sort = ($sort != '' && in_array($sort, array("ASC","DESC"))) ? $sort:"DESC";
@@ -105,7 +106,7 @@ if (check_admin_permission($module_name, false, true))
 			$where 
 			ORDER BY main_survey DESC, canVote DESC, $order_by $sort LIMIT $start_at, $entries_per_page
 		", $params);
-		
+
 		$contents .= GraphicAdmin();
 		$contents .= surveys_menu();
 		
@@ -814,7 +815,7 @@ if (check_admin_permission($module_name, false, true))
 	}
 	
 	$op = (isset($op)) ? filter($op, "nohtml"):'';
-	$status = (isset($status) && $status != '') ? intval($status):'';
+	$status = (isset($status) && $status !== '') ? intval($status):'';
 	$mode = (isset($mode)) ? filter($mode, "nohtml"):'new';
 	$order_by = (isset($order_by)) ? filter($order_by, "nohtml"):'';
 	$sort = (isset($sort)) ? filter($sort, "nohtml"):'';
