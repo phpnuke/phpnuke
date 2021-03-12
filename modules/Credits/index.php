@@ -210,6 +210,7 @@ function credit_edit($order_data = array())
 	
 	$boxes_contents = show_modules_boxes($module_name, "form", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 
+
 	$meta_tags = array(
 		"title" => $form_title,
 		"description" => ""._CREDITS_ADMIN." - ".$form_title,
@@ -241,7 +242,6 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 {
 	global $db, $hooks, $nuke_configs, $module_name, $userinfo, $pn_credits_config, $users_system;
 	
-	$order_data = (isset($order_data) && $order_data != '' && !empty($order_data)) ? objectToArray(json_decode(str_replace("'",'"', $order_data))):"";
 	$order_data = $hooks->apply_filters("credits_order_data_form", $order_data);
 	
 	$credit_method = intval($credit_method);

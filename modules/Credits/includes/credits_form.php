@@ -51,6 +51,10 @@ $contents .= "
 	$contents .= "</div>";
 	if(isset($order_data) && !empty($order_data))
 	{
+		foreach($order_data as $order_key => $order_value)
+		{
+			$contents .= "<input type=\"hidden\" name=\"order_data[$order_key]\" value=\"$order_value\" />";
+		}
 		$contents .= "
 			<input type=\"hidden\" name=\"order_data\" value=\"".str_replace('"', "'", json_encode($order_data))."\" />
 			<div class=\"form-group\">

@@ -435,12 +435,6 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 	);
 	
 	$ya_config['meta_tags'] = $hooks->apply_filters("login_header_meta", $ya_config['meta_tags'], $module_name);
-		
-	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
-	{
-		return array_merge($all_meta_tags, $ya_config['meta_tags']);
-	}, 10);		
-	unset($meta_tags);
 			
 	ya_html_output($ya_config, $contents);
 }
@@ -522,12 +516,6 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 		);
 		
 		$ya_config['meta_tags'] = $hooks->apply_filters("register_email_activatation_header_meta", $ya_config['meta_tags'], $module_name, $username, $check_num, $link_to_redirect);
-			
-		$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
-		{
-			return array_merge($all_meta_tags, $ya_config['meta_tags']);
-		}, 10);		
-		unset($meta_tags);
 	
 		ya_html_output($ya_config, $contents);
 	}
@@ -786,7 +774,7 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 
 	if(isset($submit) && $submit != '' && !empty($users_fields) && $pn_Sessions->get('register_yes', false) == 1)
 	{
-		$hooks->do_action("users_register_submit", $username, $user_password);
+		$hooks->do_action("users_register_submit", $users_fields['username'], $users_fields['user_password']);
 		
 		$register_errors = array();
 		$code_accepted = true;
@@ -1178,12 +1166,6 @@ function register($submit = '', $users_fields = array(), $invitation_code = '', 
 		"extra_meta_tags" => array()
 	);
 	$ya_config['meta_tags'] = $hooks->apply_filters("register_header_meta", $ya_config['meta_tags'], $module_name);
-		
-	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($ya_config)
-	{
-		return array_merge($all_meta_tags, $ya_config['meta_tags']);
-	}, 10);		
-	unset($meta_tags);
 		
 	ya_html_output($ya_config, $contents);
 }
