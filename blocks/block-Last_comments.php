@@ -20,7 +20,7 @@ if ( !defined('BLOCK_FILE') ) {
     die();
 }
 
-global $nuke_configs, $db, $users_system;
+global $nuke_configs, $db, $users_system, $hooks;
 
 $params = array();
 $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['comments'])):array();

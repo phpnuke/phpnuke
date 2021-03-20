@@ -331,7 +331,7 @@ if (check_admin_permission($filename))
 	function categories_delete($catid, $cat_modulename='Articles')
 	{
 		csrfProtector::authorisePost(true);
-		global $db, $admin_file, $nuke_configs;
+		global $db, $admin_file, $nuke_configs, $hooks;
 		
 		$catid = intval($catid);
 		

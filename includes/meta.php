@@ -21,7 +21,7 @@ if(!defined('NUKE_FILE'))
 # Include for meta Tags generation               #
 ##################################################
 	
-	
+global $hooks;
 $all_meta_tags = array();
 $all_meta_tags = $hooks->apply_filters("site_header_meta", $all_meta_tags);
 

@@ -219,7 +219,7 @@ CREATE TABLE `{NUKEPREFIX}comments` (
   `ratings` int(11) NOT NULL DEFAULT '0',
   `score` tinyint(4) NOT NULL DEFAULT '0',
   `reason` text COLLATE utf8mb4_unicode_ci,
-  `last_moderation` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `last_replay_time` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
   `status` int(1) NOT NULL DEFAULT '0',
   `reported` tinyint(1) NOT NULL DEFAULT '0',
   `imported_id` int(11) NOT NULL DEFAULT '0',

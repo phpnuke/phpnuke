@@ -290,7 +290,7 @@ class phpnuke_comments
 
 	private function comment_form()
 	{
-		global $nuke_configs, $users_system, $userinfo, $last_comment_info;
+		global $nuke_configs, $users_system, $userinfo, $last_comment_info, $hooks;
 		
 		$is_user = is_user();
 		$content = "";
@@ -414,12 +414,13 @@ class phpnuke_comments
 			$content = "<br>";
 			$content .= "<div class=\"text-center\">"._NOANONCOMMENTS."</div>";
 		}
+		$content = $hooks->apply_filters("comments_form", $content);
 		return $content;
 	}
 		
 	private function post_comments($comment_form_fields)
 	{
-		global $db, $userinfo, $nuke_configs, $security_code, $security_code_id, $visitor_ip, $PnValidator, $users_system;
+		global $db, $userinfo, $nuke_configs, $security_code, $security_code_id, $visitor_ip, $PnValidator, $users_system, $hooks;
 
 		$code_accepted = false;
 		
@@ -545,6 +546,8 @@ class phpnuke_comments
 					{
 						$this->sendtoconfirm = 1;
 					}
+					
+					$hooks->do_action("comments_form_after", $comment_form_fields, $cid);
 					
 					phpnuke_db_error();
 					redirect_to($this->Req_URIs_2."#comment-$cid");
