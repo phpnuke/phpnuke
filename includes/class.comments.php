@@ -71,7 +71,7 @@ class phpnuke_comments
 		if ($this->allow_comments > 0)
 		{
 			$votetype = $nuke_configs['votetype'];
-			$user_id = (isset($userinfo['user_id']) && isset($userinfo['is_registered']) && $userinfo['is_registered'] == 1) ? $userinfo['user_id']:0;
+			$user_id = (is_user()) ? $userinfo['user_id']:0;
 			$query_params[':user_id'] = $user_id;
 			$query_params[':visitor_ip'] = $visitor_ip;
 			$vote_where = ($user_id != 0) ? "user_id = :user_id":"rating_ip = :visitor_ip";
@@ -493,6 +493,7 @@ class phpnuke_comments
 
 				if(empty($errors))
 				{
+					$user_id = (is_user()) ? $userinfo['user_id']:0;
 					$db->table(COMMENTS_TABLE)
 						->insert([
 							'pid' => $comment_form_fields['reply_pid'], 
@@ -504,6 +505,7 @@ class phpnuke_comments
 							'last_replay_time' => $time, 
 							'name' => $comment_form_fields['name'], 
 							'username' => $username, 
+							'user_id' => $user_id, 
 							'email' => $comment_form_fields['email'], 
 							'url' => $comment_form_fields['url'], 
 							'ip' => $visitor_ip, 
