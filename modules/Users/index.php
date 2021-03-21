@@ -378,7 +378,7 @@ function login($submit = '', $username = '', $user_password = '', $remember_me =
 					<div class=\"col-md-4 col-xs-4\">
 						<div class=\"logo\"></div>
 					</div>
-					<div cl.ass=\"col-md-8 col-xs-8\">
+					<div class=\"col-md-8 col-xs-8\">
 						<h2>"._USER_LOGIN_TITLE."</h2>
 					</div>
 				</div>

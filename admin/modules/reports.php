@@ -81,8 +81,8 @@ if (check_admin_permission($filename))
 		$contents = '';
 		$contents .= GraphicAdmin();
 		
-		$all_modules_comments = array();
-		$all_modules_comments = $hooks->apply_filters('modules_have_comments', $all_modules_comments);
+		$all_modules_reports = array();
+		$all_modules_reports = $hooks->apply_filters('modules_have_reports', $all_modules_reports);
 		
 		$all_modules_reports_link[] = "<option value=\"".$admin_file.".php?op=reports&module_name=comments".(($post_id != 0) ? "&post_id=$post_id":"")."\" ".(($module_name == 'comments') ? "selected":"").">"._COMMENTS."</option>";
 		

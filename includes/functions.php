@@ -3513,7 +3513,7 @@ function nuketimes($time = 0, $hour=false, $min=false, $sec=false, $mode=3)
 	else
 		$result = $dateTimes.$add_Times;
 	
-	$result = $hooks->apply_filters("nuketimes", $result, $time, $hour, $min, $sec, $mode);
+	$result = $hooks->apply_filters("nuketimes_filter", $result, $time, $hour, $min, $sec, $mode);
 	
 	return $result;
 }

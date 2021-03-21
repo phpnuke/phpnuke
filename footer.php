@@ -107,6 +107,8 @@ if(is_user())
 
 send_headers();
 
+$html_output = $hooks->apply_filters("html_output", $html_output);
+
 echo((($nuke_configs['minify_src']) ? minify_html($html_output):$html_output));
 
 die();

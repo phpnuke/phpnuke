@@ -15,7 +15,7 @@ function cache_caspian_data()
 {
 	global $db, $nuke_configs, $cache, $caspian_configs, $theme_setup;
 	
-	if($cache->isCached("ib3theme_data") && ((_NOWTIME-$cache->retrieve("caspian_data", true)) <= 3600))
+	if($cache->isCached("caspian_data") && ((_NOWTIME-$cache->retrieve("caspian_data", true)) <= 3600))
 	{
 		$caspian_data = $cache->retrieve("caspian_data");
 	}

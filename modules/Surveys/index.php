@@ -75,7 +75,7 @@ function pollList()
 		"description" => _POLLS_LIST,
 		"extra_meta_tags" => array()
 	);
-	$meta_tags = $hooks->apply_filters("feedback_header_meta", $meta_tags);
+	$meta_tags = $hooks->apply_filters("surveys_header_meta", $meta_tags);
 	
 	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
 	{
