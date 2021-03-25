@@ -131,7 +131,7 @@ $nuke_comments_configs = ($nuke_configs['comments'] != '') ? phpnuke_unserialize
 				$forum_groups_cacheData = get_cache_file_contents('nuke_forum_groups');
 				if(isset($forum_groups_cacheData[$users_data[$user_id]['group_id']]))
 				{
-					$user_colour = "#".str_replace("#","",$forum_groups_cacheData[$group_id]['group_colour']);
+					$user_colour = "#".str_replace("#","",$forum_groups_cacheData[$users_data[$user_id]['group_id']]['group_colour']);
 					$group_name = $forum_groups_cacheData[$users_data[$user_id]['group_id']]['group_name'];
 				}
 			}
