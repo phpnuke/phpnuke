@@ -1,4 +1,4 @@
-[![phpNuke](http://www.phpnuke.ir/themes/Mashhadteam-BlueOcean/images/logo-blue.png)](http://www.phpnuke.ir)
+[![phpNuke](https://raw.githubusercontent.com/phpnuke/phpnuke/master/admin/template/images/shared/logo.png)](http://www.phpnuke.ir)
 
 ## ABOUT
 
