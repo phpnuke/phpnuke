@@ -158,7 +158,7 @@ function upgrade_header($step = 1, $progress = 0)
     echo "<!DOCTYPE html>
 <html lang=\"en\">
 <head>
-	<title>نصب نيوک فارسي 8.4.3</title>
+    <title>نصب نيوک فارسي 8.4.4-dev</title>
 	<meta charset=\"UTF-8\">
 	<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
 	<link href=\"includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\">
