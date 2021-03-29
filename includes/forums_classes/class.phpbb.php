@@ -1952,23 +1952,26 @@ class users_system{
 
 			$pn_Cookies->cookie_prefix_set = true;
 			
-			$result = $db->table($this->sessions_table)
-				->where("session_user_id", (int) $this->data['user_id'])
-				->where("session_time", ">=", (int) ($this->time_now - (max($this->config['session_length'], $this->config['form_token_lifetime']))))
-				->first(array("COUNT(session_id) AS sessions"));
-
-			if($db->count() > 0)
+			if((int) $this->data['user_id'] > 1)
 			{
-				if ((int) $result['sessions'] <= 1 || empty($this->data['user_form_salt']))
+				$result = $db->table($this->sessions_table)
+					->where("session_user_id", (int) $this->data['user_id'])
+					->where("session_time", ">=", (int) ($this->time_now - (max($this->config['session_length'], $this->config['form_token_lifetime']))))
+					->first(array("COUNT(session_id) AS sessions"));
+
+				if($db->count() > 0)
 				{
-					$this->data['user_form_salt'] = $this->unique_id();
-					// Update the form key
-					
-					$result = $db->table($this->users_table)
-						->where("user_id", (int) $this->data['user_id'])
-						->update([
-							"user_form_salt" => $this->data['user_form_salt']
-						]);
+					if ((int) $result['sessions'] <= 1 || empty($this->data['user_form_salt']))
+					{
+						$this->data['user_form_salt'] = $this->unique_id();
+						// Update the form key
+						
+						$result = $db->table($this->users_table)
+							->where("user_id", (int) $this->data['user_id'])
+							->update([
+								"user_form_salt" => $this->data['user_form_salt']
+							]);
+					}
 				}
 			}
 		}
