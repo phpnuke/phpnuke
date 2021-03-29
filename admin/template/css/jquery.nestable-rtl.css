@@ -1,4 +1,13 @@
-#nestable {direction:rtl;}
-.dd-list .dd-list { padding-left:0px!important;padding-right: 30px; }
-.dd-item > button {float: right;}
-.dd-options{float:left;}
+#nestable {
+  direction: rtl;
+}
+.dd-list .dd-list {
+  padding-left: 0px !important;
+  padding-right: 30px;
+}
+.dd-item > button {
+  float: right;
+}
+.dd-options {
+  float: left;
+}
