@@ -8,8 +8,8 @@
  *
  */
 
-// 8.4.3 installer
-// 8.3.7 to 8.4.3 upgrader
+// 8.4.4-dev installer
+// 8.3.7 to 8.4.4-dev upgrader
 
 if (version_compare(PHP_VERSION, '5.4.0', "<")) {
     die(
@@ -6035,7 +6035,7 @@ function upgrade_final()
         $install_options['siteinfo']['sitename']
     )
         ? $install_options['siteinfo']['sitename']
-        : "PhpNuke 8.4.3";
+        : "PhpNuke 8.4.4-dev";
     $install_options['db_info']['db_have_forum'] = isset(
         $install_options['db_info']['db_have_forum']
     )
@@ -6063,7 +6063,7 @@ function upgrade_final()
         : "";
 
     $config_data = [
-        "WHEN config_name = 'Version_Num' THEN '8.4.3'",
+        "WHEN config_name = 'Version_Num' THEN '8.4.4-dev'",
         "WHEN config_name = 'lock_siteurl' THEN '" .
         (isset($install_options['db_info']['nukeurl']) ? 1 : 0) .
         "'",
