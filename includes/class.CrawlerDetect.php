@@ -1,7 +1,15 @@
 <?php
+/**
+ *
+ * This file is part of the PHP-NUKE Software package.
+ *
+ * @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ */
 
 if (!defined('NUKE_FILE')) {
-	die ("You can't access this file directly...");
+    die("You can't access this file directly...");
 }
 
 /*
@@ -17,13 +25,13 @@ abstract class AbstractProvider
 {
     /**
      * The data set.
-     * 
+     *
      * @var array
      */
     protected $data;
     /**
      * Return the data set.
-     * 
+     *
      * @return array
      */
     public function getAll()
@@ -39,7 +47,7 @@ class Crawlers extends AbstractProvider
      *
      * @var array
      */
-    protected $data = array(
+    protected $data = [
         '.*Java.*outbrain',
         '008\/',
         '192\.comAgent',
@@ -794,7 +802,7 @@ class Crawlers extends AbstractProvider
         'ZnajdzFoto',
         'ZyBorg',
         '[a-z0-9\-_]*((?<!cu)bot|crawler|archiver|transcoder|spider|uptime|validator|fetcher)',
-    );
+    ];
 }
 
 class Exclusions extends AbstractProvider
@@ -805,7 +813,7 @@ class Exclusions extends AbstractProvider
      *
      * @var array
      */
-    protected $data = array(
+    protected $data = [
         'Safari.[\d\.]*',
         'Firefox.[\d\.]*',
         'Chrome.[\d\.]*',
@@ -847,7 +855,7 @@ class Exclusions extends AbstractProvider
         'Opera',
         ' \.NET[\d\.]*',
         ';', // Remove the following characters ;
-    );
+    ];
 }
 
 class Headers extends AbstractProvider
@@ -857,7 +865,7 @@ class Headers extends AbstractProvider
      *
      * @var array
      */
-    protected $data = array(
+    protected $data = [
         // The default User-Agent string.
         'HTTP_USER_AGENT',
         // Header can occur on devices using Opera Mini.
@@ -871,7 +879,7 @@ class Headers extends AbstractProvider
         'HTTP_X_UCBROWSER_DEVICE_UA',
         // Sometimes, bots (especially Google) use a genuine user agent, but fill this header in with their email address
         'HTTP_FROM',
-    );
+    ];
 }
 
 class CrawlerDetect
@@ -888,14 +896,14 @@ class CrawlerDetect
      *
      * @var array
      */
-    protected $httpHeaders = array();
+    protected $httpHeaders = [];
 
     /**
      * Store regex matches.
      *
      * @var array
      */
-    protected $matches = array();
+    protected $matches = [];
 
     /**
      * Crawlers object.
@@ -942,7 +950,9 @@ class CrawlerDetect
         $this->uaHttpHeaders = new Headers();
 
         $this->compiledRegex = $this->compileRegex($this->crawlers->getAll());
-        $this->compiledExclusions = $this->compileRegex($this->exclusions->getAll());
+        $this->compiledExclusions = $this->compileRegex(
+            $this->exclusions->getAll()
+        );
 
         $this->setHttpHeaders($headers);
         $this->setUserAgent($userAgent);
@@ -952,12 +962,12 @@ class CrawlerDetect
      * Compile the regex patterns into one regex string.
      *
      * @param array
-     * 
+     *
      * @return string
      */
     public function compileRegex($patterns)
     {
-        return '('.implode('|', $patterns).')';
+        return '(' . implode('|', $patterns) . ')';
     }
 
     /**
@@ -968,12 +978,12 @@ class CrawlerDetect
     public function setHttpHeaders($httpHeaders = null)
     {
         // Use global _SERVER if $httpHeaders aren't defined.
-        if (! is_array($httpHeaders) || ! count($httpHeaders)) {
+        if (!is_array($httpHeaders) || !count($httpHeaders)) {
             $httpHeaders = $_SERVER;
         }
 
         // Clear existing headers.
-        $this->httpHeaders = array();
+        $this->httpHeaders = [];
 
         // Only save HTTP headers. In PHP land, that means
         // only _SERVER vars that start with HTTP_.
@@ -1006,12 +1016,15 @@ class CrawlerDetect
         } else {
             $this->userAgent = null;
             foreach ($this->getUaHttpHeaders() as $altHeader) {
-                if (false === empty($this->httpHeaders[$altHeader])) { // @todo: should use getHttpHeader(), but it would be slow.
-                    $this->userAgent .= $this->httpHeaders[$altHeader].' ';
+                if (false === empty($this->httpHeaders[$altHeader])) {
+                    // @todo: should use getHttpHeader(), but it would be slow.
+                    $this->userAgent .= $this->httpHeaders[$altHeader] . ' ';
                 }
             }
 
-            $this->userAgent = (! empty($this->userAgent) ? trim($this->userAgent) : null);
+            $this->userAgent = !empty($this->userAgent)
+                ? trim($this->userAgent)
+                : null;
         }
     }
 
@@ -1026,13 +1039,21 @@ class CrawlerDetect
     {
         $agent = $userAgent ?: $this->userAgent;
 
-        $agent = preg_replace('/'.$this->compiledExclusions.'/i', '', $agent);
+        $agent = preg_replace(
+            '/' . $this->compiledExclusions . '/i',
+            '',
+            $agent
+        );
 
         if (strlen(trim($agent)) == 0) {
             return false;
         }
 
-        $result = preg_match('/'.$this->compiledRegex.'/i', trim($agent), $matches);
+        $result = preg_match(
+            '/' . $this->compiledRegex . '/i',
+            trim($agent),
+            $matches
+        );
 
         if ($matches) {
             $this->matches = $matches;
