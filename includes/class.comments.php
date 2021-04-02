@@ -328,24 +328,24 @@ class phpnuke_comments
                 }
 
                 $post_comment['group_id'] =
-                    isset($this->users_data['group_id']) &&
-                    $this->users_data['group_id'] != ''
-                        ? intval($this->users_data['group_id'])
+                    isset($this->users_data[$post_comment['user_id']]['group_id']) &&
+                    $this->users_data[$post_comment['user_id']]['group_id'] != ''
+                        ? intval($this->users_data[$post_comment['user_id']]['group_id'])
                         : 0;
                 $post_comment['user_avatar'] =
-                    isset($this->users_data['user_avatar']) &&
-                    $this->users_data['user_avatar'] != ''
-                        ? $this->users_data['user_avatar']
+                    isset($this->users_data[$post_comment['user_id']]['user_avatar']) &&
+                    $this->users_data[$post_comment['user_id']]['user_avatar'] != ''
+                        ? $this->users_data[$post_comment['user_id']]['user_avatar']
                         : '';
                 $post_comment['user_avatar_type'] =
-                    isset($this->users_data['user_avatar_type']) &&
-                    $this->users_data['user_avatar_type'] != ''
-                        ? $this->users_data['user_avatar_type']
+                    isset($this->users_data[$post_comment['user_id']]['user_avatar_type']) &&
+                    $this->users_data[$post_comment['user_id']]['user_avatar_type'] != ''
+                        ? $this->users_data[$post_comment['user_id']]['user_avatar_type']
                         : '';
                 $post_comment['user_email'] =
-                    isset($this->users_data['user_email']) &&
-                    $this->users_data['user_email'] != ''
-                        ? $this->users_data['user_email']
+                    isset($this->users_data[$post_comment['user_id']]['user_email']) &&
+                    $this->users_data[$post_comment['user_id']]['user_email'] != ''
+                        ? $this->users_data[$post_comment['user_id']]['user_email']
                         : '';
 
                 $post_comment['deact'] =
@@ -853,8 +853,7 @@ class phpnuke_comments
                     $user_id = is_user() ? $userinfo['user_id'] : 0;
                     $db->table(COMMENTS_TABLE)->insert([
                         'pid' => $comment_form_fields['reply_pid'],
-                        'main_parent' =>
-                            $comment_form_fields['reply_main_parent'],
+                        'main_parent' => $comment_form_fields['reply_main_parent'],
                         'module' => $this->module_name,
                         'post_id' => $this->post_id,
                         'post_title' => $this->post_title,
