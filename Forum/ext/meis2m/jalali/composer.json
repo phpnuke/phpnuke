@@ -3,9 +3,9 @@
 	"type": "phpbb-extension",
 	"description": "Shamsi Date for phpBB",
 	"homepage": "http://www.php-bb.ir",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"keywords": ["phpbb", "shamsi-date", "شمسی", "تاریخ شمسی"],
-	"time": "2021-01-01",
+	"time": "2021-02-15",
 	"license": "GPL-2.0",
 	"authors": [
 		{

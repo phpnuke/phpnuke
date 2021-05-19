@@ -1,10 +1,10 @@
-Subject: Topic disapproved - "{TOPIC_TITLE}"
+Subject: موضوع تأیید نشد - "{TOPIC_TITLE}"
 
-Hello {USERNAME},
+سلام {USERNAME}،
 
-You are receiving this notification because your topic "{TOPIC_TITLE}" at "{SITENAME}" was disapproved by a moderator or administrator.
+این اطلاعیه را دریافت می کنید زیرا موضوع "{TOPIC_TITLE}" درسایت "{SITENAME}" توسط مدیر و یا مدیر انجمن تأیید نشد.
 
-The following reason was given for the disapproval:
+دلیل تأیید نشدن:
 
 {REASON}
 

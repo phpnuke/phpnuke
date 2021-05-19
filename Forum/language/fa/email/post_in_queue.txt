@@ -1,13 +1,13 @@
-Subject: Post moderation notification - "{TOPIC_TITLE}"
+Subject: پست نیاز به تأیید - "{TOPIC_TITLE}"
 
-Hello {USERNAME},
+سلام {USERNAME}،
 
-You are receiving this notification because the post "{POST_SUBJECT}" at "{SITENAME}" needs approval.
+پست "{POST_SUBJECT}" در سایت "{SITENAME}" نیاز به تأیید دارد.
 
-If you want to view the post, click the following link:
+برای مشاهده پست بر روی لینک زیر کلیک کنید:
 {U_VIEW_POST}
 
-If you want to view the topic, click the following link:
+برای مشاهده موضوع بر روی لینک زیر کلیک کنید:
 {U_TOPIC}
 
 {EMAIL_SIG}

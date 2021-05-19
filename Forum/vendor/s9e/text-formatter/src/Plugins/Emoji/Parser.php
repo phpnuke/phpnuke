@@ -2,7 +2,7 @@
 
 /**
 * @package   s9e\TextFormatter
-* @copyright Copyright (c) 2010-2020 The s9e authors
+* @copyright Copyright (c) 2010-2021 The s9e authors
 * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
 */
 namespace s9e\TextFormatter\Plugins\Emoji;
@@ -65,8 +65,8 @@ class Parser extends ParserBase
 	protected function getHexSequence($str)
 	{
 		$seq = [];
-		$i   = 0;
-		do
+		$i   = -1;
+		while (++$i < strlen($str))
 		{
 			$cp = ord($str[$i]);
 			if ($cp >= 0xF0)
@@ -83,7 +83,6 @@ class Parser extends ParserBase
 			}
 			$seq[] = sprintf('%04x', $cp);
 		}
-		while (++$i < strlen($str));
 
 		return implode('-', $seq);
 	}

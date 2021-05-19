@@ -1,13 +1,13 @@
-Subject: Post report - "{TOPIC_TITLE}"
+Subject: گزارش پست - "{TOPIC_TITLE}"
 
-Hello {USERNAME},
+سلام {USERNAME}،
 
-You are receiving this notification because the post "{POST_SUBJECT}" at "{SITENAME}" was reported.
+پست "{POST_SUBJECT}" در سایت "{SITENAME}" گزارش شد.
 
-If you want to view the report, click the following link:
+برای مشاهده گزارش بر روی لینک زیر کلیک کنید:
 {U_VIEW_REPORT}
 
-If you want to view the post, click the following link:
+برای مشاهده پست بر روی لینک زیر کلیک کنید:
 {U_VIEW_POST}
 
 {EMAIL_SIG}

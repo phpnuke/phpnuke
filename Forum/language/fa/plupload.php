@@ -3,7 +3,7 @@
 *
 * phpBB 3.3.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
-* 
+*
 * This file is part of the phpBB Forum Software package.
 *
 * @copyright (c) phpBB Limited <https://www.phpbb.com>
@@ -42,41 +42,41 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	'PLUPLOAD_ADD_FILES'		=> 'افزودن فایل',
-	'PLUPLOAD_ADD_FILES_TO_QUEUE'	=> 'فایل جهت بارگزاری به صف انتظار اضافه شد ، برای آغاز روی دکمه شروع کلیک کنید.',
+	'PLUPLOAD_ADD_FILES_TO_QUEUE'	=> 'پرونده ها را به صف بارگذاری اضافه کنید و روی دکمه شروع کلیک کنید.',
 	'PLUPLOAD_ALREADY_QUEUED'	=> '%s در حال حاضر در صف انتظار وجود دارد.',
-	'PLUPLOAD_CLOSE'			=> 'بستن',
-	'PLUPLOAD_DRAG'				=> 'فایل را اینجا رها کنید.',
+	'PLUPLOAD_CLOSE'		=> 'بستن',
+	'PLUPLOAD_DRAG'			=> 'فایل را اینجا رها کنید.',
 	'PLUPLOAD_DUPLICATE_ERROR'	=> 'خطا فایل هم نام.',
-	'PLUPLOAD_DRAG_TEXTAREA'	=> 'شما بایستی جهت پیوست فایل ، آن را اینجا بکشید و رها کنید.',
+	'PLUPLOAD_DRAG_TEXTAREA'	=> 'همچنین می‌توانید فایل‌ها را با کشیدن و رها کردن در جعبه پیام، پیوست کنید.',
 	'PLUPLOAD_ERR_INPUT'		=> 'خطا در باز کردن فایل.',
-	'PLUPLOAD_ERR_MOVE_UPLOADED'	=> 'خطا در انتقال فایل بارگزاری شده.',
+	'PLUPLOAD_ERR_MOVE_UPLOADED'	=> 'خطا در انتقال فایل بارگذاری شده.',
 	'PLUPLOAD_ERR_OUTPUT'		=> 'خطا در باز کردن فایل',
 	'PLUPLOAD_ERR_FILE_TOO_LARGE'	=> 'فایل خیلی بزرگ است:',
 	'PLUPLOAD_ERR_FILE_COUNT'	=> 'خطا در شمارش فایل',
-	'PLUPLOAD_ERR_FILE_INVALID_EXT'	=> 'پسوند مورد نظر نا معتبر است:',
-	'PLUPLOAD_ERR_RUNTIME_MEMORY'	=> 'حافظه جهت بارگزاری دچار کمبود است.',
-	'PLUPLOAD_ERR_UPLOAD_URL'	=> 'آدرس فایل بارگزاری شده وجود ندارد.',
+	'PLUPLOAD_ERR_FILE_INVALID_EXT'	=> 'پسوند مورد نظر نامعتبر است:',
+	'PLUPLOAD_ERR_RUNTIME_MEMORY'	=> 'حافظه در دسترس تمام شد.',
+	'PLUPLOAD_ERR_UPLOAD_URL'	=> 'آدرس فایل بارگذاری شده وجود ندارد.',
 	'PLUPLOAD_EXTENSION_ERROR'	=> 'خطا در پسوند فایل',
-	'PLUPLOAD_FILE'				=> 'فایل: %s',
+	'PLUPLOAD_FILE'			=> 'فایل: %s',
 	'PLUPLOAD_FILE_DETAILS'		=> 'فایل: %s, حجم: %d, حداکثر حجم فایل: %d',
-	'PLUPLOAD_FILENAME'			=> 'نام فایل',
+	'PLUPLOAD_FILENAME'		=> 'نام فایل',
 	'PLUPLOAD_FILES_QUEUED'		=> '%d فایل در صف انتظار',
 	'PLUPLOAD_GENERIC_ERROR'	=> 'خطا کلی.',
 	'PLUPLOAD_HTTP_ERROR'		=> 'HTTP خطا.',
-	'PLUPLOAD_IMAGE_FORMAT'		=> 'فرمت فایل تصویری نا معتبر یا قابل دسترس نیست.',
+	'PLUPLOAD_IMAGE_FORMAT'		=> 'فرمت تصویر نامعتبر یا قابل دسترس نیست.',
 	'PLUPLOAD_INIT_ERROR'		=> 'Init خطا.',
-	'PLUPLOAD_IO_ERROR'			=> 'IO خطا.',
+	'PLUPLOAD_IO_ERROR'		=> 'IO خطا.',
 	'PLUPLOAD_NOT_APPLICABLE'	=> 'N/A',
 	'PLUPLOAD_SECURITY_ERROR'	=> 'خطای امنیتی.',
-	'PLUPLOAD_SELECT_FILES'		=> 'انتخاب فایل ها',
-	'PLUPLOAD_SIZE'				=> 'حجم',
+	'PLUPLOAD_SELECT_FILES'		=> 'انتخاب فایل‌ها',
+	'PLUPLOAD_SIZE'			=> 'حجم',
 	'PLUPLOAD_SIZE_ERROR'		=> 'خطا حجم فایل.',
-	'PLUPLOAD_STATUS'			=> 'وضعیت',
-	'PLUPLOAD_START_UPLOAD'		=> 'آغاز بارگزاری',
-	'PLUPLOAD_START_CURRENT_UPLOAD'	=> 'آغاز بارگزاری صف انتظار',
-	'PLUPLOAD_STOP_UPLOAD'		=> 'توقف بارگزاری',
-	'PLUPLOAD_STOP_CURRENT_UPLOAD'	=> 'توقف بارگزاری در حال انجام',
+	'PLUPLOAD_STATUS'		=> 'وضعیت',
+	'PLUPLOAD_START_UPLOAD'		=> 'آغاز بارگذاری',
+	'PLUPLOAD_START_CURRENT_UPLOAD'	=> 'آغاز بارگذاری صف انتظار',
+	'PLUPLOAD_STOP_UPLOAD'		=> 'توقف بارگذاری',
+	'PLUPLOAD_STOP_CURRENT_UPLOAD'	=> 'توقف بارگذاری در حال انجام',
 	// Note: This string is formatted independently by plupload and so does not
 	// use the same formatting rules as normal phpBB translation strings
-	'PLUPLOAD_UPLOADED'			=> 'آپلود شده %d/%d فایل',
+	'PLUPLOAD_UPLOADED'		=> 'بارگذاری شده %d/%d فایل',
 ));

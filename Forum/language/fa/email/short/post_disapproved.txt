@@ -1,10 +1,10 @@
-Subject: Post disapproved - "{POST_SUBJECT}"
+Subject: پست تأیید نشد - "{POST_SUBJECT}"
 
-Hello {USERNAME},
+سلام {USERNAME}،
 
-You are receiving this notification because your post "{POST_SUBJECT}" at "{SITENAME}" was disapproved by a moderator or administrator.
+پست "{POST_SUBJECT}" در سایت "{SITENAME}" توسط مدیر انجمن و یا مدیر تأیید نشده است.
 
-The following reason was given for the disapproval:
+دلیل تأیید نشدن پست:
 
 {REASON}
 

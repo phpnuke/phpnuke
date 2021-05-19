@@ -40,24 +40,24 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'ACP_FILES'						=> 'فایل های زبانی مدیریت',
-	'ACP_LANGUAGE_PACKS_EXPLAIN'	=> 'در این بخش می توانید بسته های زبانی را حذف/نصب کنید. بسته زبانی پیشفرض با * مشخص شده است.',
+	'ACP_FILES'						=> 'فایل‌های زبانی مدیریت',
+	'ACP_LANGUAGE_PACKS_EXPLAIN'	=> 'در این بخش می‌توانید بسته های زبانی را حذف/نصب کنید. بسته زبانی پیش‌فرض با * مشخص شده است.',
 
-	'DELETE_LANGUAGE_CONFIRM'		=> 'آیا از حذف “%s” اطمینان دارید؟',
+	'DELETE_LANGUAGE_CONFIRM'		=> 'آیا از حذف “%s” مطمئنید؟',
 
 	'INSTALLED_LANGUAGE_PACKS'		=> 'پکیج زبان نصب شد.',
 
-	'LANGUAGE_DETAILS_UPDATED'			=> 'جزئیات زبان با موفقیت به روز رسانی شد.',
+	'LANGUAGE_DETAILS_UPDATED'			=> 'جزئیات زبان با موفقیت به‌روز رسانی شد.',
 	'LANGUAGE_PACK_ALREADY_INSTALLED'	=> 'پکیج زبانی قبلا نصب شده بود.',
-	'LANGUAGE_PACK_DELETED'				=> 'بسته زبانی <strong>%s</strong> با موفقیت حذف شد. زبان کاربرانی که از این بسته زبانی استفاده می کرند به زبان پیشفرض تالار تغییر یافت.',
+	'LANGUAGE_PACK_DELETED'				=> 'بسته زبانی “%s” با موفقیت حذف شد. زبان کاربرانی که از این بسته زبانی استفاده می کرند به زبان پیش‌فرض تالار تغییر یافت.',
 	'LANGUAGE_PACK_DETAILS'				=> 'جزئیات بسته زبانی',
-	'LANGUAGE_PACK_INSTALLED'			=> 'بسته زبانی <strong>%s</strong> با موفقیت نصب شد.',
-	'LANGUAGE_PACK_CPF_UPDATE'			=> 'تابع های زبانی فیلد های سفارشی از زبان پیشفرض کپی می شوند،در صورت نیاز آنها را تغییر دهید.',
+	'LANGUAGE_PACK_INSTALLED'			=> 'بسته زبانی “%s” با موفقیت نصب شد.',
+	'LANGUAGE_PACK_CPF_UPDATE'			=> 'تابع های زبانی فیلد های سفارشی از زبان پیش‌فرض کپی می شوند،در صورت نیاز آن‌ها را تغییر دهید.',
 	'LANGUAGE_PACK_ISO'					=> 'ISO',
 	'LANGUAGE_PACK_LOCALNAME'			=> 'نام محلی',
 	'LANGUAGE_PACK_NAME'				=> 'نام',
 	'LANGUAGE_PACK_NOT_EXIST'			=> 'بسته زبانی انتخاب شده موجود نیست.',
-	'LANGUAGE_PACK_USED_BY'				=> 'استفاده شده توسط(شامل موتورهای جستجو)',
+	'LANGUAGE_PACK_USED_BY'				=> 'استفاده شده توسط(شامل موتورهای جست‌وجو)',
 	'LANGUAGE_VARIABLE'					=> 'متغیر های زبان',
 	'LANG_AUTHOR'						=> 'نویسنده بسته زبانی',
 	'LANG_ENGLISH_NAME'					=> 'نام انگلیسی',
@@ -69,13 +69,13 @@ $lang = array_merge($lang, array(
 
 	'NO_FILE_SELECTED'				=> 'فایل زبانی را مشخص نکرده اید.',
 	'NO_LANG_ID'					=> 'بسته زبانی را مشخص نکرده اید.',
-	'NO_REMOVE_DEFAULT_LANG'		=> 'نمی توانید بسته زبانی پیشفرض را حذف کنید.<br />اگر مایل به حذف این بسته زبانی هستید ابتدا بسته زبانی پیشفرض تالارتان را تغییر دهید.',
+	'NO_REMOVE_DEFAULT_LANG'		=> 'نمی‌توانید بسته زبانی پیش‌فرض را حذف کنید.<br />اگر مایل به حذف این بسته زبانی هستید ابتدا بسته زبانی پیش‌فرض تالارتان را تغییر دهید.',
 	'NO_UNINSTALLED_LANGUAGE_PACKS'	=> 'هیچ بسته زبانی حذف نشده است.',
 
-	'THOSE_MISSING_LANG_FILES'			=> 'فایل های مقابل از بسته زبانی %s گم شده اند',
-	'THOSE_MISSING_LANG_VARIABLES'		=> 'متغیر های زبانی مقابل از بسته زبانی <strong>%s</strong> گم شده اند',
+	'THOSE_MISSING_LANG_FILES'			=> 'فایل‌های مقابل از بسته زبانی “%s” گم شده اند',
+	'THOSE_MISSING_LANG_VARIABLES'		=> 'متغیر های زبانی مقابل از بسته زبانی “%s” گم شده اند',
 
 	'UNINSTALLED_LANGUAGE_PACKS'	=> 'بسته های زبانی حذف شده',
 	
-	'BROWSE_LANGUAGE_PACKS_DATABASE'	=> 'جستجو بسته های زبانی در پایگاه',
+	'BROWSE_LANGUAGE_PACKS_DATABASE'	=> 'جست‌وجو بسته های زبانی در پایگاه',
 ));

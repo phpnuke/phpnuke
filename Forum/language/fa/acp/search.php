@@ -40,23 +40,23 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'ACP_SEARCH_INDEX_EXPLAIN'				=> 'در این بخش می توانید مرجع های جستجو را مدیریت کنید،اگر تنها از یک مرجع استفاده می کنید،باید شاخص های سایر مراجع را حذف کنید،تغییر تنظیمات جستجو عملکرد جستجو را بالا خواهد برد.',
-	'ACP_SEARCH_SETTINGS_EXPLAIN'			=> 'در این بخش می توانید انتخاب کنید که از کدام مرجع جستجو برای شاخص بندی استفاده شود.',
+	'ACP_SEARCH_INDEX_EXPLAIN'				=> 'در این بخش می‌توانید مرجع های جست‌وجو را مدیریت کنید،اگر تنها از یک مرجع استفاده می کنید،باید شاخص های سایر مراجع را حذف کنید،تغییر تنظیمات جست‌وجو عملکرد جست‌وجو را بالا خواهد برد.',
+	'ACP_SEARCH_SETTINGS_EXPLAIN'			=> 'در این بخش می‌توانید انتخاب کنید که از کدام مرجع جست‌وجو برای شاخص بندی استفاده شود.',
 
 	'COMMON_WORD_THRESHOLD'					=> 'آستانه کلمات عمومی',
-	'COMMON_WORD_THRESHOLD_EXPLAIN'			=> 'کلماتی که در درصد بیشتری از پست ها حضور داشته باشند جزو کلمات عمومی محسوب خواهند شد،این کلمات در نتایج جستجو محسوب نمی شوند،اگر کلمه ای در بیش از 100 پست وجود داشته باشد این تنظیم برای آن کلمه فعال خواهد شد.برای وارد کردن کلمات به طور دستی باید شاخص جستجو را از نو ایجاد کنید.',
+	'COMMON_WORD_THRESHOLD_EXPLAIN'			=> 'کلماتی که در درصد بیشتری از پست‌ها حضور داشته باشند جزو کلمات عمومی محسوب خواهند شد،این کلمات در نتایج جست‌وجو محسوب نمی شوند،اگر کلمه ای در بیش از 100 پست وجود داشته باشد این تنظیم برای آن کلمه فعال خواهد شد.برای وارد کردن کلمات به طور دستی باید شاخص جست‌وجو را از نو ایجاد کنید.',
 	'CONFIRM_SEARCH_BACKEND'				=> 'Are you sure you wish to switch to a different search backend? After changing the search backend you will have to create an index for the new search backend. If you don’t plan on switching back to the old search backend you can also delete the old backend’s index in order to free system resources.',
 	'CONTINUE_DELETING_INDEX'				=> 'ادامه فرآیند حذف شاخص گذشته',
-	'CONTINUE_DELETING_INDEX_EXPLAIN'		=> 'فرآیند حذف شاخص شروع شد،برای دسترسی به صفحه شاخص جستجو باید این فرآیند تکمیل شده و یا لغو شود.',
+	'CONTINUE_DELETING_INDEX_EXPLAIN'		=> 'فرآیند حذف شاخص شروع شد،برای دسترسی به صفحه شاخص جست‌وجو باید این فرآیند تکمیل شده و یا لغو شود.',
 	'CONTINUE_INDEXING'						=> 'ادامه فرآیند شاخص بندی گذشته',
-	'CONTINUE_INDEXING_EXPLAIN'				=> 'فرآیند  شاخص بندی آغاز شد،برای دسترسی به صفحه شاخص جستجو باید این فرآیند تکمیل شده و یا لغو شود.',
+	'CONTINUE_INDEXING_EXPLAIN'				=> 'فرآیند  شاخص بندی آغاز شد،برای دسترسی به صفحه شاخص جست‌وجو باید این فرآیند تکمیل شده و یا لغو شود.',
 	'CREATE_INDEX'							=> 'ایجاد شاخص',
 
 	'DEFAULT_SEARCH_RETURN_CHARS'			=> 'Default number of returned characters',
 	'DEFAULT_SEARCH_RETURN_CHARS_EXPLAIN'	=> 'The default number of characters that will be returned while searching. A value of 0 will return the entire post.',
 	'DELETE_INDEX'							=> 'حذف شاخص',
 	'DELETING_INDEX_IN_PROGRESS'			=> 'حذف شاخص در حال اجرا می باشد',
-	'DELETING_INDEX_IN_PROGRESS_EXPLAIN'	=> 'در حال حاضر مرجع جستجو شاخص خود را پاکسازی می کند،این فرآیند ممکن است چند دقیقه به طول انجامد.',
+	'DELETING_INDEX_IN_PROGRESS_EXPLAIN'	=> 'در حال حاضر مرجع جست‌وجو شاخص خود را پاکسازی می کند،این فرآیند ممکن است چند دقیقه به طول انجامد.',
 
 
 
@@ -65,9 +65,9 @@ $lang = array_merge($lang, array(
 
 
 
-	'FULLTEXT_MYSQL_TOTAL_POSTS'			=> 'تعداد کل پست های شاخص بندی شده',
-	'FULLTEXT_MYSQL_MIN_SEARCH_CHARS_EXPLAIN'	=> 'کلماتی حداقل با این تعداد کاراکتر در جستجو ها محسوب خواهند شد،این تعداد کاراکتر از تنظیمات پیکربندی MYSQL قابل تغییر است.',
-	'FULLTEXT_MYSQL_MAX_SEARCH_CHARS_EXPLAIN'	=> 'کلماتی که بیشتر از این تعداد کاراکتر باشند در جستجو ها محسوب خواهند شد،این رقم از تنظیمات پیکربندی MYSQL قابل تغییر است.',
+	'FULLTEXT_MYSQL_TOTAL_POSTS'			=> 'تعداد کل پست‌های شاخص بندی شده',
+	'FULLTEXT_MYSQL_MIN_SEARCH_CHARS_EXPLAIN'	=> 'کلماتی حداقل با این تعداد نویسه در جست‌وجو ها محسوب خواهند شد،این تعداد نویسه از تنظیمات پیکربندی MYSQL قابل تغییر است.',
+	'FULLTEXT_MYSQL_MAX_SEARCH_CHARS_EXPLAIN'	=> 'کلماتی که بیشتر از این تعداد نویسه باشند در جست‌وجو ها محسوب خواهند شد،این رقم از تنظیمات پیکربندی MYSQL قابل تغییر است.',
 
 	'FULLTEXT_POSTGRES_INCOMPATIBLE_DATABASE'	=> 'The PostgreSQL fulltext backend can only be used with PostgreSQL.',
 	'FULLTEXT_POSTGRES_TOTAL_POSTS'			=> 'Total number of indexed posts',
@@ -96,56 +96,56 @@ $lang = array_merge($lang, array(
 	'FULLTEXT_SPHINX_CONFIG_FILE_EXPLAIN'	=> 'The generated content of the sphinx config file. This data needs to be pasted into the sphinx.conf which is used by sphinx search daemon. Replace the [dbuser] and [dbpassword] placeholders with your database credentials.',
 	'FULLTEXT_SPHINX_NO_CONFIG_DATA'		=> 'The sphinx data directory path is not defined. Please define the path and submit to generate the config file.',
 
-	'GENERAL_SEARCH_SETTINGS'				=> 'تنظیمات عمومی جستجو',
-	'GO_TO_SEARCH_INDEX'					=> 'رفتن به صفحه اصلی جستجو',
+	'GENERAL_SEARCH_SETTINGS'				=> 'تنظیمات عمومی جست‌وجو',
+	'GO_TO_SEARCH_INDEX'					=> 'رفتن به صفحه اصلی جست‌وجو',
 
 	'INDEX_STATS'							=> 'آمار شاخص',
 	'INDEXING_IN_PROGRESS'					=> 'ضاخص بندی در حال اجرا می باشد',
-	'INDEXING_IN_PROGRESS_EXPLAIN'			=> 'مرجع جستجو در حال شاخص بندی تمامی پست های تالار می باشد،این فرآیند ممکن است بسته به حجم تالار بین چند دقیقه تا چند ساعت به طول بیانجامد.',
+	'INDEXING_IN_PROGRESS_EXPLAIN'			=> 'مرجع جست‌وجو در حال شاخص بندی تمامی پست‌های تالار می باشد،این فرآیند ممکن است بسته به حجم تالار بین چند دقیقه تا چند ساعت به طول بیانجامد.',
 
-	'LIMIT_SEARCH_LOAD'						=> 'محدودیت بارگذاری صفحه جستجو',
-	'LIMIT_SEARCH_LOAD_EXPLAIN'				=> 'اگر بارگذاری صفحه جستجو بیش از 1 دقیقه طول بکشد،صفحه آفلاین خواهد شد. 1.0 معادل 100% مصرف یک پردازنده می باشد. این عملکرد فقط در سرور های UNIX فعال است.',
+	'LIMIT_SEARCH_LOAD'						=> 'محدودیت بارگذاری صفحه جست‌وجو',
+	'LIMIT_SEARCH_LOAD_EXPLAIN'				=> 'اگر بارگذاری صفحه جست‌وجو بیش از 1 دقیقه طول بکشد،صفحه آفلاین خواهد شد. 1.0 معادل 100% مصرف یک پردازنده می باشد. این عملکرد فقط در سرور های UNIX فعال است.',
 
-	'MAX_SEARCH_CHARS'						=> 'حداکثر تعداد کاراکتر کلمات برای شاخص بندی شدن در جستجو',
-	'MAX_SEARCH_CHARS_EXPLAIN'				=> 'کلماتی که بیشتر از این تعداد کاراکتر نباشند،در جستجو شاخص بندی خواهند شد.',
+	'MAX_SEARCH_CHARS'						=> 'حداکثر تعداد نویسه کلمات برای شاخص بندی شدن در جست‌وجو',
+	'MAX_SEARCH_CHARS_EXPLAIN'				=> 'کلماتی که بیشتر از این تعداد نویسه نباشند،در جست‌وجو شاخص بندی خواهند شد.',
 	'MAX_NUM_SEARCH_KEYWORDS'				=> 'بیشترین تعداد مورد قبول کلمات کلیدی',
-	'MAX_NUM_SEARCH_KEYWORDS_EXPLAIN'		=> 'بیشترین تعداد کلمه ای که کاربران می توانند جستجو کنند،برای جستجوی نامحدود 0 را وارد کنید.',
-	'MIN_SEARCH_CHARS'						=> 'حداقل تعداد کاراکتر کلمات برای شاخص بندی شدن در جستجو',
-	'MIN_SEARCH_CHARS_EXPLAIN'				=> 'کلماتی که کمتر از ایت تعداد کاراکتر باشند در جستجو شاخص بندی خواهند شد.',
-	'MIN_SEARCH_AUTHOR_CHARS'				=> 'حداقل تعداد کاراکتر برای جستجوی نام نویسنده',
-	'MIN_SEARCH_AUTHOR_CHARS_EXPLAIN'		=> 'در جستجوی قسمتی از نام نویسنده کاربر باید حداقل این تعداد کاراکتر را وارد کند،اگر نام نویسنده ای کوتاه تر از این تعداد کاراکتر باشد باز هم اگر نام کامل وی در جستجو درج شود،پست های او نمایش داده خواهند شدو',
+	'MAX_NUM_SEARCH_KEYWORDS_EXPLAIN'		=> 'بیشترین تعداد کلمه ای که کاربران می توانند جست‌وجو کنند،برای جست‌وجوی نامحدود 0 را وارد کنید.',
+	'MIN_SEARCH_CHARS'						=> 'حداقل تعداد نویسه کلمات برای شاخص بندی شدن در جست‌وجو',
+	'MIN_SEARCH_CHARS_EXPLAIN'				=> 'کلماتی که کمتر از ایت تعداد نویسه باشند در جست‌وجو شاخص بندی خواهند شد.',
+	'MIN_SEARCH_AUTHOR_CHARS'				=> 'حداقل تعداد نویسه برای جست‌وجوی نام نویسنده',
+	'MIN_SEARCH_AUTHOR_CHARS_EXPLAIN'		=> 'در جست‌وجوی قسمتی از نام نویسنده کاربر باید حداقل این تعداد نویسه را وارد کند،اگر نام نویسنده ای کوتاه تر از این تعداد نویسه باشد باز هم اگر نام کامل وی در جست‌وجو درج شود،پست‌های او نمایش داده خواهند شدو',
 
 	'PROGRESS_BAR'							=> 'نوار پیشرفت',
 
-	'SEARCH_GUEST_INTERVAL'					=> 'محدودیت زمانی جستجو برای مهمان ها',
-	'SEARCH_GUEST_INTERVAL_EXPLAIN'			=> 'تعدا ثانیه هایی که مهمانان باید بین دو جستجو صبر کنند،اگر مهمانی جستجویی را انجام دهد،مهمانان دیگر باید این تعداد ثانیه صبر کنند تا بتوانند جستجوی دیگری را انجام دهند.',
+	'SEARCH_GUEST_INTERVAL'					=> 'محدودیت زمانی جست‌وجو برای مهمان ها',
+	'SEARCH_GUEST_INTERVAL_EXPLAIN'			=> 'تعدا ثانیه هایی که مهمانان باید بین دو جست‌وجو صبر کنند،اگر مهمانی جست‌وجویی را انجام دهد،مهمانان دیگر باید این تعداد ثانیه صبر کنند تا بتوانند جست‌وجوی دیگری را انجام دهند.',
 	'SEARCH_INDEX_CREATE_REDIRECT'			=> array(
-		2	=> 'همه پست ها تا id %1$d از بین %2$d پست در این مرحله شاخص بندی شدند.رتبه شاخص بندی کنونی تقریبا %3$در ثانیه می باشد.<br />شاخص بندی در حال اجرا است.',
+		2	=> 'همه پست‌ها تا id %1$d از بین %2$d پست در این مرحله شاخص بندی شدند.رتبه شاخص بندی کنونی تقریبا %3$در ثانیه می باشد.<br />شاخص بندی در حال اجرا است.',
 	),
 	'SEARCH_INDEX_CREATE_REDIRECT_RATE'		=> array(
 		2	=> 'The current rate of indexing is approximately %1$.1f posts per second.<br />Indexing in progress…',
 	),
 	'SEARCH_INDEX_DELETE_REDIRECT'			=> array(
-		2	=> 'تمامی پست های شماره %2$d پاک شدند, که تعداد %1$d پست در مرحله اجراست<br />',
+		2	=> 'تمامی پست‌های شماره %2$d پاک شدند, که تعداد %1$d پست در مرحله اجراست<br />',
 	),
 	'SEARCH_INDEX_DELETE_REDIRECT_RATE'		=> array(
-		2	=> 'زمان تخمینی حذف پست ها % ثانیه به ازاء هر پست است.<br />فرآیند حذف در حال اجرا',
+		2	=> 'زمان تخمینی حذف پست‌ها % ثانیه به ازاء هر پست است.<br />فرآیند حذف در حال اجرا',
 	),
-	'SEARCH_INDEX_CREATED'					=> 'با موفقیت تمامی پست ها در پایگاه داده شاخص بندی شدند.',
-	'SEARCH_INDEX_REMOVED'					=> 'با موفقیت شاخص این مرجع جستجو حذف شد.',
-	'SEARCH_INTERVAL'						=> 'محدودیت زمانی برای جستجوی کاربران',
-	'SEARCH_INTERVAL_EXPLAIN'				=> 'تعداد ثانیه هایی که کاربر باید بین دوجستجو صبر کند،این زمان برای هر کاربر مستقل می باشد.',
-	'SEARCH_STORE_RESULTS'					=> 'درازای cache برای نتایج جستجو',
-	'SEARCH_STORE_RESULTS_EXPLAIN'			=> 'cache نتایج جستجو بعد از این مدت زمان (ثانیه) حذف خواهد شد،برای غیرفعال کردن این ویژگی 0 را وارد کنید.',
-	'SEARCH_TYPE'							=> 'مرجع جستجو',
-	'SEARCH_TYPE_EXPLAIN'					=> 'phpBB به شما این اجازه را می دهد تا مرجع جستجوی خود را انتخاب کنید،به صورت پیشفرض از مرجع جستجوی متنی phpBB استفاده می شود.',
-	'SWITCHED_SEARCH_BACKEND'				=> 'مرجع جستجو را تغییر داده اید،برای استفاده از مرجع جستجو باید مطمئن باشید که شاخصی برای این مرجع وجود داشته باشد.',
+	'SEARCH_INDEX_CREATED'					=> 'با موفقیت تمامی پست‌ها در پایگاه داده شاخص بندی شدند.',
+	'SEARCH_INDEX_REMOVED'					=> 'با موفقیت شاخص این مرجع جست‌وجو حذف شد.',
+	'SEARCH_INTERVAL'						=> 'محدودیت زمانی برای جست‌وجوی کاربران',
+	'SEARCH_INTERVAL_EXPLAIN'				=> 'تعداد ثانیه هایی که کاربر باید بین دوجست‌وجو صبر کند،این زمان برای هر کاربر مستقل می باشد.',
+	'SEARCH_STORE_RESULTS'					=> 'مدت ذخیره نتایج جست‌وجو در نهانگاه',
+	'SEARCH_STORE_RESULTS_EXPLAIN'			=> 'نتایج جست‌وجو ذخیره شده در نهانگاه، بعد از این مدت زمان (ثانیه) حذف خواهند شد، برای غیرفعال کردن این ویژگی 0 را وارد کنید.',
+	'SEARCH_TYPE'							=> 'مرجع جست‌وجو',
+	'SEARCH_TYPE_EXPLAIN'					=> 'phpBB به شما این اجازه را می دهد تا مرجع جست‌وجوی خود را انتخاب کنید، به صورت پیش‌فرض از مرجع جست‌وجوی متنی phpBB استفاده می شود.',
+	'SWITCHED_SEARCH_BACKEND'				=> 'مرجع جست‌وجو را تغییر داده اید،برای استفاده از مرجع جست‌وجو باید مطمئن باشید که شاخصی برای این مرجع وجود داشته باشد.',
 
 	'TOTAL_WORDS'							=> 'تعداد کل کلمات شاخص بندی شده',
 	'TOTAL_MATCHES'							=> 'تعدا کل کلماتی که در ارتباط با پست شاخص بندی شده اند',
 
-	'YES_SEARCH'							=> 'فعال سازی امکانات جستجو',
-	'YES_SEARCH_EXPLAIN'					=> 'فعال سازی نمای جستجو شامل جستجوی اعضا',
-	'YES_SEARCH_UPDATE'						=> 'فعال سازی بروزرسانی متنی',
-	'YES_SEARCH_UPDATE_EXPLAIN'				=> 'هنگام ارسال پست های جدید،شاخص جستجو را بروزرسانی می کند،اگر جستجو غیرفعال باشد این گزینه عملکردی نخواهد داشت.',
+	'YES_SEARCH'							=> 'فعال سازی امکانات جست‌وجو',
+	'YES_SEARCH_EXPLAIN'					=> 'فعال سازی نمای جست‌وجو شامل جست‌وجوی اعضا',
+	'YES_SEARCH_UPDATE'						=> 'فعال سازی به‌روز رسانی متنی',
+	'YES_SEARCH_UPDATE_EXPLAIN'				=> 'هنگام ارسال پست‌های جدید،شاخص جست‌وجو را به‌روز رسانی می کند،اگر جست‌وجو غیرفعال باشد این گزینه عملکردی نخواهد داشت.',
 ));

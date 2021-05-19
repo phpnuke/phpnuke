@@ -1,19 +1,15 @@
-Subject: Topic reply notification - "{TOPIC_TITLE}"
+Subject: پاسخ در "{TOPIC_TITLE}"
+لیست انجمن های عضو نشده: <{U_STOP_WATCHING_TOPIC}>
 
-Hello {USERNAME},
+سلام {USERNAME}،
 
-You are receiving this notification because you are watching the topic "{TOPIC_TITLE}" at "{SITENAME}". This topic has received a reply<!-- IF AUTHOR_NAME !== '' --> by {AUTHOR_NAME}<!-- ENDIF --> since your last visit. You can use the following link to view the replies made, no more notifications will be sent until you visit the topic.
+موضوع "{TOPIC_TITLE}" یک پاسخ جدید<!-- IF AUTHOR_NAME !== '' --> توسط {AUTHOR_NAME}<!-- ENDIF --> پس از آخرین بازدید شما از سایت "{SITENAME}" دریافت کرده است. تا زمانی که از موضوع بازدید نکنید، اطلاعیه بیشتری ارسال نمیشود.
 
-If you want to view the newest post made since your last visit, click the following link:
+برای مشاهده جدیدترین پست ها از آخرین بازدید شما بر روی لینک زیر کلیک کنید :
 {U_NEWEST_POST}
 
-If you want to view the topic, click the following link:
-{U_TOPIC}
 
-If you want to view the forum, click the following link:
-{U_FORUM}
-
-If you no longer wish to watch this topic you can either click the "Unsubscribe topic" link found at the bottom of the topic above, or by clicking the following link:
+برای لغو دریافت اطلاعیه ها بر روی لینک زیر کلیک کنید:
 
 {U_STOP_WATCHING_TOPIC}
 

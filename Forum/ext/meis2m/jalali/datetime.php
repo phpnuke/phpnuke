@@ -90,9 +90,10 @@ class datetime extends \phpbb\datetime
 		list($jalali_year, $jalali_month, $jalali_day) = $this->gregorian_to_jalali($gregorian_year, $gregorian_month, $gregorian_day);
 
 
-		return strtr(@parent::format('D ', $this->getTimestamp()), $format['lang']).
+		$en_date = strtr(@parent::format('D ', $this->getTimestamp()), $format['lang']).
 		$jalali_day . ' ' . $this->givemonth($jalali_month) . ' ' . $jalali_year.
 		strtr(@parent::format(', g:i a', $this->getTimestamp()), $format['lang']);
+		return $this->fa_number($en_date);
 	}
 
 	protected function div($a, $b)
@@ -128,6 +129,17 @@ class datetime extends \phpbb\datetime
 		$jm = $i+1;
 		$jd = $j_day_no+1;
 		return array($jy, $jm, $jd);
+	}
+
+	// Convert English numbers to Persian
+	protected function fa_number($number)
+	{
+		if(empty($number))
+		return '۰';
+		// I added the last two variables and you can delete it in case of an error
+		$en = array("0","1","2","3","4","5","6","7","8","9","am","pm");
+		$fa = array("۰","۱","۲","۳","۴","۵","۶","۷","۸","۹","ق.ظ","ب.ظ");
+		return str_replace($en, $fa, $number);
 	}
 
 	// http://en.wikipedia.org/wiki/Iranian_calendars#Zoroastrian_calendar

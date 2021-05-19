@@ -46,6 +46,6 @@ if (empty($lang) || !is_array($lang))
 $lang = array_merge($lang, array(
 	'CONTROLLER_ARGUMENT_VALUE_MISSING'	=> 'عدم وجود مقدار مناسب در #%1$s: <strong>%3$s</strong> در کلاس <strong>%2$s</strong>',
 	'CONTROLLER_NOT_SPECIFIED'			=> 'هیچ کنترل کننده ای مشخص نشده است.',
-	'CONTROLLER_METHOD_NOT_SPECIFIED'	=> 'هیچ روش مشخصی برای کنترل کننده وجود ندارد.',
-	'CONTROLLER_SERVICE_UNDEFINED'		=> 'سرویس کنترل کننده “<strong>%s</strong>” به طور پیش فرض در این آدرس قرار دارد. ./config/services.yml.',
+	'CONTROLLER_METHOD_NOT_SPECIFIED'		=> 'هیچ روشی برای کنترل کننده مشخص نشده است.',
+	'CONTROLLER_SERVICE_UNDEFINED'		=> 'سرویس کنترل کننده “<strong>%s</strong>” در آدرس ./config/services.yml تعریف نشده است.',
 ));

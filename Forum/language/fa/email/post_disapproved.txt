@@ -1,12 +1,11 @@
 Subject: پست تأیید نشد - "{POST_SUBJECT}"
 
-سلام {USERNAME},
+سلام {USERNAME}،
 
-این اطلاعیه را دریافت می کنید زیرا پست "{POST_SUBJECT}" در "{SITENAME}" توسط مدیر انجمن و یا مدیر تأیید نشده است.
+پست "{POST_SUBJECT}" در سایت "{SITENAME}" توسط مدیر انجمن و یا مدیر تأیید نشده است.
 
 دلیل تأیید نشدن پست :
 
 {REASON}
-
 
 {EMAIL_SIG}
