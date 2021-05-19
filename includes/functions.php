@@ -7082,7 +7082,7 @@ function mtsn_check()
 			$ipbanx = stripslashes($nuke_configs['mtsn_block_ip']);
 			if ($ipbanx == "1")
 			{
-				if ($visitor_ip != "127.0.0.1" AND !is_admin())
+				if ($visitor_ip != "127.0.0.1" AND $visitor_ip != "::1" AND !is_admin())
 				{
 					$ip = addslashes($visitor_ip);
 					$ip_arr = explode(".", $ip);
