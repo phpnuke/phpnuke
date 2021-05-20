@@ -772,7 +772,7 @@ function parse_post_gt_links($matches)
 
 function parse_post_links($matches)
 {
-	global $hooks;
+	global $hooks, $main_module;
 	$output = array();
 	
 	if(isset($matches[1]))
@@ -781,7 +781,7 @@ function parse_post_links($matches)
 		
 		if(!empty($post_url))
 		{
-			$output[] = "modname=".((in_array($post_url[0], array("downloads","pages","gallery","statics","faqs"))) ? ((is_active($post_url[0])) ? ucfirst($post_url[0]):"Articles&main_module=".ucfirst($post_url[0]).""):"Articles&main_module=Articles");
+			$output[] = "modname=".((in_array($post_url[0], array("downloads","pages","gallery","statics","faqs"))) ? ((is_active($post_url[0])) ? ucfirst($post_url[0]):"Articles&main_module=".ucfirst($post_url[0]).""):"Articles&main_module=$main_module");
 			
 			if(in_array($post_url[0], array("downloads","pages","gallery","statics","faqs")))
 				unset($post_url[0]);
