@@ -710,7 +710,7 @@ function credits_currency_cal($amount, $in_currency='')
 	return $amount;
 }
 
-$other_admin_configs['credits_settings'] = array("title" => _CREDITS_SETTINGS, "function" => "credits_settings", "God" => false);
+$other_admin_configs['credits_settings'] = array("title" => "_CREDITS_SETTINGS", "function" => "credits_settings", "God" => false);
 
 function credits_boxes_parts($nuke_modules_boxes_parts)
 {

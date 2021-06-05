@@ -76,6 +76,6 @@ function statistics_boxes_parts($nuke_modules_boxes_parts)
 
 $hooks->add_filter("modules_boxes_parts", "statistics_boxes_parts", 10);
 
-//$other_admin_configs['statistics'] = array("title" => _VIEWERS_STATISTICS, "function" => "statistics_config", "God" => false);
+//$other_admin_configs['statistics'] = array("title" => "_VIEWERS_STATISTICS", "function" => "statistics_config", "God" => false);
 
 ?>

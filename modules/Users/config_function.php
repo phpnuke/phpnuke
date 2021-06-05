@@ -466,7 +466,7 @@ function users_config()
 	 return $contents;
 }
 
-$other_admin_configs['users_config'] = array("title" => _USERS_CONFIGS, "function" => "users_config", "God" => false);
+$other_admin_configs['users_config'] = array("title" => "_USERS_CONFIGS", "function" => "users_config", "God" => false);
 
 function users_boxes_parts($nuke_modules_boxes_parts)
 {
