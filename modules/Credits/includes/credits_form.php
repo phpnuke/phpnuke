@@ -56,7 +56,6 @@ $contents .= "
 			$contents .= "<input type=\"hidden\" name=\"order_data[$order_key]\" value=\"$order_value\" />";
 		}
 		$contents .= "
-			<input type=\"hidden\" name=\"order_data\" value=\"".str_replace('"', "'", json_encode($order_data))."\" />
 			<div class=\"form-group\">
 				<label class=\"col-sm-2 control-label\">"._CREDITS_AMOUNT."</label>
 				<div class=\"col-sm-10 form-control-static\">

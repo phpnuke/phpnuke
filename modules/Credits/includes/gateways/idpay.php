@@ -8,8 +8,7 @@ class idpay_gateway{
 	var $request_address		= "https://api.idpay.ir/v1.1/payment";
 	var $verify_address			= "https://api.idpay.ir/v1.1/payment/verify";
 	var $inquiry_address		= "https://api.idpay.ir/v1.1/payment/inquiry";
-	var $response				= array();
-	var $pn_reserve_configs		= array();
+	var $response					= array();
 	
 	private $request_response = array(
 		"200" => array("","تراکنش با موفقیت ایجاد شد"),
@@ -54,13 +53,11 @@ class idpay_gateway{
 	);
 	
 	function __construct(){
-		global $module_name, $nuke_configs;
+		global $module_name;
 	
 		if(file_exists("modules/$module_name/includes/idpay.gif"))
 			$this->gateway_icon = "modules/$module_name/includes/idpay.gif";
 		
-		$this->pn_reserve_configs = (isset($nuke_configs['reserve_configs']) && $nuke_configs['reserve_configs'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['reserve_configs'])):array();
-
 		return true;
 	}
 	
@@ -76,14 +73,8 @@ class idpay_gateway{
 		
 		$redirect = $nuke_configs['nukeurl']."index.php?modname=$module_name&op=credit_response&tid=$tid&credit_gateway=".$this->gateway_name."&csrf_token="._PN_CSRF_TOKEN."";
 		
-		$employer_id = $db->table(RESERVES_TABLE)
-						->where('order_id', $form_data['order_id'])
-						->first()['employer'];
-						
-		$employer_idpay = (isset($this->pn_reserve_configs['employers'][$employer_id]['idpay']) && $this->pn_reserve_configs['employers'][$employer_id]['idpay'] != '') ? $this->pn_reserve_configs['employers'][$employer_id]['idpay']:$pn_credits_config['gateways'][$this->gateway_name]['apikey'];
-		
 		$params = array(
-		  'order_id' => $form_data['order_id'],
+		  'order_id' => $form_data['factor_number'],
 		  'amount' => $form_data['amount'],
 		  'name' => $form_data['name'],
 		  'phone' => $form_data['phone'],
@@ -99,7 +90,7 @@ class idpay_gateway{
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 		  'Content-Type: application/json',
-		  'X-API-KEY: '.$employer_idpay.'',
+		  'X-API-KEY: '.$pn_credits_config['gateways'][$this->gateway_name]['apikey'].'',
 		));
 
 		$this->response['error_code'] = 0;
@@ -130,12 +121,7 @@ class idpay_gateway{
 
 	function response($tid, $factor_number)
 	{
-		global $db, $status, $track_id, $id, $order_id, $amount, $card_no, $hashed_card_no, $date, $pn_Sessions, $module_name, $nuke_configs, $pn_credits_config;
-		
-		$employer_id = $db->table(RESERVES_TABLE)
-						->where('order_id', $order_id)
-						->first()['employer'];
-		$employer_idpay = (isset($this->pn_reserve_configs['employers'][$employer_id]['idpay']) && $this->pn_reserve_configs['employers'][$employer_id]['idpay'] != '') ? $this->pn_reserve_configs['employers'][$employer_id]['idpay']:$pn_credits_config['gateways'][$this->gateway_name]['apikey'];
+		global $status, $track_id, $id, $order_id, $amount, $card_no, $hashed_card_no, $date, $pn_Sessions, $module_name, $nuke_configs, $pn_credits_config;
 
 		$site_id = $pn_Sessions->get("idpay_".$order_id."", false);
 		$this->response['result']			= false;
@@ -155,7 +141,7 @@ class idpay_gateway{
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
-			  'X-API-KEY: '.$employer_idpay.'',
+			  'X-API-KEY: '.$pn_credits_config['gateways'][$this->gateway_name]['apikey'].'',
 			));
 
 			$result      = curl_exec( $ch );
@@ -208,11 +194,6 @@ class idpay_gateway{
 			  'id' => $order_id['id'],
 			  'order_id' => $order_id['order_id'],
 			);
-		
-			$employer_id = $db->table(RESERVES_TABLE)
-							->where('order_id', $order_id['order_id'])
-							->first()['employer'];
-			$employer_idpay = (isset($this->pn_reserve_configs['employers'][$employer_id]['idpay']) && $this->pn_reserve_configs['employers'][$employer_id]['idpay'] != '') ? $this->pn_reserve_configs['employers'][$employer_id]['idpay']:$pn_credits_config['gateways'][$this->gateway_name]['apikey'];
 
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $this->inquiry_address);
@@ -220,7 +201,7 @@ class idpay_gateway{
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			  'Content-Type: application/json',
-			  'X-API-KEY: '.$employer_idpay.'',
+			  'X-API-KEY: '.$pn_credits_config['gateways'][$this->gateway_name]['apikey'].'',
 			));
 
 			$result      = curl_exec( $ch );
