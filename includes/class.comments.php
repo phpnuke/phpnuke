@@ -99,7 +99,7 @@ class phpnuke_comments
             $where = [];
             $main_parents = [];
             $all_userids = [];
-            $total_rows = 0;
+			
             $where[] = "c.module = :module";
             $where[] = "c.post_id = :post_id";
 
@@ -151,8 +151,8 @@ class phpnuke_comments
             if ($result->count() > 0) {
                 $rows = $result->results();
                 foreach ($rows as $row) {
-                    if ($total_rows == 0) {
-                        $total_rows = $row['total_rows'];
+                    if ($this->total_rows == 0) {
+                        $this->total_rows = $row['total_rows'];
                     }
                     $main_parents[] = intval($row['cid']);
                 }
