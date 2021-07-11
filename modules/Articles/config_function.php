@@ -820,8 +820,13 @@ function parse_post_links($matches)
 			
 			if(isset($post_url[0]))
 			{
-				if(in_array($post_url[0], array("category", "tags")))
+				if($post_url[0] == "tags")
 					$output[] = (isset($post_url[1]) && $post_url[1] != '') ? "$post_url[0]=$post_url[1]":"";
+				elseif($post_url[0] == "category")
+				{
+					unset($post_url[0]);
+					$output[] = (!empty($post_url)) ? "category=".implode("/", $post_url)."":"";
+				}
 				else
 				{
 					if($post_url[0] == 'archive')
@@ -1248,12 +1253,17 @@ function posts_breadcrumb($breadcrumb, $article_info)
 		
 		if(isset($article_info['cat_link']) && $catname_link != 'uncategorized' && isset($post_categories[$article_info['cat_link']]) && $nuke_configs['breadcrumb_cat'] == 1)
 		{
-			$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($article_info['cat_link'], $post_categories, "parent_id", "catname_url"))), "nohtml"), array("/"));
-			$breadcrumb[] = array(
-				"name" => category_lang_text($post_categories[$article_info['cat_link']]['cattext']),
-				"link" => LinkToGT("index.php?modname=".$article_info['post_type']."&category=$cat_title"),
-				"itemtype" => "WebPage"
-			);
+			$parent_cats = array_reverse(get_parent_names($article_info['cat_link'], $post_categories, "parent_id", "catname_url"), true);
+			
+			foreach($parent_cats as $catid => $catname_url)
+			{
+				$catname_urls[] = $catname_url;
+				$breadcrumb[] = array(
+					"name" => category_lang_text($post_categories[$catid]['cattext']),
+					"link" => LinkToGT("index.php?modname=".$article_info['post_type']."&category=".implode("/", $catname_urls).""),
+					"itemtype" => "WebPage"
+				);
+			}
 		}
 	}
 	if($op == 'article_show')

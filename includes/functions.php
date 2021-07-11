@@ -6107,7 +6107,7 @@ function get_parent_names($id, $array, $parent_field, $name_field, $names=array(
 	$id = intval($id);
 	if(!isset($array[$id][$name_field]))
 		return array();
-	$names[] = $array[$id][$name_field];
+	$names[$id] = $array[$id][$name_field];
 	if(isset($array[$id][$parent_field]) && $array[$id][$parent_field] != 0)
 	{
 		$names = get_parent_names($array[$id][$parent_field], $array, $parent_field, $name_field, $names);
