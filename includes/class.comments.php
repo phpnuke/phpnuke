@@ -38,7 +38,8 @@ class phpnuke_comments
         $comments_data = [];
         $comments_data = $hooks->apply_filters(
             "global_contents",
-            $comments_data
+            $comments_data,
+			$this
         );
 
         $this->module_name = filter($comments_data['module_name'], "nohtml");
@@ -699,7 +700,7 @@ class phpnuke_comments
             $content .=
                 "<div class=\"text-center\">" . _NOANONCOMMENTS . "</div>";
         }
-        $content = $hooks->apply_filters("comments_form", $content);
+        $content = $hooks->apply_filters("comments_form", $content, $this);
         return $content;
     }
 
@@ -947,7 +948,8 @@ class phpnuke_comments
                     $hooks->do_action(
                         "comments_form_after",
                         $comment_form_fields,
-                        $cid
+                        $cid,
+						$this
                     );
 
                     phpnuke_db_error();
