@@ -113,8 +113,8 @@ function feedback($submit = '', $feedback_fields = array())
 			
 			if(isset($feedback_fields['custom']) && is_array($feedback_fields['custom']) && !empty($feedback_fields['custom']) && is_array($feedback_custom_fields) && !empty($feedback_custom_fields))
 			{
-				$validation_rules = '';
-				$filter_rules = '';
+				$validation_rules = array();
+				$filter_rules = array();
 				
 				foreach($feedback_fields['custom'] as $key => $val)
 				{
