@@ -1951,7 +1951,9 @@ function show_modules_boxes(
     $middle_module_boxes = str_replace("_r_l", "_l_r", $middle_module_boxes);
 
     $middle_module_boxes_class = "middle_module_boxes" . $middle_module_boxes;
-
+	
+	$middle_module_boxes = ($middle_module_boxes == "") ? "_full":$middle_module_boxes;
+	
     $sides_output = [];
 
     $output =

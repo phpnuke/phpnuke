@@ -379,6 +379,7 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 	
 	if(!empty($article_info))
 	{
+		$contents = $hooks->apply_filters("posts_contents_start", $contents, $article_info);
 		foreach ($article_info as $row)
 		{
 			$contents = $hooks->apply_filters("posts_contents_before", $contents, $row);
@@ -398,6 +399,7 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 				
 			$contents = $hooks->apply_filters("posts_contents_after", $contents, $row);
 		}
+		$contents = $hooks->apply_filters("posts_contents_end", $contents, $article_info);
 		unset($article_info);
 	}
 

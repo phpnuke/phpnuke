@@ -40,7 +40,7 @@ function feedback($submit = '', $feedback_fields = array())
 		foreach($feedback_configs['depts'] as $key => $depts_data)
 		{
 			$depts_data['part'] = isset($depts_data['part']) ? $depts_data['part']:"";
-			$depts_html[] = "<option value=\"$key\">".$depts_data['name']." ".$depts_data['part']."</options>";
+			$depts_html[] = "<option value=\"$key\">".$depts_data['name']." ".$depts_data['part']."</option>";
 		}
 
 	$depts_html = implode("\n", $depts_html);
