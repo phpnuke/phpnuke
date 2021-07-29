@@ -144,6 +144,9 @@ function search_form($search_query='', $module = 'Articles', $author = '', $cate
 		</div>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 	</form>";
+	
+	$contents = $hooks->apply_filters("search_form", $contents, $search_query, $module, $author, $category, $time);
+	
 	return $contents;
 }
 
