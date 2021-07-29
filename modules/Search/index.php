@@ -362,7 +362,7 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 						
 						$pagination = $hooks->apply_filters("posts_paginations", $pagination, $total_rows, $entries_per_page, $current_page, $link_to);
 	
-						$contents .= $pagination_contents;
+						$contents .= $pagination;
 					}
 					
 				}
