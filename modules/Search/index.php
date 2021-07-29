@@ -356,9 +356,13 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 
 					if($entries_per_page < $total_rows)
 					{
-						$contents .= "<div id=\"pagination\">";
-						$contents .= clean_pagination($total_rows, $entries_per_page, $current_page, $link_to);
-						$contents .= "</div>";
+						$pagination = "<div id=\"pagination\">";
+						$pagination .= clean_pagination($total_rows, $entries_per_page, $current_page, $link_to);
+						$pagination .= "</div>";
+						
+						$pagination = $hooks->apply_filters("posts_paginations", $pagination, $total_rows, $entries_per_page, $current_page, $link_to);
+	
+						$contents .= $pagination_contents;
 					}
 					
 				}
