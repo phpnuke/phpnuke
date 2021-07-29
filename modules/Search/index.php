@@ -411,8 +411,10 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 	}, 10);
 	unset($meta_tags);
 	
+	$contents = show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), search_form($search_data['search_query'], $search_data['module'], $search_data['author'], $search_data['category'], $search_data['time']).$contents);
+	
 	include("header.php");
-	$html_output .= show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), search_form($search_data['search_query'], $search_data['module'], $search_data['author'], $search_data['category'], $search_data['time']).$contents);
+	$html_output .= $contents;
 	include("footer.php");
 }
 
