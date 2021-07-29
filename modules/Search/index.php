@@ -30,7 +30,7 @@ function search_form($search_query='', $module = 'Articles', $author = '', $cate
 	$modules_search_data = array();
 	$modules_search_data = $hooks->apply_filters("modules_search_data", $modules_search_data);
 	
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $modules_search_data)
+	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $modules_search_data, $module, $category, $module_name)
 	{
 		$theme_setup = array_merge_recursive($theme_setup, array(
 			"defer_js" => array(
