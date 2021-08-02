@@ -374,7 +374,7 @@ function articles_home($category='', $tags='', $orderby = '', $year = 0, $month 
 			$cat_contents .= CloseTable();
 		}
 		$contents = $contents.$cat_contents;
-		$contents = $hooks->apply_filters("post_subcats", $contents);
+		$contents = $hooks->apply_filters("post_subcats", $contents, $catid);
 		$link_to['category'] = $cat_title;
 		
 		$hooks->add_filter("global_contents", function ($block_global_contents) use($catid, $main_module)
@@ -852,9 +852,12 @@ function article_categories($main_module = 'Articles')
 		return $breadcrumbs;
 	}, 10);
 	
+	$contents = title($nuke_configs['sitename']." : "._ARTICLES_CATEGORIES."").$contents;
+	
 	$contents = $hooks->apply_filters("post_categories_contents", $contents);
+	
 	include("header.php");
-	$html_output .= show_modules_boxes($module_name, "category", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), title($nuke_configs['sitename']." : "._ARTICLES_CATEGORIES."").$contents);
+	$html_output .= show_modules_boxes($module_name, "category", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	include("footer.php");
 }
 
