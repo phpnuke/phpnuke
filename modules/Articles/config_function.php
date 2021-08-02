@@ -255,66 +255,76 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 {
 	global $db, $nuke_configs, $module_name, $HijriCalendar, $hooks;
 	
+	$arcjive_list = array();
 	$contents = "";
-	$contents .= "<div class=\"text-center\"><font class=\"content\">"._SELECTMONTH2VIEW."</font><br><br></div>";
 	
-	$result = $db->table(POSTS_TABLE)
-					->where('post_type', $post_type)
-					->order_by(['time' => 'DESC'])
-					->select(['time']);
+	$result = $db->query("SELECT 
+	YEAR(FROM_UNIXTIME(time)) AS `year`, 
+	MONTH(FROM_UNIXTIME(time)) AS `month`, 
+	count(sid) as posts 
+	FROM ".POSTS_TABLE." where post_type = '$post_type' AND status = 'publish' 
+	GROUP BY YEAR(FROM_UNIXTIME(time)), MONTH(FROM_UNIXTIME(time)) 
+	ORDER BY time DESC");
 
 	$module_name = (isset($post_type) && $post_type != 'Articles') ? $module:$module_name;
-	$contents .= "<ul>";
-	$thismonth = "";//gregorian date
-	$thisjmonth = "";//jalali date
-	$thishmonth = "";//hijri date
 
 	if(!empty($result))
 	{
 		foreach($result as $row)
 		{
-			$time = $row['time'];
 			if($nuke_configs['datetype'] == 1)
 			{
-				$j_datetime = array(date("Y", $time), date("m", $time), date("d", $time));
-				$jalalidate= gregorian_to_jalali($j_datetime[0],$j_datetime[1],$j_datetime[2]);
-				if ($jalalidate[1] != $thisjmonth)
-				{
-					$month = $nuke_configs['j_month_name'][$jalalidate[1]];
-					$month2 = str_replace(" ","-",$month);
-					$contents .= "<li><a href=\"".LinkToGT("index.php?modname=$module_name&op=article_archive&year=$jalalidate[0]&month=$jalalidate[1]&month_l=$month2")."\">$month, $jalalidate[0]</a>";
-					$thisjmonth = $jalalidate[1];
-				}
-
+				$jalalidate = gregorian_to_jalali($row['year'],$row['month'],1);
+				$year = $jalalidate[0];
+				$month = $nuke_configs['j_month_name'][$jalalidate[1]];
+				$month2 = str_replace(" ","-",$month);
 			}
 			elseif($nuke_configs['datetype'] == 2)
 			{
-				$dateTimes = $HijriCalendar->GregorianToHijri($time);
+				$a_time = to_mktime("".$row['year']."-".$row['month']."-1");
+				$dateTimes = $HijriCalendar->GregorianToHijri($a_time);
 				$hgetdate = $dateTimes[0]-1;
-				if ($dateTimes[0] != $thishmonth)
-				{
-					$month = $nuke_configs['A_month_name'][$hgetdate];
-					$month2 = str_replace(" ","-",$month);
-					$contents .= "<li><a href=\"".LinkToGT("index.php?modname=$module_name&op=article_archive&year=$dateTimes[2]&month=$dateTimes[0]&month_l=$month2")."\">$month, $dateTimes[2]</a>";
-					$thishmonth = $dateTimes[0];
-				}	
+				$year = $jalalidate[2];
+				$month = $nuke_configs['A_month_name'][$hgetdate];
+				$month2 = str_replace(" ","-",$month);
 			}
 			else
 			{
-				$dateTimes_year = date("Y",$time);
-				$dateTimes_month = date("m",$time);
+				$dateTimes_year = $row['year'];
+				$dateTimes_month = $row['month'];
 				$dateTimes_month = intval($dateTimes_month);
-				if ($dateTimes_month != $thismonth)
-				{
-					$month = $nuke_configs['g_month_name'][$dateTimes_month];
-					$month2 = str_replace(" ","-",$month);
-					$contents .= "<li><a href=\"".LinkToGT("index.php?modname=$module_name&op=article_archive&&year=$dateTimes_year&month=$dateTimes_month&month_l=$month2")."\">$month, $dateTimes_year</a>";
-					$thismonth = $dateTimes_month;
-				}	
-			}	
+				$month = $nuke_configs['g_month_name'][$dateTimes_month];
+				$month2 = str_replace(" ","-",$month);
+			}
+			
+			$archive_list[] = array('url' => LinkToGT("index.php?modname=$module_name&op=article_archive&&year=$year&month=$month&month_l=$month2"), 'title' => "$month, $year", 'count' => $row['posts']);
 		}
 	}
-	$contents .= "</ul>";
+
+	$contents .= "";
+	if(file_exists("themes/".$nuke_configs['ThemeSel']."/".$module_name."_archive.php"))
+		include("themes/".$nuke_configs['ThemeSel']."/".$module_name."_archive.php");
+	elseif(function_exists("".$module_name."_archive"))
+	{
+		$module_function_name = "".$module_name."_archive";
+		$contents .= $module_function_name($archive_list);
+	}
+	elseif(function_exists("articles_archive"))
+	{
+		$contents .= articles_archive($archive_list);
+	}
+	else
+	{
+		$contents .= "<div class=\"text-center\">"._SELECTMONTH2VIEW."</div>
+		<ul>";
+		foreach($archive_list as $lists)
+		{
+			$contents .= "<li><a href=\"".$lists['url']."\">".$lists['title']." (".$lists['count'].")</li>";
+		}
+		$contents .= "</ul>";
+	}
+	
+	$contents = $hooks->apply_filters("posts_archive", $contents, $archive_list, $module_name);
 
 	if(intval($in) == 0)
 	{
@@ -340,15 +350,11 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 			);
 			return $breadcrumbs;
 		}, 10);
-	
+		
+		$contents = show_modules_boxes($module_name, "archive", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+		
 		include("header.php");
-		$output = '';
-		$output .= title(_STORIESARCHIVE);
-		$output .= OpenTable();
-		$contents .= "<br><br><div class=\"text-center\">[ <a href=\"".LinkToGT("index.php?modname=$module_name&op=article_archive")."\">"._SHOWALLSTORIES."</a> ]</div>";
-		$output .= $contents;
-		$output .= CloseTable();
-		$html_output .= show_modules_boxes($module_name, "archive", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $output);
+		$html_output .= $contents;
 		include("footer.php");
 		
 	}
