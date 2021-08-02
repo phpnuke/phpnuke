@@ -276,28 +276,28 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 			{
 				$jalalidate = gregorian_to_jalali($row['year'],$row['month'],1);
 				$year = $jalalidate[0];
-				$month = $nuke_configs['j_month_name'][$jalalidate[1]];
-				$month2 = str_replace(" ","-",$month);
+				$month = $jalalidate[1];
+				$month2 = $nuke_configs['j_month_name'][$month];
+				$month_l = str_replace(" ","-",$month2);
 			}
 			elseif($nuke_configs['datetype'] == 2)
 			{
 				$a_time = to_mktime("".$row['year']."-".$row['month']."-1");
 				$dateTimes = $HijriCalendar->GregorianToHijri($a_time);
-				$hgetdate = $dateTimes[0]-1;
 				$year = $jalalidate[2];
-				$month = $nuke_configs['A_month_name'][$hgetdate];
-				$month2 = str_replace(" ","-",$month);
+				$month = $dateTimes[0]-1;
+				$month2 = $nuke_configs['A_month_name'][$month];
+				$month_l = str_replace(" ","-",$month2);
 			}
 			else
 			{
-				$dateTimes_year = $row['year'];
-				$dateTimes_month = $row['month'];
-				$dateTimes_month = intval($dateTimes_month);
-				$month = $nuke_configs['g_month_name'][$dateTimes_month];
-				$month2 = str_replace(" ","-",$month);
+				$year = $row['year'];
+				$month = intval($row['month']);
+				$month2 = $nuke_configs['g_month_name'][$month];
+				$month_l = str_replace(" ","-",$month2);
 			}
 			
-			$archive_list[] = array('url' => LinkToGT("index.php?modname=$module_name&op=article_archive&&year=$year&month=$month&month_l=$month2"), 'title' => "$month, $year", 'count' => $row['posts']);
+			$archive_list[] = array('url' => LinkToGT("index.php?modname=$module_name&op=article_archive&year=$year&month=$month&month_l=$month_l"), 'title' => "$month2, $year", 'count' => $row['posts']);
 		}
 	}
 
@@ -319,7 +319,7 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 		<ul>";
 		foreach($archive_list as $lists)
 		{
-			$contents .= "<li><a href=\"".$lists['url']."\">".$lists['title']." (".$lists['count'].")</li>";
+			$contents .= "<li><a href=\"".$lists['url']."\">".$lists['title']." (".$lists['count'].")</a></li>";
 		}
 		$contents .= "</ul>";
 	}
