@@ -697,7 +697,7 @@ function parse_post_gt_links($matches)
 	if(isset($matches[1]))
 	{
 		parse_str($matches[1], $post_url);
-		$vars = array('modname' => 'filter', 'category' => 'filter', 'orderby' => 'filter', 'page' => 'int', 'tags' => 'filter', 'year' => 'int', 'month' => 'int', 'day' => 'int', 'post_url' => 'filter', 'op' => 'filter', 'sid' => 'int', 'month_l' => 'filter');
+		$vars = array('modname' => 'filter', 'category' => 'filter', 'orderby' => 'filter', 'page' => 'int', 'tags' => 'filter', 'year' => 'int', 'month' => 'int', 'post_url' => 'filter', 'op' => 'filter', 'sid' => 'int', 'month_l' => 'filter');
 		
 		foreach($vars as $key => $filter)
 		{
@@ -728,9 +728,6 @@ function parse_post_gt_links($matches)
 		if($vars['month'] != '')
 			$output[] = $vars['month'];
 		
-		if($vars['day'] != '')
-			$output[] = $vars['day'];
-		
 		if($vars['month_l'] != '')
 			$output[] = $vars['month_l'];
 		
@@ -751,10 +748,10 @@ function parse_post_gt_links($matches)
 				$output[] = "category";
 			elseif($vars['op'] == 'send_article')
 				$output[] = "send-article";
-			elseif($vars['op'] == 'article_archive' && $vars['year'] == '')
+			/*elseif($vars['op'] == 'article_archive' && $vars['year'] == '')
 			{
 				$output[] = "all";
-			}
+			}*/
 		}
 		
 		if($vars['page'] != '')
@@ -772,7 +769,7 @@ function parse_post_gt_links($matches)
 
 function parse_post_links($matches)
 {
-	global $hooks, $main_module;
+	global $hooks;
 	$output = array();
 	
 	if(isset($matches[1]))
@@ -781,7 +778,7 @@ function parse_post_links($matches)
 		
 		if(!empty($post_url))
 		{
-			$output[] = "modname=".((in_array($post_url[0], array("downloads","pages","gallery","statics","faqs"))) ? ((is_active($post_url[0])) ? ucfirst($post_url[0]):"Articles&main_module=".ucfirst($post_url[0]).""):"Articles&main_module=$main_module");
+			$output[] = "modname=".((in_array($post_url[0], array("downloads","pages","gallery","statics","faqs"))) ? ((is_active($post_url[0])) ? ucfirst($post_url[0]):"Articles&main_module=".ucfirst($post_url[0]).""):"Articles&main_module=Articles");
 			
 			if(in_array($post_url[0], array("downloads","pages","gallery","statics","faqs")))
 				unset($post_url[0]);
@@ -1175,42 +1172,45 @@ function Articles_microdata_json($json_ld, $meta_tags, $article_info)
 {
 	global $nuke_configs;
 	
-	$graph_key = '@graph';
-	
-	$json_ld->$graph_key['Article'] = (object)[
-		"@type" => [
-			"Article",
-			"MediaObject",
-			"BlogPosting"
-		],
-		"@id" => "".$article_info['article_link']."#article",
-		"author" => (object) [
-			"@type" => "Person",
-			"@id" => "".$nuke_configs['nukeurl']."#/schema/person/".md5($article_info['aid'])."",
-			"name" => $article_info['aid']
-		],
-		"headline" => $article_info['title'],
-		"datePublished" => date('Y-m-d\TH:i:s+00:00', $article_info['time']),
-		"dateModified" => date('Y-m-d\TH:i:s+00:00', $article_info['time']),
-		"commentCount" => $article_info['comments'],
-		"mainEntityOfPage" => (object) [
-			"@type" => "WebPage",
-			"@id" => "".$article_info['article_link']."#webpage"
-		],
-		"publisher" => (object) [
-			"@type" => "Person",
-			"@id" => "".$nuke_configs['nukeurl']."#/schema/person/".md5($article_info['aid']).""
-		],
-		"image" => (object) [
-			"@type" => "ImageObject",
-			"@id" => "".$article_info['post_image']."#primaryimage",
-			"url" => "".$article_info['post_image']
-		],
-		"keywords" => str_replace(":",",", $article_info['tags']),
-		"name" => $article_info['title']
-	];
+	if(isset($article_info['sid']))
+	{
+		$graph_key = '@graph';
 		
-	if($article_info['ratings'] != 0)
+		$json_ld->$graph_key['Article'] = (object)[
+			"@type" => [
+				"Article",
+				"MediaObject",
+				"BlogPosting"
+			],
+			"@id" => "".$article_info['article_link']."#article",
+			"author" => (object) [
+				"@type" => "Person",
+				"@id" => "".$nuke_configs['nukeurl']."#/schema/person/".md5($article_info['aid'])."",
+				"name" => $article_info['aid']
+			],
+			"headline" => $article_info['title'],
+			"datePublished" => date('Y-m-d\TH:i:s+00:00', $article_info['time']),
+			"dateModified" => date('Y-m-d\TH:i:s+00:00', $article_info['time']),
+			"commentCount" => $article_info['comments'],
+			"mainEntityOfPage" => (object) [
+				"@type" => "WebPage",
+				"@id" => "".$article_info['article_link']."#webpage"
+			],
+			"publisher" => (object) [
+				"@type" => "Person",
+				"@id" => "".$nuke_configs['nukeurl']."#/schema/person/".md5($article_info['aid']).""
+			],
+			"image" => (object) [
+				"@type" => "ImageObject",
+				"@id" => "".$article_info['post_image']."#primaryimage",
+				"url" => "".$article_info['post_image']
+			],
+			"keywords" => str_replace(":",",", $article_info['tags']),
+			"name" => $article_info['title']
+		];
+	}
+	
+	if(isset($article_info['ratings']) && $article_info['ratings'] != 0)
 	{
 		$json_ld->$graph_key['Article']->aggregateRating = [
 			"@type" => "AggregateRating",
@@ -1236,9 +1236,11 @@ function Articles_microdata_json($json_ld, $meta_tags, $article_info)
 	return $json_ld;
 }
 
+$hooks->add_filter("microdata_json", "Articles_microdata_json", 10);
+	
 function posts_breadcrumb($breadcrumb, $article_info)
 {
-	global $nuke_configs, $op, $hooks;
+	global $nuke_configs, $op, $page, $hooks;
 	
 	$block_global_contents = array();
 	$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
@@ -1274,6 +1276,33 @@ function posts_breadcrumb($breadcrumb, $article_info)
 			"itemtype" => "WebPage"
 		);
 	}
+	
+	if($op == 'article_archive')
+	{
+		$breadcrumb_title = "".$article_info['month_l']." ".$article_info['year']."";
+	
+		$breadcrumb['archive_main'] = array(
+			"name" => _STORIESARCHIVE,
+			"link" => LinkToGT("index.php?modname=".$article_info['module_name']."&op=article_select_month"),
+			"itemtype" => "WebPage"
+		);
+		
+		$breadcrumb['archive_path'] = array(
+			"name" => str_replace("-", " ", $breadcrumb_title),
+			"link" => $article_info['url'],
+			"itemtype" => "WebPage"
+		);
+		
+		if(isset($page) && $page > 0)
+		{
+			$breadcrumb['archive_page'] = array(
+				"name" => _PAGES." ".$page,
+				"link" => $article_info['url']."&page=$page",
+				"itemtype" => "WebPage"
+			);
+		}
+	}
+	
 	if(isset($block_global_contents['tags']) && $block_global_contents['tags'] != '' && $op == 'article_home')
 	{
 		$breadcrumb[] = array(
@@ -1282,8 +1311,9 @@ function posts_breadcrumb($breadcrumb, $article_info)
 			"itemtype" => "WebPage"
 		);
 	}
-	
 	return $breadcrumb;
 }
+
+$hooks->add_filter("site_breadcrumb", "posts_breadcrumb", 10);
 
 ?>

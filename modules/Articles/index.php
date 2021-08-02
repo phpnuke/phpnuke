@@ -119,13 +119,15 @@ if(!function_exists("article_more"))
 	}
 }
 
-function articles_home($category='', $tags='', $orderby = '', $main_module = 'Articles')
+function articles_home($category='', $tags='', $orderby = '', $year = 0, $month = 0, $month_l = '', $mode = '', $main_module = 'Articles')
 {
-	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $hooks;
-	
+	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $hooks, $op;
+
 	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 	
 	$link_to = array();
+	$extra_meta_tags = array();
+	
 	$link_to['modname'] = ($main_module != 'Articles') ? "$main_module":"";
 
 	$top_middle = ((isset($tags) && $tags != '') || (isset($page) && intval($page) != 0) || (isset($category) && $category != '')) ? false:true;
@@ -139,6 +141,10 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 	if($catid < 0)
 		header("location: ".LinkToGT("index.php")."");
 
+	$month_l = isset($month_l) ? str_replace("-", " ", filter($month_l, "nohtml")):'';
+	
+	$month_names = ($nuke_configs['datetype'] == 1) ? "j_month_name":(($nuke_configs['datetype'] == 2) ? "h_month_name":"g_month_name");
+		
 	switch($main_module)
 	{
 		case"Downloads":
@@ -207,6 +213,25 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 	$query_set['ihome'] = "s.ihome = '1'";
 	$query_set['cat'] = array();
 	$query_set['post_type'] = "(s.post_type = '$main_module')";
+	
+	if($year != 0 && $month != 0)
+	{
+		$jnmonth				= $month +1;
+		$jnyear					= $year;
+		if ($jnmonth == 13)
+		{
+			$jnyear++;
+			$jnmonth			= "01";
+		}
+		
+		$month					= correct_date_number($month);
+		$jnmonth				= correct_date_number($jnmonth);
+		
+		$currenttime			= to_mktime("$year/$month/1");
+		$nexttime				= to_mktime("$jnyear/$jnmonth/1");
+		
+		$query_set['time']		= "s.time BETWEEN '$currenttime' AND '$nexttime'";
+	}
 	
 	if ($nuke_configs['multilingual'] == 1)
 		$query_set['alanguage'] = "(s.alanguage='".$nuke_configs['currentlang']."' OR s.alanguage='')";		
@@ -358,6 +383,9 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 			$block_global_contents['cat_link'] = $catid;
 			return $block_global_contents;
 		}, 10);
+		
+		$extra_meta_tags[] = "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - $cat_title\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n";
+		
 	}
 	
 	$total_rows	= 0;
@@ -401,8 +429,23 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 		}
 		$contents = $hooks->apply_filters("posts_contents_end", $contents, $article_info);
 		unset($article_info);
+	}	
+	
+	if(isset($op) && $op == "article_archive")
+	{
+		$extra_meta_tags[] = "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - "._STORIESARCHIVE." - ".(($month_l != '') ? " - $month_l $year":"")."\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n";
+		
+		$module_title = _STORIESARCHIVE."".(($month_l != '') ? " - $month_l $year":"");
+		
+		$link_to['op'] = 'article_archive';
+		if($year != 0)
+			$link_to['year'] = "$year";
+		if($month != 0)
+			$link_to['month'] = "$month";
+		if($year != 0)
+			$link_to['month_l'] = "$month_l";
 	}
-
+	
 	$link_to = $hooks->apply_filters("posts_linkto", $link_to);
 	
 	$_link_to = array();
@@ -440,22 +483,33 @@ function articles_home($category='', $tags='', $orderby = '', $main_module = 'Ar
 		"keywords"			=> '',
 		"prev"				=> ($page < $lastpage && intval($page) != 0) ? LinkToGT($_link_to."&page=".intval($page+1).""):"",
 		"next"				=> ($page > 1 && $entries_per_page < $total_rows) ? LinkToGT($_link_to."&page=".intval($page-1).""):"",
-		"extra_meta_tags"	=> ($catid > 0) ? array(
-			"<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - $cat_title\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n"
-		):"",
+		"extra_meta_tags"	=> $extra_meta_tags
 	);
 	
 	$meta_tags = $hooks->apply_filters("posts_header_meta", $meta_tags, $meta_url, $page, $lastpage, $_link_to, $entries_per_page, $catid, $total_rows, $cat_title);
-
-	$hooks->add_filter("site_breadcrumb", "posts_breadcrumb", 10);
 	
 	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
 	{
 		return array_merge($all_meta_tags, $meta_tags);
-	}, 10);		
-	unset($meta_tags);	
+	}, 10);
 		
 	$main_module_box = (($main_module != 'Articles')) ? strtolower($main_module)."_index":"index";
+	
+	if(isset($op) && $op == "article_archive")
+	{
+		$hooks->add_filter("global_contents", function ($block_global_contents) use($link_to, $meta_tags, $_link_to, $main_module)
+		{
+			$block_global_contents['year'] = $link_to['year'];
+			$block_global_contents['month'] = $link_to['month'];
+			$block_global_contents['month_l'] = $link_to['month_l'];
+			$block_global_contents['url'] = $_link_to;
+			$block_global_contents['module_name'] = $main_module;
+			return $block_global_contents;
+		}, 10);
+		$main_module_box = "archive";
+	}
+	
+	unset($meta_tags);	
 	
 	if($top_middle)
 		$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
@@ -632,10 +686,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 	}
 	
 	$article_info = $hooks->apply_filters("post_more_article_info", $article_info);
-	
-	$hooks->add_filter("site_breadcrumb", "posts_breadcrumb", 10);
-	$hooks->add_filter("microdata_json", "Articles_microdata_json", 10);
-	
+		
 	$meta_tags = array(
 		"url" => $article_info['article_link'],
 		"title" => $article_info['title'],
@@ -719,263 +770,6 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 			die();
 		break;
 	}
-}
-
-function article_archive($year = 0, $month = 0, $month_l = '', $mode = '', $main_module = 'Articles')
-{
-	global $userinfo, $db, $user, $page, $module_name, $nuke_configs, $hooks;
-	
-	$contents = '';
-
-	$page = isset($page) ? intval($page):0;
-	$year = (isset($year) && strlen($year) == 4) ? intval($year):0;
-	$month = (isset($month) && strlen($month) > 0 && strlen($month) < 3) ? intval($month):0;
-	$month_l = isset($month_l) ? str_replace("-", " ", filter($month_l, "nohtml")):'';
-	
-	$month_names = ($nuke_configs['datetype'] == 1) ? "j_month_name":(($nuke_configs['datetype'] == 2) ? "h_month_name":"g_month_name");
-	
-	$month_l = str_replace(" ","-", $nuke_configs[$month_names][$month]);
-	
-	$link = "index.php?modname=$main_module&op=article_archive".
-	(($year != 0) ? "&year=$year":"").
-	(($month != 0) ? "&month=$month":"").
-	(($month_l != '') ? "&month_l=$month_l":"").
-	(($page != 0) ? "&page=$page":"");
-	
-	if(trim(LinkToGT($link), "/")."/" != trim(rawurldecode(LinkToGT($nuke_configs['REQUESTURL'])), "/")."/")
-		die_error("404");
-		
-	$where_between = array();
-	
-	if($mode != 'all' && $year == 0 && $month == 0)
-		$contents .= article_select_month(1);
-	
-	if($year != 0 && $month != 0)
-	{
-		$jnmonth				= $month +1;
-		$jnyear					= $year;
-		if ($jnmonth == 13)
-		{
-			$jnyear++;
-			$jnmonth			= "01";
-		}
-		
-		$month					= correct_date_number($month);
-		$jnmonth				= correct_date_number($jnmonth);
-		
-		$currenttime			= to_mktime("$year/$month/1");
-		$nexttime				= to_mktime("$jnyear/$jnmonth/1");
-		
-		$query_set['time']		= "s.time BETWEEN '$currenttime' AND '$nexttime'";
-	}
-	
-	$entries_per_page			= 20;
-	$current_page				= (empty($page)) ? 1 : $page;
-	$start_at					= ($current_page * $entries_per_page) - $entries_per_page;
-	$link_to					= ($year != 0 && $month != 0 && $month_l != '') ? "index.php?modname=$main_module&op=article_archive&year=$year&month=$month&month_l=$month_l":"index.php?modname=$main_module&op=article_archive";
-					
-	if(!is_admin())
-		$query_set['status']	= "s.status = 'publish'";
-		
-	$query_set['post_type'] = "(s.post_type = '$main_module' OR s.post_type = '')";
-	$query_set['alanguage']		= "";
-	
-	if ($nuke_configs['multilingual'] == 1)
-		$query_set['alanguage']	= "(s.alanguage='".$nuke_configs['currentlang']."' OR s.alanguage='')";
-	
-	$query_set					= implode(" AND ", array_filter($query_set));
-	$query_set					= ($query_set != "") ? "WHERE $query_set":"";
-	
-    $result						= $db->query("
-	SELECT s.sid, s.title, s.time, s.post_url, s.comments, s.counter, s.alanguage, s.cat_link, s.score, s.ratings, s.status, 
-	(SELECT COUNT(s2.sid) FROM ".POSTS_TABLE." as s2 ".str_replace("s.","s2.", $query_set).") as total_rows 
-	FROM ".POSTS_TABLE." AS s 
-	$query_set 
-	GROUP BY s.sid 
-	ORDER BY s.time DESC, s.sid DESC LIMIT $start_at, $entries_per_page");
-	
-	$contents					.="
-	<div class=\"table-responsive\">
-	<table border=\"0\" width=\"100%\" class=\"table-striped table-hover table-condensed\">
-		<tr>
-			<th align=\"right\"><b>"._ARTICLES."</b></th>
-			<th align=\"center\"><b>"._COMMENTS."</b></th>
-			<th align=\"center\"><b>"._READS."</b></th>
-			<th align=\"center\"><b>"._USCORE."</b></th>
-			<th align=\"center\"><b>"._DATE."</b></th>
-			<th align=\"center\"><b>"._OPERATION."</b></th>
-		</tr>";
-	if(!empty($result))
-	{
-		foreach ($result as $row)
-		{
-			$total_rows				= intval($row['total_rows']);
-			$sid					= intval($row['sid']);
-			$title					= filter($row['title'], "nohtml");
-			$time					= $row['time'];
-			$post_url				= filter($row['post_url'], "nohtml");
-			$comments				= intval($row['comments']);
-			$counter				= intval($row['counter']);
-			$alanguage				= $row['alanguage'];
-			$cat_link				= intval($row['cat_link']);
-			$score					= intval($row['score']);
-			$ratings				= intval($row['ratings']);
-			$article_link			= LinkToGT(articleslink($sid, $title, $post_url, $time, $cat_link, $main_module));
-			$time					= nuketimes($time);
-
-			$this_status			= filter($row['status'], "nohtml");	
-
-			switch($this_status)
-			{
-				case"future":
-					$this_post_status = " ("._PUBLISH_IN_FUTURE.")";
-				break;
-				case"draft":
-					$this_post_status = " ("._DRAFT.")";
-				break;
-				case"pending":
-					$this_post_status = " ("._PENDING_POST.")";
-				break;
-				default:
-					$this_post_status = "";
-				break;
-			}
-					
-			if($nuke_configs['gtset'] == 1)
-			{
-				
-				$print_link			= $article_link."print/";
-				$pdf_link			= $article_link."pdf/";
-				$friend_link		= $article_link."friend/";
-			}
-			else
-			{
-				$print_link			= "index.php?modname=$main_module&op=article_show&mode=print&sid=$sid";
-				$pdf_link			= "index.php?modname=$main_module&op=article_show&mode=pdf&sid=$sid";
-				$friend_link		= "index.php?modname=$main_module&op=article_show&mode=friend&sid=$sid";
-			}
-			
-			$actions				= "<a href=\"$print_link\" title=\""._PRINT."\"><i class=\"fa fa-print\"></i></a>&nbsp;";
-			$actions				.= "<a href=\"$pdf_link\" title=\""._PDFFILE."><i class=\"fa fa-pdf\"></i></a>&nbsp;";
-			if(is_user())
-			{
-				$actions			.= "<a href=\"$friend_link\" class=\"thickbox\" title=\""._SEND_POST_TO_FRIEND."\"><i class=\"fa fa-email\"></i></a>";
-			}
-			if ($score != 0)
-			{
-				$rated				= substr($score / $ratings, 0, 4);
-			}
-			else
-			{
-				$rated = 0;
-			}
-			$title					= "<a href=\"$article_link\">$title</a>";
-			if ($nuke_configs['multilingual'] == 1)
-			{
-				if (empty($alanguage))
-				{
-					$alanguage		= $nuke_configs['language'];
-				}
-				$alt_language		= ucfirst($alanguage);
-				$lang_img			= "<img src=\"".$nuke_configs['nukecdnurl']."images/language/flag-$alanguage.png\" border=\"0\" hspace=\"2\" alt=\"$alt_language\" title=\"$alt_language\">";
-			}
-			else
-			{
-				$lang_img			= "<strong><big><b>&middot;</b></big></strong>";
-			}
-			$contents .="<tr>
-				<td align=\"right\">$lang_img $title$this_post_status</td>
-				<td align=\"center\">$comments</td>
-				<td align=\"center\">$counter</td>
-				<td align=\"center\">$rated</td>
-				<td align=\"center\">$time</td>
-				<td align=\"center\">$actions</td>
-			</tr>";
-		}
-	}
-	$contents .="
-		<tr>
-			<td valign=\"top\" align=\"center\" colspan=\"6\">
-			<div id=\"pagination\" class=\"pagination\">";
-			$contents			.= clean_pagination($total_rows, $entries_per_page, $current_page, $link_to);
-			$contents			.="</div>
-			</td>
-		</tr>
-	</table>
-	</div>
-	<br><br><hr size=\"1\" noshade>";
-	$contents					.= article_select_month(1);
-	$contents					.="<div align=\"center\">
-	[ <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_select_month")."\">"._ARCHIVESINDEX."</a>".(($mode !== 'all') ? " | <a href=\"".LinkToGT("index.php?modname=$main_module&op=article_archive")."\">"._SHOWALLSTORIES."</a>":"")." ]</div>";
-	
-	$meta_url				= $link_to;
-	if (intval($page) != 0)
-	{
-		$meta_url				.= "&page=".intval($page)."";
-	}
-	$meta_url = $hooks->apply_filters("posts_archive_meta_url", $meta_url, $link_to, $page);
-	
-	$next_link					= '';
-	$prev_link					= '';
-	
-	$lastpage					= ceil($total_rows/$entries_per_page);
-	
-	if($page < $lastpage && $page != 0)
-		$next_link				= LinkToGT($link_to."&page=".intval($page+1)."");
-	
-	if($page > 1 && $entries_per_page < $total_rows)
-		$prev_link				= LinkToGT($link_to."&page=".intval($page-1)."");
-
-	$meta_tags = array(
-		"url" 					=> $meta_url,
-		"title" 				=> _STORIESARCHIVE."".(($month_l != '') ? " - $month_l $year":""),
-		"description" 			=> '',
-		"keywords" 				=> '',
-		"prev" 					=> $prev_link,
-		"next" 					=> $next_link,
-		"extra_meta_tags" 		=> array(
-			"<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - "._STORIESARCHIVE." - ".(($month_l != '') ? " - $month_l $year":"")."\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n"
-		)
-		
-	);
-	$meta_url = $hooks->apply_filters("posts_archive_meta_tags", $meta_tags, $prev_link, $next_link, $meta_url, $month_l, $year);
-	
-	$hooks->add_filter("site_header_meta", function ($all_meta_tags) use($meta_tags)
-	{
-		return array_merge($all_meta_tags, $meta_tags);
-	}, 10);	
-	
-	$breadcrumb_title = ($mode == 'all') ? 	_SHOWALLSTORIES:("$month_l $year");
-	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($main_module, $meta_tags, $breadcrumb_title){
-		$breadcrumbs['archive_main'] = array(
-			"name" => _STORIESARCHIVE,
-			"link" => LinkToGT("index.php?modname=".$main_module."&op=article_select_month"),
-			"itemtype" => "WebPage"
-		);
-		
-		$breadcrumbs['archive_path'] = array(
-			"name" => str_replace("-", " ", $breadcrumb_title),
-			"link" => $meta_tags['url'],
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);
-	unset($meta_tags);
-	
-	include("header.php");
-	$output = '';
-	$output .= title($nuke_configs['sitename']." : "._STORIESARCHIVE);
-	
-	if($month_l != '')
-		$output .= title("$month_l $year");
-		
-	$output .= OpenTable();
-	$output .= $contents;
-	$output .= CloseTable();
-	$output = $hooks->apply_filters("post_archive_contents", $output);
-	$html_output .= show_modules_boxes($module_name, "archive", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $output);
-	include("footer.php");
 }
 
 function article_select_month($in = 0)
@@ -1346,8 +1140,8 @@ $category 			= isset($category) ? filter($category, "nohtml") : "";
 $orderby 			= isset($orderby) ? filter($orderby, "nohtml") : "DESC";
 $sid				= (isset($sid) && intval($sid) > 0) ? intval($sid) : 0;
 $in					= (isset($in) && intval($in) > 0) ? intval($in) : 0;
-$year				= (isset($year) && intval($year) > 0) ? intval($year) : 0;
-$month				= (isset($month) && intval($month) > 0) ? intval($month) : 0;
+$year				= (isset($year) && intval($year) > 0 && strlen($year) == 4) ? intval($year) : 0;
+$month				= (isset($month) && intval($month) > 0 && strlen($month) < 3) ? intval($month) : 0;
 $month_l			= isset($month_l)? filter($month_l, "nohtml") : "";
 $mode				= isset($mode)? filter($mode, "nohtml") : "";
 $post_url			= isset($post_url)? filter($post_url, "nohtml") : "";
@@ -1360,14 +1154,14 @@ $main_module		= isset($main_module)? filter($main_module, "nohtml") : "Articles"
 	
 if($year == 0 && $month == 0 && $mode != 'all' && $op == 'article_archive')
 	$op = "article_select_month";
+	
+if($year == 0 && $month == 0 && $mode == 'all' && $op == 'article_archive')
+	$op = "articles_home";
 
 $hooks->do_action("post_operations", $main_module);
 
 switch ($op)
 {
-	case "article_archive":
-		article_archive($year, $month, $month_l, $mode, $main_module);
-	break;
 	case"article_select_month":
 		article_select_month(0);
 	break;
@@ -1381,7 +1175,7 @@ switch ($op)
 		article_show($sid, $post_url, $mode, $main_module);
 	break;
 	default:
-	articles_home($category, $tags, $orderby, $main_module);
+	articles_home($category, $tags, $orderby, $year, $month, $month_l, $mode, $main_module);
 	break;
 }
 
