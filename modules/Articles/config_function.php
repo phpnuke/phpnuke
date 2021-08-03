@@ -315,13 +315,14 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 	}
 	else
 	{
-		$contents .= "<div class=\"text-center\">"._SELECTMONTH2VIEW."</div>
-		<ul>";
+		$contents .= OpenTable(_SELECTMONTH2VIEW);
+		$contents .= "<ul>";
 		foreach($archive_list as $lists)
 		{
 			$contents .= "<li><a href=\"".$lists['url']."\">".$lists['title']." (".$lists['count'].")</a></li>";
 		}
 		$contents .= "</ul>";
+		$contents .= CloseTable();
 	}
 	
 	$contents = $hooks->apply_filters("posts_archive", $contents, $archive_list, $module_name);
@@ -1251,64 +1252,67 @@ function posts_breadcrumb($breadcrumb, $article_info)
 	$block_global_contents = array();
 	$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
 	
-	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
-	
-	if(isset($article_info['post_type']) && isset($nuke_categories_cacheData[$article_info['post_type']]) && isset($article_info['cat_link']) && $article_info['cat_link'] != 0)
+	if(isset($article_info) && !empty($article_info))
 	{
-		$post_categories = $nuke_categories_cacheData[$article_info['post_type']];
+		$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 		
-		$catname_link = filter($post_categories[$article_info['cat_link']]['catname'], "nohtml");
-		
-		if(isset($article_info['cat_link']) && $catname_link != 'uncategorized' && isset($post_categories[$article_info['cat_link']]) && $nuke_configs['breadcrumb_cat'] == 1)
+		if(isset($article_info['post_type']) && isset($nuke_categories_cacheData[$article_info['post_type']]) && isset($article_info['cat_link']) && $article_info['cat_link'] != 0)
 		{
-			$parent_cats = array_reverse(get_parent_names($article_info['cat_link'], $post_categories, "parent_id", "catname_url"), true);
+			$post_categories = $nuke_categories_cacheData[$article_info['post_type']];
 			
-			foreach($parent_cats as $catid => $catname_url)
+			$catname_link = filter($post_categories[$article_info['cat_link']]['catname'], "nohtml");
+			
+			if(isset($article_info['cat_link']) && $catname_link != 'uncategorized' && isset($post_categories[$article_info['cat_link']]) && $nuke_configs['breadcrumb_cat'] == 1)
 			{
-				$catname_urls[] = $catname_url;
-				$breadcrumb[] = array(
-					"name" => category_lang_text($post_categories[$catid]['cattext']),
-					"link" => LinkToGT("index.php?modname=".$article_info['post_type']."&category=".implode("/", $catname_urls).""),
+				$parent_cats = array_reverse(get_parent_names($article_info['cat_link'], $post_categories, "parent_id", "catname_url"), true);
+				
+				foreach($parent_cats as $catid => $catname_url)
+				{
+					$catname_urls[] = $catname_url;
+					$breadcrumb[] = array(
+						"name" => category_lang_text($post_categories[$catid]['cattext']),
+						"link" => LinkToGT("index.php?modname=".$article_info['post_type']."&category=".implode("/", $catname_urls).""),
+						"itemtype" => "WebPage"
+					);
+				}
+			}
+		}
+		
+		if($op == 'article_show')
+		{
+			$breadcrumb[] = array(
+				"name" => $article_info['title'],
+				"link" => $article_info['article_link'],
+				"itemtype" => "WebPage"
+			);
+		}
+		
+		if($op == 'article_archive')
+		{
+			$breadcrumb_title = "".$article_info['month_l']." ".$article_info['year']."";
+		
+			$breadcrumb['archive_main'] = array(
+				"name" => _STORIESARCHIVE,
+				"link" => LinkToGT("index.php?modname=".$article_info['module_name']."&op=article_select_month"),
+				"itemtype" => "WebPage"
+			);
+			
+			$breadcrumb['archive_path'] = array(
+				"name" => str_replace("-", " ", $breadcrumb_title),
+				"link" => $article_info['url'],
+				"itemtype" => "WebPage"
+			);
+			
+			if(isset($page) && $page > 0)
+			{
+				$breadcrumb['archive_page'] = array(
+					"name" => _PAGES." ".$page,
+					"link" => $article_info['url']."&page=$page",
 					"itemtype" => "WebPage"
 				);
 			}
 		}
 	}
-	if($op == 'article_show')
-	{
-		$breadcrumb[] = array(
-			"name" => $article_info['title'],
-			"link" => $article_info['article_link'],
-			"itemtype" => "WebPage"
-		);
-	}
-	
-	if($op == 'article_archive')
-	{
-		$breadcrumb_title = "".$article_info['month_l']." ".$article_info['year']."";
-	
-		$breadcrumb['archive_main'] = array(
-			"name" => _STORIESARCHIVE,
-			"link" => LinkToGT("index.php?modname=".$article_info['module_name']."&op=article_select_month"),
-			"itemtype" => "WebPage"
-		);
-		
-		$breadcrumb['archive_path'] = array(
-			"name" => str_replace("-", " ", $breadcrumb_title),
-			"link" => $article_info['url'],
-			"itemtype" => "WebPage"
-		);
-		
-		if(isset($page) && $page > 0)
-		{
-			$breadcrumb['archive_page'] = array(
-				"name" => _PAGES." ".$page,
-				"link" => $article_info['url']."&page=$page",
-				"itemtype" => "WebPage"
-			);
-		}
-	}
-	
 	if(isset($block_global_contents['tags']) && $block_global_contents['tags'] != '' && $op == 'article_home')
 	{
 		$breadcrumb[] = array(
