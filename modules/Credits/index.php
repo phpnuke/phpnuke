@@ -90,6 +90,8 @@ function credits_list($sort = 'DESC', $order_by = '')
 		$contents .=CloseTable();
 	}
 	
+	$contents = $hooks->apply_filters("credits_list_contents", $contents, $rows_data);
+	
 	$boxes_contents = show_modules_boxes($module_name, "list", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 
 	$hooks->add_filter("site_theme_headers", "credits_theme_assets", 10);
@@ -207,6 +209,10 @@ function credit_edit($order_data = array())
 		$contents .= credits_form($order_data);
 	else
 		include("modules/$module_name/includes/credits_form.php");
+
+	$contents = $hooks->apply_filters("credits_form_contents", $contents, $order_data);
+
+	$hooks->add_filter("site_theme_headers", "credits_theme_assets", 10);
 	
 	$boxes_contents = show_modules_boxes($module_name, "form", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 
@@ -259,7 +265,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 	$order_id = 0;
 	$order_link = '';
 	$order_part = '';
-	if($order_data != '')
+	if(isset($order_data) && !empty($order_data))
 	{
 		$amount = (isset($order_data['ex_rate']) && $order_data['ex_rate']!= '') ? credits_currency_cal($order_data['amount'], $order_data['ex_rate']):$order_data['amount'];
 		$order_id = $order_data['id'];
@@ -287,7 +293,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			"user_id" => $userinfo['user_id'],
 			"factor_number" => _NOWTIME,
 			"create_time" => _NOWTIME,
-			"update_time" => _NOWTIME,
+			"update_time" => '',
 			"status" => _CREDIT_STATUS_NORMAL,
 			"type" => $transaction_type,
 			"gateway" => ($credit_method != 1) ? '':$credit_gateway,
@@ -382,7 +388,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			
 			$hooks->do_action("credits_after_offline_payment", $payment_data);
 			
-			if($order_data != '')
+			if(isset($order_data) && !empty($order_data))
 				redirect_to($order_link);
 			else
 				redirect_to(LinkToGT("index.php?modname=$module_name&op=credits_list"));
@@ -525,7 +531,7 @@ function credit_response($tid, $credit_gateway='')
 
 					if(isset($nuke_configs['sms']) && $nuke_configs['sms'] == 1 && $userinfo['user_phone'] != '' && isset($pn_credits_config['notify']['sms']) && $pn_credits_config['notify']['sms'] == 1)
 					{
-						$sms_text = ($order_data != '') ? sprintf(_CREDITS_PAY_ONLINE_ORDER_SMS, $tid, $row['amount'], $row['order_id'], nuketimes(_NOWTIME, true, true, true, 1)):sprintf(_CREDITS_PAY_ONLINE_NOORDER_SMS, $tid, number_format($row['amount'], 0), nuketimes(_NOWTIME, true, true, true, 1));
+						$sms_text = (isset($order_data) && !empty($order_data)) ? sprintf(_CREDITS_PAY_ONLINE_ORDER_SMS, $tid, $row['amount'], $row['order_id'], nuketimes(_NOWTIME, true, true, true, 1)):sprintf(_CREDITS_PAY_ONLINE_NOORDER_SMS, $tid, number_format($row['amount'], 0), nuketimes(_NOWTIME, true, true, true, 1));
 						pn_sms('send', $userinfo['user_phone'], $sms_text);
 					}
 					
@@ -545,7 +551,7 @@ function credit_response($tid, $credit_gateway='')
 						phpnuke_mail($userinfo['user_email'], sprintf(_CREDITS_EMAIL_ONLINE_OK, $nuke_configs['sitename']), $message);
 					}
 					
-					if($order_data != '')
+					if(isset($order_data) && !empty($order_data))
 					{
 						$user_credits_allowed = user_credits_allowed();
 						if($user_credits_allowed > 0)

@@ -56,6 +56,7 @@ $contents .= "
 			$contents .= "<input type=\"hidden\" name=\"order_data[$order_key]\" value=\"$order_value\" />";
 		}
 		$contents .= "
+			<input type=\"hidden\" name=\"order_data_json\" value=\"".str_replace('"', "'", json_encode($order_data))."\" />
 			<div class=\"form-group\">
 				<label class=\"col-sm-2 control-label\">"._CREDITS_AMOUNT."</label>
 				<div class=\"col-sm-10 form-control-static\">
@@ -177,9 +178,5 @@ $contents .= "
 	</div>
 </form>";
 $contents .= CloseTable();
-
-$contents = $hooks->apply_filters("credits_form_contents", $contents);
-
-$hooks->add_filter("site_theme_headers", "credits_theme_assets", 10);
 
 ?>
