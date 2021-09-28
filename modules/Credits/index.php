@@ -75,6 +75,7 @@ function credits_list($sort = 'DESC', $order_by = '')
 			$pagination .= clean_pagination($total_rows, $entries_per_page, $current_page, $link_to);
 			$pagination .= "</div>";
 		}
+		$pagination = $hooks->apply_filters("posts_paginations", $pagination, $total_rows, $entries_per_page, $current_page, $link_to);
 		
 		if(file_exists("themes/".$nuke_configs['ThemeSel']."/credits_list.php"))
 			include("themes/".$nuke_configs['ThemeSel']."/credits_list.php");
@@ -707,7 +708,7 @@ $in_admin						= (isset($in_admin)) ? filter($in_admin, "nohtml"):"";
 $credit_gateway					= (isset($credit_gateway)) ? filter($credit_gateway, "nohtml"):"";
 $offline_credit_file			= request_var('offline_credit_file', array(), '_FILES');
 $order_data						= request_var('order_data', array(), '_POST');
-$search_data					= (isset($search_data)) ? $search_data:array();
+$search_data					= request_var('search_data', array(), '_POST');
 $op								= (isset($op)) ? filter($op, "nohtml"):"";
 
 switch($op)

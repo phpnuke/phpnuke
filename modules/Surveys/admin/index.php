@@ -603,6 +603,9 @@ if (check_admin_permission($module_name, false, true))
 		$show_voters_num_checked1 = ($surveys_fields['show_voters_num'] == 1) ? "checked":"";
 		$show_voters_num_checked2 = ($surveys_fields['show_voters_num'] == 0) ? "checked":"";
 		
+		$show_result_checked1 = (isset($surveys_fields['show_result']) && $surveys_fields['show_result'] == 1) ? "checked":"";
+		$show_result_checked2 = (isset($surveys_fields['show_result']) && $surveys_fields['show_result'] == 0) ? "checked":"";
+		
 		$allow_comment_checked1 = ($surveys_fields['allow_comment'] == 1) ? "checked":"";
 		$allow_comment_checked2 = ($surveys_fields['allow_comment'] == 0) ? "checked":"";
 		
@@ -654,6 +657,10 @@ if (check_admin_permission($module_name, false, true))
 				<tr>
 					<th>"._ENABLE_MULTIOPTIONS."</th>
 					<td><input type=\"radio\" name=\"surveys_fields[multi_vote]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $multi_vote_checked1 /><input type=\"radio\" name=\"surveys_fields[multi_vote]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $multi_vote_checked2 /></td>					
+				</tr>
+				<tr>
+					<th>"._SHOW_VOTERS_NUM."</th>
+					<td><input type=\"radio\" name=\"surveys_fields[show_voters_num]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $show_voters_num_checked1 /><input type=\"radio\" name=\"surveys_fields[show_voters_num]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $show_voters_num_checked2 /></td>					
 				</tr>
 				<tr>
 					<th>"._SHOW_VOTERS_NUM."</th>

@@ -1246,6 +1246,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_IS_MAIN_POLL" => "نظر سنجی اصلی سایت",
 	"_ENABLE_MULTIOPTIONS" => "امکان انتخاب چند گزینه",
 	"_SHOW_VOTERS_NUM" => "نمایش تعداد شرکت کنندگان",
+	"_SHOW_RESULT" => "نمایش نتیجه",
 	"_ASSIGN_TO_POST" => "اختصاص به یک مطلب",
 	"_POST_ID" => "شماره پست",
 	"_NOTMAIN_IF_ASSIGN" => "با پر کردن این قسمت نظر سنجی از حالت نظرسنجی اصلی سایت خارج خواهد شد",
