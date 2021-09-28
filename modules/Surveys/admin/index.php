@@ -606,6 +606,9 @@ if (check_admin_permission($module_name, false, true))
 		$show_result_checked1 = (isset($surveys_fields['show_result']) && $surveys_fields['show_result'] == 1) ? "checked":"";
 		$show_result_checked2 = (isset($surveys_fields['show_result']) && $surveys_fields['show_result'] == 0) ? "checked":"";
 		
+		$vote_limit_checked1 = (isset($surveys_fields['vote_limit']) && $surveys_fields['vote_limit'] == 1) ? "checked":"";
+		$vote_limit_checked2 = (isset($surveys_fields['vote_limit']) && $surveys_fields['vote_limit'] == 2) ? "checked":"";
+		
 		$allow_comment_checked1 = ($surveys_fields['allow_comment'] == 1) ? "checked":"";
 		$allow_comment_checked2 = ($surveys_fields['allow_comment'] == 0) ? "checked":"";
 		
@@ -662,7 +665,9 @@ if (check_admin_permission($module_name, false, true))
 				</tr>
 				<tr>
 					<th>"._MULTIOPTIONS_LIMIT."</th>
-					<td><input type=\"text\" size=\"40\" name=\"surveys_fields[multi_vote_limit]\" id=\"title_field\" value=\"".$surveys_fields['multi_vote_limit']."\" class=\"inp-form\" /></td>
+					<td><input type=\"text\" size=\"40\" name=\"surveys_fields[multi_vote_limit]\" id=\"title_field\" value=\"".$surveys_fields['multi_vote_limit']."\" class=\"inp-form\" />
+						".bubble_show(_MULTIOPTIONS_LIMIT_DESC)."
+					</td>
 				</tr>
 				<tr>
 					<th>"._SHOW_VOTERS_NUM."</th>
@@ -764,6 +769,11 @@ if (check_admin_permission($module_name, false, true))
 					<th>"._PUBLISH_AS_MAIN."</th>
 					<td><input type=\"radio\" name=\"surveys_fields[to_main]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $to_main_checked1 /><input type=\"radio\" name=\"surveys_fields[to_main]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $to_main_checked2 />
 					".bubble_show(_SET_TO_MAIN_AFTER_PUBLISH)."
+					</td>					
+				</tr>
+				<tr>
+					<th>"._VOTE_LIMIT_BY."</th>
+					<td><input type=\"checkbox\" name=\"surveys_fields[vote_limit]\" value=\"1\" class=\"styled\" data-label=\""._COOKIE."\" $vote_limit_checked1 /><input type=\"checkbox\" name=\"surveys_fields[vote_limit]\" value=\"1\" class=\"styled\" data-label=\""._IP."\" $vote_limit_checked2 />
 					</td>					
 				</tr>
 				<tr>
