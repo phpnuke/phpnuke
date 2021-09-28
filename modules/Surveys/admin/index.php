@@ -773,7 +773,7 @@ if (check_admin_permission($module_name, false, true))
 				</tr>
 				<tr>
 					<th>"._VOTE_LIMIT_BY."</th>
-					<td><input type=\"checkbox\" name=\"surveys_fields[vote_limit]\" value=\"1\" class=\"styled\" data-label=\""._COOKIE."\" $vote_limit_checked1 /><input type=\"checkbox\" name=\"surveys_fields[vote_limit]\" value=\"1\" class=\"styled\" data-label=\""._IP."\" $vote_limit_checked2 />
+					<td><input type=\"checkbox\" name=\"surveys_fields[vote_limit][]\" value=\"1\" class=\"styled\" data-label=\""._COOKIE."\" $vote_limit_checked1 /><input type=\"checkbox\" name=\"surveys_fields[vote_limit][]\" value=\"2\" class=\"styled\" data-label=\""._IP."\" $vote_limit_checked2 />
 					</td>					
 				</tr>
 				<tr>
