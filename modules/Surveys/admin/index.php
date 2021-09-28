@@ -613,6 +613,8 @@ if (check_admin_permission($module_name, false, true))
 		$end_time	= ($surveys_fields['end_time'] != '') ? $surveys_fields['end_time']:'';
 		$set_publish_date = ($start_time > _NOWTIME) ? "checked":"";
 		
+		$surveys_fields['multi_vote_limit'] = (isset($surveys_fields['multi_vote_limit']) && intval($surveys_fields['multi_vote_limit']) != 0) ? intval($surveys_fields['multi_vote_limit']):5;
+		
 		$start_time = nuketimes($start_time, false, false, false, 1);
 		$end_time	= ($end_time != '') ? nuketimes($end_time, false, false, false, 1):"";
 
@@ -659,12 +661,16 @@ if (check_admin_permission($module_name, false, true))
 					<td><input type=\"radio\" name=\"surveys_fields[multi_vote]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $multi_vote_checked1 /><input type=\"radio\" name=\"surveys_fields[multi_vote]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $multi_vote_checked2 /></td>					
 				</tr>
 				<tr>
-					<th>"._SHOW_VOTERS_NUM."</th>
-					<td><input type=\"radio\" name=\"surveys_fields[show_voters_num]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $show_voters_num_checked1 /><input type=\"radio\" name=\"surveys_fields[show_voters_num]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $show_voters_num_checked2 /></td>					
+					<th>"._MULTIOPTIONS_LIMIT."</th>
+					<td>input type=\"text\" size=\"40\" name=\"surveys_fields[multi_vote_limit]\" id=\"title_field\" value=\"".$surveys_fields['multi_vote_limit']."\" class=\"inp-form\" /></td>
 				</tr>
 				<tr>
 					<th>"._SHOW_VOTERS_NUM."</th>
 					<td><input type=\"radio\" name=\"surveys_fields[show_voters_num]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $show_voters_num_checked1 /><input type=\"radio\" name=\"surveys_fields[show_voters_num]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $show_voters_num_checked2 /></td>					
+				</tr>
+				<tr>
+					<th>"._SHOW_RESULT."</th>
+					<td><input type=\"radio\" name=\"surveys_fields[show_result]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $show_result_checked1 /><input type=\"radio\" name=\"surveys_fields[show_result]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $show_result_checked2 /></td>					
 				</tr>
 				<tr>
 					<th>"._ALLOW_COMMENT."</th>

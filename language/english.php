@@ -1244,6 +1244,7 @@ $nuke_languages['english'] = array_merge($nuke_languages['english'], array(
 	"_ENABLE_VOTTING"     =>       "Enable Polling",
 	"_IS_MAIN_POLL"     =>       "Main Polling",
 	"_ENABLE_MULTIOPTIONS"     =>       "Select Multioptions",
+	"_MULTIOPTIONS_LIMIT" => "Max Choise",
 	"_SHOW_VOTERS_NUM"     =>       "Show Votters",
 	"_SHOW_RESULT" => "Show Results",
 	"_ASSIGN_TO_POST"     =>       "Assign To Content",
