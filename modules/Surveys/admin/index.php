@@ -750,7 +750,7 @@ if (check_admin_permission($module_name, false, true))
 							$option_text = $option_data[0];
 							$option_counter = $option_data[1];
 							$contents .= "
-							<div style=\"margin-bottom:3px;\"><input placeholder=\""._OPTION_NAME."\" type=\"text\" class=\"inp-form\" id=\"option_text_$voteID\" value=\"$option_text\" name=\"surveys_fields[options][$voteID][]\" />&nbsp; $option_counter "._VOTE."".(($key > 1) ? " &nbsp; <a href=\"#\" class=\"remove_field\">Remove</a>":"")."</div>";
+							<div style=\"margin-bottom:3px;\"><input placeholder=\""._OPTION_NAME."\" type=\"text\" class=\"inp-form\" id=\"option_text_$voteID\" value=\"$option_text\" name=\"surveys_fields[options][$voteID][]\" />&nbsp; $option_counter "._VOTE."".(($key > 1) ? " &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>":"")."</div>";
 							$key++;
 						}
 						$contents .= "
