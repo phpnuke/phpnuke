@@ -662,7 +662,7 @@ if (check_admin_permission($module_name, false, true))
 				</tr>
 				<tr>
 					<th>"._MULTIOPTIONS_LIMIT."</th>
-					<td>input type=\"text\" size=\"40\" name=\"surveys_fields[multi_vote_limit]\" id=\"title_field\" value=\"".$surveys_fields['multi_vote_limit']."\" class=\"inp-form\" /></td>
+					<td><input type=\"text\" size=\"40\" name=\"surveys_fields[multi_vote_limit]\" id=\"title_field\" value=\"".$surveys_fields['multi_vote_limit']."\" class=\"inp-form\" /></td>
 				</tr>
 				<tr>
 					<th>"._SHOW_VOTERS_NUM."</th>
