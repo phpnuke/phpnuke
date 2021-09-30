@@ -883,7 +883,7 @@ CREATE TABLE `{NUKEPREFIX}surveys` (
   `allow_comment` tinyint(1) NOT NULL DEFAULT '0',
   `comments` int(11) DEFAULT '0',
   `options` text COLLATE utf8mb4_unicode_ci,
-  `multi_vote` tinyint(1) NOT NULL DEFAULT '0',
+  `multi_vote` int(2) NOT NULL DEFAULT '1',
   `show_voters_num` tinyint(1) NOT NULL DEFAULT '0',
   `permissions` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`pollID`),

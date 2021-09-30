@@ -583,6 +583,7 @@ if (check_admin_permission($module_name, false, true))
 			"to_main"			=> ((isset($row['to_main'])) ?			$row['to_main']:1),
 			"multi_vote"		=> ((isset($row['multi_vote'])) ?		$row['multi_vote']:1),
 			"show_voters_num"	=> ((isset($row['show_voters_num'])) ?	$row['show_voters_num']:1),
+			"show_result"		=> ((isset($row['show_result'])) ?		$row['show_result']:1),
 		);
 		
 		$status_checked1 = ($surveys_fields['status'] == 1) ? "checked":"";
@@ -597,17 +598,11 @@ if (check_admin_permission($module_name, false, true))
 		$to_main_checked1 = ($surveys_fields['to_main'] == 1) ? "checked":"";
 		$to_main_checked2 = ($surveys_fields['to_main'] == 0) ? "checked":"";
 		
-		$multi_vote_checked1 = ($surveys_fields['multi_vote'] == 1) ? "checked":"";
-		$multi_vote_checked2 = ($surveys_fields['multi_vote'] == 0) ? "checked":"";
-		
 		$show_voters_num_checked1 = ($surveys_fields['show_voters_num'] == 1) ? "checked":"";
 		$show_voters_num_checked2 = ($surveys_fields['show_voters_num'] == 0) ? "checked":"";
 		
-		$show_result_checked1 = (isset($surveys_fields['show_result']) && $surveys_fields['show_result'] == 1) ? "checked":"";
-		$show_result_checked2 = (isset($surveys_fields['show_result']) && $surveys_fields['show_result'] == 0) ? "checked":"";
-		
-		$vote_limit_checked1 = (isset($surveys_fields['vote_limit']) && $surveys_fields['vote_limit'] == 1) ? "checked":"";
-		$vote_limit_checked2 = (isset($surveys_fields['vote_limit']) && $surveys_fields['vote_limit'] == 2) ? "checked":"";
+		$show_result_checked1 = ($surveys_fields['show_result'] == 1) ? "checked":"";
+		$show_result_checked2 = ($surveys_fields['show_result'] == 0) ? "checked":"";
 		
 		$allow_comment_checked1 = ($surveys_fields['allow_comment'] == 1) ? "checked":"";
 		$allow_comment_checked2 = ($surveys_fields['allow_comment'] == 0) ? "checked":"";
@@ -615,8 +610,6 @@ if (check_admin_permission($module_name, false, true))
 		$start_time = ($surveys_fields['start_time'] != '') ? $surveys_fields['start_time']:_NOWTIME;
 		$end_time	= ($surveys_fields['end_time'] != '') ? $surveys_fields['end_time']:'';
 		$set_publish_date = ($start_time > _NOWTIME) ? "checked":"";
-		
-		$surveys_fields['multi_vote_limit'] = (isset($surveys_fields['multi_vote_limit']) && intval($surveys_fields['multi_vote_limit']) != 0) ? intval($surveys_fields['multi_vote_limit']):5;
 		
 		$start_time = nuketimes($start_time, false, false, false, 1);
 		$end_time	= ($end_time != '') ? nuketimes($end_time, false, false, false, 1):"";
@@ -661,11 +654,7 @@ if (check_admin_permission($module_name, false, true))
 				</tr>
 				<tr>
 					<th>"._ENABLE_MULTIOPTIONS."</th>
-					<td><input type=\"radio\" name=\"surveys_fields[multi_vote]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $multi_vote_checked1 /><input type=\"radio\" name=\"surveys_fields[multi_vote]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $multi_vote_checked2 /></td>					
-				</tr>
-				<tr>
-					<th>"._MULTIOPTIONS_LIMIT."</th>
-					<td><input type=\"text\" size=\"40\" name=\"surveys_fields[multi_vote_limit]\" id=\"title_field\" value=\"".$surveys_fields['multi_vote_limit']."\" class=\"inp-form\" />
+					<td><input type=\"text\" size=\"40\" name=\"surveys_fields[multi_vote]\" id=\"title_field\" value=\"".$surveys_fields['multi_vote']."\" class=\"inp-form\" />
 						".bubble_show(_MULTIOPTIONS_LIMIT_DESC)."
 					</td>
 				</tr>
@@ -734,7 +723,7 @@ if (check_admin_permission($module_name, false, true))
 					$contents .= "</td>					
 				</tr>
 				<tr>
-					<th>"._OPTIONS." <button class=\"add_field_button\">"._ADD_NEW_OPTION."</button></th>
+					<th>"._OPTIONS." <button type=\"button\" class=\"add_field_button\">"._ADD_NEW_OPTION."</button></th>
 					<td>
 						<div class=\"input_fields_wrap\">";
 						if(empty($surveys_fields['options']))
@@ -769,11 +758,6 @@ if (check_admin_permission($module_name, false, true))
 					<th>"._PUBLISH_AS_MAIN."</th>
 					<td><input type=\"radio\" name=\"surveys_fields[to_main]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $to_main_checked1 /><input type=\"radio\" name=\"surveys_fields[to_main]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $to_main_checked2 />
 					".bubble_show(_SET_TO_MAIN_AFTER_PUBLISH)."
-					</td>					
-				</tr>
-				<tr>
-					<th>"._VOTE_LIMIT_BY."</th>
-					<td><input type=\"checkbox\" name=\"surveys_fields[vote_limit][]\" value=\"1\" class=\"styled\" data-label=\""._COOKIE."\" $vote_limit_checked1 /><input type=\"checkbox\" name=\"surveys_fields[vote_limit][]\" value=\"2\" class=\"styled\" data-label=\""._IP."\" $vote_limit_checked2 />
 					</td>					
 				</tr>
 				<tr>

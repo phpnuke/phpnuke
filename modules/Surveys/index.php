@@ -36,9 +36,8 @@ function pollList()
 	
 	$nuke_surveys_cacheData = change_poll_status();
 	
-	$contents .="<div class=\"pollNuke\">";
-	$contents .= OpenTable(_POLLS_LIST);
-	$contents .= "<ul>";
+	$polls_data = array();
+	
 	foreach($nuke_surveys_cacheData as $pollID => $nuke_surveys_data)
 	{
 		if ($nuke_surveys_data['status'] != 1 || ($nuke_configs['multilingual'] == 1 && $nuke_surveys_data['planguage'] != "" && $nuke_configs['currentlang'] != $nuke_surveys_data['planguage'])) continue;
@@ -46,29 +45,42 @@ function pollList()
 		$pollTitle = filter($nuke_surveys_data['pollTitle'], "nohtml");
 		$pollUrl = filter($nuke_surveys_data['pollUrl'], "nohtml");
 		$voters = intval($nuke_surveys_data['voters']);
-		$planguage = intval($nuke_surveys_data['planguage']);
 		$poll_link = surveys_link($pollID, $pollTitle, $pollUrl);
-		
-		$contents .="
-		<li>
-			<a href=\"".LinkToGT($poll_link[0])."\">$pollTitle</a>
-			<span> ( 
-				<i class=\"glyphicon glyphicon-stats\"></i> 
-				<a href=\"".LinkToGT($poll_link[1])."\">"._RESULTS."</a>
-				- 
-				<i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : $voters "._VOTE."";
-				if(is_admin())
-				{
-					$contents .= "- <i class=\"glyphicon glyphicon-edit\"></i> <a href=\"".$admin_file.".php?op=surveys_admin&pollID=$pollID\">"._EDIT."</a>";
-				}
-		$contents .=")</span>
-		</li>";
+		$polls_data[$pollID] = array($pollTitle, $poll_link, $voters);
 	}
-	$contents .="</ul>";
-	$contents .= CloseTable();
-	$contents .="</div>";
-
-		
+	
+	if(file_exists("themes/".$nuke_configs['ThemeSel']."/pollList.php")) {
+		include("themes/".$nuke_configs['ThemeSel']."/pollList.php");
+	}elseif(function_exists("pollList_html")) {
+		$contents = pollList_html($polls_data);
+	}else {
+		$contents .="<div class=\"pollNuke\">";
+		$contents .= OpenTable(_POLLS_LIST);
+		$contents .= "<ul>";
+		foreach($polls_data as $pollID => $polls_data)
+		{
+			$contents .="
+			<li>
+				<a href=\"".LinkToGT($polls_data[1][0])."\">".$polls_data[0]."</a>
+				<span> ( 
+					<i class=\"glyphicon glyphicon-stats\"></i> 
+					<a href=\"".LinkToGT($polls_data[1][1])."\">"._RESULTS."</a>
+					- 
+					<i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : ".$polls_data[2]." "._VOTE."";
+					if(is_admin())
+					{
+						$contents .= "- <i class=\"glyphicon glyphicon-edit\"></i> <a href=\"".$admin_file.".php?op=surveys_admin&pollID=$pollID\">"._EDIT."</a>";
+					}
+			$contents .=")</span>
+			</li>";
+		}
+		$contents .="</ul>";
+		$contents .= CloseTable();
+		$contents .="</div>";
+	}
+	
+	$contents = $hooks->apply_filters("pollList_filter", $contents);
+	
 	$meta_tags = array(
 		"url" => LinkToGT("index.php?modname=Surveys"),
 		"title" => _SURVEYS,
@@ -128,7 +140,7 @@ function poll_show($pollUrl, $mode="")
 		header("location: ".LinkToGT("index.php?modname=$module_name")."");
 	
 	$contents ='';
-	if($mode == '')
+	if($mode == '' && (is_admin() || intval($poll_data['show_result']) == 1))
 		$contents .= pollMain($nuke_surveys_cacheData, $pollID);
 	else
 		$contents .= pollResults($nuke_surveys_cacheData, $pollID);
@@ -194,9 +206,10 @@ function poll_show($pollUrl, $mode="")
 		return $block_global_contents;
 	}, 10);	
 	
+	$contents = "<div class=\"surveys\">".$contents."</div>";
 	$contents = $hooks->apply_filters("poll_show", $contents);
 	
-	$html_output .= show_modules_boxes($module_name, "results", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), "<div class=\"surveys\">".$contents."</div>");
+	$html_output .= show_modules_boxes($module_name, "results", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	
 	include ("footer.php");
 }
@@ -208,21 +221,45 @@ function pollCollector($pollID, $vote_data)
 	
 	$row = $db->table(SURVEYS_TABLE)
 				->where('pollID', $pollID)
-				->first(['status', 'canVote']);
+				->first(['status', 'canVote', 'multi_vote']);
 				
 	if(intval($row['status']) == 0)
+	{
 		$response = json_encode(array(
 			"status" => "error",
 			"message" => _DEACTIVATED_POLL
 		));
+		die($response);
+	}
 	
 	if(intval($row['canVote']) == 0)
+	{
 		$response = json_encode(array(
 			"status" => "error",
 			"message" => _NOT_ALLOWED_VOTE
 		));
-	
+		die($response);
+	}
 	$vote_data = (!is_array($vote_data)) ? explode(",", $vote_data):$vote_data;
+	
+	if($row['multi_vote'] > 1)
+	{
+		$numvotes = 0;
+		foreach($vote_data as $voteID => $vote_val)
+		{
+			if($vote_val != 0)
+				$numvotes++;
+		}
+
+		if($numvotes > $row['multi_vote'])
+		{
+			$response = json_encode(array(
+				"status" => "error",
+				"message" => _MORE_THAN_ALLOWED_VOTE." -". $numvotes
+			));
+			die($response);
+		}
+	}
 	
 	$voted_ip_number = $db->table(SURVEYS_CHECK_TABLE)
 							->where('ip', $visitor_ip)
@@ -230,7 +267,10 @@ function pollCollector($pollID, $vote_data)
 							->select(['ip'])
 							->count();
 	$now_time = _NOWTIME;
-	if ($voted_ip_number == 0)
+	
+	$poll_cookie = $pn_Cookies->get('poll-'.$pollID);
+	
+	if (intval($poll_cookie) != 1 && $voted_ip_number == 0)
 	{		
 		$change = false;
 		$nuke_surveys_cacheData = change_poll_status();
@@ -264,7 +304,10 @@ function pollCollector($pollID, $vote_data)
 			
 			$pn_Cookies->set("poll-".$pollID,1,(365*24*3600));
 			cache_system("nuke_surveys");
-			$contents = pollResults('', $pollID, true);
+			if(is_admin() || intval($poll_data['show_result']) == 1)
+				$contents = pollResults('', $pollID, true);
+			else
+				$contents = _VOTE_SUCCUSS;
 			$response = json_encode(array(
 				"status" => "success",
 				"message" => $contents
