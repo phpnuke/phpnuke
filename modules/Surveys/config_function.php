@@ -116,7 +116,7 @@ function change_poll_status()
 
 function pollMain($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 {
-	global $module_name, $db, $userinfo, $visitor_ip, $nuke_configs, $pn_Cookies;
+	global $module_name, $db, $admin_file, $userinfo, $visitor_ip, $nuke_configs, $pn_Cookies, $hooks;
 	
 	if($nuke_surveys_cacheData == '')
 		$nuke_surveys_cacheData = change_poll_status();
@@ -206,12 +206,14 @@ function pollMain($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 		}
 	}
 	
+	$contents = $hooks->apply_filters("pollMain", $contents, $pollID, $in_block);
+	
 	return $contents;
 }
 
 function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 {
-	global $nuke_configs, $module_name, $visitor_ip, $db, $admin_file, $userinfo;
+	global $nuke_configs, $module_name, $visitor_ip, $db, $admin_file, $userinfo, $hooks;
 	
 	if($nuke_surveys_cacheData == '')
 		$nuke_surveys_cacheData = change_poll_status();
@@ -268,7 +270,7 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 		$other_polls[$last_pollID]['voters'] = intval($nuke_surveys_data['voters']);
 		$other_polls[$last_pollID]['show_voters_num'] = intval($nuke_surveys_data['show_voters_num']);
 		$other_polls[$last_pollID]['planguage'] = intval($nuke_surveys_data['planguage']);
-		$other_polls[$last_pollID]['poll_link'] = surveys_link($last_pollID, $pollTitle, $pollUrl);
+		$other_polls[$last_pollID]['poll_link'] = surveys_link($last_pollID, $nuke_surveys_data['pollTitle'], $nuke_surveys_data['pollUrl']);
 	}
 	
 	if(file_exists("themes/".$nuke_configs['ThemeSel']."/pollResult.php")) {
@@ -296,7 +298,7 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 		$contents .= "
 		</div>";
 		if($poll_data['show_voters_num'] && !$in_block)
-			$contents .= "<b>"._TOTALVOTES." $voters</b><br>";
+			$contents .= "<b>"._TOTALVOTES." ".$poll_data['voters']."</b><br>";
 		
 		if($in_block)
 		{
@@ -306,7 +308,7 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 						<i class=\"glyphicon glyphicon-stats\"></i> <a href=\"".$poll_data['poll_link'][1]."\">"._RESULTS."</a><br>
 						<i class=\"glyphicon glyphicon-list-alt\"></i> <a href=\"".LinkToGT("index.php?modname=Surveys")."\">"._SURVEYS."</a><br>
 						<p>";
-							if($poll_data['show_voters_num']) $contents .= "<br><i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : $voters راي<br>";
+							if($poll_data['show_voters_num']) $contents .= "<br><i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : ".$poll_data['voters']." "._VOTE."<br>";
 							$contents .= "<i class=\"glyphicon glyphicon-comment\"></i> <a href=\"".$poll_data['poll_link'][1]."#postcomments\">"._COMMENTS."</a><br>
 						</p>
 					</div>
@@ -315,7 +317,7 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 		if($voted_ip_number == 0)
 			 $contents .= "<div class=\"text-center\"><a href=\"".LinkToGT($poll_data['poll_link'][0])."\">"._POLL_PARTICIPATION."</a><br></div>";
 		
-		if(!$in_block)
+		if(!$in_block && !empty($other_polls))
 		{
 			$contents .= CloseTable();
 			$contents .="<div class=\"pollNuke\">";
@@ -346,6 +348,7 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 			$contents .="</div>";
 		}
 	}
+	$contents = $hooks->apply_filters("pollResults", $contents, $pollID, $in_block);
 	return $contents;
 }
 
