@@ -317,35 +317,38 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 		if($voted_ip_number == 0)
 			 $contents .= "<div class=\"text-center\"><a href=\"".LinkToGT($poll_data['poll_link'][0])."\">"._POLL_PARTICIPATION."</a><br></div>";
 		
-		if(!$in_block && !empty($other_polls))
+		if(!$in_block)
 		{
 			$contents .= CloseTable();
-			$contents .="<div class=\"pollNuke\">";
-			$contents .= OpenTable(_LAST5POLLS.$nuke_configs['sitename'], "info");
-			$contents .= "<ul>";
-			$key_counter = 0;
-			foreach($other_polls as $last_pollID => $nuke_surveys_data)
+			if(!empty($other_polls))
 			{
-				$contents .="
-				<li>
-					<a href=\"".LinkToGT($nuke_surveys_data['poll_link'][0])."\">$pollTitle</a>
-					<span> ( 
-						<i class=\"glyphicon glyphicon-stats\"></i> 
-						<a href=\"".LinkToGT($nuke_surveys_data['poll_link'][1])."\">"._RESULTS."</a>";
-						if($nuke_surveys_data['show_voters_num'])
-						$contents .=" - 
-						<i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : ".$nuke_surveys_data['voters']." "._VOTE."";
-						if(is_admin())
-						{
-							$contents .= " - <i class=\"glyphicon glyphicon-edit\"></i> <a href=\"".$admin_file.".php?op=surveys_admin&pollID=$last_pollID\">"._EDIT."</a>";
-						}
-				$contents .=")</span>
-				</li>";
+				$contents .="<div class=\"pollNuke\">";
+				$contents .= OpenTable(_LAST5POLLS.$nuke_configs['sitename'], "info");
+				$contents .= "<ul>";
+				$key_counter = 0;
+				foreach($other_polls as $last_pollID => $nuke_surveys_data)
+				{
+					$contents .="
+					<li>
+						<a href=\"".LinkToGT($nuke_surveys_data['poll_link'][0])."\">$pollTitle</a>
+						<span> ( 
+							<i class=\"glyphicon glyphicon-stats\"></i> 
+							<a href=\"".LinkToGT($nuke_surveys_data['poll_link'][1])."\">"._RESULTS."</a>";
+							if($nuke_surveys_data['show_voters_num'])
+							$contents .=" - 
+							<i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : ".$nuke_surveys_data['voters']." "._VOTE."";
+							if(is_admin())
+							{
+								$contents .= " - <i class=\"glyphicon glyphicon-edit\"></i> <a href=\"".$admin_file.".php?op=surveys_admin&pollID=$last_pollID\">"._EDIT."</a>";
+							}
+					$contents .=")</span>
+					</li>";
+				}
+				$contents .="</ul>
+				<a href=\"".LinkToGT("index.php?modname=Surveys")."\"><b>"._MOREPOLLS."</b></a>";
+				$contents .= CloseTable();
+				$contents .="</div>";
 			}
-			$contents .="</ul>
-			<a href=\"".LinkToGT("index.php?modname=Surveys")."\"><b>"._MOREPOLLS."</b></a>";
-			$contents .= CloseTable();
-			$contents .="</div>";
 		}
 	}
 	$contents = $hooks->apply_filters("pollResults", $contents, $pollID, $in_block);

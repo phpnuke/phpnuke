@@ -1,12 +1,18 @@
 <?php
-/**
- *
- * This file is part of the PHP-NUKE Software package.
- *
- * @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
- * @license GNU General Public License, version 2 (GPL-2.0)
- *
- */
+
+/************************************************************************/
+/* PHP-NUKE: Web Portal System                                          */
+/* Part: blocks				                                            */
+/* Part Name: block-ads		                                            */
+/* ===========================                                          */
+/*                                                                      */
+/* Copyright (c) 2006 by Francisco Burzi                                */
+/* http://phpnuke.org                                                   */
+/*                                                                      */
+/* This program is free software. You can redistribute it and/or modify */
+/* it under the terms of the GNU General Public License as published by */
+/* the Free Software Foundation; either version 2 of the License.       */
+/************************************************************************/
 
 if (!defined('BLOCK_FILE'))
 {

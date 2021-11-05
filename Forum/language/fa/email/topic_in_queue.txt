@@ -1,13 +1,13 @@
-Subject: موضوع نیاز به تأیید - "{TOPIC_TITLE}"
+Subject: Topic moderation notification - "{TOPIC_TITLE}"
 
-سلام {USERNAME}،
+Hello {USERNAME},
 
-موضوع "{TOPIC_TITLE}" در سایت "{SITENAME}" نیاز به تأیید دارد.
+You are receiving this notification because the topic "{TOPIC_TITLE}" at "{SITENAME}" needs approval.
 
-برای مشاهده موضوع بر روی لینک زیر کلیک کنید:
+If you want to view the topic, click the following link:
 {U_VIEW_TOPIC}
 
-برای مشاهده انجمن بر روی لینک زیر کلیک کنید:
+If you want to view the forum, click the following link:
 {U_FORUM}
 
 {EMAIL_SIG}

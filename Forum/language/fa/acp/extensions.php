@@ -39,68 +39,68 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	'EXTENSION'					=> 'افزونه',
-	'EXTENSIONS'				=> 'افزونه‌ها',
-	'EXTENSIONS_ADMIN'			=> 'مدیریت افزونه‌ها',
-	'EXTENSIONS_EXPLAIN'		=> 'مدیریت افزونه ابزاریست در انجمن شما که می‌توانید افزونه‌های نصب شده را مدیریت ، مشاهده و اطلاعات آن‌ها را بررسی کنید.',
+	'EXTENSIONS'				=> 'افزونه ها',
+	'EXTENSIONS_ADMIN'			=> 'مدیریت افزونه ها',
+	'EXTENSIONS_EXPLAIN'		=> 'مدیریت افزونه ابزاریست در انجمن شما که میتوانید افزونه های نصب شده را مدیریت ، مشاهده و اطلاعات آنها را بررسی کنید.',
 	'EXTENSION_INVALID_LIST'	=> 'افزونه “%s” معتبر نیست.<br />%s<br /><br />',
 	'EXTENSION_NOT_AVAILABLE'	=> 'افزونه انتخابی در انجمن شما قابل دسترس نیست. لطفا نسخه phpBB و php انجمن خود را بررسی کنید. (مشاهده صفحه جزئیات).',
-	'EXTENSION_DIR_INVALID'		=> 'افزونه انتخابی در مسیر نامعتبری بارگذاری شده است و قابل فعال سازی نیست.',
-	'EXTENSION_NOT_ENABLEABLE'	=> 'افزونه انتخابی قابل فعال سازی نمی‌باشد, لطفا موارد لازم را بررسی نمایید.',
+	'EXTENSION_DIR_INVALID'		=> 'افزونه انتخابی در مسیر نامعتبری آپلود شده است و قابل فعال سازی نیست.',
+	'EXTENSION_NOT_ENABLEABLE'	=> 'افزونه انتخابی قابل فعال سازی نمیباشد, لطفا موارد لازم را بررسی نمایید.',
 	'EXTENSION_NOT_INSTALLED'	=> 'افزونه %s دردسترس نیست. لطفا بررسی کنید که به درستی نصب شده است.',
 
 
 	'DETAILS'				=> 'جزئیات',
 
-	'EXTENSIONS_DISABLED'	=> 'افزونه‌های غیرفعال',
-	'EXTENSIONS_ENABLED'	=> 'افزونه‌های فعال',
+	'EXTENSIONS_DISABLED'	=> 'افزونه های غیر فعال',
+	'EXTENSIONS_ENABLED'	=> 'افزونه های فعال',
 
 	'EXTENSION_DELETE_DATA'	=> 'حذف کلی اطلاعات',
-	'EXTENSION_DISABLE'		=> 'غیرفعال',
+	'EXTENSION_DISABLE'		=> 'غیر فعال',
 	'EXTENSION_ENABLE'		=> 'فعال',
 
-	'EXTENSION_DELETE_DATA_EXPLAIN'	=> 'حذف کلی اطلاعات افزونه به معنی حذف کامل داده‌ها و تنظیمات مربوط به آن است. اما فایل‌ها و پوشه های افزونه همچنان باقیست و میتوان دوباره آن را فعال کرد.',
-	'EXTENSION_DISABLE_EXPLAIN'		=> 'غیرفعال کردن افزونه به معنای حفظ داده‌ها ، فایل‌ها و تنظیمات است اما عملکرد و کارایی افزونه تا فعال کردن مجدد از بین خواهد رفت.',
+	'EXTENSION_DELETE_DATA_EXPLAIN'	=> 'حذف کلی اطلاعات افزونه به معنی حذف کامل داده ها و تنظیمات مربوط به آن است. اما فایل ها و پوشه های افزونه همچنان باقیست و میتوان دوباره آن را فعال کرد.',
+	'EXTENSION_DISABLE_EXPLAIN'		=> 'غیر فعال کردن افزونه به معنای حفظ داده ها ، فایل ها و تنظیمات است اما عملکرد و کارایی افزونه تا فعال کردن مجدد از بین خواهد رفت.',
 	'EXTENSION_ENABLE_EXPLAIN'		=> 'فعال کردن افزونه به شما اجازه استفاده از آن را میدهد.',
 
-	'EXTENSION_DELETE_DATA_IN_PROGRESS'	=> 'داده‌های افزونه در حال حذف می باشند. لطفا تا کامل شدن مراحل حذف ،این صفحه را ترک یا رفرش نکنید.',
-	'EXTENSION_DISABLE_IN_PROGRESS'	=> 'افزونه در حال غیرفعال شدن است. تا کامل شدن مراحل ، لطفا این صفحه را ترک یا رفرش نکنید.',
+	'EXTENSION_DELETE_DATA_IN_PROGRESS'	=> 'داده های افزونه در حال حذف می باشند. لطفا تا کامل شدن مراحل حذف ،این صفحه را ترک یا رفرش نکنید.',
+	'EXTENSION_DISABLE_IN_PROGRESS'	=> 'افزونه در حال غیر فعال شدن است. تا کامل شدن مراحل ، لطفا این صفحه را ترک یا رفرش نکنید.',
 	'EXTENSION_ENABLE_IN_PROGRESS'	=> 'افزونه در حال فعال شدن است. تا کامل شدن مراحل لطفا این صفحه را ترک یا رفرش نکنید.',
 
-	'EXTENSION_DELETE_DATA_SUCCESS'	=> 'داده‌های مربوط به افزونه با موفقیت حذف شد.',
-	'EXTENSION_DISABLE_SUCCESS'		=> 'افزونه با موفقیت غیرفعال شد.',
+	'EXTENSION_DELETE_DATA_SUCCESS'	=> 'داده های مربوط به افزونه با موفقیت حذف شد.',
+	'EXTENSION_DISABLE_SUCCESS'		=> 'افزونه با موفقیت غیر فعال شد.',
 	'EXTENSION_ENABLE_SUCCESS'		=> 'افزونه با موفقیت فعال شد.',
 
-	'EXTENSION_NAME'			=> 'افزونه‌ها',
+	'EXTENSION_NAME'			=> 'افزونه ها',
 	'EXTENSION_ACTIONS'			=> 'عملکرد',
-	'EXTENSION_OPTIONS'			=> 'گزینه‌ها',
+	'EXTENSION_OPTIONS'			=> 'گزینه ها',
 	'EXTENSION_INSTALL_HEADLINE'=> 'نصب افزونه',
 	'EXTENSION_INSTALL_EXPLAIN'	=> '<ol>
 			<li>دانلود یک افزونه از پایگاه phpBB</li>
-			<li>در آوردن از حالت فشرده و بارگذاری فایل‌ها در پوشه <samp>ext/</samp> واقع در تالار phpBB شما</li>
-			<li>فعال سازی افزونه واقع در بخش مدیریت افزونه‌ها</li>
+			<li>در آوردن از حالت فشرده و اپلود فایل ها در پوشه <samp>ext/</samp> واقع در دایرکتوری phpBB</li>
+			<li>فعال سازی افزونه واقع در بخش مدیریت افزونه ها</li>
 		</ol>',
-	'EXTENSION_UPDATE_HEADLINE'	=> 'به‌روز رسانی افزونه',
+	'EXTENSION_UPDATE_HEADLINE'	=> 'مراحل به روز رسانی افزونه',
 	'EXTENSION_UPDATE_EXPLAIN'	=> '<ol>
-			<li>غیرفعال کردن افزونه</li>
-			<li>حذف فایل‌های افزونه</li>
-			<li>بارگذاری فایل‌های جدید</li>
+			<li>غیر فعال کردن افزونه</li>
+			<li>حذف فایل های افزونه آپلود شده</li>
+			<li>بارگزاری فایل های جدید</li>
 			<li>فعال سازی افزونه</li>
 		</ol>',
-	'EXTENSION_REMOVE_HEADLINE'	=> 'مراحل حذف کامل افزونه از تالار',
+	'EXTENSION_REMOVE_HEADLINE'	=> 'مراحل حذف کامل افزونه از انجمن',
 	'EXTENSION_REMOVE_EXPLAIN'	=> '<ol>
-			<li>غیرفعال کردن افزونه</li>
-			<li>حذف داده‌های افزونه</li>
-			<li>حذف فایل‌های افزونه</li>
+			<li>غیر فعال کردن افزونه</li>
+			<li>حذف داده های افزونه</li>
+			<li>حذف فایل های افزونه آپلود شده</li>
 		</ol>',
 
-	'EXTENSION_DELETE_DATA_CONFIRM'	=> 'آیا از حذف داده‌های مرتبط با افزونه “%s” مطمئنید؟<br /><br />این کار باعث میشود تمامی تنظیمات مربوط به افزونه از بین برود.',
-	'EXTENSION_DISABLE_CONFIRM'		=> 'آیا از غیرفعال کردن افزونه “%s” مطمئنید؟',
-	'EXTENSION_ENABLE_CONFIRM'		=> 'آیا از فعال کردن افزونه “%s” مطمئنید؟',
-	'EXTENSION_FORCE_UNSTABLE_CONFIRM'	=> 'آیا از استفاده کردن اجباری از این نسخه ناپایدار مطمئنید؟',
+	'EXTENSION_DELETE_DATA_CONFIRM'	=> 'آیا از حذف داده های مرتبط با افزونه “%s” اطمینان دارید؟<br /><br />این کار باعث میشود تمامی تنظیمات مربوط به افزونه از بین برود.',
+	'EXTENSION_DISABLE_CONFIRM'		=> 'آیا از غیر فعال کردن افزونه “%s” اطمینان دارید؟',
+	'EXTENSION_ENABLE_CONFIRM'		=> 'آیا از فعال کردن افزونه “%s” اطمینان دارید؟',
+	'EXTENSION_FORCE_UNSTABLE_CONFIRM'	=> 'آیا از استفاده کردن اجباری این افزونه اطمینان دارید؟',
 
-	'RETURN_TO_EXTENSION_LIST'	=> 'بازگشت به لیست افزونه‌ها',
+	'RETURN_TO_EXTENSION_LIST'	=> 'بازگشت به لیست افزونه ها',
 
-	'EXT_DETAILS'			=> 'جزئیات افزونه',
+	'EXT_DETAILS'			=> 'جزئیات افزونه ها',
 	'DISPLAY_NAME'			=> 'نمایش نام',
 	'CLEAN_NAME'			=> 'نام',
 	'TYPE'					=> 'نوع',
@@ -112,8 +112,8 @@ $lang = array_merge($lang, array(
 	'LICENSE'				=> 'لایسنس',
 
 	'REQUIREMENTS'			=> 'پیش نیاز',
-	'PHPBB_VERSION'			=> 'phpBB نسخه',
-	'PHP_VERSION'			=> 'PHP نسخه',
+	'PHPBB_VERSION'			=> 'phpBB ورژن',
+	'PHP_VERSION'			=> 'PHP ورژن',
 	'AUTHOR_INFORMATION'	=> 'اطلاعات نویسنده',
 	'AUTHOR_NAME'			=> 'نام',
 	'AUTHOR_EMAIL'			=> 'ایمیل',
@@ -127,10 +127,10 @@ $lang = array_merge($lang, array(
 	'NO_VERSIONCHECK'		=> 'هیچ اطلاعاتی برای بررسی نسخه دریافت نشد.',
 
 	'VERSIONCHECK_FORCE_UPDATE_ALL'		=> 'بررسی مجدد نسخه',
-	'FORCE_UNSTABLE'					=> 'بررسی همیشگی جهت نسخه‌های ناپایدار',
+	'FORCE_UNSTABLE'					=> 'بررسی همیشگی جهت نسخه های ناپایدار',
 	'EXTENSIONS_VERSION_CHECK_SETTINGS'	=> 'تنظیمات بررسی نسخه',
 
-	'BROWSE_EXTENSIONS_DATABASE'		=> 'جست‌وجو در پایگاه افزونه‌ها',
+	'BROWSE_EXTENSIONS_DATABASE'		=> 'جستجو در پایگاه افزونه ها',
 	
 	'META_FIELD_NOT_SET'	=> 'بخش متا دیتا %s تنظیم نشده است.',
 	'META_FIELD_INVALID'	=> 'بخش متا %s نامعتبر است.',

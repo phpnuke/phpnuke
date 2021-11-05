@@ -339,7 +339,7 @@
                 ""
             ],
             "bbcode_helpline": [
-                "VCHAR_UNI",
+                "TEXT_UNI",
                 ""
             ],
             "display_on_posting": [

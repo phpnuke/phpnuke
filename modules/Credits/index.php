@@ -294,7 +294,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			"user_id" => $userinfo['user_id'],
 			"factor_number" => _NOWTIME,
 			"create_time" => _NOWTIME,
-			"update_time" => '',
+			"update_time" => _NOWTIME,
 			"status" => _CREDIT_STATUS_NORMAL,
 			"type" => $transaction_type,
 			"gateway" => ($credit_method != 1) ? '':$credit_gateway,

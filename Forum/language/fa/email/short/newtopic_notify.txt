@@ -1,12 +1,13 @@
-Subject: موضوع جدید در "{FORUM_NAME}"
-لیست انجمن های عضو نشده: <{U_STOP_WATCHING_FORUM}>
+Subject: New topic notification - "{FORUM_NAME}"
 
-سلام {USERNAME}،
+Hello {USERNAME},
 
-انجمن "{FORUM_NAME}" یک موضوع جدید "{TOPIC_TITLE}"<!-- IF AUTHOR_NAME !== '' --> نوشته شده توسط {AUTHOR_NAME}<!-- ENDIF --> را پس از آخرین بازدید شما از سایت "{SITENAME}" دریافت کرده است. تا زمانی که از موضوع بازدید نکنید، اطلاعیه بیشتری ارسال نمیشود.
+You are receiving this notification because you are watching the forum "{FORUM_NAME}" at "{SITENAME}". This forum has received a new topic<!-- IF AUTHOR_NAME !== '' --> by {AUTHOR_NAME}<!-- ENDIF --> since your last visit, "{TOPIC_TITLE}". You can use the following link to view the forum, no more notifications will be sent until you visit the forum.
+
 {U_FORUM}
 
-برای لغو دریافت اطلاعیه ها بر روی لینک زیر کلیک کنید:
+If you no longer wish to watch this forum you can either click the "Unsubscribe forum" link found in the forum above, or by clicking the following link:
+
 {U_STOP_WATCHING_FORUM}
 
 {EMAIL_SIG}

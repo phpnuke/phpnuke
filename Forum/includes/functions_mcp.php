@@ -51,8 +51,18 @@ function phpbb_module_warn_url($mode, $module_row)
 	{
 		global $forum_id, $post_id;
 
-		$url_extra = ($forum_id) ? "&amp;f=$forum_id" : '';
-		$url_extra .= ($post_id) ? "&amp;p=$post_id" : '';
+		if ($post_id)
+		{
+			$url_extra = "&amp;p=$post_id";
+		}
+		else if ($forum_id)
+		{
+			$url_extra = "&amp;f=$forum_id";
+		}
+		else
+		{
+			$url_extra = '';
+		}
 
 		return $url_extra;
 	}
@@ -93,10 +103,22 @@ function phpbb_extra_url()
 {
 	global $forum_id, $topic_id, $post_id, $report_id, $user_id;
 
-	$url_extra = '';
-	$url_extra .= ($forum_id) ? "&amp;f=$forum_id" : '';
-	$url_extra .= ($topic_id) ? "&amp;t=$topic_id" : '';
-	$url_extra .= ($post_id) ? "&amp;p=$post_id" : '';
+	if ($post_id)
+	{
+		$url_extra = "&amp;p=$post_id";
+	}
+	else if ($topic_id)
+	{
+		$url_extra = "&amp;t=$topic_id";
+	}
+	else if ($forum_id)
+	{
+		$url_extra = "&amp;f=$forum_id";
+	}
+	else
+	{
+		$url_extra = '';
+	}
 	$url_extra .= ($user_id) ? "&amp;u=$user_id" : '';
 	$url_extra .= ($report_id) ? "&amp;r=$report_id" : '';
 
@@ -383,7 +405,7 @@ function phpbb_get_pm_data($pm_ids)
 /**
 * sorting in mcp
 *
-* @param string $where_sql should either be WHERE (default if ommited) or end with AND or OR
+* $where_sql should either be WHERE (default if ommited) or end with AND or OR
 *
 * $mode reports and reports_closed: the $where parameters uses aliases p for posts table and r for report table
 * $mode unapproved_posts: the $where parameters uses aliases p for posts table and t for topic table
@@ -684,7 +706,7 @@ function phpbb_mcp_sorting($mode, &$sort_days_val, &$sort_key_val, &$sort_dir_va
 * @param	string	$table			The table to find the ids in
 * @param	string	$sql_id			The ids relevant column name
 * @param	array	$acl_list		A list of permissions the user need to have
-* @param	mixed	$singe_forum	Limit to one forum id (int) or the first forum found (true)
+* @param	mixed	$single_forum	Limit to one forum id (int) or the first forum found (true)
 *
 * @return	mixed	False if no ids were able to be retrieved, true if at least one id left.
 *					Additionally, this value can be the forum_id assigned if $single_forum was set.

@@ -133,7 +133,7 @@ function custom_jquery(nuke_options)
 	
 	var inputs = $('body input.styled:not(.disabled)').each(function()
 	{
-		$(this).prettyCheckable({labelPosition:((options.nuke_lang == 'farsi' || options.nuke_lang == 'arabic') ? 'left':'right')});
+		$(this).prettyCheckable({labelPosition:'left'});
 	});
 
 		

@@ -34,22 +34,21 @@ final class Versions
      */
     const VERSIONS          = array (
   'bantu/ini-get-wrapper' => 'v1.0.1@4770c7feab370c62e23db4f31c112b7c6d90aee2',
-  'composer/package-versions-deprecated' => '1.11.99.1@7413f0b55a051e89485c5cb9f765fe24bb02a7b6',
+  'composer/package-versions-deprecated' => '1.11.99.3@fff576ac850c045158a250e7e27666e146e78d18',
   'google/recaptcha' => '1.2.4@614f25a9038be4f3f2da7cbfd778dc5b357d2419',
   'guzzlehttp/guzzle' => '6.5.5@9d4290de1cfd701f38099ef7e183b64b4b7b0c5e',
   'guzzlehttp/promises' => '1.4.1@8e7d04f1f6450fef59366c399cfad4b9383aa30d',
-  'guzzlehttp/psr7' => '1.7.0@53330f47520498c0ae1f61f7e2c90f55690c06a3',
+  'guzzlehttp/psr7' => '1.8.2@dc960a912984efb74d0a90222870c72c87f10c91',
   'lusitanian/oauth' => 'v0.8.11@fc11a53db4b66da555a6a11fce294f574a8374f9',
   'marc1706/fast-image-size' => 'v1.1.6@3a3a2b036be20f43fa06ce00dfa754df503e6684',
   'ocramius/proxy-manager' => '2.1.1@e18ac876b2e4819c76349de8f78ccc8ef1554cd7',
-  'patchwork/utf8' => 'v1.3.3@e1fa4d4a57896d074c9a8d01742b688d5db4e9d5',
   'psr/container' => '1.0.0@b7ce3b176482dbbc1245ebf52b181af44c2cf55f',
   'psr/http-message' => '1.0.1@f6561bf28d520154e4b0ec72be95418abe6d9363',
-  'psr/log' => '1.1.3@0f73288fd15629204f9d42b7055f72dacbe811fc',
+  'psr/log' => '1.1.4@d49695b909c3b7628b6289db5479a1c204601f11',
   'ralouphie/getallheaders' => '3.0.3@120b605dfeb996808c31b6477290a714d356e822',
-  's9e/regexp-builder' => '1.4.4@605b33841a766abd40ba3d07c15d0f62b5e7f033',
+  's9e/regexp-builder' => '1.4.5@45992e3389e0179672f3a3605d66891a8b64918c',
   's9e/sweetdom' => '2.0.0@5fc62bc1f4756650924e5cd1b429afcf34542722',
-  's9e/text-formatter' => '2.8.4@7856f66f4cfaf1402b8ec30c0f0ba124da4e9b76',
+  's9e/text-formatter' => '2.10.0@00df71d0a803c041efa320ce2f2c0e56c1a6fca9',
   'symfony/config' => 'v3.4.47@bc6b3fd3930d4b53a60b42fe2ed6fc466b75f03f',
   'symfony/console' => 'v3.4.47@a10b1da6fc93080c180bba7219b5ff5b7518fe81',
   'symfony/debug' => 'v3.4.47@ab42889de57fdfcfcc0759ab102e2fd4ea72dcae',
@@ -58,14 +57,14 @@ final class Versions
   'symfony/filesystem' => 'v3.4.47@e58d7841cddfed6e846829040dca2cca0ebbbbb3',
   'symfony/finder' => 'v3.4.47@b6b6ad3db3edb1b4b1c1896b1975fb684994de6e',
   'symfony/http-foundation' => 'v3.4.47@b9885fcce6fe494201da4f70a9309770e9d13dc8',
-  'symfony/http-kernel' => 'v3.4.47@a98a4c30089e6a2d52a9fa236f718159b539f6f5',
-  'symfony/polyfill-ctype' => 'v1.22.1@c6c942b1ac76c82448322025e084cadc56048b4e',
-  'symfony/polyfill-intl-idn' => 'v1.22.1@2d63434d922daf7da8dd863e7907e67ee3031483',
-  'symfony/polyfill-intl-normalizer' => 'v1.22.1@43a0283138253ed1d48d352ab6d0bdb3f809f248',
-  'symfony/polyfill-mbstring' => 'v1.22.1@5232de97ee3b75b0360528dae24e73db49566ab1',
+  'symfony/http-kernel' => 'v3.4.49@5aa72405f5bd5583c36ed6e756acb17d3f98ac40',
+  'symfony/polyfill-ctype' => 'v1.23.0@46cd95797e9df938fdd2b03693b5fca5e64b01ce',
+  'symfony/polyfill-intl-idn' => 'v1.23.0@65bd267525e82759e7d8c4e8ceea44f398838e65',
+  'symfony/polyfill-intl-normalizer' => 'v1.23.0@8590a5f561694770bdcd3f9b5c69dde6945028e8',
+  'symfony/polyfill-mbstring' => 'v1.23.1@9174a3d80210dca8daa7f31fec659150bbeabfc6',
   'symfony/polyfill-php56' => 'v1.20.0@54b8cd7e6c1643d78d011f3be89f3ef1f9f4c675',
   'symfony/polyfill-php70' => 'v1.20.0@5f03a781d984aae42cebd18e7912fa80f02ee644',
-  'symfony/polyfill-php72' => 'v1.22.1@cc6e6f9b39fe8075b3dabfbaf5b5f645ae1340c9',
+  'symfony/polyfill-php72' => 'v1.23.0@9a142215a36a3888e30d0a9eeea9766764e96976',
   'symfony/process' => 'v3.4.47@b8648cf1d5af12a44a51d07ef9bf980921f15fca',
   'symfony/proxy-manager-bridge' => 'v3.4.47@25351bb4d5a60cfeddbaf6cf6faebd3a700e2ff4',
   'symfony/routing' => 'v3.4.47@3e522ac69cadffd8131cc2b22157fa7662331a6c',
@@ -74,8 +73,8 @@ final class Versions
   'twig/twig' => 'v2.13.1@57e96259776ddcacf1814885fc3950460c8e18ef',
   'zendframework/zend-code' => '3.4.1@268040548f92c2bfcba164421c1add2ba43abaaa',
   'zendframework/zend-eventmanager' => '3.2.1@a5e2583a211f73604691586b8406ff7296a946dd',
-  'phpbb/phpbb-core' => '3.3.x-dev@782b0758efb00f6bf0698c3a71489355e5893d94',
-  'phpbb/phpbb' => '3.3.x-dev@782b0758efb00f6bf0698c3a71489355e5893d94',
+  'phpbb/phpbb-core' => '3.3.x-dev@ceca69d121fbb5b5952a9f65eb567e54030aaca7',
+  'phpbb/phpbb' => '3.3.x-dev@ceca69d121fbb5b5952a9f65eb567e54030aaca7',
 );
 
     private function __construct()
@@ -90,7 +89,7 @@ final class Versions
      */
     public static function rootPackageName() : string
     {
-        if (!class_exists(InstalledVersions::class, false) || !InstalledVersions::getRawData()) {
+        if (!self::composer2ApiUsable()) {
             return self::ROOT_PACKAGE_NAME;
         }
 
@@ -108,7 +107,7 @@ final class Versions
      */
     public static function getVersion(string $packageName): string
     {
-        if (class_exists(InstalledVersions::class, false) && InstalledVersions::getRawData()) {
+        if (self::composer2ApiUsable()) {
             return InstalledVersions::getPrettyVersion($packageName)
                 . '@' . InstalledVersions::getReference($packageName);
         }
@@ -120,5 +119,26 @@ final class Versions
         throw new OutOfBoundsException(
             'Required package "' . $packageName . '" is not installed: check your ./vendor/composer/installed.json and/or ./composer.lock files'
         );
+    }
+
+    private static function composer2ApiUsable(): bool
+    {
+        if (!class_exists(InstalledVersions::class, false)) {
+            return false;
+        }
+
+        if (method_exists(InstalledVersions::class, 'getAllRawData')) {
+            $rawData = InstalledVersions::getAllRawData();
+            if (count($rawData) === 1 && count($rawData[0]) === 0) {
+                return false;
+            }
+        } else {
+            $rawData = InstalledVersions::getRawData();
+            if ($rawData === []) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -885,6 +885,7 @@ CREATE TABLE `{NUKEPREFIX}surveys` (
   `options` text COLLATE utf8mb4_unicode_ci,
   `multi_vote` int(2) NOT NULL DEFAULT '1',
   `show_voters_num` tinyint(1) NOT NULL DEFAULT '0',
+  `show_result` tinyint(1) NOT NULL DEFAULT '1',
   `permissions` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`pollID`),
   KEY `pollID` (`pollID`),

@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
 * @package   s9e\RegexpBuilder
-* @copyright Copyright (c) 2016-2020 The s9e authors
+* @copyright Copyright (c) 2016-2021 The s9e authors
 * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
 */
 namespace s9e\RegexpBuilder;
@@ -26,7 +26,7 @@ class Escaper
 	/**
 	* @param string $delimiter Delimiter used in the final regexp
 	*/
-	public function __construct($delimiter = '/')
+	public function __construct(string $delimiter = '/')
 	{
 		foreach (str_split($delimiter, 1) as $char)
 		{
@@ -41,9 +41,9 @@ class Escaper
 	* @param  string $char Original character
 	* @return string       Escaped character
 	*/
-	public function escapeCharacterClass($char)
+	public function escapeCharacterClass(string $char): string
 	{
-		return (isset($this->inCharacterClass[$char])) ? $this->inCharacterClass[$char] : $char;
+		return $this->inCharacterClass[$char] ?? $char;
 	}
 
 	/**
@@ -52,8 +52,8 @@ class Escaper
 	* @param  string $char Original character
 	* @return string       Escaped character
 	*/
-	public function escapeLiteral($char)
+	public function escapeLiteral(string $char): string
 	{
-		return (isset($this->inLiteral[$char])) ? $this->inLiteral[$char] : $char;
+		return $this->inLiteral[$char] ?? $char;
 	}
 }

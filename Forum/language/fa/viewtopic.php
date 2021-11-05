@@ -40,64 +40,64 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'APPROVE'							=> 'تأیید',
+	'APPROVE'								=> 'تایید',
 	'ATTACHMENT'						=> 'پیوست',
-	'ATTACHMENT_FUNCTIONALITY_DISABLED'	=> 'قابلیت پیوست غیرفعال شده است.',
+	'ATTACHMENT_FUNCTIONALITY_DISABLED'	=> 'بخش پیوست غیرفعال شده است.',
 
-	'BOOKMARK_ADDED'		=> 'موضوع با موفقیت نشانه‌گذاری شد.',
-	'BOOKMARK_ERR'			=> 'نشانه‌گذاری  این موضوع با شکست مواجه شد. لطفا مجددا تلاش کنید.',
-	'BOOKMARK_REMOVED'		=> 'نشانه‌گذاری موضوع با موفقیت حذف شد.',
-	'BOOKMARK_TOPIC'		=> 'نشانه‌گذاری موضوع',
-	'BOOKMARK_TOPIC_REMOVE'	=> 'حذف از نشانه‌گذاری ها',
+	'BOOKMARK_ADDED'		=> 'مبحث با موفقیت نشانه گذاری شد.',
+	'BOOKMARK_ERR'			=> 'نشان گذاری (Bookmark) این موضوع با شکست مواجه شد.لطفا مجددا تلاش کنید',
+	'BOOKMARK_REMOVED'		=> 'نشانه گذاری مبحث با موفقیت حذف شد.',
+	'BOOKMARK_TOPIC'		=> 'نشانه گذاری مبحث',
+	'BOOKMARK_TOPIC_REMOVE'	=> 'حذف از نشانه گذاری ها',
 	'BUMPED_BY'				=> 'آخرین بالا اندازی (Bump) توسط %1$s در %2$s.',
-	'BUMP_TOPIC'			=> 'بالا انداختن (Bump کردن)',
+	'BUMP_TOPIC'			=> 'بالا انداختن (Bump کردن) ',
 
 	'DELETE_TOPIC'			=> 'حذف موضوع',
-	'DELETED_INFORMATION'	=> 'حذف شده توسط %1$s در %2$s',
-	'DISAPPROVE'			=> 'تأیید نشده',
-	'DOWNLOAD_NOTICE'		=> 'شما برای مشاهده فایل پیوست شده در این پست، دسترسی ندارید.',
+	'DELETED_INFORMATION'	=> 'حذف شده توسط %1$s در تاریخ %2$s',
+	'DISAPPROVE'					=> 'تایید نشده',
+	'DOWNLOAD_NOTICE'		=> 'شما دسترسی جهت مشاهده فایل پیوست این پست را ندارید.',
 
 	'EDITED_TIMES_TOTAL'	=> array(
-		1	=> 'آخرین ویرایش توسط %2$s در %3$s، در مجموع %1$d بار ویرایش شده است.',
-		2	=> 'آخرین ویرایش توسط %2$s در %3$s، در مجموع %1$d بار ویرایش شده است.',
+		1	=> 'آخرین ويرايش توسط %1$s on %2$s, ويرايش شده در %3$d.',
+		2	=> 'آخرین ويرايش توسط %1$s on %2$s, ويرايش شده در %3$d.',
 	),
 	'EMAIL_TOPIC'			=> 'ارسال به دوستان',
-	'ERROR_NO_ATTACHMENT'	=> 'پیوست انتخاب شده دیگر موجود نیست.',
+	'ERROR_NO_ATTACHMENT'	=> 'ضمیمه انتخاب شده دیگر موجود نیست.',
 
 	'FILE_NOT_FOUND_404'	=> 'فایل <strong>%s</strong> موجود نیست.',
 	'FORK_TOPIC'			=> 'کپی موضوع',
 	'FULL_EDITOR'			=> 'ارسال پیشرفته و پیش نمایش',
 
-	'LINKAGE_FORBIDDEN'		=> 'شما مجاز به مشاهده، بارگیری یا پیوند از/به این سایت نیستید.',
-	'LOGIN_NOTIFY_TOPIC'	=> 'شما در مورد این موضوع مطلع شده اید، لطفاً برای مشاهده آن وارد شوید.',
+	'LINKAGE_FORBIDDEN'		=> 'شما اجازه نمایش،دریافت یا لینک دادن از/به این سایت را ندارید.',
+	'LOGIN_NOTIFY_TOPIC'	=> 'شما از این تاپیک مطلع شدید.برای مشاهده باید با شناسه کاربری خود وارد شوید.',
 	'LOGIN_VIEWTOPIC'		=> 'برای مشاهده این موضوع حتما باید عضو شوید و با شناسه کاربری خود وارد شوید.',
 
-	'MAKE_ANNOUNCE'				=> 'تغییر به ”اطلاعیه“',
-	'MAKE_GLOBAL'				=> 'تغییر به ”اطلاعیه سراسری“',
-	'MAKE_NORMAL'				=> 'تغییر به ”موضوع استاندارد“',
-	'MAKE_STICKY'				=> 'تغییر به ”سنجاق شده“',
+	'MAKE_ANNOUNCE'				=> 'تغییر به "اطلاعیه"',
+	'MAKE_GLOBAL'				=> 'تغيير به “اطلاعيه کلي (درهمه انجمن ها)”',
+	'MAKE_NORMAL'				=> 'تغيير به “مبحث استاندارد”',
+	'MAKE_STICKY'				=> 'تغيير به “مهم”',
 	'MAX_OPTIONS_SELECT'		=> array(
-		1	=> 'شما می‌توانید <strong>%d</strong> گزینه را انتخاب نمایید',
-		2	=> 'شما می‌توانید حداکثر تا <strong>%d</strong> گزینه را انتخاب نمایید',
+		1	=> 'شما می توانید حداکثر تا <strong>%d</strong> گزینه را انتخاب نمایید.',
+		2	=> 'شما مي توانيد <strong>%d</strong> گزينه را انتخاب نماييد',
 	),
-	'MISSING_INLINE_ATTACHMENT'	=> 'فایل پیوست <strong>%s</strong> دیگر موجود نیست',
+	'MISSING_INLINE_ATTACHMENT'	=> 'فایل ضمیمه <strong>%s</strong> دیگر موجود نیست',
 	'MOVE_TOPIC'				=> 'انتقال موضوع',
 
-	'NO_ATTACHMENT_SELECTED'=> 'شما هیچ پیوستی برای دریافت یا نمایش انتخاب نکردید.',
+	'NO_ATTACHMENT_SELECTED'=> 'شماهیچ ضمیمه ای برای دریافت یا نمایش انتخاب نکردید.',
 	'NO_NEWER_TOPICS'		=> 'موضوع جدید تری در این انجمن وجود ندارد.',
 	'NO_OLDER_TOPICS'		=> 'موضوع قدیمی تری در این انجمن وجود ندارد.',
 	'NO_UNREAD_POSTS'		=> 'پست ناخوانده دیگری در این انجمن موجود نیست.',
-	'NO_VOTE_OPTION'		=> 'در هنگام ارسال رأی، باید یک گزینه را انتخاب کنید.',
-	'NO_VOTES'				=> 'بدون رأی',
-	'NO_AUTH_PRINT_TOPIC'	=> 'شما اجازه چاپ موضوع را ندارید.',
+	'NO_VOTE_OPTION'		=> 'در هنگام ارسال راي لطفا يک گزينه را انتخاب کنيد.',
+	'NO_VOTES'				=> 'بدون راي',
+	'NO_AUTH_PRINT_TOPIC'	=> 'شما اجازه پرینت موضوع را ندارید.',
 
-	'POLL_ENDED_AT'			=> 'پایان نظرسنجی در %s',
+	'POLL_ENDED_AT'			=> 'پايان نظرسنجي در %s',
 	'POLL_RUN_TILL'			=> 'مدت زمان نظر سنجی تا %s ادامه خواهد داشت.',
-	'POLL_VOTED_OPTION'		=> 'شما به این گزینه رأی داده اید',
-	'POST_DELETED_RESTORE'	=> 'این پست حذف شده، اما قابل بازگردانی می‌باشد.',
-	'PRINT_TOPIC'			=> 'نمایش حالت چاپ',
+	'POLL_VOTED_OPTION'		=> 'شما به اين گزينه راي داده ايد',
+	'POST_DELETED_RESTORE'	=> 'این پست حذف شده است اما قابل بازگردانی میباشد.',
+	'PRINT_TOPIC'			=> 'نمایش حالت پرینت',
 
-	'QUICK_MOD'				=> 'ابزار فوری',
+	'QUICK_MOD'				=> 'ابزار فوري',
 	'QUICKREPLY'			=> 'پاسخ سریع',
 
 	'REPLY_TO_TOPIC'		=> 'پاسخ به موضوع',
@@ -105,10 +105,10 @@ $lang = array_merge($lang, array(
 	'RESTORE_TOPIC'			=> 'بازگردانی موضوع',
 	'RETURN_POST'			=> '%sبازگشت به پست%s',
 
-	'SUBMIT_VOTE'			=> 'ثبت رأی شما',
+	'SUBMIT_VOTE'			=> 'ثبت رای شما',
 
 	'TOPIC_TOOLS'			=> 'ابزار موضوع',
-	'TOTAL_VOTES'			=> 'مجموع رأی ها',
+	'TOTAL_VOTES'			=> 'مجموع رای گیری',
 
 	'UNLOCK_TOPIC'			=> 'بازکردن موضوع',
 
@@ -117,11 +117,11 @@ $lang = array_merge($lang, array(
 	'VIEW_PREVIOUS_TOPIC'	=> 'موضوع قبلی',
 	'VIEW_RESULTS'			=> 'نمایش نتیجه',
 	'VIEW_TOPIC_POSTS'		=> array(
-		1	=> 'تعداد پست‌ها:%d',
-		2	=> 'تعداد پست‌ها:%d',
+		1	=> 'تعداد پست ها:%d',
+		2	=> 'تعداد پست ها:%d',
 	),
 	'VIEW_UNREAD_POST'		=> 'اولین پست خوانده نشده',
-	'VOTE_SUBMITTED'		=> 'رأی شما با موفقیت ثبت شد.',
-	'VOTE_CONVERTED'		=> 'امکان تغییر رأی وجود ندارد.',
+	'VOTE_SUBMITTED'		=> 'رای شما با موفقیت ثبت شد.',
+	'VOTE_CONVERTED'		=> 'امکان تغییر رای وجود ندارد.',
 
 ));

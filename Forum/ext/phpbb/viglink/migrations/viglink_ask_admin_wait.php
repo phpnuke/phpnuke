@@ -15,7 +15,7 @@ namespace phpbb\viglink\migrations;
  */
 class viglink_ask_admin_wait extends \phpbb\db\migration\migration
 {
-	static public function depends_on()
+	public static function depends_on()
 	{
 		return array('\phpbb\viglink\migrations\viglink_ask_admin');
 	}

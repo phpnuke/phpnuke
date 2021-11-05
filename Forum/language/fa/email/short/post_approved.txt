@@ -1,13 +1,13 @@
-Subject: پست تأیید شد - "{POST_SUBJECT}"
+Subject: Post approved - "{POST_SUBJECT}"
 
-سلام {USERNAME}،
+Hello {USERNAME},
 
-پست "{POST_SUBJECT}" در سایت "{SITENAME}" توسط مدیر انجمن و یا مدیر تأیید شده است.
+You are receiving this notification because your post "{POST_SUBJECT}" at "{SITENAME}" was approved by a moderator or administrator.
 
-برای مشاهده پست بر روی لینک زیر کلیک کنید:
+If you want to view the post, click the following link:
 {U_VIEW_POST}
 
-برای مشاهده موضوع بر روی لینک زیر کلیک کنید:
+If you want to view the topic, click the following link:
 {U_VIEW_TOPIC}
 
 {EMAIL_SIG}

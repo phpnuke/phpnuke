@@ -1,20 +1,24 @@
 <?php
+
 /**
+ * @title            Session Class
+ * @desc             Handler Session
  *
- * This file is part of the PHP-NUKE Software package.
- *
- * @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
- * @license GNU General Public License, version 2 (GPL-2.0)
- *
+ * @author           Pierre-Henry Soria <ph7software@gmail.com>
+ * @url              https://www.phpclasses.org/package/9644-PHP-Store-and-retrieve-data-in-cookies-or-PHP-sessions.html#usage
+ * @copyright        (c) 2012-2016, Pierre-Henry Soria. All Rights Reserved.
+ * @license          GNU General Public License 3 or later <http://www.gnu.org/licenses/gpl.html>
+ * @package          phpnuke 8.4
  */
 
-if (!defined('NUKE_FILE')) {
-    die("You can't access this file directly...");
+if(!defined('NUKE_FILE'))
+{
+	die ("You can't access this file directly...");
 }
 
-class pn_Sessions
-{
-    protected $sessionID;
+class pn_Sessions {
+
+	protected $sessionID;
     private $iExpiration = 31536000; // 1 Year
     public $sPrefix = 'pnSession_';
     private $sPath = '/';
@@ -22,7 +26,7 @@ class pn_Sessions
     private $bIsSsl;
     public $session_started = false;
     private $sCookieName = 'PH84SESS'; // Default Cookie Name
-
+	
     public function __construct()
     {
         session_name($this->getCookieName());
@@ -31,21 +35,16 @@ class pn_Sessions
          * In localhost mode, security session_set_cookie_params causing problems in the sessions, so we disable this if we are in localhost mode.
          * Otherwise if we are in production mode, we activate this.
          */
-        if (!$this->isLocalHost()) {
+        if (!$this->isLocalHost())
+		{
             $iTime = (int) $this->getExpiration();
-            session_set_cookie_params(
-                $iTime,
-                $this->getPath(),
-                $this->getDomain(),
-                $this->getIsSsl(),
-                true
-            );
+            session_set_cookie_params($iTime, $this->getPath(), $this->getDomain(), $this->getIsSsl(), true);
         }
 
         // Session initialization
         if ('' === session_id()) {
             session_start();
-            $this->session_started = true;
+			$this->session_started = true;
         }
     }
 
@@ -61,7 +60,7 @@ class pn_Sessions
     {
         $this->sCookieName = $sCookieName;
     }
-
+	
     /**
      * Check if the server is in local.
      *
@@ -72,10 +71,7 @@ class pn_Sessions
         $sServerName = $_SERVER['SERVER_NAME'];
         $sHttpHost = $_SERVER['HTTP_HOST'];
 
-        return $sServerName === 'localhost' ||
-            $sServerName === '127.0.0.1' ||
-            $sHttpHost === 'localhost' ||
-            $sHttpHost === '127.0.0.1';
+        return ($sServerName === 'localhost' || $sServerName === '127.0.0.1' || $sHttpHost === 'localhost' || $sHttpHost === '127.0.0.1');
     }
 
     /**
@@ -87,9 +83,7 @@ class pn_Sessions
      */
     public static function escape(string $sValue, $bStrip = false)
     {
-        return $bStrip
-            ? strip_tags($sValue)
-            : htmlspecialchars($sValue, ENT_QUOTES, 'utf-8');
+        return ($bStrip) ? strip_tags($sValue) : htmlspecialchars($sValue, ENT_QUOTES, 'utf-8');
     }
 
     public function getExpiration()
@@ -110,15 +104,9 @@ class pn_Sessions
     public function getDomain()
     {
         if (empty($this->sDomain)) {
-            $sDomain =
-                $_SERVER['SERVER_PORT'] != '80' &&
-                $_SERVER['SERVER_PORT'] != '443'
-                    ? $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']
-                    : $_SERVER['SERVER_NAME'];
-
-            $this->sDomain = filter_var($sDomain, FILTER_VALIDATE_IP)
-                ? $sDomain
-                : '.' . str_replace('www.', '', $sDomain);
+            $sDomain = (($_SERVER['SERVER_PORT'] != '80') && ($_SERVER['SERVER_PORT'] != '443')) ?  $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] : $_SERVER['SERVER_NAME'];
+			
+            $this->sDomain = (filter_var($sDomain, FILTER_VALIDATE_IP)) ? $sDomain:'.' . str_replace('www.', '', $sDomain);
         }
         return $this->sDomain;
     }
@@ -126,9 +114,7 @@ class pn_Sessions
     public function getIsSsl()
     {
         if (empty($this->bIsSsl)) {
-            $this->bIsSsl =
-                !empty($_SERVER['HTTPS']) &&
-                strtolower($_SERVER['HTTPS'] == 'on');
+            $this->bIsSsl = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS'] == 'on'));
         }
         return $this->bIsSsl;
     }
@@ -172,25 +158,26 @@ class pn_Sessions
     {
         $this->bIsSsl = $bIsSsl;
     }
-
+	
     /**
      * Returns the current session status
      *
      * @return bool
      */
-    protected function is_session_started()
-    {
-        if (php_sapi_name() !== 'cli') {
-            if (version_compare(phpversion(), '5.4.0', '>=')) {
-                return session_status() === PHP_SESSION_ACTIVE ? true : false;
-            } else {
-                return session_id() === '' || !$this->session_started
-                    ? false
-                    : true;
-            }
-        }
-        return false;
-    }
+	protected function is_session_started()
+	{
+		if ( php_sapi_name() !== 'cli' ) {
+			if ( version_compare(phpversion(), '5.4.0', '>=') )
+			{
+				return session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
+			}
+			else
+			{
+				return (session_id() === '' || !$this->session_started) ? FALSE : TRUE;
+			}
+		}
+		return FALSE;
+	}
 
     /**
      * Set a PHP Session.
@@ -201,8 +188,8 @@ class pn_Sessions
      */
     public function set($mName, $sValue = null)
     {
-        $this->reopen();
-
+		$this->reopen();
+		
         if (is_array($mName)) {
             foreach ($mName as $sName => $sVal) {
                 $this->set($sName, $sVal); // Recursive method
@@ -210,7 +197,7 @@ class pn_Sessions
         } else {
             $_SESSION[$this->getPrefix() . $mName] = $sValue;
         }
-        $this->close();
+		$this->close();
     }
 
     /**
@@ -222,21 +209,16 @@ class pn_Sessions
      */
     public function get($sName, $bEscape = true, $expire = 0)
     {
-        if (!is_string($sName)) {
-            trigger_error('No, you fool!');
-            return;
-        }
-
-        if ($expire != 0 && $expire < _NOWTIME) {
-            return false;
-        }
-
+		if (!is_string($sName)) {
+			trigger_error('No, you fool!');
+			return;
+		}
+		
+		if($expire != 0 && $expire < _NOWTIME)
+			return false;
+		
         $sSessionName = $this->getPrefix() . $sName;
-        return $this->exists($sName)
-            ? ($bEscape
-                ? $this->escape($_SESSION[$sSessionName])
-                : $_SESSION[$sSessionName])
-            : null;
+        return ($this->exists($sName) ? ($bEscape ? $this->escape($_SESSION[$sSessionName]) : $_SESSION[$sSessionName]) : null);
     }
 
     /**
@@ -251,13 +233,11 @@ class pn_Sessions
 
         if (is_array($mName)) {
             foreach ($mName as $sName) {
-                if (!($bExists = $this->exists($sName))) {
-                    break;
-                } // Recursive method
+                if (!$bExists = $this->exists($sName)) break; // Recursive method
             }
         } else {
-            $sSessionName = $this->getPrefix() . $mName;
-            $bExists = isset($_SESSION[$sSessionName]) ? true : false;
+			$sSessionName = $this->getPrefix() . $mName;
+            $bExists = (isset($_SESSION[$sSessionName])) ? true : false;
         }
 
         return $bExists;
@@ -271,19 +251,19 @@ class pn_Sessions
      */
     public function remove($mName)
     {
-        $this->reopen();
-        if (is_array($mName)) {
-            foreach ($mName as $sName) {
-                $this->remove($sName); // Recursive method
-            }
-        } else {
-            $sSessionName = $this->getPrefix() . $mName;
+		$this->reopen();
+		if (is_array($mName)) {
+			foreach ($mName as $sName) {
+				$this->remove($sName); // Recursive method
+			}
+		} else {
+			$sSessionName = $this->getPrefix() . $mName;
 
-            // We put the session in a table so if the session is in the form of multi-dimensional array, it is clear how much is destroyed
-            $_SESSION[$sSessionName] = [];
-            unset($_SESSION[$sSessionName]);
-        }
-        $this->close();
+			// We put the session in a table so if the session is in the form of multi-dimensional array, it is clear how much is destroyed
+			$_SESSION[$sSessionName] = array();
+			unset($_SESSION[$sSessionName]);
+		}
+		$this->close();
     }
 
     /**
@@ -296,45 +276,46 @@ class pn_Sessions
         session_regenerate_id(true);
     }
 
-    public function uagent_no_version()
-    {
-        $uagent = $_SERVER['HTTP_USER_AGENT'];
-        $regx = '/\/[a-zA-Z0-9.]+/';
-        $newString = preg_replace($regx, '', $uagent);
-        return $newString;
-    }
+	public function uagent_no_version()
+	{
+		$uagent = $_SERVER['HTTP_USER_AGENT'];
+		$regx = '/\/[a-zA-Z0-9.]+/';
+		$newString = preg_replace($regx,'',$uagent);
+		return $newString;
+	}
 
     /**
      * Destroy all PHP's sessions.
      */
     public function destroy()
     {
-        $this->reopen();
+		$this->reopen();
         if (!empty($_SESSION)) {
-            $_SESSION = [];
+            $_SESSION = array();
             session_unset();
-            session_destroy();
+			session_destroy();
         }
-        $this->close();
+		$this->close();
     }
 
     protected function reopen()
     {
-        if ($this->is_session_started() === false) {
-            ini_set('session.use_strict_mode', true);
-            ini_set('session.use_only_cookies', false);
-            ini_set('session.use_cookies', false);
-            //ini_set('session.use_trans_sid', false); //May be necessary in some situations
-            ini_set('session.cache_limiter', null);
-            session_start(); //Reopen the (previously closed) session for writing.
-            $this->session_started = true;
-        }
+		if ($this->is_session_started() === FALSE)
+		{
+			ini_set('session.use_strict_mode', true);
+			ini_set('session.use_only_cookies', false);
+			ini_set('session.use_cookies', false);
+			//ini_set('session.use_trans_sid', false); //May be necessary in some situations
+			ini_set('session.cache_limiter', null);
+			session_start(); //Reopen the (previously closed) session for writing.
+			$this->session_started = true;
+		}
     }
-
+	
     protected function close()
     {
         session_write_close();
-        $this->session_started = false;
+		$this->session_started = false;
     }
 
     public function __destruct()
@@ -342,9 +323,8 @@ class pn_Sessions
         // $this->close();
     }
 
-    private function __clone()
-    {
-    }
+    private function __clone() {}
+	
 }
 
 ?>

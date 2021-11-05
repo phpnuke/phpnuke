@@ -1,45 +1,59 @@
 <?php
-/**
- *
- * This file is part of the PHP-NUKE Software package.
- *
- * @copyright (c) PHP-NUKE <https://www.phpnuke.ir>
- * @license GNU General Public License, version 2 (GPL-2.0)
- *
- */
+/************************************************************************/
+/* PHP-NUKE: Web Portal System                                          */
+/* ===========================                                          */
+/*                                                                      */
+/* Copyright (c) 2006 by Francisco Burzi                                */
+/* http://phpnuke.org                                                   */
+/*                                                                      */
+/* This program is free software. You can redistribute it and/or modify */
+/* it under the terms of the GNU General Public License as published by */
+/* the Free Software Foundation; either version 2 of the License.       */
+/************************************************************************/
 
-if (!defined('NUKE_FILE')) {
-    die("You can't access this file directly...");
+if(!defined('NUKE_FILE'))
+{
+	die ("You can't access this file directly...");
 }
 
-if (!function_exists("floatval")) {
+if (!function_exists("floatval"))
+{
     function floatval($inputval)
-    {
-        return (float) $inputval;
+	{
+        return (float)$inputval;
     }
 }
 
 // We want to use the function stripos,
 // but thats only available since PHP5.
 // So we cloned the function...
-if (!function_exists('stripos')) {
-    function stripos_clone($haystack, $needle, $offset = 0)
-    {
-        $return = strpos(strtoupper($haystack), strtoupper($needle), $offset);
-        if ($return === false) {
-            return false;
-        } else {
+if (!function_exists('stripos'))
+{
+	function stripos_clone($haystack, $needle, $offset = 0)
+	{
+		$return = strpos(strtoupper($haystack), strtoupper($needle), $offset);
+		if($return === false)
+		{
+			return false;
+		}
+		else
+		{
             return true;
         }
     }
-} else {
+}
+else
+{
     // But when this is PHP5, we use the original function
     function stripos_clone($haystack, $needle, $offset = 0)
-    {
+	{
         $return = stripos($haystack, $needle, $offset = 0);
-        if ($return === false) {
+        if($return === false)
+		{
             return false;
-        } else {
+        }
+		else
+		{
             return true;
         }
     }
@@ -47,231 +61,175 @@ if (!function_exists('stripos')) {
 
 function nukeversion()
 {
-    global $nuke_configs;
-    $nukeversion = $nuke_configs['Version_Num'];
-    return $nukeversion;
+	global $nuke_configs;
+	$nukeversion = $nuke_configs['Version_Num'];
+	return $nukeversion;
 }
 
 function nuke_set_cookie($name, $cookiedata, $cookietime, $httponly = false)
 {
-    global $nuke_configs;
-    if ($cookiedata === false) {
-        $cookietime = _NOWTIME - 3600;
-    }
-    $name_data = rawurlencode($name) . '=' . rawurlencode($cookiedata);
-    $expire = gmdate('D, d-M-Y H:i:s \\G\\M\\T', $cookietime);
-    if (!headers_sent()) {
-        header(
-            'Set-Cookie: ' .
-                $name_data .
-                ($cookietime ? '; expires=' . $expire : '') .
-                '; path=' .
-                $nuke_configs['sitecookies'] .
-                ';' .
-                ($httponly ? ' HttpOnly' : ''),
-            false
-        );
-    }
+	global $nuke_configs;
+	if($cookiedata === false){
+		$cookietime = _NOWTIME-3600;
+	}
+	$name_data = rawurlencode($name) . '=' . rawurlencode($cookiedata);
+	$expire = gmdate('D, d-M-Y H:i:s \\G\\M\\T', $cookietime);
+	if (!headers_sent())
+	{
+		header('Set-Cookie: '.$name_data.(($cookietime) ? '; expires='.$expire : '').'; path='.$nuke_configs['sitecookies'].';' . (($httponly) ? ' HttpOnly' : ''), false);
+	}
 }
 
 function is_ajax()
 {
-    return array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) &&
-        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+	return (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) && (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'));
 }
-
+	
 function get_client_ip()
 {
-    $get_nav = false;
+	$get_nav = false;
+	
+	if(function_exists("getenv"))
+		$get_nav = true;
+		
+	$ipaddress = '';
+	if (($get_nav && getenv('HTTP_CLIENT_IP')) || isset($_SERVER['HTTP_CLIENT_IP']))
+		$ipaddress = ($get_nav) ? getenv('HTTP_CLIENT_IP'):$_SERVER['HTTP_CLIENT_IP'];
+	else if(($get_nav && getenv('HTTP_X_FORWARDED_FOR')) || isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+		$ipaddress = ($get_nav) ? getenv('HTTP_X_FORWARDED_FOR'):$_SERVER['HTTP_X_FORWARDED_FOR'];
+	else if(($get_nav && getenv('HTTP_X_FORWARDED')) || isset($_SERVER['HTTP_X_FORWARDED']))
+		$ipaddress = ($get_nav) ? getenv('HTTP_X_FORWARDED'):$_SERVER['HTTP_X_FORWARDED'];
+	else if(($get_nav && getenv('HTTP_X_CLUSTER_CLIENT_IP')) || isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP']))
+		$ipaddress = ($get_nav) ? getenv('HTTP_X_CLUSTER_CLIENT_IP'):$_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
+	else if(($get_nav && getenv('HTTP_FORWARDED_FOR')) || isset($_SERVER['HTTP_FORWARDED_FOR']))
+		$ipaddress = ($get_nav) ? getenv('HTTP_FORWARDED_FOR'):$_SERVER['HTTP_FORWARDED_FOR'];
+	else if(($get_nav && getenv('HTTP_FORWARDED')) || isset($_SERVER['HTTP_FORWARDED']))
+		$ipaddress = ($get_nav) ? getenv('HTTP_FORWARDED'):$_SERVER['HTTP_FORWARDED'];
+	else if(($get_nav && getenv('REMOTE_ADDR')) || isset($_SERVER['REMOTE_ADDR']))
+		$ipaddress = ($get_nav) ? getenv('REMOTE_ADDR'):$_SERVER['REMOTE_ADDR'];
+	else
+		$ipaddress = 'UNKNOWN';
 
-    if (function_exists("getenv")) {
-        $get_nav = true;
-    }
-
-    $ipaddress = '';
-    if (
-        ($get_nav && getenv('HTTP_CLIENT_IP')) ||
-        isset($_SERVER['HTTP_CLIENT_IP'])
-    ) {
-        $ipaddress = $get_nav
-            ? getenv('HTTP_CLIENT_IP')
-            : $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (
-        ($get_nav && getenv('HTTP_X_FORWARDED_FOR')) ||
-        isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-    ) {
-        $ipaddress = $get_nav
-            ? getenv('HTTP_X_FORWARDED_FOR')
-            : $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } elseif (
-        ($get_nav && getenv('HTTP_X_FORWARDED')) ||
-        isset($_SERVER['HTTP_X_FORWARDED'])
-    ) {
-        $ipaddress = $get_nav
-            ? getenv('HTTP_X_FORWARDED')
-            : $_SERVER['HTTP_X_FORWARDED'];
-    } elseif (
-        ($get_nav && getenv('HTTP_X_CLUSTER_CLIENT_IP')) ||
-        isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])
-    ) {
-        $ipaddress = $get_nav
-            ? getenv('HTTP_X_CLUSTER_CLIENT_IP')
-            : $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
-    } elseif (
-        ($get_nav && getenv('HTTP_FORWARDED_FOR')) ||
-        isset($_SERVER['HTTP_FORWARDED_FOR'])
-    ) {
-        $ipaddress = $get_nav
-            ? getenv('HTTP_FORWARDED_FOR')
-            : $_SERVER['HTTP_FORWARDED_FOR'];
-    } elseif (
-        ($get_nav && getenv('HTTP_FORWARDED')) ||
-        isset($_SERVER['HTTP_FORWARDED'])
-    ) {
-        $ipaddress = $get_nav
-            ? getenv('HTTP_FORWARDED')
-            : $_SERVER['HTTP_FORWARDED'];
-    } elseif (
-        ($get_nav && getenv('REMOTE_ADDR')) ||
-        isset($_SERVER['REMOTE_ADDR'])
-    ) {
-        $ipaddress = $get_nav ? getenv('REMOTE_ADDR') : $_SERVER['REMOTE_ADDR'];
-    } else {
-        $ipaddress = 'UNKNOWN';
-    }
-
-    $ipaddress = adv_filter($ipaddress, [], ['valid_ip']);
-    if ($ipaddress[0] == 'success') {
-        return $ipaddress[1];
-    } else {
-        return 'UNKNOWN';
-    }
+	$ipaddress = adv_filter($ipaddress, array(), array('valid_ip'));
+	if($ipaddress[0] == 'success')
+		return $ipaddress[1];
+	else
+		return 'UNKNOWN';
 }
 
 function send_headers()
 {
-    global $hooks;
-
-    $headers = $hooks->apply_filters("site_headers", []);
-
-    foreach ($headers as $header_key => $header_val) {
-        header("$header_key: $header_val");
-    }
+	global $hooks;
+	
+	$headers = $hooks->apply_filters("site_headers", array());
+	
+	foreach($headers as $header_key => $header_val)
+		header("$header_key: $header_val");
 }
 
 // cache functions
-function cache_system($mode = "", $extra_code = [])
+function cache_system($mode = "", $extra_code=array())
 {
-    global $db, $cache, $cache_systems, $users_system, $pn_Sessions;
+	global $db, $cache, $cache_systems, $users_system, $pn_Sessions;
 
-    $args = array_slice(func_get_args(), 2);
-    $exept_caches = isset($args[0]) ? $args[0] : [];
-    $new_cache = false;
-
-    if (isset($extra_code) && !empty($extra_code)) {
-        if (isset($extra_code['general']) && $extra_code['general'] != '') {
-            eval($extra_code['general']);
-        }
-        if (!empty($extra_code['phpcodes'])) {
-            foreach ($extra_code['phpcodes'] as $mode_name => $phpcode) {
-                //nuke_configs
-                if (
-                    (!$cache->isCached($mode_name) or
-                        in_array($mode, ["$mode_name", 'all'])) &&
-                    !in_array("$mode_name", $exept_caches)
-                ) {
-                    if (!$cache->isCached($mode_name)) {
-                        $new_cache = true;
-                    }
-                    $extra_codes_rows = [];
-                    eval($phpcode);
-
-                    $nuke_extra_cacheData = !empty($extra_codes_rows)
-                        ? $extra_codes_rows
-                        : [];
-                    $cache->store("$mode_name", $nuke_extra_cacheData);
-                    /*file_put_contents("cache/cache_nuke_configs.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_configs_cacheData);*/
-                }
-            }
-        }
-    } else {
-        //nuke_configs
-        if (
-            (!$cache->isCached("nuke_configs") or
-                in_array($mode, ['nuke_configs', 'all'])) &&
-            !in_array('nuke_configs', $exept_caches)
-        ) {
-            $config_rows = [];
-            $results = $db->table(CONFIG_TABLE)->select();
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_configs")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $nuke_configs_row) {
-                    $config_rows[$nuke_configs_row['config_name']] =
-                        $nuke_configs_row['config_value'];
-                }
-                unset($results);
-            }
-            $nuke_configs_cacheData = !empty($config_rows) ? $config_rows : [];
-            $cache->store('nuke_configs', $nuke_configs_cacheData);
-            /*file_put_contents("cache/cache_nuke_configs.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_configs_cacheData);*/
-        }
-
-        //nuke_admins_menu
-        if (
-            (!$cache->isCached("nuke_admins_menu") or
-                in_array($mode, ['nuke_admins_menu', 'all'])) &&
-            !in_array('nuke_admins_menu', $exept_caches)
-        ) {
-            $results = $db->table(ADMINS_MENU_TABLE)->select();
-            $nuke_admins_menu = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_admins_menu")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $amid = $row['amid'];
-                    unset($row['amid']);
-                    $nuke_admins_menu[$amid] = $row;
-                }
-                unset($results);
-            }
-            $nuke_admins_menu_cacheData = !empty($nuke_admins_menu)
-                ? $nuke_admins_menu
-                : [];
-            $cache->store('nuke_admins_menu', $nuke_admins_menu_cacheData);
-            /*file_put_contents("cache/cache_nuke_admins_menu.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_admins_menu_cacheData);*/
-        }
-
-        //nuke_authors
-        if (
-            (!$pn_Sessions->exists('nuke_authors') or
-                in_array($mode, ['nuke_authors', 'all'])) &&
-            !in_array('nuke_authors', $exept_caches)
-        ) {
-            $results = $db->table(AUTHORS_TABLE)->select();
-            $nuke_authors = [];
-            if ($db->count() > 0) {
-                if (!$pn_Sessions->exists('nuke_authors')) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $aid = $row['aid'];
-                    unset($row['aid']);
-                    $nuke_authors[$aid] = $row;
-                }
-                unset($results);
-            }
-            $nuke_authors_cacheData = !empty($nuke_authors)
-                ? $nuke_authors
-                : [];
-            $pn_Sessions->set('nuke_authors', $nuke_authors_cacheData);
-            /*file_put_contents("cache/cache_nuke_authors.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_authors_cacheData);*/
-        }
-
-        //nuke_banners
-        /*if((!$cache->isCached("nuke_banner") OR in_array($mode, array('nuke_banners','all'))) && !in_array('nuke_banners', $exept_caches))
+	$args = array_slice(func_get_args(), 2);
+	$exept_caches = (isset($args[0])) ? $args[0]:array();
+	$new_cache = false;
+		
+	if(isset($extra_code) && !empty($extra_code))
+	{
+		if(isset($extra_code['general']) && $extra_code['general'] != '')
+			eval($extra_code['general']);
+		if(!empty($extra_code['phpcodes']))
+		{
+			foreach($extra_code['phpcodes'] as $mode_name => $phpcode)
+			{
+				//nuke_configs
+				if((!$cache->isCached($mode_name) OR in_array($mode, array("$mode_name",'all'))) && !in_array("$mode_name", $exept_caches))
+				{
+					if(!$cache->isCached($mode_name))
+						$new_cache = true;
+					$extra_codes_rows = array();
+					eval($phpcode);
+					
+					$nuke_extra_cacheData = (!empty($extra_codes_rows)) ? $extra_codes_rows:array();
+					$cache->store("$mode_name", $nuke_extra_cacheData);
+					/*file_put_contents("cache/cache_nuke_configs.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_configs_cacheData);*/
+				}
+			}
+		}
+	}
+	else
+	{
+		//nuke_configs
+		if((!$cache->isCached("nuke_configs") OR in_array($mode, array('nuke_configs','all'))) && !in_array('nuke_configs', $exept_caches))
+		{
+			$config_rows = array();
+			$results = $db->table(CONFIG_TABLE)
+						->select();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_configs"))
+					$new_cache = true;
+				foreach($results as $nuke_configs_row)
+				{
+					$config_rows[$nuke_configs_row['config_name']] = $nuke_configs_row['config_value'];
+				}
+				unset($results);
+			}
+			$nuke_configs_cacheData = (!empty($config_rows)) ? $config_rows:array();
+			$cache->store('nuke_configs', $nuke_configs_cacheData);
+			/*file_put_contents("cache/cache_nuke_configs.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_configs_cacheData);*/
+		}
+		
+		//nuke_admins_menu
+		if((!$cache->isCached("nuke_admins_menu") OR in_array($mode, array('nuke_admins_menu','all'))) && !in_array('nuke_admins_menu', $exept_caches))
+		{
+			$results = $db->table(ADMINS_MENU_TABLE)
+						->select();
+			$nuke_admins_menu = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_admins_menu"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$amid = $row['amid'];
+					unset($row['amid']);
+					$nuke_admins_menu[$amid] = $row;
+				}
+				unset($results);
+			}
+			$nuke_admins_menu_cacheData = (!empty($nuke_admins_menu)) ? $nuke_admins_menu:array();
+			$cache->store('nuke_admins_menu', $nuke_admins_menu_cacheData);
+			/*file_put_contents("cache/cache_nuke_admins_menu.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_admins_menu_cacheData);*/
+		}
+		
+		//nuke_authors	
+		if((!$pn_Sessions->exists('nuke_authors') OR in_array($mode, array('nuke_authors','all'))) && !in_array('nuke_authors', $exept_caches))
+		{
+			$results = $db->table(AUTHORS_TABLE)
+						->select();
+			$nuke_authors = array();
+			if($db->count() > 0)
+			{
+				if(!$pn_Sessions->exists('nuke_authors'))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$aid = $row['aid'];
+					unset($row['aid']);
+					$nuke_authors[$aid] = $row;
+				}
+				unset($results);
+			}
+			$nuke_authors_cacheData = (!empty($nuke_authors)) ? $nuke_authors:array();
+			$pn_Sessions->set('nuke_authors', $nuke_authors_cacheData);
+			/*file_put_contents("cache/cache_nuke_authors.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_authors_cacheData);*/
+		}
+		
+		//nuke_banners
+		/*if((!$cache->isCached("nuke_banner") OR in_array($mode, array('nuke_banners','all'))) && !in_array('nuke_banners', $exept_caches))
 		{
 			$results = $db->query("SELECT b.*, bc.name as client_name, bc.contact, bc.email, bc.extrainfo FROM ".BANNER_TABLE." AS b LEFT JOIN ".BANNER_TABLE."_clients AS bc ON b.cid = bc.cid ORDER BY b.bid ASC");
 			
@@ -292,550 +250,389 @@ function cache_system($mode = "", $extra_code = [])
 			$cache->store('nuke_banner', $nuke_banners_cacheData);
 			//file_put_contents("cache/cache_nuke_banner.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_banners_cacheData);
 		}*/
+		
+		//nuke_blocks
+		if((!$cache->isCached("nuke_blocks") OR in_array($mode, array('nuke_blocks','all'))) && !in_array('nuke_blocks', $exept_caches))
+		{
+			$results = $db->table(BLOCKS_TABLE)
+						->order_by(['bid'=> 'ASC'])
+						->select();
+			$nuke_blocks = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_blocks"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$bid = $row['bid'];
+					unset($row['bid']);
+					$nuke_blocks['blocks'][$bid] = $row;
+				}
+				unset($results);
+			}
+			
+			if(!empty($nuke_blocks))
+			{
+				$results = $db->table(BLOCKS_BOXES_TABLE)
+							->order_by(['box_id'=> 'ASC'])
+							->select();
 
-        //nuke_blocks
-        if (
-            (!$cache->isCached("nuke_blocks") or
-                in_array($mode, ['nuke_blocks', 'all'])) &&
-            !in_array('nuke_blocks', $exept_caches)
-        ) {
-            $results = $db
-                ->table(BLOCKS_TABLE)
-                ->order_by(['bid' => 'ASC'])
-                ->select();
-            $nuke_blocks = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_blocks")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $bid = $row['bid'];
-                    unset($row['bid']);
-                    $nuke_blocks['blocks'][$bid] = $row;
-                }
-                unset($results);
-            }
+				if($db->count() > 0)
+				{
+					foreach($results as $row)
+					{
+						$box_id = $row['box_id'];
+						$box_blocks = (isset($row['box_blocks']) && $row['box_blocks'] != '') ? explode(",", $row['box_blocks']):array();
+						$box_blocks_data = (isset($row['box_blocks_data']) && $row['box_blocks_data'] != '') ? phpnuke_unserialize(stripslashes($row['box_blocks_data'])):array();
+						
+						unset($row['box_blocks']);
+						unset($row['box_blocks_data']);
+						
+						$nuke_blocks['blocks_boxes'][$box_id] = $row;
+						if(!empty($box_blocks) && !empty($box_blocks_data))
+							foreach($box_blocks as $bid)
+								if(isset($box_blocks_data[$bid]) && isset($nuke_blocks['blocks'][$bid]))
+								{
+									$nuke_blocks['blocks_boxes'][$box_id]['blocks'][$bid] = array_merge($nuke_blocks['blocks'][$bid], $box_blocks_data[$bid]);
+								}
+					}
+					unset($results);
+				}
+				
+				$nuke_blocks_cacheData = (!empty($nuke_blocks)) ? $nuke_blocks:array();
+				$cache->store('nuke_blocks', $nuke_blocks_cacheData);
+				/*file_put_contents("cache/cache_nuke_blocks.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_blocks_cacheData);*/
+			}
+		}
+		
+		//nuke_bookmarksite
+		if((!$cache->isCached("nuke_bookmarksite") OR in_array($mode, array('nuke_bookmarksite','all'))) && !in_array('nuke_bookmarksite', $exept_caches))
+		{
+			$results = $db->table(BOOKMARKSITE_TABLE)
+						->order_by(['bid' => 'ASC'])
+						->select();
+			$bookmarksite = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_bookmarksite"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$bid = $row['bid'];
+					unset($row['bid']);
+					$bookmarksite[$bid] = $row;
+				}
+				unset($results);
+			}
+			
+			$nuke_bookmarksite_cacheData = (!empty($bookmarksite)) ? $bookmarksite:array();
+			$cache->store('nuke_bookmarksite', $nuke_bookmarksite_cacheData);
+			/*file_put_contents("cache/cache_nuke_bookmarksite.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_bookmarksite_cacheData);*/
+		}
+		
+		//nuke_categories
+		if((!$cache->isCached("nuke_categories") OR in_array($mode, array('nuke_categories','all'))) && !in_array('nuke_categories', $exept_caches))
+		{
+			$results = $db->table(CATEGORIES_TABLE)
+						->order_by(['catid' => 'ASC'])
+						->select();
+						
+			$categories = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_categories"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$catid = $row['catid'];
+					$module = $row['module'];
+					$categories[$module][$catid] = $row;
+					$categories[$module][$catid]['catname_url'] = filter(sanitize(str2url($row['catname'])), "nohtml");
+				}
+				unset($results);
+			}
+			
+			$nuke_categories_cacheData = (!empty($categories)) ? $categories:array();
+			$cache->store('nuke_categories', $nuke_categories_cacheData);
+			/*file_put_contents("cache/cache_nuke_categories.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_categories_cacheData);*/
+		}
+		
+		//nuke_points_groups
+		if((!$cache->isCached("nuke_points_groups") OR in_array($mode, array('nuke_points_groups','all'))) && !in_array('nuke_points_groups', $exept_caches))
+		{
+			$results = $db->table(POINTS_GROUPS_TABLE)
+						->order_by(['id' => 'ASC'])
+						->select();
+						
+			$nuke_points_groups = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_points_groups"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$id = $row['id'];
+					unset($row['id']);
+					$nuke_points_groups[$id] = $row;
+				}
+				unset($results);
+			}
+			
+			$nuke_points_groups_cacheData = (!empty($nuke_points_groups)) ? $nuke_points_groups:array();
+			$cache->store('nuke_points_groups', $nuke_points_groups_cacheData);
+			/*file_put_contents("cache/cache_nuke_points_groups.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_points_groups_cacheData);*/
+		}
+		
+		//nuke_nav_menus
+		if((!$cache->isCached("nuke_nav_menus") OR in_array($mode, array('nuke_nav_menus','all'))) && !in_array('nuke_nav_menus', $exept_caches))
+		{
+			$results = $db->query("SELECT nd.*,nd.status as item_status,n.*, n.status as nav_status FROM ".NAV_MENUS_DATA_TABLE." AS nd LEFT JOIN ".NAV_MENUS_TABLE." AS n ON n.nav_id = nd.nav_id ORDER BY nd.weight ASC, nd.nid ASC");
 
-            if (!empty($nuke_blocks)) {
-                $results = $db
-                    ->table(BLOCKS_BOXES_TABLE)
-                    ->order_by(['box_id' => 'ASC'])
-                    ->select();
+			$nuke_nav_menus = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_nav_menus"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$nav_status = intval($row['nav_status']);
+					$item_status = intval($row['item_status']);
+					
+					if($nav_status == 1)
+					{
+						$nav_id = intval($row['nav_id']);
+						$nav_location = filter($row['nav_location'], "nohtml");
+						$lang_nav_title = ($row['lang_nav_title'] != '') ? phpnuke_unserialize(stripslashes($row['lang_nav_title'])):array();
 
-                if ($db->count() > 0) {
-                    foreach ($results as $row) {
-                        $box_id = $row['box_id'];
-                        $box_blocks =
-                            isset($row['box_blocks']) &&
-                            $row['box_blocks'] != ''
-                                ? explode(",", $row['box_blocks'])
-                                : [];
-                        $box_blocks_data =
-                            isset($row['box_blocks_data']) &&
-                            $row['box_blocks_data'] != ''
-                                ? phpnuke_unserialize(
-                                    stripslashes($row['box_blocks_data'])
-                                )
-                                : [];
+						$nid = $row['nid'];
+						
+						$nuke_nav_menus[$nav_location][$nav_id]['nav_title'] =  filter($row['nav_title'], "nohtml");
+						$nuke_nav_menus[$nav_location][$nav_id]['nav_id'] = $nav_id;
+						$nuke_nav_menus[$nav_location][$nav_id]['date'] = $row['date'];
+						$nuke_nav_menus[$nav_location][$nav_id]['lang_nav_title'] = $lang_nav_title;
+						unset($row['nav_id'], $row['nav_title'], $row['lang_nav_title'], $row['nav_location'], $row['date'],  $row['nav_status']);
+						$row['attributes'] = ($row['attributes'] != '') ? phpnuke_unserialize(stripslashes($row['attributes'])):array();
+						if($item_status > 0)
+							$nuke_nav_menus[$nav_location][$nav_id]['nav_items'][$nid] = $row;
+					}
+				}
+				unset($results);
+			}
+			
+			$nuke_nav_menus_cacheData = (!empty($nuke_nav_menus)) ? $nuke_nav_menus:array();
+			$cache->store('nuke_nav_menus', $nuke_nav_menus_cacheData);
+			/*file_put_contents("cache/cache_nuke_nav_menus.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_nav_menus_cacheData);*/
+		}
+		
+		//nuke_headlines
+		if((!$cache->isCached("nuke_headlines") OR in_array($mode, array('nuke_headlines','all'))) && !in_array('nuke_headlines', $exept_caches))
+		{
+			$results = $db->table(HEADLINES_TABLE)
+						->order_by(['hid' => 'ASC'])
+						->select();
+						
+			$nuke_headlines = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_headlines"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$hid = $row['hid'];
+					unset($row['hid']);
+					$nuke_headlines[$hid] = $row;
+				}
+				unset($results);
+			}
+			
+			$nuke_headlines_cacheData = (!empty($nuke_headlines)) ? $nuke_headlines:array();
+			$cache->store('nuke_headlines', $nuke_headlines_cacheData);
+			/*file_put_contents("cache/cache_nuke_headlines.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_headlines_cacheData);*/
+		}
+		
+		//nuke_modules
+		if((!$cache->isCached("nuke_modules") OR in_array($mode, array('nuke_modules','all'))) && !in_array('nuke_modules', $exept_caches))
+		{
+			$results = $db->table(MODULES_TABLE)
+						->order_by(['mid' => 'ASC'])
+						->select();
+						
+			$nuke_modules = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_modules"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$mid = $row['mid'];
+					unset($row['mid']);
+					$nuke_modules[$mid] = $row;
+				}
+				unset($results);
+			}
+			
+			$results = $db->table(POSTS_META_TABLE)
+						->where('meta_part', 'module_boxes')
+						->select();
+			$nuke_modules_boxes = array();
+			
+			if($db->count() > 0)
+			{
+				foreach($results as $row)
+				{
+					$meta_key = $row['meta_key'];
+					unset($row['meta_key']);
+					$nuke_modules_boxes[$meta_key] = $row;
+				}
+				unset($results);
+			}
+			
+			$nuke_modules_cacheData = (!empty($nuke_modules)) ? $nuke_modules:array();
+			$cache->store('nuke_modules', $nuke_modules_cacheData);
+			$nuke_modules_boxes_cacheData = (!empty($nuke_modules_boxes)) ? $nuke_modules_boxes:array();
+			$cache->store('nuke_modules_boxes', $nuke_modules_boxes_cacheData);
+			/*file_put_contents("cache/cache_nuke_modules.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_modules_cacheData);*/
+		}
+		
+		//nuke_languages
+		if((!$cache->isCached("nuke_languages") OR in_array($mode, array('nuke_languages','all'))) && !in_array('nuke_languages', $exept_caches))
+		{
+			$results = $db->table(LANGUAGES_TABLE)
+						->order_by(['lid' => 'ASC'])
+						->select();
+						
+			$nuke_languages = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_languages"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$main_word = $row['main_word'];
+					unset($row['main_word']);
+					$nuke_languages[$main_word] = array("lid" => intval($row['lid']), "equals" => (($row['equals'] != "") ? phpnuke_unserialize(stripslashes($row['equals'])):array()));
+				}
+				unset($results);
+			}
+			
+			$nuke_languages_cacheData = (!empty($nuke_languages)) ? $nuke_languages:array();
+			$cache->store('nuke_languages', $nuke_languages_cacheData);
+			/*file_put_contents("cache/cache_nuke_languages.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_languages_cacheData);*/
+		}
+		
+		//nuke_modules_friendly_urls
+		if((!$cache->isCached("nuke_modules_friendly_urls") OR in_array($mode, array('nuke_modules_friendly_urls','all'))) && !in_array('nuke_modules_friendly_urls', $exept_caches))
+		{
+			global $friendly_links, $rewrite_rule;
+			if(isset($friendly_links) && is_array($friendly_links) && !empty($friendly_links))
+			{
+				if(!$cache->isCached("nuke_modules_friendly_urls"))
+					$new_cache = true;
+				foreach($friendly_links as $friendly_link_key => $friendly_links_val){
+					$friendly_urls['urlins'][] = "#^$friendly_link_key#";
+					$friendly_urls['urlouts'][] = preg_replace("#/+#", "/", preg_replace("#([^/]+)//#" ,"/", $friendly_links_val));
+				}
+			}
+			unset($friendly_links);
+			
+			$handle=opendir('modules');
+			$modules_list = array();
+			while($mfile = readdir($handle))
+			{
+				if(is_dir("modules/$mfile") && $mfile != '.' && $mfile != '..' && $mfile != 'Articles')
+					$modules_list[] = $mfile;
+			}
+			closedir($handle);
+			sort($modules_list);
+			foreach($modules_list as $modules_name) {
+				if(file_exists("modules/$modules_name/GT-$modules_name.php"))
+				{
+					@include("modules/$modules_name/GT-$modules_name.php");
+					if(isset($friendly_links) && is_array($friendly_links) && !empty($friendly_links))
+					{
+						foreach($friendly_links as $friendly_link_key => $friendly_links_val){
+							$friendly_urls['urlins'][] = "#^$friendly_link_key#";
+							$friendly_urls['urlouts'][] = preg_replace("#/+#", "/", preg_replace("#([^/]+)//#" ,"/", $friendly_links_val));
+						}
+					}
+				}
+				unset($friendly_links);
+			}
+			
+			if(file_exists("modules/Articles/GT-Articles.php"))
+			{
+				@include("modules/Articles/GT-Articles.php");
+				if(isset($friendly_links) && is_array($friendly_links) && !empty($friendly_links))
+				{
+					foreach($friendly_links as $friendly_link_key => $friendly_links_val){
+						$friendly_urls['urlins'][] = "#^$friendly_link_key#";
+						$friendly_urls['urlouts'][] = preg_replace("#/+#", "/", preg_replace("#([^/]+)//#" ,"/", $friendly_links_val));
+					}
+				}
+			}
+				
+			$nuke_modules_friendly_urls_cacheData = (!empty($friendly_urls) && !empty($rewrite_rule)) ? array($friendly_urls, $rewrite_rule):array();
+			$cache->store('nuke_modules_friendly_urls', $nuke_modules_friendly_urls_cacheData);
+			/*file_put_contents("cache/cache_nuke_modules_friendly_urls.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_modules_friendly_urls_cacheData);*/
+		}
+		
+		//nuke_mtsn_ipban
+		if((!$cache->isCached("nuke_mtsn_ipban") OR in_array($mode, array('nuke_mtsn_ipban','all'))) && !in_array('nuke_mtsn_ipban', $exept_caches))
+		{
+			$results = $db->table(MTSN_IPBAN_TABLE)
+						->order_by(['id' => 'ASC'])
+						->select();
 
-                        unset($row['box_blocks']);
-                        unset($row['box_blocks_data']);
-
-                        $nuke_blocks['blocks_boxes'][$box_id] = $row;
-                        if (!empty($box_blocks) && !empty($box_blocks_data)) {
-                            foreach ($box_blocks as $bid) {
-                                if (
-                                    isset($box_blocks_data[$bid]) &&
-                                    isset($nuke_blocks['blocks'][$bid])
-                                ) {
-                                    $nuke_blocks['blocks_boxes'][$box_id][
-                                        'blocks'
-                                    ][$bid] = array_merge(
-                                        $nuke_blocks['blocks'][$bid],
-                                        $box_blocks_data[$bid]
-                                    );
-                                }
-                            };
-                        }
-                    }
-                    unset($results);
-                }
-
-                $nuke_blocks_cacheData = !empty($nuke_blocks)
-                    ? $nuke_blocks
-                    : [];
-                $cache->store('nuke_blocks', $nuke_blocks_cacheData);
-                /*file_put_contents("cache/cache_nuke_blocks.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_blocks_cacheData);*/
-            }
-        }
-
-        //nuke_bookmarksite
-        if (
-            (!$cache->isCached("nuke_bookmarksite") or
-                in_array($mode, ['nuke_bookmarksite', 'all'])) &&
-            !in_array('nuke_bookmarksite', $exept_caches)
-        ) {
-            $results = $db
-                ->table(BOOKMARKSITE_TABLE)
-                ->order_by(['bid' => 'ASC'])
-                ->select();
-            $bookmarksite = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_bookmarksite")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $bid = $row['bid'];
-                    unset($row['bid']);
-                    $bookmarksite[$bid] = $row;
-                }
-                unset($results);
-            }
-
-            $nuke_bookmarksite_cacheData = !empty($bookmarksite)
-                ? $bookmarksite
-                : [];
-            $cache->store('nuke_bookmarksite', $nuke_bookmarksite_cacheData);
-            /*file_put_contents("cache/cache_nuke_bookmarksite.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_bookmarksite_cacheData);*/
-        }
-
-        //nuke_categories
-        if (
-            (!$cache->isCached("nuke_categories") or
-                in_array($mode, ['nuke_categories', 'all'])) &&
-            !in_array('nuke_categories', $exept_caches)
-        ) {
-            $results = $db
-                ->table(CATEGORIES_TABLE)
-                ->order_by(['catid' => 'ASC'])
-                ->select();
-
-            $categories = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_categories")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $catid = $row['catid'];
-                    $module = $row['module'];
-                    $categories[$module][$catid] = $row;
-                    $categories[$module][$catid]['catname_url'] = filter(
-                        sanitize(str2url($row['catname'])),
-                        "nohtml"
-                    );
-                }
-                unset($results);
-            }
-
-            $nuke_categories_cacheData = !empty($categories) ? $categories : [];
-            $cache->store('nuke_categories', $nuke_categories_cacheData);
-            /*file_put_contents("cache/cache_nuke_categories.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_categories_cacheData);*/
-        }
-
-        //nuke_points_groups
-        if (
-            (!$cache->isCached("nuke_points_groups") or
-                in_array($mode, ['nuke_points_groups', 'all'])) &&
-            !in_array('nuke_points_groups', $exept_caches)
-        ) {
-            $results = $db
-                ->table(POINTS_GROUPS_TABLE)
-                ->order_by(['id' => 'ASC'])
-                ->select();
-
-            $nuke_points_groups = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_points_groups")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $id = $row['id'];
-                    unset($row['id']);
-                    $nuke_points_groups[$id] = $row;
-                }
-                unset($results);
-            }
-
-            $nuke_points_groups_cacheData = !empty($nuke_points_groups)
-                ? $nuke_points_groups
-                : [];
-            $cache->store('nuke_points_groups', $nuke_points_groups_cacheData);
-            /*file_put_contents("cache/cache_nuke_points_groups.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_points_groups_cacheData);*/
-        }
-
-        //nuke_nav_menus
-        if (
-            (!$cache->isCached("nuke_nav_menus") or
-                in_array($mode, ['nuke_nav_menus', 'all'])) &&
-            !in_array('nuke_nav_menus', $exept_caches)
-        ) {
-            $results = $db->query(
-                "SELECT nd.*,nd.status as item_status,n.*, n.status as nav_status FROM " .
-                    NAV_MENUS_DATA_TABLE .
-                    " AS nd LEFT JOIN " .
-                    NAV_MENUS_TABLE .
-                    " AS n ON n.nav_id = nd.nav_id ORDER BY nd.weight ASC, nd.nid ASC"
-            );
-
-            $nuke_nav_menus = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_nav_menus")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $nav_status = intval($row['nav_status']);
-                    $item_status = intval($row['item_status']);
-
-                    if ($nav_status == 1) {
-                        $nav_id = intval($row['nav_id']);
-                        $nav_location = filter($row['nav_location'], "nohtml");
-                        $lang_nav_title =
-                            $row['lang_nav_title'] != ''
-                                ? phpnuke_unserialize(
-                                    stripslashes($row['lang_nav_title'])
-                                )
-                                : [];
-
-                        $nid = $row['nid'];
-
-                        $nuke_nav_menus[$nav_location][$nav_id][
-                            'nav_title'
-                        ] = filter($row['nav_title'], "nohtml");
-                        $nuke_nav_menus[$nav_location][$nav_id][
-                            'nav_id'
-                        ] = $nav_id;
-                        $nuke_nav_menus[$nav_location][$nav_id]['date'] =
-                            $row['date'];
-                        $nuke_nav_menus[$nav_location][$nav_id][
-                            'lang_nav_title'
-                        ] = $lang_nav_title;
-                        unset(
-                            $row['nav_id'],
-                            $row['nav_title'],
-                            $row['lang_nav_title'],
-                            $row['nav_location'],
-                            $row['date'],
-                            $row['nav_status']
-                        );
-                        $row['attributes'] =
-                            $row['attributes'] != ''
-                                ? phpnuke_unserialize(
-                                    stripslashes($row['attributes'])
-                                )
-                                : [];
-                        if ($item_status > 0) {
-                            $nuke_nav_menus[$nav_location][$nav_id][
-                                'nav_items'
-                            ][$nid] = $row;
-                        }
-                    }
-                }
-                unset($results);
-            }
-
-            $nuke_nav_menus_cacheData = !empty($nuke_nav_menus)
-                ? $nuke_nav_menus
-                : [];
-            $cache->store('nuke_nav_menus', $nuke_nav_menus_cacheData);
-            /*file_put_contents("cache/cache_nuke_nav_menus.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_nav_menus_cacheData);*/
-        }
-
-        //nuke_headlines
-        if (
-            (!$cache->isCached("nuke_headlines") or
-                in_array($mode, ['nuke_headlines', 'all'])) &&
-            !in_array('nuke_headlines', $exept_caches)
-        ) {
-            $results = $db
-                ->table(HEADLINES_TABLE)
-                ->order_by(['hid' => 'ASC'])
-                ->select();
-
-            $nuke_headlines = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_headlines")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $hid = $row['hid'];
-                    unset($row['hid']);
-                    $nuke_headlines[$hid] = $row;
-                }
-                unset($results);
-            }
-
-            $nuke_headlines_cacheData = !empty($nuke_headlines)
-                ? $nuke_headlines
-                : [];
-            $cache->store('nuke_headlines', $nuke_headlines_cacheData);
-            /*file_put_contents("cache/cache_nuke_headlines.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_headlines_cacheData);*/
-        }
-
-        //nuke_modules
-        if (
-            (!$cache->isCached("nuke_modules") or
-                in_array($mode, ['nuke_modules', 'all'])) &&
-            !in_array('nuke_modules', $exept_caches)
-        ) {
-            $results = $db
-                ->table(MODULES_TABLE)
-                ->order_by(['mid' => 'ASC'])
-                ->select();
-
-            $nuke_modules = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_modules")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $mid = $row['mid'];
-                    unset($row['mid']);
-                    $nuke_modules[$mid] = $row;
-                }
-                unset($results);
-            }
-
-            $results = $db
-                ->table(POSTS_META_TABLE)
-                ->where('meta_part', 'module_boxes')
-                ->select();
-            $nuke_modules_boxes = [];
-
-            if ($db->count() > 0) {
-                foreach ($results as $row) {
-                    $meta_key = $row['meta_key'];
-                    unset($row['meta_key']);
-                    $nuke_modules_boxes[$meta_key] = $row;
-                }
-                unset($results);
-            }
-
-            $nuke_modules_cacheData = !empty($nuke_modules)
-                ? $nuke_modules
-                : [];
-            $cache->store('nuke_modules', $nuke_modules_cacheData);
-            $nuke_modules_boxes_cacheData = !empty($nuke_modules_boxes)
-                ? $nuke_modules_boxes
-                : [];
-            $cache->store('nuke_modules_boxes', $nuke_modules_boxes_cacheData);
-            /*file_put_contents("cache/cache_nuke_modules.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_modules_cacheData);*/
-        }
-
-        //nuke_languages
-        if (
-            (!$cache->isCached("nuke_languages") or
-                in_array($mode, ['nuke_languages', 'all'])) &&
-            !in_array('nuke_languages', $exept_caches)
-        ) {
-            $results = $db
-                ->table(LANGUAGES_TABLE)
-                ->order_by(['lid' => 'ASC'])
-                ->select();
-
-            $nuke_languages = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_languages")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $main_word = $row['main_word'];
-                    unset($row['main_word']);
-                    $nuke_languages[$main_word] = [
-                        "lid" => intval($row['lid']),
-                        "equals" =>
-                            $row['equals'] != ""
-                                ? phpnuke_unserialize(
-                                    stripslashes($row['equals'])
-                                )
-                                : [],
-                    ];
-                }
-                unset($results);
-            }
-
-            $nuke_languages_cacheData = !empty($nuke_languages)
-                ? $nuke_languages
-                : [];
-            $cache->store('nuke_languages', $nuke_languages_cacheData);
-            /*file_put_contents("cache/cache_nuke_languages.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_languages_cacheData);*/
-        }
-
-        //nuke_modules_friendly_urls
-        if (
-            (!$cache->isCached("nuke_modules_friendly_urls") or
-                in_array($mode, ['nuke_modules_friendly_urls', 'all'])) &&
-            !in_array('nuke_modules_friendly_urls', $exept_caches)
-        ) {
-            global $friendly_links, $rewrite_rule;
-            if (
-                isset($friendly_links) &&
-                is_array($friendly_links) &&
-                !empty($friendly_links)
-            ) {
-                if (!$cache->isCached("nuke_modules_friendly_urls")) {
-                    $new_cache = true;
-                }
-                foreach (
-                    $friendly_links
-                    as $friendly_link_key => $friendly_links_val
-                ) {
-                    $friendly_urls['urlins'][] = "#^$friendly_link_key#";
-                    $friendly_urls['urlouts'][] = preg_replace(
-                        "#/+#",
-                        "/",
-                        preg_replace("#([^/]+)//#", "/", $friendly_links_val)
-                    );
-                }
-            }
-            unset($friendly_links);
-
-            $handle = opendir('modules');
-            $modules_list = [];
-            while ($mfile = readdir($handle)) {
-                if (
-                    is_dir("modules/$mfile") &&
-                    $mfile != '.' &&
-                    $mfile != '..' &&
-                    $mfile != 'Articles'
-                ) {
-                    $modules_list[] = $mfile;
-                }
-            }
-            closedir($handle);
-            sort($modules_list);
-            foreach ($modules_list as $modules_name) {
-                if (file_exists("modules/$modules_name/GT-$modules_name.php")) {
-                    @include "modules/$modules_name/GT-$modules_name.php";
-                    if (
-                        isset($friendly_links) &&
-                        is_array($friendly_links) &&
-                        !empty($friendly_links)
-                    ) {
-                        foreach (
-                            $friendly_links
-                            as $friendly_link_key => $friendly_links_val
-                        ) {
-                            $friendly_urls[
-                                'urlins'
-                            ][] = "#^$friendly_link_key#";
-                            $friendly_urls['urlouts'][] = preg_replace(
-                                "#/+#",
-                                "/",
-                                preg_replace(
-                                    "#([^/]+)//#",
-                                    "/",
-                                    $friendly_links_val
-                                )
-                            );
-                        }
-                    }
-                }
-                unset($friendly_links);
-            }
-
-            if (file_exists("modules/Articles/GT-Articles.php")) {
-                @include "modules/Articles/GT-Articles.php";
-                if (
-                    isset($friendly_links) &&
-                    is_array($friendly_links) &&
-                    !empty($friendly_links)
-                ) {
-                    foreach (
-                        $friendly_links
-                        as $friendly_link_key => $friendly_links_val
-                    ) {
-                        $friendly_urls['urlins'][] = "#^$friendly_link_key#";
-                        $friendly_urls['urlouts'][] = preg_replace(
-                            "#/+#",
-                            "/",
-                            preg_replace(
-                                "#([^/]+)//#",
-                                "/",
-                                $friendly_links_val
-                            )
-                        );
-                    }
-                }
-            }
-
-            $nuke_modules_friendly_urls_cacheData =
-                !empty($friendly_urls) && !empty($rewrite_rule)
-                    ? [$friendly_urls, $rewrite_rule]
-                    : [];
-            $cache->store(
-                'nuke_modules_friendly_urls',
-                $nuke_modules_friendly_urls_cacheData
-            );
-            /*file_put_contents("cache/cache_nuke_modules_friendly_urls.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_modules_friendly_urls_cacheData);*/
-        }
-
-        //nuke_mtsn_ipban
-        if (
-            (!$cache->isCached("nuke_mtsn_ipban") or
-                in_array($mode, ['nuke_mtsn_ipban', 'all'])) &&
-            !in_array('nuke_mtsn_ipban', $exept_caches)
-        ) {
-            $results = $db
-                ->table(MTSN_IPBAN_TABLE)
-                ->order_by(['id' => 'ASC'])
-                ->select();
-
-            $nuke_mtsn_ipbans = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_mtsn_ipban")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $id = $row['id'];
-                    unset($row['id']);
-                    $nuke_mtsn_ipbans[$id] = $row;
-                }
-                unset($results);
-            }
-
-            $nuke_mtsn_ipban_cacheData = !empty($nuke_mtsn_ipbans)
-                ? $nuke_mtsn_ipbans
-                : [];
-            $cache->store('nuke_mtsn_ipban', $nuke_mtsn_ipban_cacheData);
-            /*file_put_contents("cache/cache_nuke_mtsn_ipban.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_mtsn_ipban_cacheData);*/
-        }
-
-        //nuke_surveys
-        if (
-            (!$cache->isCached("nuke_surveys") or
-                in_array($mode, ['nuke_surveys', 'all'])) &&
-            !in_array('nuke_surveys', $exept_caches)
-        ) {
-            $results = $db
-                ->table(SURVEYS_TABLE)
-                ->order_by(['pollID' => 'ASC'])
-                ->select();
-
-            $nuke_mtsn_ipbans = [];
-            if ($db->count() > 0) {
-                if (!$cache->isCached("nuke_surveys")) {
-                    $new_cache = true;
-                }
-                foreach ($results as $row) {
-                    $pollID = $row['pollID'];
-                    $options = stripslashes($row['options']);
-                    $options = phpnuke_unserialize($options);
-                    $row['options'] = $options;
-                    unset($row['pollID']);
-                    $nuke_surveys[$pollID] = $row;
-                }
-                unset($results);
-            }
-
-            $nuke_surveys_cacheData = !empty($nuke_surveys)
-                ? $nuke_surveys
-                : [];
-            $cache->store('nuke_surveys', $nuke_surveys_cacheData);
-            /*file_put_contents("cache/cache_nuke_surveys.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_surveys_cacheData);*/
-        }
-
-        //nuke_subscriptions
-        /*if((!$cache->isCached("nuke_subscriptions") OR in_array($mode, array('nuke_subscriptions','all'))) && !in_array('nuke_subscriptions', $exept_caches))
+			$nuke_mtsn_ipbans = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_mtsn_ipban"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$id = $row['id'];
+					unset($row['id']);
+					$nuke_mtsn_ipbans[$id] = $row;
+				}
+				unset($results);
+			}
+			
+			$nuke_mtsn_ipban_cacheData = (!empty($nuke_mtsn_ipbans)) ? $nuke_mtsn_ipbans:array();
+			$cache->store('nuke_mtsn_ipban', $nuke_mtsn_ipban_cacheData);
+			/*file_put_contents("cache/cache_nuke_mtsn_ipban.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_mtsn_ipban_cacheData);*/
+		}
+		
+		//nuke_surveys
+		if((!$cache->isCached("nuke_surveys") OR in_array($mode, array('nuke_surveys','all'))) && !in_array('nuke_surveys', $exept_caches))
+		{			
+			$results = $db->table(SURVEYS_TABLE)
+						->order_by(['pollID' => 'ASC'])
+						->select();
+						
+			$nuke_mtsn_ipbans = array();
+			if($db->count() > 0)
+			{
+				if(!$cache->isCached("nuke_surveys"))
+					$new_cache = true;
+				foreach($results as $row)
+				{
+					$pollID = $row['pollID'];
+					$options = stripslashes($row['options']);
+					$options = phpnuke_unserialize($options);
+					$row['options'] = $options;
+					unset($row['pollID']);
+					$nuke_surveys[$pollID] = $row;
+				}
+				unset($results);
+			}
+			
+			$nuke_surveys_cacheData = (!empty($nuke_surveys)) ? $nuke_surveys:array();
+			$cache->store('nuke_surveys', $nuke_surveys_cacheData);
+			/*file_put_contents("cache/cache_nuke_surveys.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_surveys_cacheData);*/
+		}
+		
+		//nuke_subscriptions
+		/*if((!$cache->isCached("nuke_subscriptions") OR in_array($mode, array('nuke_subscriptions','all'))) && !in_array('nuke_subscriptions', $exept_caches))
 		{
 			if(!$cache->isCached("nuke_subscriptions"))
 				$new_cache = true;
@@ -860,547 +657,409 @@ function cache_system($mode = "", $extra_code = [])
 			//file_put_contents("cache/cache_nuke_subscriptions.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_subscriptions_cacheData);
 		}*/
 
-        if (is_array($cache_systems) && !empty($cache_systems)) {
-            foreach ($cache_systems as $cache_system_name => $cache_system) {
-                if (
-                    $cache_system_name != "" &&
-                    isset($cache_system['main_id']) &&
-                    $cache_system['main_id'] != "" &&
-                    isset($cache_system['table']) &&
-                    $cache_system['table'] != ""
-                ) {
-                    if (
-                        (!$cache->isCached($cache_system_name) or
-                            in_array($mode, ["$cache_system_name", 'all'])) &&
-                        !in_array("$cache_system_name", $exept_caches)
-                    ) {
-                        if (isset($cache_system['fetch_type'])) {
-                            $db->setFetchType($cache_system['fetch_type']);
-                        }
+		if(is_array($cache_systems) && !empty($cache_systems))
+		{
+			foreach($cache_systems as $cache_system_name => $cache_system)
+			{
+				if($cache_system_name != "" && isset($cache_system['main_id']) && $cache_system['main_id'] != "" && isset($cache_system['table']) && $cache_system['table'] != "")
+				{
+					if((!$cache->isCached($cache_system_name) OR in_array($mode, array("$cache_system_name",'all'))) && !in_array("$cache_system_name", $exept_caches))
+					{
+						if(isset($cache_system['fetch_type']))
+						{
+							$db->setFetchType($cache_system['fetch_type']);
+						}
+						
+						$results = $db->query("SELECT * FROM ".$cache_system['table']."".((isset($cache_system['where'])&& $cache_system['where'] != '') ? " WHERE ".$cache_system['where']."":"")."".((isset($cache_system['order'])&& $cache_system['order'] != '') ? " ORDER BY ".$cache_system['main_id']." ".$cache_system['order']."":"")."");
+						
+						$this_data_array = array();
+							
+						if(isset($cache_system['first_code']))
+							eval($cache_system['first_code']);
 
-                        $results = $db->query(
-                            "SELECT * FROM " .
-                                $cache_system['table'] .
-                                "" .
-                                (isset($cache_system['where']) &&
-                                $cache_system['where'] != ''
-                                    ? " WHERE " . $cache_system['where'] . ""
-                                    : "") .
-                                "" .
-                                (isset($cache_system['order']) &&
-                                $cache_system['order'] != ''
-                                    ? " ORDER BY " .
-                                        $cache_system['main_id'] .
-                                        " " .
-                                        $cache_system['order'] .
-                                        ""
-                                    : "") .
-                                ""
-                        );
-
-                        $this_data_array = [];
-
-                        if (isset($cache_system['first_code'])) {
-                            eval($cache_system['first_code']);
-                        }
-
-                        if ($db->count() > 0) {
-                            if (!$cache->isCached($cache_system_name)) {
-                                $new_cache = true;
-                            }
-                            foreach ($results as $row) {
-                                $this_main_id = $row[$cache_system['main_id']];
-
-                                $this_data_array[$this_main_id] = $row;
-
-                                if (isset($cache_system['loop_code'])) {
-                                    eval($cache_system['loop_code']);
-                                }
-                            }
-                            unset($results);
-                        }
-
-                        if (isset($cache_system['end_code'])) {
-                            eval($cache_system['end_code']);
-                        }
-
-                        $this_cacheData = !empty($this_data_array)
-                            ? $this_data_array
-                            : [];
-                        $cache->store($cache_system_name, $this_cacheData);
-                        /*file_put_contents("cache/cache_".$cache_system_name.".php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$this_cacheData);*/
-                    }
-                } elseif (
-                    $cache->isCached($cache_system_name) &&
-                    in_array($mode, ["$cache_system_name", 'all']) &&
-                    !in_array("$cache_system_name", $exept_caches)
-                ) {
-                    $cache->erase($cache_system_name);
-                }
-            }
-        }
-    }
-    if ($new_cache && !defined("IN_FLUSH")) {
-        // Request URL Redirect To Nuke Url
-        $Req_Protocol =
-            strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === false
-                ? 'http'
-                : 'https';
-        $Req_Host = $_SERVER['HTTP_HOST'];
-        $Req_Uri = $_SERVER['REQUEST_URI'];
-        $Req_URI = $Req_Protocol . '://' . $Req_Host . $Req_Uri;
-        redirect_to($Req_URI);
-    }
+						if($db->count() > 0)
+						{
+							if(!$cache->isCached($cache_system_name))
+								$new_cache = true;
+							foreach($results as $row)
+							{
+								$this_main_id = $row[$cache_system['main_id']];
+								
+								$this_data_array[$this_main_id] = $row;
+								
+								if(isset($cache_system['loop_code']))
+								{
+									eval($cache_system['loop_code']);
+								}
+							}
+							unset($results);
+						}
+						
+						if(isset($cache_system['end_code']))
+							eval($cache_system['end_code']);
+							
+						$this_cacheData = (!empty($this_data_array)) ? $this_data_array:array();
+						$cache->store($cache_system_name, $this_cacheData);
+						/*file_put_contents("cache/cache_".$cache_system_name.".php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$this_cacheData);*/
+					}
+				}
+				elseif($cache->isCached($cache_system_name) && in_array($mode, array("$cache_system_name",'all')) && !in_array("$cache_system_name", $exept_caches))
+				{
+					$cache->erase($cache_system_name);
+				}
+			}
+		}
+	}
+	if($new_cache && !defined("IN_FLUSH"))
+	{
+		// Request URL Redirect To Nuke Url
+		$Req_Protocol 	= strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === FALSE ? 'http' : 'https';
+		$Req_Host     	= $_SERVER['HTTP_HOST'];
+		$Req_Uri		= $_SERVER['REQUEST_URI'];
+		$Req_URI		= $Req_Protocol . '://' . $Req_Host . $Req_Uri;
+		redirect_to($Req_URI);
+	}
 }
 
-function get_cache_file_contents($cache_file, $secure = false, $recache = false)
+function get_cache_file_contents($cache_file, $secure=false, $recache=false)
 {
-    global $cache, $pn_Sessions;
-    if ($recache) {
-        cache_system($cache_file);
-    }
+	global $cache, $pn_Sessions;
+	if($recache)
+		cache_system($cache_file);
+		
+	$data = array();
+	
+	if($secure && $pn_Sessions->exists($cache_file))
+		$data = $pn_Sessions->get($cache_file, false);
+	else
+		$data = $cache->retrieve($cache_file);
 
-    $data = [];
-
-    if ($secure && $pn_Sessions->exists($cache_file)) {
-        $data = $pn_Sessions->get($cache_file, false);
-    } else {
-        $data = $cache->retrieve($cache_file);
-    }
-
-    return $data;
+	return $data;
 }
 // cache functions
 
 //serialize
-function phpnuke_unserialize($original)
+function phpnuke_unserialize( $original )
 {
-    if (is_serialized($original)) {
-        // don't attempt to unserialize data that wasn't serialized going in
-        return @unserialize($original);
-    }
-    return $original;
+	if ( is_serialized( $original ) ) // don't attempt to unserialize data that wasn't serialized going in
+		return @unserialize( $original );
+	return $original;
 }
 
-function is_serialized($data, $strict = true)
+function is_serialized( $data, $strict = true )
 {
-    // if it isn't a string, it isn't serialized
-    if (!is_string($data)) {
-        return false;
-    }
-    $data = trim($data);
-    if ('N;' == $data) {
-        return true;
-    }
-    $length = strlen($data);
-    if ($length < 4) {
-        return false;
-    }
-    if (':' !== $data[1]) {
-        return false;
-    }
-    if ($strict) {
-        $lastc = $data[$length - 1];
-        if (';' !== $lastc && '}' !== $lastc) {
-            return false;
-        }
-    } else {
-        $semicolon = strpos($data, ';');
-        $brace = strpos($data, '}');
-        // Either ; or } must exist.
-        if (false === $semicolon && false === $brace) {
-            return false;
-        }
-        // But neither must be in the first X characters.
-        if (false !== $semicolon && $semicolon < 3) {
-            return false;
-        }
-        if (false !== $brace && $brace < 4) {
-            return false;
-        }
-    }
-    $token = $data[0];
-    switch ($token) {
-        case 's':
-            if ($strict) {
-                if ('"' !== $data[$length - 2]) {
-                    return false;
-                }
-            } elseif (false === strpos($data, '"')) {
-                return false;
-            }
-        // or else fall through
-        case 'a':
-        case 'O':
-            return (bool) preg_match("/^{$token}:[0-9]+:/s", $data);
-        case 'b':
-        case 'i':
-        case 'd':
-            $end = $strict ? '$' : '';
-            return (bool) preg_match("/^{$token}:[0-9.E-]+;$end/", $data);
-    }
-    return false;
+	// if it isn't a string, it isn't serialized
+	if ( ! is_string( $data ) )
+		return false;
+	$data = trim( $data );
+ 	if ( 'N;' == $data )
+		return true;
+	$length = strlen( $data );
+	if ( $length < 4 )
+		return false;
+	if ( ':' !== $data[1] )
+		return false;
+	if ( $strict ) {
+		$lastc = $data[ $length - 1 ];
+		if ( ';' !== $lastc && '}' !== $lastc )
+			return false;
+	}
+	else
+	{
+		$semicolon = strpos( $data, ';' );
+		$brace     = strpos( $data, '}' );
+		// Either ; or } must exist.
+		if ( false === $semicolon && false === $brace )
+			return false;
+		// But neither must be in the first X characters.
+		if ( false !== $semicolon && $semicolon < 3 )
+			return false;
+		if ( false !== $brace && $brace < 4 )
+			return false;
+	}
+	$token = $data[0];
+	switch ( $token )
+	{
+		case 's' :
+			if ( $strict ) {
+				if ( '"' !== $data[ $length - 2 ] )
+					return false;
+			}
+			elseif ( false === strpos( $data, '"' ) )
+			{
+				return false;
+			}
+			// or else fall through
+		case 'a' :
+		case 'O' :
+			return (bool) preg_match( "/^{$token}:[0-9]+:/s", $data );
+		case 'b' :
+		case 'i' :
+		case 'd' :
+			$end = $strict ? '$' : '';
+			return (bool) preg_match( "/^{$token}:[0-9.E-]+;$end/", $data );
+	}
+	return false;
 }
 
-function is_serialized_string($data)
+function is_serialized_string( $data )
 {
-    // if it isn't a string, it isn't a serialized string
-    if (!is_string($data)) {
-        return false;
-    }
-    $data = trim($data);
-    $length = strlen($data);
-    if ($length < 4) {
-        return false;
-    } elseif (':' !== $data[1]) {
-        return false;
-    } elseif (';' !== $data[$length - 1]) {
-        return false;
-    } elseif ($data[0] !== 's') {
-        return false;
-    } elseif ('"' !== $data[$length - 2]) {
-        return false;
-    } else {
-        return true;
-    }
+	// if it isn't a string, it isn't a serialized string
+	if ( !is_string( $data ) )
+		return false;
+	$data = trim( $data );
+	$length = strlen( $data );
+	if ( $length < 4 )
+		return false;
+	elseif ( ':' !== $data[1] )
+		return false;
+	elseif ( ';' !== $data[$length-1] )
+		return false;
+	elseif ( $data[0] !== 's' )
+		return false;
+	elseif ( '"' !== $data[$length-2] )
+		return false;
+	else
+		return true;
 }
 
-function phpnuke_serialize($data)
-{
-    if (is_array($data) || is_object($data)) {
-        return serialize($data);
-    }
+function phpnuke_serialize( $data ) {
+	if ( is_array( $data ) || is_object( $data ) )
+		return serialize( $data );
 
-    if (is_serialized($data, false)) {
-        return serialize($data);
-    }
+	if ( is_serialized( $data, false ) )
+		return serialize( $data );
 
-    return $data;
+	return $data;
 }
 
 function is_base64_encoded($data)
 {
-    return preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $data);
+	return (preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $data));
 }
 //serialize
 
 // configs functions
-function update_configs($config_name, $config_value)
+function update_configs( $config_name, $config_value )
 {
-    global $db, $nuke_configs;
+	global $db, $nuke_configs;
 
-    $config_name = trim($config_name);
-    if (empty($config_name)) {
-        return false;
-    }
+	$config_name = trim($config_name);
+	if ( empty($config_name) )
+		return false;
 
-    if (is_object($config_value)) {
-        $config_value = clone $config_value;
-    }
+	if ( is_object( $config_value ) )
+		$config_value = clone $config_value;
 
-    $old_value = isset($nuke_configs[$config_name])
-        ? $nuke_configs[$config_name]
-        : false;
+	$old_value = (isset($nuke_configs[$config_name])) ? $nuke_configs[$config_name]:false;
 
-    // If the new and old values are the same, no need to update.
-    if ($config_value === $old_value) {
-        return false;
-    }
+	// If the new and old values are the same, no need to update.
+	if ( $config_value === $old_value )
+		return false;
 
-    if (false === $old_value) {
-        return add_configs($config_name, $config_value);
-    }
+	if ( false === $old_value )
+		return add_configs( $config_name, $config_value );
 
-    $serialized_value = phpnuke_serialize($config_value);
+	$serialized_value = phpnuke_serialize( $config_value );
 
-    $result = $db
-        ->table(CONFIG_TABLE)
-        ->where('config_name', $config_name)
-        ->update([
-            'config_value' => $serialized_value,
-        ]);
-
-    if (!$result) {
-        return false;
-    }
-    cache_system("nuke_configs");
-    return true;
+	$result = $db->table(CONFIG_TABLE)
+		->where('config_name', $config_name)
+		->update([
+			'config_value' => $serialized_value
+		]);
+	
+	if ( ! $result )
+		return false;
+	cache_system("nuke_configs");
+	return true;
 }
 
-function add_configs($config_name, $config_value = '')
+function add_configs( $config_name, $config_value = '')
 {
-    global $db, $nuke_configs;
+	global $db, $nuke_configs;
 
-    $config_name = trim($config_name);
-    if (empty($config_name)) {
-        return false;
-    }
+	$config_name = trim($config_name);
+	if ( empty($config_name) )
+		return false;
 
-    if (is_object($config_value)) {
-        $config_value = clone $config_value;
-    }
+	if ( is_object($config_value) )
+		$config_value = clone $config_value;
 
-    if (!is_array($nuke_configs) || !isset($nuke_configs[$config_name])) {
-        if (
-            isset($nuke_configs[$config_name]) &&
-            false !== $nuke_configs[$config_name]
-        ) {
-            return false;
-        }
-    }
+	if ( !is_array( $nuke_configs ) || !isset( $nuke_configs[$config_name] ) )
+		if (isset($nuke_configs[$config_name]) && false !== $nuke_configs[$config_name] )
+			return false;
 
-    $serialized_value = phpnuke_serialize($config_value);
+	$serialized_value = phpnuke_serialize( $config_value );
 
-    $result = $db->table(CONFIG_TABLE)->insert([
-        'config_name' => $config_name,
-        'config_value' => $serialized_value,
-    ]);
-
-    if (!$result) {
-        return false;
-    }
-    cache_system("nuke_configs");
-    return true;
+	$result = $db->table(CONFIG_TABLE)
+		->insert([
+			'config_name' => $config_name,
+			'config_value' => $serialized_value
+		]);
+		
+	if ( ! $result )
+		return false;
+	cache_system("nuke_configs");
+	return true;
 }
 // configs functions
 
 // captcha functions
-function makePass($cid, $custum_options = [], $google_recaptcha = false)
+function makePass($cid, $custum_options = array(), $google_recaptcha = false)
 {
-    global $nuke_configs, $hooks;
-
-    $security_code = ["image" => "", "input" => ""];
-
-    if (
-        ($nuke_configs['seccode_type'] == 2 || $google_recaptcha) &&
-        $nuke_configs['google_recaptcha_sitekey'] != ''
-    ) {
-        $security_code['input'] = '';
-        $security_code['image'] =
-            "<script src=\"https://www.google.com/recaptcha/api.js?hl=" .
-            _GOOGLE_RECAPTCHA_LANG .
-            "\"></script>
-		<div id=\"security_code_$cid\" class=\"security_code_container\"><div class=\"g-recaptcha\" data-sitekey=\"" .
-            $nuke_configs['google_recaptcha_sitekey'] .
-            "\" data-size=\"compact\"></div></div>";
-    } elseif (extension_loaded("gd") && $nuke_configs['seccode_type'] == 1) {
-        $options = [
-            "height" => isset($custum_options['height'])
-                ? $custum_options['height']
-                : 50,
-            "img_attr" => [
-                "id" => isset($custum_options['img_attr']['id'])
-                    ? $custum_options['img_attr']['id']
-                    : "capchaimage" . $cid,
-                "style" =>
-                    "cursor: pointer;" .
-                    (isset($custum_options['img_attr']['style'])
-                        ? $custum_options['img_attr']['style']
-                        : ""),
-                "title" =>
-                    _CLICKFORREFRESH .
-                    (isset($custum_options['img_attr']['title'])
-                        ? $custum_options['img_attr']['title']
-                        : ""),
-                "alt" =>
-                    _SECCODE .
-                    (isset($custum_options['img_attr']['alt'])
-                        ? $custum_options['img_attr']['alt']
-                        : ""),
-            ],
-            "input_attr" => [
-                "id" => isset($custum_options['input_attr']['id'])
-                    ? $custum_options['input_attr']['id']
-                    : "security_code" . $cid,
-            ],
-        ];
-
-        if (isset($custum_options['img_attr']['style'])) {
-            unset($custum_options['img_attr']['style']);
-        }
-        if (isset($custum_options['img_attr']['title'])) {
-            unset($custum_options['img_attr']['title']);
-        }
-        if (isset($custum_options['img_attr']['alt'])) {
-            unset($custum_options['img_attr']['alt']);
-        }
-        if (isset($custum_options['img_attr']['id'])) {
-            unset($custum_options['img_attr']['id']);
-        }
-        if (isset($custum_options['input_attr']['id'])) {
-            unset($custum_options['input_attr']['id']);
-        }
-
-        if (isset($custum_options['height'])) {
-            unset($custum_options['height']);
-        }
-
-        if (!empty($custum_options)) {
-            $options = array_merge_recursive($options, $custum_options);
-        }
-
-        $img_attrs = $input_attrs = [];
-        foreach ($options['img_attr'] as $key => $value) {
-            $img_attrs[] = $value != '' ? "$key=\"$value\"" : "$key";
-        }
-        foreach ($options['input_attr'] as $key => $value) {
-            $input_attrs[] = $value != '' ? "$key=\"$value\"" : "$key";
-        }
-
-        $img_attrs = implode(" ", $img_attrs);
-        $input_attrs = implode(" ", $input_attrs);
-
-        $security_code['image'] =
-            "<img src=\"" .
-            $nuke_configs['nukeurl'] .
-            "index.php?captcha=true&sid=" .
-            md5(uniqid(_NOWTIME)) .
-            "&id=$cid&language=" .
-            $nuke_configs['currentlang'] .
-            "&height=" .
-            $options['height'] .
-            "\" onclick=\"document.getElementById('capchaimage" .
-            $cid .
-            "').src = '" .
-            $nuke_configs['nukeurl'] .
-            "index.php?captcha=true&sid=' + Math.random()+'&id=$cid&language=" .
-            $nuke_configs['currentlang'] .
-            "&height=" .
-            $options['height'] .
-            "'; return false\" " .
-            $img_attrs .
-            " />";
-        $security_code['input'] =
-            "<input name=\"security_code\" type=\"text\" " .
-            $input_attrs .
-            " /><input name=\"security_code_id\" type=\"hidden\" value=\"$cid\">";
-    }
-
-    $security_code = $hooks->apply_filters(
-        "make_pass_filter",
-        $security_code,
-        $cid,
-        $custum_options,
-        $google_recaptcha
-    );
-
-    return $security_code;
+	global $nuke_configs, $hooks;
+	
+	$security_code = array("image" => "", "input" => "");
+	
+	if(($nuke_configs['seccode_type'] == 2 || $google_recaptcha) && $nuke_configs['google_recaptcha_sitekey'] != '')
+	{
+		$security_code['input'] = '';
+		$security_code['image'] = "<script src=\"https://www.google.com/recaptcha/api.js?hl="._GOOGLE_RECAPTCHA_LANG."\"></script>
+		<div id=\"security_code_$cid\" class=\"security_code_container\"><div class=\"g-recaptcha\" data-sitekey=\"".$nuke_configs['google_recaptcha_sitekey']."\" data-size=\"compact\"></div></div>";
+	}
+	elseif(extension_loaded("gd") && $nuke_configs['seccode_type'] == 1)
+	{
+		$options = array(
+			"height" => (isset($custum_options['height']) ? $custum_options['height']:50),
+			"img_attr" => array(
+				"id" => (isset($custum_options['img_attr']['id']) ? $custum_options['img_attr']['id']:"capchaimage".$cid),
+				"style" => "cursor: pointer;".(isset($custum_options['img_attr']['style']) ? $custum_options['img_attr']['style']:""),
+				"title" => _CLICKFORREFRESH.(isset($custum_options['img_attr']['title']) ? $custum_options['img_attr']['title']:""),
+				"alt" => _SECCODE.(isset($custum_options['img_attr']['alt']) ? $custum_options['img_attr']['alt']:""),
+			),
+			"input_attr" => array(
+				"id" => (isset($custum_options['input_attr']['id']) ? $custum_options['input_attr']['id']:"security_code".$cid),
+			)
+		);
+		
+		if(isset($custum_options['img_attr']['style']))
+			unset($custum_options['img_attr']['style']);
+		if(isset($custum_options['img_attr']['title']))
+			unset($custum_options['img_attr']['title']);
+		if(isset($custum_options['img_attr']['alt']))
+			unset($custum_options['img_attr']['alt']);
+		if(isset($custum_options['img_attr']['id']))
+			unset($custum_options['img_attr']['id']);
+		if(isset($custum_options['input_attr']['id']))
+			unset($custum_options['input_attr']['id']);
+		
+		if(isset($custum_options['height']))
+			unset($custum_options['height']);
+			
+		
+		if(!empty($custum_options))
+			$options = array_merge_recursive($options, $custum_options);
+		
+		$img_attrs = $input_attrs = array();
+		foreach($options['img_attr'] as $key => $value)
+			$img_attrs[] = ($value != '') ? "$key=\"$value\"":"$key";
+		foreach($options['input_attr'] as $key => $value)
+			$input_attrs[] = ($value != '') ? "$key=\"$value\"":"$key";
+		
+		$img_attrs = implode(" ", $img_attrs);
+		$input_attrs = implode(" ", $input_attrs);
+				
+		$security_code['image'] = "<img src=\"".$nuke_configs['nukeurl']."index.php?captcha=true&sid=".md5(uniqid(_NOWTIME))."&id=$cid&language=".$nuke_configs['currentlang']."&height=".$options['height']."\" onclick=\"document.getElementById('capchaimage".$cid."').src = '".$nuke_configs['nukeurl']."index.php?captcha=true&sid=' + Math.random()+'&id=$cid&language=".$nuke_configs['currentlang']."&height=".$options['height']."'; return false\" ".$img_attrs." />";
+		$security_code['input'] = "<input name=\"security_code\" type=\"text\" ".$input_attrs." /><input name=\"security_code_id\" type=\"hidden\" value=\"$cid\">";
+	}
+	
+	$security_code = $hooks->apply_filters("make_pass_filter", $security_code, $cid, $custum_options, $google_recaptcha);
+	
+	return($security_code);
 }
 
-function code_check(
-    $security_code,
-    $security_code_id,
-    $google_recaptcha = false
-) {
-    global $nuke_configs, $visitor_ip, $hooks;
-
-    $hooks->do_action(
-        "code_check_action",
-        $security_code,
-        $security_code_id,
-        $google_recaptcha
-    );
-
-    $g_recaptcha =
-        $nuke_configs['google_recaptcha_sitekey'] != '' &&
-        $nuke_configs['google_recaptcha_secretkey'] != '' &&
-        ($nuke_configs['seccode_type'] == 2 || $google_recaptcha)
-            ? true
-            : false;
-
-    if ($g_recaptcha) {
-        if (
-            isset($_POST['g-recaptcha-response']) &&
-            $_POST['g-recaptcha-response'] != ''
-        ) {
-            $g_recaptcha_response = filter(
-                $_POST['g-recaptcha-response'],
-                "nohtml"
-            );
-            if (function_exists('curl_version')) {
-                require_once INCLUDE_PATH . '/Curl/Curl.php';
-                require_once INCLUDE_PATH . '/Curl/CaseInsensitiveArray.php';
-
-                $curl = new Curl();
-                $curl->setUserAgent('');
-                $curl->setReferrer('');
-                $curl->setHeader('X-Requested-With', 'XMLHttpRequest');
-                $curl->post("https://www.google.com/recaptcha/api/siteverify", [
-                    "secret" => $nuke_configs['google_recaptcha_secretkey'],
-                    "response" => $g_recaptcha_response,
-                    "remoteip" => $visitor_ip,
-                ]);
-                $response = $curl->response;
-
-                if (!is_object($response) && $response != '') {
-                    $response = json_decode($response);
-                }
-
-                return $response->success == 1 ? true : false;
-            } elseif (
-                extension_loaded('sockets') &&
-                function_exists('fsockopen')
-            ) {
-                @require_once INCLUDE_PATH . "/class.HttpFsockopen.php";
-                $object = new HttpFsockopen(
-                    "https://www.google.com/recaptcha/api/siteverify"
-                );
-                $object->setTimeout(15);
-                $object->setPostData([
-                    "secret" => $nuke_configs['google_recaptcha_secretkey'],
-                    "response" => $g_recaptcha_response,
-                    "remoteip" => $visitor_ip,
-                ]);
-
-                $response = $object->exec();
-                if ($response->getErrno()) {
-                    return false;
-                } else {
-                    $response = $response->getContent();
-
-                    if ($response != '') {
-                        $response = json_decode($response);
-                    }
-
-                    return $response->success == 1 ? true : false;
-                }
-            }
-            return false;
-        }
-        return false;
-    } elseif (
-        extension_loaded("gd") &&
-        $nuke_configs['seccode_type'] == 1 &&
-        !$google_recaptcha
-    ) {
-        include "includes/captcha/securimage.php";
-        $img = new Securimage();
-        $img->setNamespace($security_code_id);
-        if ($img->check($security_code) == true && !empty($security_code)) {
-            return true;
-        }
-        return false;
-    }
-
-    return true;
+function code_check($security_code, $security_code_id, $google_recaptcha = false)
+{
+	global $nuke_configs, $visitor_ip, $hooks;
+	
+	$hooks->do_action("code_check_action", $security_code, $security_code_id, $google_recaptcha);
+	
+	$g_recaptcha = ($nuke_configs['google_recaptcha_sitekey'] != '' && $nuke_configs['google_recaptcha_secretkey'] != '' && ($nuke_configs['seccode_type'] == 2 || $google_recaptcha)) ? true:false;
+	
+	if($g_recaptcha)
+	{
+		if(isset($_POST['g-recaptcha-response']) && $_POST['g-recaptcha-response'] != '')
+		{
+			$g_recaptcha_response = filter($_POST['g-recaptcha-response'], "nohtml");
+			if (function_exists('curl_version'))
+			{
+				require_once(INCLUDE_PATH.'/Curl/Curl.php');
+				require_once(INCLUDE_PATH.'/Curl/CaseInsensitiveArray.php');
+				
+				$curl = new Curl();
+				$curl->setUserAgent('');
+				$curl->setReferrer('');
+				$curl->setHeader('X-Requested-With', 'XMLHttpRequest');
+				$curl->post("https://www.google.com/recaptcha/api/siteverify", array(
+					"secret" => $nuke_configs['google_recaptcha_secretkey'],
+					"response" => $g_recaptcha_response,
+					"remoteip" => $visitor_ip,
+				));
+				$response = $curl->response;
+				
+				if(!is_object($response) && $response != '')
+					$response = json_decode($response);
+				
+				return ($response->success == 1) ? true:false;
+			}
+			elseif (extension_loaded('sockets') && function_exists('fsockopen') )
+			{
+				@require_once(INCLUDE_PATH."/class.HttpFsockopen.php");
+				$object = new HttpFsockopen("https://www.google.com/recaptcha/api/siteverify");
+				$object->setTimeout(15);
+				$object->setPostData(array(
+					"secret" => $nuke_configs['google_recaptcha_secretkey'],
+					"response" => $g_recaptcha_response,
+					"remoteip" => $visitor_ip,
+				));
+				
+				$response = $object->exec();
+				if($response->getErrno())
+					return false;
+				else
+				{
+					$response = $response->getContent();
+				
+					if($response != '')
+						$response = json_decode($response);
+					
+					return ($response->success == 1) ? true:false;
+				}
+			}
+			return false;		
+		}
+		return false;
+	}	
+	elseif (extension_loaded("gd") && $nuke_configs['seccode_type'] == 1 && !$google_recaptcha)
+	{
+		include("includes/captcha/securimage.php");
+		$img = new Securimage();
+		$img->setNamespace($security_code_id);
+		if ($img->check($security_code) == true && !empty($security_code))
+		{
+			return true;
+		}
+		return false;
+	}
+		
+	return true;
 }
 // captcha functions
 
 // permissions functions
 function is_admin($admin_id = '')
 {
-    global $admin;
-    if (!$admin) {
-        return 0;
-    }
+    global $admin; 
+    if (!$admin) { return 0; }
 
     $aid = $admin[0];
     $hmac = $admin[1];
     $expiration = $admin[2];
     $aid = substr(addslashes($aid), 0, 25);
     if (!empty($aid) && !empty($hmac)) {
-        if (phpnuke_validate_user_cookie($admin, "admin")) {
-            return true;
+        if (phpnuke_validate_user_cookie($admin, "admin"))
+		{
+        	return true;
         }
     }
     return false;
@@ -1408,222 +1067,148 @@ function is_admin($admin_id = '')
 
 function is_an_admin($admin_id = '')
 {
-    global $admin;
-
-    if (isset($admin_id) && $admin_id != '') {
-        $nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
-        return isset($nuke_authors_cacheData[$admin_id]) ? true : false;
-    }
+    global $admin; 
+	
+	if(isset($admin_id) && $admin_id != '')
+	{
+		$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+		return (isset($nuke_authors_cacheData[$admin_id])) ? true:false;
+	}
 }
 
-function is_God($admin_id = '')
+function is_God($admin_id='')
 {
     global $admin;
-
-    $nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
-
-    if ($admin_id == '') {
-        if (!is_admin()) {
-            return false;
-        }
-        $aid = $admin[0];
-    } else {
-        $aid = $admin_id;
-    }
-
-    if ($nuke_authors_cacheData[$aid]['name'] == 'God') {
-        return true;
-    } else {
-        return false;
-    }
+	
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+	
+	if($admin_id == '')
+	{
+		if(!is_admin()) return false;
+		$aid = $admin[0];
+	}
+	else
+	{
+		$aid = $admin_id;
+	}
+	
+	if($nuke_authors_cacheData[$aid]['name'] == 'God')
+		return true;
+	else
+		return false;
 }
 
-function is_user($username = '')
+function is_user($username='')
 {
-    global $userinfo, $users_system;
-    if ($username != '') {
-        $result = $db->query(
-            "SELECT " .
-                $users_system->user_fields['user_id'] .
-                " as user_id FROM " .
-                $users_system->users_table .
-                " WHERE " .
-                $users_system->user_fields['username'] .
-                " = '$username' " .
-                ($users_system->user_fields['common_where'] != ''
-                    ? " AND " . $users_system->user_fields['common_where']
-                    : "") .
-                ""
-        );
-        $num_result = intval($result->count());
-        if ($num_result > 0) {
-            return true;
-        }
-    } else {
-        if (isset($userinfo) && !empty($userinfo)) {
-            if (
-                isset($userinfo['user_id']) &&
-                (isset($userinfo['is_registered']) &&
-                    $userinfo['is_registered'] == true)
-            ) {
-                return true;
-            }
-        }
-    }
-    return false;
+	global $userinfo, $users_system;
+	if($username != '')
+	{
+		$result = $db->query("SELECT ".$users_system->user_fields['user_id']." as user_id FROM ".$users_system->users_table." WHERE ".$users_system->user_fields['username']." = '$username' ".(($users_system->user_fields['common_where'] != '') ? " AND ".$users_system->user_fields['common_where']:"")."");
+		$num_result = intval($result->count());
+		if($num_result > 0)
+			return true;
+	}
+	else
+	{
+		if(isset($userinfo) && !empty($userinfo))
+		{
+			if(isset($userinfo['user_id']) && (isset($userinfo['is_registered']) && $userinfo['is_registered'] == true))
+				return true;
+		}
+	}
+	return false;
 }
 
-function is_in_group($group_id = 0, $other_userinfo = [])
+function is_in_group($group_id = 0, $other_userinfo=array())
 {
-    global $userinfo;
-    if (is_user()) {
-        $nuke_points_groups_cacheData = get_cache_file_contents(
-            'nuke_points_groups'
-        );
-        $points =
-            !empty($other_userinfo) && isset($other_userinfo['points'])
-                ? intval($other_userinfo['points'])
-                : intval($userinfo['points']);
-        $grp = intval($nuke_points_groups_cacheData[$group_id]['points']);
-        if ($points >= 0 and $points >= $grp or $group_id == 0) {
-            return 1;
-        }
-    }
-    return 0;
+	global $userinfo;
+     if (is_user())
+	 {
+		$nuke_points_groups_cacheData = get_cache_file_contents('nuke_points_groups');
+		$points = (!empty($other_userinfo) && isset($other_userinfo['points'])) ? intval($other_userinfo['points']):intval($userinfo['points']);
+		$grp = intval($nuke_points_groups_cacheData[$group_id]['points']);
+		if (($points >= 0 AND $points >= $grp) OR $group_id == 0)
+		{
+        	return 1;
+		}
+     }
+     return 0;
 }
 
 function get_groups_permissions()
 {
-    global $hooks;
-    $nuke_forum_groups_cacheData = get_cache_file_contents('nuke_forum_groups');
-    $permissions = [
-        "0" => _ALLVISITORS, // all visitors
-        "1" => _GUESTS, // who userinfo['user_id'] = 0;
-        "2" => _BOTS, // who userinfo['user_type'] = 2;
-        "3" => _MEMBERS, // who userinfo['user_id'] = 1;
-        "4" => _SPECIAL_USERS, // who userinfo['user_special'] = 1;
-        "5" => _ADMINS, // who is_admin();
-    ];
-    if (!empty($nuke_forum_groups_cacheData)) {
-        foreach ($nuke_forum_groups_cacheData as $group_id => $group_info) {
-            if ($group_info['group_type'] == 3) {
-                continue;
-            }
-
-            $permissions = array_merge($permissions, [
-                $group_id => $group_info['group_name'],
-            ]);
-        }
-    }
-
-    $permissions = $hooks->apply_filters(
-        "get_all_permissions",
-        $permissions,
-        $nuke_forum_groups_cacheData
-    );
-
-    return $permissions;
+	global $hooks;
+	$nuke_forum_groups_cacheData = get_cache_file_contents('nuke_forum_groups');
+	$permissions = array(
+		"0" => _ALLVISITORS,// all visitors
+		"1" => _GUESTS,// who userinfo['user_id'] = 0;
+		"2" => _BOTS,// who userinfo['user_type'] = 2;
+		"3" => _MEMBERS,// who userinfo['user_id'] = 1;
+		"4" => _SPECIAL_USERS,// who userinfo['user_special'] = 1;
+		"5" => _ADMINS,// who is_admin();
+	);
+	if(!empty($nuke_forum_groups_cacheData))
+	{
+		foreach($nuke_forum_groups_cacheData as $group_id => $group_info)
+		{
+			if($group_info['group_type'] == 3)
+				continue;
+			
+			$permissions = array_merge($permissions, array($group_id => $group_info['group_name']));
+		}
+	}
+	
+	$permissions = $hooks->apply_filters("get_all_permissions", $permissions, $nuke_forum_groups_cacheData);
+	
+	return $permissions;
 }
 
 function phpnuke_permissions_check($permissions)
 {
-    global $userinfo, $users_system, $hooks;
+	global $userinfo, $users_system, $hooks;
+	
+	$allow_to_view = false;
+	$disallow_message_arr = array();
+	$disallow_message_gr = "";
+	$disallow_message = ""._SECTION_SPECIALTO." ";
+	
+	if (
+		(in_array(0, $permissions)) || 
+		(in_array(1, $permissions) && isset($userinfo['is_registered']) &&  intval($userinfo['is_registered']) == 0) || 
+		(in_array(2, $permissions) && isset($userinfo['is_bot']) && intval($userinfo['is_bot']) == 1) || 
+		(in_array(3, $permissions) && isset($userinfo['is_registered']) && intval($userinfo['is_registered']) == 1) || 
+		(in_array(4, $permissions) && isset($userinfo['is_special']) && is_paid($userinfo['is_special'])) || 
+		(in_array(5, $permissions) && is_admin()) || 
+		(isset($userinfo['group_id']) && in_array($userinfo['group_id'], $permissions)) 
+	)// this visitors can view this module
+	{
+		$allow_to_view = true;
+	}
+	
+	$pn_Bots = new CrawlerDetect();
 
-    $allow_to_view = false;
-    $disallow_message_arr = [];
-    $disallow_message_gr = "";
-    $disallow_message = "" . _SECTION_SPECIALTO . " ";
-
-    if (
-        in_array(0, $permissions) ||
-        (in_array(1, $permissions) &&
-            isset($userinfo['is_registered']) &&
-            intval($userinfo['is_registered']) == 0) ||
-        (in_array(2, $permissions) &&
-            isset($userinfo['is_bot']) &&
-            intval($userinfo['is_bot']) == 1) ||
-        (in_array(3, $permissions) &&
-            isset($userinfo['is_registered']) &&
-            intval($userinfo['is_registered']) == 1) ||
-        (in_array(4, $permissions) &&
-            isset($userinfo['is_special']) &&
-            is_paid($userinfo['is_special'])) ||
-        (in_array(5, $permissions) && is_admin()) ||
-        (isset($userinfo['group_id']) &&
-            in_array($userinfo['group_id'], $permissions))
-    ) {
-        // this visitors can view this module
-        $allow_to_view = true;
-    }
-
-    $pn_Bots = new CrawlerDetect();
-
-    if (is_array($permissions) && empty($permissions) && is_God()) {
-        $allow_to_view = true;
-    }
-
-    if (
-        in_array(1, $permissions) &&
-        isset($userinfo['user_id']) &&
-        intval($userinfo['user_id']) != 0
-    ) {
-        $disallow_message_arr[] = _GUESTS;
-    }
-    if (
-        in_array(2, $permissions) &&
-        ((isset($userinfo['user_type']) &&
-            intval($userinfo['user_type']) != 2) ||
-            !$pn_Bots->isCrawler())
-    ) {
-        $disallow_message_arr[] = _SEARCH_ENGINS;
-    }
-    if (
-        in_array(3, $permissions) &&
-        isset($userinfo['user_id']) &&
-        intval($userinfo['user_id']) == 0
-    ) {
-        $disallow_message_arr[] = _SITE_MEMBERS;
-    }
-    if (
-        in_array(4, $permissions) &&
-        isset($userinfo['user_special']) &&
-        intval($userinfo['user_special']) == 0
-    ) {
-        $disallow_message_arr[] = _SITE_SPECIAL_MEMBERS;
-    }
-    if (in_array(5, $permissions) && !is_admin()) {
-        $disallow_message_arr[] = _ADMINS;
-    }
-    if (
-        isset($userinfo['group_id']) &&
-        !in_array($userinfo['group_id'], $permissions)
-    ) {
-        $disallow_message_gr = sprintf(
-            _NOT_IN_ALLOWED_GROUPS,
-            $users_system->register_url
-        );
-    }
-
-    $disallow_message =
-        $disallow_message .
-        (!empty($disallow_message_arr)
-            ? implode(" " . _AND . " ", $disallow_message_arr)
-            : "") .
-        "." .
-        $disallow_message_gr;
-
-    $allow_to_view = $hooks->apply_filters(
-        "permissions_allow_to_view",
-        $allow_to_view,
-        $permissions
-    );
-    $disallow_message = $hooks->apply_filters(
-        "permissions_disallow_message",
-        $disallow_message,
-        $permissions
-    );
-
-    return [$allow_to_view, $disallow_message];
+	if(is_array($permissions) && empty($permissions) && is_God())
+		$allow_to_view = true;
+		
+	if(in_array(1, $permissions) && isset($userinfo['user_id']) && intval($userinfo['user_id']) != 0)
+		$disallow_message_arr[] = _GUESTS;
+	if(in_array(2, $permissions) && ((isset($userinfo['user_type']) && intval($userinfo['user_type']) != 2) || !$pn_Bots->isCrawler()))
+		$disallow_message_arr[] = _SEARCH_ENGINS;
+	if(in_array(3, $permissions) && isset($userinfo['user_id']) && intval($userinfo['user_id']) == 0)
+		$disallow_message_arr[] = _SITE_MEMBERS;
+	if(in_array(4, $permissions) && isset($userinfo['user_special']) && intval($userinfo['user_special']) == 0)
+		$disallow_message_arr[] = _SITE_SPECIAL_MEMBERS;
+	if(in_array(5, $permissions) && !is_admin())
+		$disallow_message_arr[] = _ADMINS;
+	if(isset($userinfo['group_id']) && !in_array($userinfo['group_id'], $permissions))
+		$disallow_message_gr = sprintf(_NOT_IN_ALLOWED_GROUPS, $users_system->register_url);
+	
+	$disallow_message = $disallow_message.((!empty($disallow_message_arr)) ? implode(" "._AND." ", $disallow_message_arr):"").".".$disallow_message_gr;
+	
+	$allow_to_view = $hooks->apply_filters("permissions_allow_to_view", $allow_to_view, $permissions);
+	$disallow_message = $hooks->apply_filters("permissions_disallow_message", $disallow_message, $permissions);
+	
+	return array($allow_to_view, $disallow_message);
 }
 
 // permissions functions
@@ -1631,163 +1216,109 @@ function phpnuke_permissions_check($permissions)
 // outputs functions
 function title($text)
 {
-    global $hooks;
-    $contents = '';
-    $contents .= defined("ADMIN_FILE") ? OpenAdminTable() : OpenTable();
-    $contents .= "<div class=\"text-center\"><span class=\"title\"><strong>$text</strong></span></div>";
-    $contents .= defined("ADMIN_FILE") ? CloseAdminTable() : CloseTable();
-    $contents .= "<br>";
-    $contents = $hooks->apply_filters("title_filter", $contents, $text);
-    return $contents;
+	global $hooks;
+	$contents = '';
+	$contents .= (defined("ADMIN_FILE")) ? OpenAdminTable():OpenTable();
+	$contents .= "<div class=\"text-center\"><span class=\"title\"><strong>$text</strong></span></div>";
+	$contents .= (defined("ADMIN_FILE")) ? CloseAdminTable():CloseTable();
+	$contents .= "<br>";
+	$contents = $hooks->apply_filters("title_filter", $contents, $text);
+	return $contents;
 }
 
 function info_box($graphic, $message)
 {
-    global $nuke_configs, $hooks;
-    $contents = '';
-    // Function to generate a message box with a graphic inside
-    // $graphic value can be whichever: warning, caution, tip, note.
-    // Then the graphic value with the extension .gif should be present inside /images/system/ folder
-    if (
-        file_exists("images/system/" . $graphic . ".gif") and !empty($message)
-    ) {
-        $contents .= Opentable();
-        $graphic = filter($graphic, "nohtml");
-        $message = filter($message, "");
-        $contents .=
-            "<table align=\"center\" border=\"0\" width=\"80%\" cellpadding=\"10\">
+	global $nuke_configs, $hooks;
+	$contents = '';
+	// Function to generate a message box with a graphic inside
+	// $graphic value can be whichever: warning, caution, tip, note.
+	// Then the graphic value with the extension .gif should be present inside /images/system/ folder
+	if (file_exists("images/system/".$graphic.".gif") AND !empty($message))
+	{
+		$contents .= Opentable();
+		$graphic = filter($graphic, "nohtml");
+		$message = filter($message, "");
+		$contents .= "<table align=\"center\" border=\"0\" width=\"80%\" cellpadding=\"10\">
 			<tr>
-				<td valign=\"top\"><img src=\"" .
-            $nuke_configs['nukecdnurl'] .
-            "images/system/" .
-            $graphic .
-            ".gif\" border=\"0\" alt=\"\" title=\"\" width=\"34\" height=\"34\"></td>
+				<td valign=\"top\"><img src=\"".$nuke_configs['nukecdnurl']."images/system/".$graphic.".gif\" border=\"0\" alt=\"\" title=\"\" width=\"34\" height=\"34\"></td>
 				<td valign=\"top\">$message</td>
 			</tr>
 		</table>";
-        $contents .= CloseTable();
-    }
-    $contents = $hooks->apply_filters(
-        "info_box_filter",
-        $contents,
-        $graphic,
-        $message
-    );
-
-    return $contents;
+		$contents .= CloseTable();
+	}
+	$contents = $hooks->apply_filters("info_box_filter", $contents, $graphic, $message);
+		
+	return $contents;
 }
 
 function simple_output($message)
 {
-    include "header.php";
-    $html_output .= OpenTable();
-    $html_output .= $message;
-    $html_output .= CloseTable();
-    include "footer.php";
-    die();
+	include("header.php");
+	$html_output .= OpenTable();
+	$html_output .= $message;
+	$html_output .= CloseTable();
+	include("footer.php");
+	die();
 }
 // outputs functions
 
 // db functions
-function get_unique_post_slug(
-    $table,
-    $id_name,
-    $id_value,
-    $field,
-    $slug,
-    $post_status = '',
-    $ajax = false,
-    $where = ''
-) {
-    global $hooks;
-    $slug = sanitize(str2url($slug));
-    if (in_array($post_status, ['draft', 'pending'])) {
-        if ($ajax) {
-            die($slug);
-        }
-        return $slug;
-    }
+function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_status = '', $ajax=false, $where = '')
+{
+	global $hooks;
+	$slug = sanitize(str2url($slug));
+	if (in_array($post_status, array( 'draft', 'pending' )))
+	{
+		if($ajax)
+			die($slug);
+		return $slug;
+	}
+	
+	global $db;
 
-    global $db;
+	$original_slug = $slug;
 
-    $original_slug = $slug;
+	// Post slugs must be unique across all posts.
+	$result = $db->query("SELECT $field FROM $table WHERE $field = '$slug'".(($id_value != 0) ? " AND $id_name != '$id_value'":"")." $where LIMIT 1");
+	
+	$post_name_check = intval($result->count());
 
-    // Post slugs must be unique across all posts.
-    $result = $db->query(
-        "SELECT $field FROM $table WHERE $field = '$slug'" .
-            ($id_value != 0 ? " AND $id_name != '$id_value'" : "") .
-            " $where LIMIT 1"
-    );
-
-    $post_name_check = intval($result->count());
-
-    if ($post_name_check) {
-        $suffix = 2;
-        do {
-            $alt_post_name =
-                _truncate_post_slug($slug, 200 - (strlen($suffix) + 1)) .
-                "-$suffix";
-            $result2 = $db->query(
-                "SELECT $field FROM $table WHERE $field = '$alt_post_name'" .
-                    ($id_value != 0
-                        ? " AND $id_name != '$id_value' $where"
-                        : "") .
-                    " LIMIT 1"
-            );
-            $post_name_check = intval($result2->count());
-            $suffix++;
-        } while ($post_name_check);
-        $slug = $alt_post_name;
-    }
-    $slug = trim($slug, "-");
-    $slug = $hooks->apply_filters(
-        "unique_post_slug",
-        $slug,
-        $table,
-        $id_name,
-        $id_value,
-        $field,
-        $slug,
-        $post_status,
-        $ajax,
-        $where
-    );
-    if ($ajax) {
-        die($slug);
-    }
-    return $slug;
+	if ( $post_name_check)
+	{
+		$suffix = 2;
+		do
+		{
+			$alt_post_name = _truncate_post_slug($slug, 200-(strlen($suffix)+1))."-$suffix";
+			$result2 = $db->query("SELECT $field FROM $table WHERE $field = '$alt_post_name'".(($id_value != 0) ? " AND $id_name != '$id_value' $where":"")." LIMIT 1");
+			$post_name_check = intval($result2->count());
+			$suffix++;
+		}
+		while($post_name_check);
+		$slug = $alt_post_name;
+	}
+	$slug = trim($slug, "-");
+	$slug = $hooks->apply_filters("unique_post_slug", $slug, $table, $id_name, $id_value, $field, $slug, $post_status, $ajax, $where);
+	if($ajax)
+		die($slug);
+	return $slug;
 }
 
 function phpnuke_db_error()
 {
-    global $db, $hooks;
-    $errors = $db->getErrors();
-    $error_result = "";
-    if (is_admin() && is_array($errors) && !empty($errors)) {
-        $error_result .=
-            "<p align=\"center\"><span style=\"color:#ff0000;font-weight:bold;\">" .
-            _ERROR_IN_OP .
-            "</span>";
-        foreach ($errors as $key => $val) {
-            $error_result .=
-                "<br /><br />" .
-                _DBERROR_CODE .
-                " : " .
-                $val['code'] .
-                "<br /><br />" .
-                _DBERROR_MSG .
-                " : " .
-                $val['message'] .
-                "<br /><br />" .
-                _DBERROR_QUERY .
-                " : <pre><code>" .
-                $val['query'] .
-                "</code></pre>";
-        }
-        $error_result .= "</p>";
-        $error_result = $hooks->apply_filters("db_error_filter", $error_result);
-        die($error_result);
-    }
+	global $db, $hooks;
+	$errors = $db->getErrors();
+	$error_result = "";
+	if(is_admin() && is_array($errors) && !empty($errors))
+	{
+		$error_result .= "<p align=\"center\"><span style=\"color:#ff0000;font-weight:bold;\">"._ERROR_IN_OP."</span>";
+		foreach($errors as $key => $val)
+		{
+			$error_result .= "<br /><br />"._DBERROR_CODE." : ".$val['code']."<br /><br />"._DBERROR_MSG." : ".$val['message']."<br /><br />"._DBERROR_QUERY." : <pre><code>".$val['query']."</code></pre>";
+		}
+		$error_result .= "</p>";
+		$error_result = $hooks->apply_filters("db_error_filter", $error_result);
+		die($error_result);
+	}
 }
 // db functions
 
@@ -1796,444 +1327,213 @@ function is_active($module)
 {
     global $db;
     static $save;
-    if (
-        in_array($module, [
-            "Articles",
-            "Statics",
-            "Pages",
-            "Faqs",
-            "Gallery",
-            "Downloads",
-        ])
-    ) {
-        $module = "Articles";
-    }
+	if(in_array($module, array("Articles","Statics","Pages","Faqs","Gallery","Downloads")))
+		$module = "Articles";
     if (is_array($save)) {
-        if (isset($save[$module])) {
-            return $save[$module];
-        }
+        if (isset($save[$module])) return ($save[$module]);
         return 0;
     }
-
-    $result = $db
-        ->table(MODULES_TABLE)
-        ->where('title', $module)
-        ->where('active', 1)
-        ->first(['title']);
-
-    if ($result->count() > 0) {
-        return $result['title'];
-    }
+	
+	$result = $db->table(MODULES_TABLE)
+					->where('title', $module)
+					->where('active', 1)
+					->first(['title']);
+					
+	if($result->count() > 0) return ($result['title']);
     return 0;
 }
 
 function is_index_file($module_name)
 {
-    $nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
-
-    foreach ($nuke_modules_cacheData as $mid => $module_info) {
-        if (
-            $module_info['title'] == $module_name &&
-            $module_info['all_blocks'] == 1
-        ) {
-            return true;
-            break;
-        }
-    }
-    return false;
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	
+	foreach($nuke_modules_cacheData as $mid => $module_info)
+	{
+		if($module_info['title'] == $module_name && $module_info['all_blocks'] == 1)
+		{
+			return true;
+			break;
+		}
+	}
+	return false;
 }
 
-function show_modules_boxes(
-    $module_name,
-    $part = 'index',
-    $active_boxes = [],
-    $html_output = "prev",
-    $special_bids = [],
-    $except_bids = []
-) {
-    global $theme_setup, $hooks;
+function show_modules_boxes($module_name, $part='index', $active_boxes=array(), $html_output="prev", $special_bids=array(), $except_bids=array())
+{
+	global $theme_setup, $hooks;
+	
+	$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	
+	$block_global_contents = array();
+	$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
 
-    $nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+	$theme_boxes_templates = $theme_setup['theme_boxes_templates_classes'];
+	
+	$output = array(
+		"top_full" => array(),
+		"right" => array(),
+		"left" => array(),
+		"top_middle" => array(),
+		"main_middle" => array(),
+		"bottom_middle" => array(),
+		"bottom_full" => array(),
+	);
+	
+	if(isset($block_global_contents['module_boxes']) && $block_global_contents['module_boxes'] != '')
+	{
+		$all_module_boxes = phpnuke_unserialize(stripslashes($block_global_contents['module_boxes']));
+	}
+	else
+	{
+		$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
+		
+		if(in_array($module_name, array("Downloads","Pages","Gallery","Faqs","Static")) && !isset($nuke_modules_cacheData_by_title[$module_name]))
+			$nuke_modules_cacheData_by_title[$module_name] = $nuke_modules_cacheData_by_title['Articles'];
+		
+		$all_module_boxes = ($nuke_modules_cacheData_by_title[$module_name]['module_boxes'] != '') ? phpnuke_unserialize(stripslashes($nuke_modules_cacheData_by_title[$module_name]['module_boxes'])):array();
+	}
+	$all_module_boxes = (isset($all_module_boxes[$part])) ? explode("|", $all_module_boxes[$part]):array();
+	
+	$all_boxes = array('','','','','','');
+	
+	foreach($all_module_boxes as $key => $module_boxes)
+	{
+		$module_boxes = explode(",", $module_boxes);
+		$all_boxes[$key] = $module_boxes;
+	}
+	//$all_boxes = array_filter($all_boxes);
+	
+	foreach($all_boxes as $key => $val)
+	{
+		$all_boxes[$key] = (is_array($val)) ? array_filter($val):"";
+	}
+	
+	$middle_module_boxes = "";
 
-    $block_global_contents = [];
-    $block_global_contents = $hooks->apply_filters(
-        "global_contents",
-        $block_global_contents
-    );
-
-    $theme_boxes_templates = $theme_setup['theme_boxes_templates'];
-    $output = "";
-
-    if (
-        isset($block_global_contents['module_boxes']) &&
-        $block_global_contents['module_boxes'] != ''
-    ) {
-        $all_module_boxes = phpnuke_unserialize(
-            stripslashes($block_global_contents['module_boxes'])
-        );
-    } else {
-        $nuke_modules_cacheData_by_title = phpnuke_array_change_key(
-            $nuke_modules_cacheData,
-            "mid",
-            "title"
-        );
-
-        if (
-            in_array($module_name, [
-                "Downloads",
-                "Pages",
-                "Gallery",
-                "Faqs",
-                "Static",
-            ]) &&
-            !isset($nuke_modules_cacheData_by_title[$module_name])
-        ) {
-            $nuke_modules_cacheData_by_title[$module_name] =
-                $nuke_modules_cacheData_by_title['Articles'];
-        }
-
-        $all_module_boxes =
-            $nuke_modules_cacheData_by_title[$module_name]['module_boxes'] != ''
-                ? phpnuke_unserialize(
-                    stripslashes(
-                        $nuke_modules_cacheData_by_title[$module_name][
-                            'module_boxes'
-                        ]
-                    )
-                )
-                : [];
-    }
-    $all_module_boxes = isset($all_module_boxes[$part])
-        ? explode("|", $all_module_boxes[$part])
-        : [];
-
-    $all_boxes = ['', '', '', '', '', ''];
-
-    foreach ($all_module_boxes as $key => $module_boxes) {
-        $module_boxes = explode(",", $module_boxes);
-        $all_boxes[$key] = $module_boxes;
-    }
-    //$all_boxes = array_filter($all_boxes);
-
-    foreach ($all_boxes as $key => $val) {
-        $all_boxes[$key] = is_array($val) ? array_filter($val) : "";
-    }
-
-    $middle_module_boxes = "";
-
-    if (
-        is_array($all_boxes[0]) &&
-        !empty($all_boxes[0]) &&
-        (is_array($all_boxes[1]) && !empty($all_boxes[1]))
-    ) {
-        if (in_array("right", $active_boxes)) {
-            $middle_module_boxes .= "_r";
-        }
-        if (in_array("left", $active_boxes)) {
-            $middle_module_boxes .= "_l";
-        }
-    } elseif (
-        is_array($all_boxes[0]) &&
-        !empty($all_boxes[0]) &&
-        (!is_array($all_boxes[1]) || empty($all_boxes[1]))
-    ) {
-        if (in_array("right", $active_boxes)) {
-            $middle_module_boxes .= "_r";
-        }
-    } elseif (
-        (!is_array($all_boxes[0]) || empty($all_boxes[0])) &&
-        (is_array($all_boxes[1]) && !empty($all_boxes[1]))
-    ) {
-        if (in_array("left", $active_boxes)) {
-            $middle_module_boxes .= "_l";
-        }
-    }
-    $middle_module_boxes = str_replace("_r_l", "_l_r", $middle_module_boxes);
-
-    $middle_module_boxes_class = "middle_module_boxes" . $middle_module_boxes;
+	if((is_array($all_boxes[0]) && !empty($all_boxes[0])) && (is_array($all_boxes[1]) && !empty($all_boxes[1])))
+	{
+		if(in_array("right", $active_boxes))
+		{
+			$middle_module_boxes .= "_r";
+		}
+		if(in_array("left", $active_boxes))
+		{
+			$middle_module_boxes .= "_l";
+		}
+	}
+	elseif((is_array($all_boxes[0]) && !empty($all_boxes[0])) && (!is_array($all_boxes[1]) || empty($all_boxes[1])))
+	{
+		if(in_array("right", $active_boxes))
+		{
+			$middle_module_boxes .= "_r";
+		}
+	}
+	elseif((!is_array($all_boxes[0]) || empty($all_boxes[0])) && (is_array($all_boxes[1]) && !empty($all_boxes[1])))
+	{
+		if(in_array("left", $active_boxes))
+		{
+			$middle_module_boxes .= "_l";
+		}
+	}
+	$middle_module_boxes = str_replace("_r_l", "_l_r", $middle_module_boxes);
 	
 	$middle_module_boxes = ($middle_module_boxes == "") ? "_full":$middle_module_boxes;
 	
-    $sides_output = [];
+	$middle_module_boxes_class = "middle_module_boxes".$middle_module_boxes;
+	
+	$sides_output = array();
+	
+	if(in_array("top_full", $active_boxes) && is_array($all_boxes[4]) && !empty($all_boxes[4]))
+	{
+		foreach($all_boxes[4] as $top_full_module_boxes)
+		{
+			$output['top_full'][] = blocks($top_full_module_boxes, $special_bids, $except_bids);
+		}
+	}
+	
+	if(in_array("right", $active_boxes) && is_array($all_boxes[0]) && !empty($all_boxes[0]))
+	{
+		foreach($all_boxes[0] as $right_module_boxes)
+		{
+			$output['right'][] = blocks($right_module_boxes, $special_bids, $except_bids);
+		}
+	}
+	
+	if(in_array("left", $active_boxes) && is_array($all_boxes[1]) && !empty($all_boxes[1]))
+	{
+		foreach($all_boxes[1] as $left_module_boxes)
+		{
+			$output['left'][] = blocks($left_module_boxes, $special_bids, $except_bids);
+		}
+	}
+	
+	if(in_array("top_middle", $active_boxes) && is_array($all_boxes[2]) && !empty($all_boxes[2]))
+	{
+		foreach($all_boxes[2] as $top_middle_module_boxes)
+		{
+			$output['top_middle'][] = blocks($top_middle_module_boxes, $special_bids, $except_bids);
+		}
+	}
+	
+	$output['main_middle'][] = $html_output;
+				
+	if(in_array("bottom_middle", $active_boxes) && is_array($all_boxes[3]) && !empty($all_boxes[3]))
+	{
+		foreach($all_boxes[3] as $bottom_middle_module_boxes)
+		{
+			$output['bottom_middle'][] = blocks($bottom_middle_module_boxes, $special_bids, $except_bids);
+		}
+	}
+	
+	if(in_array("bottom_full", $active_boxes) && is_array($all_boxes[5]) && !empty($all_boxes[5]))
+	{
+		foreach($all_boxes[5] as $bottom_full_module_boxes)
+		{
+			$output['bottom_full'][] = blocks($bottom_full_module_boxes, $special_bids, $except_bids);
+		}
+	}
+	
+	$template_pattern = phpnuke_get_url_contents($theme_setup['theme_boxes_templates'], true, false);
 
-    $output =
-        "<div class=\"modules_boxes " .
-        $theme_boxes_templates['modules_boxes']['extra_class'] .
-        "\">";
-    if (
-        in_array("top_full", $active_boxes) &&
-        is_array($all_boxes[4]) &&
-        !empty($all_boxes[4])
-    ) {
-        $output .=
-            "<div class=\"top_full_moldule_boxes " .
-            $theme_boxes_templates['top_full_moldule_boxes']['extra_class'] .
-            "\">";
-        foreach ($all_boxes[4] as $top_full_moldule_boxes) {
-            $output .= blocks(
-                $top_full_moldule_boxes,
-                $special_bids,
-                $except_bids
-            );
-        }
-        $output .= "</div>
-			<div class=\"Clear\"></div>";
-    }
+	$template_pattern = str_replace(
+	array(
+		"{MODULES_BOXES_CLASSES}",
+		"{MIDDLE_MODULES_BOXES_CLASSES}",
+	)
+	, 
+	array(
+		$theme_boxes_templates['modules_boxes'],
+		$middle_module_boxes_class . " ". $theme_boxes_templates['middle_module_boxes'][$middle_module_boxes],
+		
+	), $template_pattern);
+	
+	foreach($output as $o_key => $o_val)
+	{
+		if(!empty($o_val))
+		{
+			$classes = (isset($theme_boxes_templates[$o_key.'_module_boxes'][$middle_module_boxes])) ? $theme_boxes_templates[$o_key.'_module_boxes'][$middle_module_boxes]:"";
+			
+			$template_pattern = str_replace(array( 
+				"{".strtoupper($o_key)."_MODULES_BOXES_CLASSES}", 
+			),	
+			$classes, $template_pattern);
+			
+			$template_pattern = str_replace(array(
+				"<!--".strtoupper($o_key)."-->",
+				"<!--/".strtoupper($o_key)."-->",
+			), "", $template_pattern);
+			
+			$template_pattern = str_replace("{".strtoupper($o_key)."_BOXES}", implode("\n", $o_val), $template_pattern);
+		}
+		else
+		{
+			$template_pattern = preg_replace("|<!--".strtoupper($o_key)."-->(.*)<!--/".strtoupper($o_key)."-->|isU", "", $template_pattern);
+		}
+	}
 
-    if (
-        in_array("right", $active_boxes) &&
-        is_array($all_boxes[0]) &&
-        !empty($all_boxes[0])
-    ) {
-        $right_extra_class = isset(
-            $theme_boxes_templates['right_module_boxes']['extra_class'][
-                $middle_module_boxes
-            ]
-        )
-            ? " " .
-                $theme_boxes_templates['right_module_boxes']['extra_class'][
-                    $middle_module_boxes
-                ]
-            : "";
-        $right_pull_class = isset(
-            $theme_boxes_templates['right_module_boxes']['pull'][
-                $middle_module_boxes
-            ]
-        )
-            ? " " .
-                $theme_boxes_templates['right_module_boxes']['pull'][
-                    $middle_module_boxes
-                ]
-            : "";
-        $right_push_class = isset(
-            $theme_boxes_templates['right_module_boxes']['push'][
-                $middle_module_boxes
-            ]
-        )
-            ? " " .
-                $theme_boxes_templates['right_module_boxes']['push'][
-                    $middle_module_boxes
-                ]
-            : "";
-        $right_order = isset(
-            $theme_boxes_templates['right_module_boxes']['order'][
-                $middle_module_boxes
-            ]
-        )
-            ? $theme_boxes_templates['right_module_boxes']['order'][
-                $middle_module_boxes
-            ]
-            : 0;
-
-        $sides_output[$right_order] =
-            "<div class=\"right_module_boxes" .
-            $right_extra_class .
-            "" .
-            $right_pull_class .
-            "" .
-            $right_push_class .
-            "\">";
-        foreach ($all_boxes[0] as $right_module_boxes) {
-            $sides_output[$right_order] .= blocks(
-                $right_module_boxes,
-                $special_bids,
-                $except_bids
-            );
-        }
-        $sides_output[$right_order] .= "</div>";
-    }
-
-    if (
-        in_array("left", $active_boxes) &&
-        is_array($all_boxes[1]) &&
-        !empty($all_boxes[1])
-    ) {
-        $left_extra_class = isset(
-            $theme_boxes_templates['left_module_boxes']['extra_class'][
-                $middle_module_boxes
-            ]
-        )
-            ? " " .
-                $theme_boxes_templates['left_module_boxes']['extra_class'][
-                    $middle_module_boxes
-                ]
-            : "";
-        $left_pull_class = isset(
-            $theme_boxes_templates['left_module_boxes']['pull'][
-                $middle_module_boxes
-            ]
-        )
-            ? " " .
-                $theme_boxes_templates['left_module_boxes']['pull'][
-                    $middle_module_boxes
-                ]
-            : "";
-        $left_push_class = isset(
-            $theme_boxes_templates['left_module_boxes']['push'][
-                $middle_module_boxes
-            ]
-        )
-            ? " " .
-                $theme_boxes_templates['left_module_boxes']['push'][
-                    $middle_module_boxes
-                ]
-            : "";
-        $left_order = isset(
-            $theme_boxes_templates['left_module_boxes']['order'][
-                $middle_module_boxes
-            ]
-        )
-            ? $theme_boxes_templates['left_module_boxes']['order'][
-                $middle_module_boxes
-            ]
-            : 0;
-
-        $sides_output[$left_order] =
-            "<div class=\"left_module_boxes" .
-            $left_extra_class .
-            "" .
-            $left_pull_class .
-            "" .
-            $left_push_class .
-            "\">";
-        foreach ($all_boxes[1] as $left_module_boxes) {
-            $sides_output[$left_order] .= blocks(
-                $left_module_boxes,
-                $special_bids,
-                $except_bids
-            );
-        }
-        $sides_output[$left_order] .= "</div>";
-    }
-
-    $middle_extra_class = isset(
-        $theme_boxes_templates['middle_module_boxes']['extra_class'][
-            $middle_module_boxes
-        ]
-    )
-        ? " " .
-            $theme_boxes_templates['middle_module_boxes']['extra_class'][
-                $middle_module_boxes
-            ]
-        : "";
-    $middle_pull_class = isset(
-        $theme_boxes_templates['middle_module_boxes']['pull'][
-            $middle_module_boxes
-        ]
-    )
-        ? " " .
-            $theme_boxes_templates['middle_module_boxes']['pull'][
-                $middle_module_boxes
-            ]
-        : "";
-    $middle_push_class = isset(
-        $theme_boxes_templates['middle_module_boxes']['push'][
-            $middle_module_boxes
-        ]
-    )
-        ? " " .
-            $theme_boxes_templates['middle_module_boxes']['push'][
-                $middle_module_boxes
-            ]
-        : "";
-
-    $middle_order = isset(
-        $theme_boxes_templates['middle_module_boxes']['order'][
-            $middle_module_boxes
-        ]
-    )
-        ? $theme_boxes_templates['middle_module_boxes']['order'][
-            $middle_module_boxes
-        ]
-        : 0;
-
-    $sides_output[$middle_order] =
-        "<div class=\"$middle_module_boxes_class" .
-        $middle_extra_class .
-        "" .
-        $middle_pull_class .
-        "" .
-        $middle_push_class .
-        "\">";
-
-    if (
-        in_array("top_middle", $active_boxes) &&
-        is_array($all_boxes[2]) &&
-        !empty($all_boxes[2])
-    ) {
-        $sides_output[$middle_order] .=
-            "<div class=\"top_middle_moldule_boxes " .
-            $theme_boxes_templates['top_middle_moldule_boxes']['extra_class'] .
-            "\">";
-        foreach ($all_boxes[2] as $top_middle_moldule_boxes) {
-            $sides_output[$middle_order] .= blocks(
-                $top_middle_moldule_boxes,
-                $special_bids,
-                $except_bids
-            );
-        }
-        $sides_output[$middle_order] .= "</div>";
-    }
-
-    $sides_output[$middle_order] .=
-        "<div class=\"main_middle_moldule_boxes " .
-        $theme_boxes_templates['main_middle_moldule_boxes']['extra_class'] .
-        "\">";
-    $sides_output[$middle_order] .= $html_output;
-
-    $sides_output[$middle_order] .= "</div>";
-
-    if (
-        in_array("bottom_middle", $active_boxes) &&
-        is_array($all_boxes[3]) &&
-        !empty($all_boxes[3])
-    ) {
-        $sides_output[$middle_order] .=
-            "<div class=\"Clear\"></div><div class=\"bottom_middle_moldule_boxes " .
-            $theme_boxes_templates['bottom_middle_moldule_boxes'][
-                'extra_class'
-            ] .
-            "\">";
-        foreach ($all_boxes[3] as $bottom_middle_moldule_boxes) {
-            $sides_output[$middle_order] .= blocks(
-                $bottom_middle_moldule_boxes,
-                $special_bids,
-                $except_bids
-            );
-        }
-        $sides_output[$middle_order] .= "</div>";
-    }
-    $sides_output[$middle_order] .= "</div>";
-
-    ksort($sides_output);
-    foreach ($sides_output as $sides_output_html) {
-        $output .= $sides_output_html;
-    }
-
-    if (
-        in_array("bottom_full", $active_boxes) &&
-        is_array($all_boxes[5]) &&
-        !empty($all_boxes[5])
-    ) {
-        $output .=
-            "<div class=\"Clear\"></div>
-			<div class=\"bottom_full_moldule_boxes " .
-            $theme_boxes_templates['bottom_full_moldule_boxes']['extra_class'] .
-            "\">";
-        foreach ($all_boxes[5] as $bottom_full_moldule_boxes) {
-            $output .= blocks(
-                $bottom_full_moldule_boxes,
-                $special_bids,
-                $except_bids
-            );
-        }
-        $output .= "</div>
-			<div class=\"Clear\"></div>";
-    }
-    $output .= "</div>
-		<div class=\"Clear\"></div>";
-
-    return $output;
+	$template_pattern = $hooks->apply_filters("show_modules_boxes", $template_pattern, $middle_module_boxes, $output);
+	
+	return $template_pattern;
 }
 
 function bulid_meta_fields($meta_part = 'Articles', $data)
@@ -7084,7 +6384,7 @@ function mtsn_check()
 			$ipbanx = stripslashes($nuke_configs['mtsn_block_ip']);
 			if ($ipbanx == "1")
 			{
-				if ($visitor_ip != "127.0.0.1" AND $visitor_ip != "::1" AND !is_admin())
+				if ($visitor_ip != "127.0.0.1" && $visitor_ip != "::1" && !is_admin())
 				{
 					$ip = addslashes($visitor_ip);
 					$ip_arr = explode(".", $ip);

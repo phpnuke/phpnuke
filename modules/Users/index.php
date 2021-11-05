@@ -121,34 +121,99 @@ function userinfo($username='')
 			
 			$list_group_ops = $hooks->apply_filters("users_info_ops", $list_group_ops, $user_data);	
 	
-			$list_group_item['user_realname'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._NAME_FAMILY." : ".$user_data['user_realname']."</div>";
-			$list_group_item['username'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USERNAME." : ".$user_data['username']."</div>";
-			$list_group_item['group_title'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._GROUP_NAME." : <span style=\"color:$group_colour\">".$group_title."</span></div>";
-			$list_group_item['user_femail'] = "<a href=\"mailto:".$user_data['user_femail']."\" class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._DISPLAY_EMAIL." : ".$user_data['user_femail']."</a>";
-			$list_group_item['user_website'] = "<a href=\"".$user_data['user_website']."\" class=\"list-group-item\"><i class=\"fa fa-link\"></i> "._USER_WEBSITE."</a>";
-			$list_group_item['user_gender'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_GENDER." : ".$user_data['user_gender']."</div>";
-			$list_group_item['user_address'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_ADDRESS." : ".$user_data['user_address']."</div>";
+			$list_group_items = array(
+				'user_realname' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _NAME_FAMILY,
+					"field_value" => $user_data['user_realname']
+				),
+				'username' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USERNAME,
+					"field_value" => $user_data['username']
+				),
+				'group_title' => array(
+					"icon" => "fa fa-user",
+					"color" => $group_colour,
+					"field_text" => _GROUP_NAME,
+					"field_value" => $group_title
+				),
+				'user_femail' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _DISPLAY_EMAIL,
+					"field_value" => $user_data['user_femail']
+				),
+				'user_website' => array(
+					"icon" => "fa fa-link",
+					"field_text" => _USER_WEBSITE,
+					"field_value" => array("url" => $user_data['user_website'])
+				),
+				'user_gender' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_GENDER,
+					"field_value" => $user_data['user_gender']
+				),
+				'user_address' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_ADDRESS,
+					"field_value" => $user_data['user_address']
+				),
+				'user_regdate' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_REGDATE,
+					"field_value" => nuketimes($user_data['user_regdate'])
+				),
+				'user_lastvisit' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_LASTVISIT,
+					"field_value" => nuketimes($user_data['user_lastvisit'], true, true)
+				),
+				'user_sig' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_SIGN,
+					"field_value" => $user_data['user_sig']
+				),
+				'user_interests' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_INTERESTS,
+					"field_value" => $user_data['user_interests']
+				),
+				'user_points' => array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_POINTS,
+					"field_value" => $user_data['user_points']
+				),
+			);
+	
 			if(!empty($user_data['user_birthday']))
 			{
-				$list_group_item['user_birthday'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_BIRTHDAY." : ".nuketimes($user_data['user_birthday'])."</div>";
+				$list_group_items['user_birthday'] = array(
+					"icon" => "fa fa-user",
+					"field_text" => _USER_BIRTHDAY,
+					"field_value" => nuketimes($user_data['user_birthday'])
+				);
 			}
-			$list_group_item['user_regdate'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_REGDATE." : ".nuketimes($user_data['user_regdate'])."</div>";
-			$list_group_item['user_lastvisit'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_LASTVISIT." : ".nuketimes($user_data['user_lastvisit'], true, true)."</div>";
 			if(isset($user_data['custom_fields']) && !empty($user_data['custom_fields']))
 			{
 				foreach($user_data['custom_fields'] as $custom_fields_key => $custom_fields_Value)
 				{
-					$list_group_item[$custom_fields_key] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> ".$custom_fields_Value[0]." : ".$custom_fields_Value[1]."</div>";
+					$list_group_items[$custom_fields_key] = array(
+						"icon" => "fa fa-user",
+						"field_text" => $custom_fields_Value[0],
+						"field_value" => $custom_fields_Value[1]
+					);
 				}
 			}
-			$list_group_item['user_sig'] = "
-			<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_SIGN." : ".$user_data['user_sig']."</div>";
-			$list_group_item['user_interests'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_INTERESTS." : ".$user_data['user_interests']."</div>";
-			$list_group_item['user_points'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._USER_POINTS." : ".$user_data['user_points']."</div>";
+			
 			if($user_data['is_your_profile'] || is_admin()){
-				$list_group_item['user_credit'] = "<div class=\"list-group-item\"><i class=\"fa fa-user\"></i> "._CREDITS_REMAIN." : ".number_format($user_data['user_credit'])." "._RIAL."</div>";
+				$list_group_items['user_credit'] = array(
+					"icon" => "fa fa-user",
+					"field_text" => _CREDITS_REMAIN,
+					"field_value" => number_format($user_data['user_credit'])." "._RIAL
+				);
 			}	
-			$users_info_items = $hooks->apply_filters("users_info_items", $list_group_item, $user_data);	
+			
+			$list_group_items = $hooks->apply_filters("users_info_items", $list_group_items, $user_data);	
 
 			if(file_exists("themes/".$nuke_configs['ThemeSel']."/userinfo.php"))
 				include("themes/".$nuke_configs['ThemeSel']."/userinfo.php");
@@ -165,18 +230,22 @@ function userinfo($username='')
 									<div class=\"col-sm-3 text-center\">
 										<p><img src=\"" . (str_replace(' ', '%20', $user_data['user_avatar'])) . "\" width=\"100%\" height=\"100%\" class=\"img-circle\" title=\""._USER_AVATAR." ".$user_data['username']."\" alt=\""._USER_AVATAR." ".$user_data['username']."\" style=\"max-width:180px;\" /></p><br />
 											".implode("\n", $list_group_ops)."
-										</div>
+									</div>
 									<div class=\"col-sm-9\">
 										<div class=\"list-group\">
-											".implode("\n", $users_info_items)."
+										".implode("\n", $list_group_items)."
 										</div>
-									</div>
+									</div>";
+									if($user_data['user_about'] != '') {
+									$contents .= "
 									<div class=\"col-sm-12\">
 										<div class=\"well well-sm\">
 											<h2>"._USER_ABOUT." ".$user_data['user_realname']."</h2>
 											".$user_data['user_about']."
 										</div>
-									</div>
+									</div>";
+									}
+									$contents .= "
 								</div>
 							</div>
 						</div> 
@@ -2154,6 +2223,9 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 	}, 10);
 	
 	$contents = OpenTable(_USER_PROFILE_EDIT.' '.$user_data['username']).$contents.CloseTable();
+	
+	$contents = $hooks->apply_filters("edit_user_form", $contents, $user_data);
+	
 	$meta_tags = array(
 		"url" => LinkToGT("index.php?modname=$module_name&op=edit_user"),
 		"title" => _USER_CONFIGS,

@@ -30,11 +30,11 @@ function CloseTable()
 function _theme_header()
 {
 	global $db, $nuke_configs, $theme_setup, $category, $modname, $op, $hooks;
-	$local = (isset($nuke_configs['local']) && $nuke_configs['local'] != '') ? explode("-", $nuke_configs['local']):array("fa","ir");
-	
+	$locale = (isset($nuke_configs['locale']) && $nuke_configs['locale'] != '') ? explode("_", $nuke_configs['locale']):array("fa","ir");
+
 	$contents = '';
 	$contents .= "<!DOCTYPE html>\n";
-	$contents .= "<html lang=\"".$local[0]."\" dir=\""._DIRECTION."\">\n";
+	$contents .= "<html lang=\"".$locale[0]."\" dir=\""._DIRECTION."\">\n";
 	$contents .= "	<head>";
 	
 	include(INCLUDE_PATH."/meta.php");
@@ -59,104 +59,109 @@ function themeheader()
 	
 	$search_query = (isset($search_query) && $search_query != '') ? $search_query:"";
 	
-	$body_class = (_DIRECTION == 'ltr') ? " class=\"body-ltr\"":"";
+	$body_class = (_DIRECTION == 'ltr') ? " class=\"ltr\"":"";
 	
-	$contents .= "
-<body".$body_class.">
-	<header>
-		<div class=\"GSTop\">
-			<div class=\"container GSTopHeader\">
-				<div class=\"GSStatus\">
-					<span><i class=\"fa fa-bullhorn\"></i> "._WELLCOME."</span>
-					<time><i class=\"fa fa-clock-o\"></i> $time <i class=\"fa fa-calendar\"></i> $dateTime</time>
-				</div>
-				<div class=\"clear\"></div>
-				<nav class=\"navbar navbar-inverse\">
-					<div class=\"container-fluid\">
-						<div class=\"navbar-header\">
-							<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#main-menu\">
-								<span class=\"icon-bar\"></span>
-								<span class=\"icon-bar\"></span>
-								<span class=\"icon-bar\"></span> 
-							</button>
-						</div>
-						<div class=\"collapse navbar-collapse\" id=\"main-menu\">";
-								$contents .= pn_nav_menu(array(
-									'walker'	=> 'caspian_nav_menus',
-									'theme_location'	=> 'primary',
-									'container_class'	=> '',
-									'menu_id'			=> 'main-menu',
-									'menu_class'		=> 'nav navbar-nav',
-									'list_class'		=> 'dropdown-menu',
-									'link_before'		=> '<a tabindex="-1" href="%1$s" target="%2$s" class="%3$s" data-toggle="%4$s">',
-									'link_after'		=> '</a>',
-								));
-							$contents .= "
-							<form class=\"navbar-form navbar-left\" role=\"search\" action=\"".LinkToGT("index.php?modname=Search")."\" method=\"post\">
-								<div class=\"form-group input-group\">
-									<input type=\"text\" class=\"form-control\" placeholder=\""._SEARCH." ...\" value=\"$search_query\" name=\"search_query\">	<span class=\"input-group-btn\">
-										<button class=\"btn btn-default\" type=\"submit\">
-											<span class=\"glyphicon glyphicon-search\"></span>
-										</button>
-									</span>
-								</div>
-								<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
-							</form>
-						</div>
-					</div>
-				</nav>
-			</div>
-		</div>
-		<div class=\"container GSTopHeader\">
-			<div class=\"GSHeader\">
-				<div class=\"GSlogo\">
-					<h1><a href=\"".LinkToGT("index.php")."\" title=\"".$nuke_configs['sitename']."\">".$nuke_configs['sitename']."</a></h1>
-				</div>
-			</div>
-		</div>
-	</header>";
-	
-	if(defined("HOME_FILE") && $caspian_configs['active_slider'] == 1)
+	if(file_exists("themes/".$nuke_configs['ThemeSel']."/theme_header.php"))
+		include("themes/".$nuke_configs['ThemeSel']."/theme_header.php");
+	else
 	{
-	$contents .="<div class=\"container GSSlider\">
-		<section>
-			<div id=\"myCarousel\" class=\"carousel slide\" data-ride=\"carousel\">
-				<ol class=\"carousel-indicators\">";
-				foreach($caspian_configs['slider_image'] as $key => $val)
-				{
-					if(empty($val)) continue;
-					$class = ($key == 0) ? "class=\"active\"":"";
-					$contents .="<li data-target=\"#myCarousel\" data-slide-to=\"$key\" $class></li>";
-				}
-				$contents .="</ol>
-				<div class=\"carousel-inner\" role=\"listbox\">";
-				foreach($caspian_configs['slider_image'] as $key => $val)
-				{
-					if(empty($val)) continue;
-					$class = ($key == 0) ? "active":"";
-					$contents .="<div class=\"item $class\">
-						<img src=\"".$val."\" alt=\"Image\">
-						<div class=\"carousel-caption\">
-							<h5><a href=\"".$caspian_configs['slider_link'][$key]."\">".$caspian_configs['slider_title'][$key]."</a></h5>
-							<h6>".$caspian_configs['slider_desc'][$key]."</h6>
-						</div>      
-					</div>";
-				}
-				$contents .="</div>
-				<a class=\"left carousel-control\" href=\"#myCarousel\" role=\"button\" data-slide=\"prev\">
-					<span class=\"glyphicon glyphicon-chevron-left\" aria-hidden=\"true\"></span>
-					<span class=\"sr-only\">Previous</span>
-				</a>
-				<a class=\"right carousel-control\" href=\"#myCarousel\" role=\"button\" data-slide=\"next\">
-					<span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span>
-					<span class=\"sr-only\">Next</span>
-				</a>
+		$contents .= "
+	<body".$body_class.">
+		<header>
+			<div class=\"GSTop\">
+				<div class=\"container GSTopHeader\">
+					<div class=\"GSStatus\">
+						<span><i class=\"fa fa-bullhorn\"></i> "._WELLCOME."</span>
+						<time><i class=\"fa fa-clock-o\"></i> $time <i class=\"fa fa-calendar\"></i> $dateTime</time>
+					</div>
+					<div class=\"clear\"></div>
+					<nav class=\"navbar navbar-inverse\">
+						<div class=\"container-fluid\">
+							<div class=\"navbar-header\">
+								<button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\"#main-menu\">
+									<span class=\"icon-bar\"></span>
+									<span class=\"icon-bar\"></span>
+									<span class=\"icon-bar\"></span> 
+								</button>
+							</div>
+							<div class=\"collapse navbar-collapse\" id=\"main-menu\">";
+									$contents .= pn_nav_menu(array(
+										'walker'	=> 'caspian_nav_menus',
+										'theme_location'	=> 'primary',
+										'container_class'	=> '',
+										'menu_id'			=> 'main-menu',
+										'menu_class'		=> 'nav navbar-nav',
+										'list_class'		=> 'dropdown-menu',
+										'link_before'		=> '<a tabindex="-1" href="%1$s" target="%2$s" class="%3$s" data-toggle="%4$s">',
+										'link_after'		=> '</a>',
+									));
+								$contents .= "
+								<form class=\"navbar-form navbar-"._TEXTALIGN2."\" role=\"search\" action=\"".LinkToGT("index.php?modname=Search")."\" method=\"post\">
+									<div class=\"form-group input-group\">
+										<input type=\"text\" class=\"form-control\" placeholder=\""._SEARCH." ...\" value=\"$search_query\" name=\"search_query\">	<span class=\"input-group-btn\">
+											<button class=\"btn btn-default\" type=\"submit\">
+												<span class=\"glyphicon glyphicon-search\"></span>
+											</button>
+										</span>
+									</div>
+									<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
+								</form>
+							</div>
+						</div>
+					</nav>
+				</div>
 			</div>
-		</section>
-	</div>";
+			<div class=\"container GSTopHeader\">
+				<div class=\"GSHeader\">
+					<div class=\"GSlogo\">
+						<h1><a href=\"".LinkToGT("index.php")."\" title=\"".$nuke_configs['sitename']."\">".$nuke_configs['sitename']."</a></h1>
+					</div>
+				</div>
+			</div>
+		</header>";
+		
+		if(defined("HOME_FILE") && $caspian_configs['active_slider'] == 1)
+		{
+		$contents .="<div class=\"container GSSlider\">
+			<section>
+				<div id=\"myCarousel\" class=\"carousel slide\" data-ride=\"carousel\">
+					<ol class=\"carousel-indicators\">";
+					foreach($caspian_configs['slider_image'] as $key => $val)
+					{
+						if(empty($val)) continue;
+						$class = ($key == 0) ? "class=\"active\"":"";
+						$contents .="<li data-target=\"#myCarousel\" data-slide-to=\"$key\" $class></li>";
+					}
+					$contents .="</ol>
+					<div class=\"carousel-inner\" role=\"listbox\">";
+					foreach($caspian_configs['slider_image'] as $key => $val)
+					{
+						if(empty($val)) continue;
+						$class = ($key == 0) ? "active":"";
+						$contents .="<div class=\"item $class\">
+							<img src=\"".$val."\" alt=\"Image\">
+							<div class=\"carousel-caption\">
+								<h5><a href=\"".$caspian_configs['slider_link'][$key]."\">".$caspian_configs['slider_title'][$key]."</a></h5>
+								<h6>".$caspian_configs['slider_desc'][$key]."</h6>
+							</div>      
+						</div>";
+					}
+					$contents .="</div>
+					<a class=\"left carousel-control\" href=\"#myCarousel\" role=\"button\" data-slide=\"prev\">
+						<span class=\"glyphicon glyphicon-chevron-left\" aria-hidden=\"true\"></span>
+						<span class=\"sr-only\">Previous</span>
+					</a>
+					<a class=\"right carousel-control\" href=\"#myCarousel\" role=\"button\" data-slide=\"next\">
+						<span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span>
+						<span class=\"sr-only\">Next</span>
+					</a>
+				</div>
+			</section>
+		</div>";
+		}
+		$contents .="<div class=\"container GSBody\">";
+		$contents .= breadcrumb_build();
 	}
-	$contents .="<div class=\"container GSBody\">";
-	$contents .= breadcrumb_build();
 	return $contents;
 }
 
@@ -168,19 +173,22 @@ function themefooter()
 
 	$caspian_data = cache_caspian_data();
 	$articles = $caspian_data['articles'];
-	
+	if(file_exists("themes/".$nuke_configs['ThemeSel']."/theme_footer.php"))
+		include("themes/".$nuke_configs['ThemeSel']."/theme_footer.php");
+	else
+	{
 	$contents = "
 	</div>
 	<footer>
 		<div class=\"container GSFooter\">
 			<div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3 GSAbout\">
 				<h4><i class=\"fa fa-coffee\"></i> "._ABOUT_US."</h4>
-				<div class=\"line-fooot-box-head\" style=\"border-right-width: 100px;\"></div>
+				<div class=\"line-fooot-box-head\"></div>
 				<p>".$caspian_configs['about_us']."</p>
 			</div>
 			<div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3\">
 				<h4><i class=\"fa fa-newspaper-o\"></i> "._TOP_ARTICLES."</h4>
-				<div class=\"line-fooot-box-head\" style=\"border-right-width: 100px;\"></div>
+				<div class=\"line-fooot-box-head\"></div>
 				<ul>";
 					if(isset($articles[1]))
 					{
@@ -193,7 +201,7 @@ function themefooter()
 			</div>
 			<div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3\">
 				<h4><i class=\"fa fa-random\"></i> "._HOT_ARTICLES."</h4>
-				<div class=\"line-fooot-box-head\" style=\"border-right-width: 100px;\"></div>
+				<div class=\"line-fooot-box-head\"></div>
 				<ul>";
 					if(isset($articles[2]))
 					{
@@ -206,7 +214,7 @@ function themefooter()
 			</div>
 			<div class=\"col-xs-12 col-sm-12 col-md-3 col-lg-3\">
 				<h4><i class=\"fa fa-phone\"></i> "._CONTACT_US."</h4>
-				<div class=\"line-fooot-box-head\" style=\"border-right-width: 100px;\"></div>
+				<div class=\"line-fooot-box-head\"></div>
 				<p>
 					<span><i class=\"fa fa-map-marker\"></i> "._POSTAL_ADDRESS." : ".$caspian_configs['address']."</span><br>
 					<span><i class=\"fa fa-phone\"></i> "._LANDLINE_PHONE." : ".$caspian_configs['phone']."</span><br>
@@ -217,8 +225,8 @@ function themefooter()
 					<a href=\"".$caspian_configs['twitter']."\" class=\"btn btn-social-icon btn-twitter btn-lg\"><i class=\"fa fa-twitter\"></i></a>
 					<a href=\"".$caspian_configs['instagram']."\" class=\"btn btn-social-icon btn-instagram btn-lg\"><i class=\"fa fa-instagram\"></i></a>
 					<a href=\"".$caspian_configs['facebook']."\" class=\"btn btn-social-icon btn-facebook btn-lg\"><i class=\"fa fa-facebook\"></i></a>
-					<a href=\"".$caspian_configs['telegram']."\" class=\"btn btn-primary btn-rw mt10\">"._TELEGRAM_CHANNEL."</a>
-					<a href=\"".$caspian_configs['contact_us']."\" class=\"btn btn-primary btn-rw mt10\">"._ADMIN_CONTACT."</a>
+					<a href=\"".$caspian_configs['telegram']."\" class=\"btn btn-social-icon btn-telegram btn-lg\"><i class=\"fa fa-telegram\"></i></a>
+					<a href=\"".$caspian_configs['contact_us']."\" class=\"btn btn-social-icon btn-google-plus btn-lg\"><i class=\"fa fa-phone\"></i></a>
 				</p>
 			</div>
 		</div>
@@ -228,7 +236,7 @@ function themefooter()
 			</div>
 		</div>
 	</footer>";
-	
+	}
 	$contents .= _theme_footer();	
 		
 	return $contents;

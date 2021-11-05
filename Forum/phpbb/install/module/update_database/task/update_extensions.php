@@ -76,7 +76,21 @@ class update_extensions extends task_base
 	 *				they were added
 	 */
 	static public $default_extensions_update = [
-		'3.2.0-RC2' => ['phpbb/viglink']
+		'3.2.0-RC2' => ['phpbb/viglink'],
+     	'3.3.0' => ['arty/scss'],
+     	'3.3.0' => ['boardtools/quickreply'],
+     	'3.3.0' => ['gfksx/ListSubforumsInColumns'],
+      	'3.3.0' => ['gfksx/thanksforposts'],
+		'3.3.0' => ['alg/addonforthanksforposts'],
+       	'3.3.0' => ['kirk/new_topic_button_in_topic'],
+       	'3.3.0' => ['meis2m/jalali'],
+     	'3.3.0' => ['paul999/mention'],
+     	'3.3.0' => ['phpbb/boardannouncements'],
+     	'3.3.0' => ['rin/editor'],
+     	'3.3.0' => ['rmcgirr83/activity24hours'],
+       	'3.3.0' => ['shredder/sitemap'],
+       	'3.3.0' => ['vinny/shareon'],
+       	'3.3.0' => ['phpbbseo/usu'],
 	];
 
 	/**

@@ -6,6 +6,11 @@ if (!defined('NUKE_FILE')) {
 
 global $nuke_configs;
 
+$theme_aligns = array(
+	"rtl" => array(),
+	"ltr" => array()
+);
+
 $theme_setup = array(
 	"default_css" => array(
 		"<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\">",
@@ -47,71 +52,28 @@ $theme_setup = array(
 		"topcenter" => _TOPCENTER_BLOCKS,
 		"bottomcenter" => _BOTTOMCENTER_BLOCKS,
 	),
-	"theme_boxes_templates" => array(
-		"modules_boxes"	=> array(
-			"extra_class" => "row",
-		),
-		"top_full_moldule_boxes" => array(
-			"extra_class" => "",
-		),
+	"theme_boxes_templates" => "themes/".$nuke_configs['ThemeSel']."/theme_boxes.html",
+	"theme_boxes_templates_classes" => array(
+		"modules_boxes"	=> "row",
+		"top_full_module_boxes" => "",
 		"right_module_boxes" => array(
-			"extra_class" => array(
-				"_r" => "col-xs-12 col-sm-12 col-md-4 col-lg-4",
-				"_l_r" => "col-xs-12 col-sm-12 col-md-3 col-lg-3",
-			),
-			"order" => array(
-				"_r" => 1,
-				"_l_r" => 1
-			),
-			"pull" => array(
-				"_l" => "",
-				"_r" => "col-md-pull-8",
-				"_l_r" => "col-md-pull-6"
-			),
-			"push" => ""
+			"_r" => "col-md-4 col-md-pull-8",
+			"_l_r" => "col-md-3 col-md-pull-6",
 		),
 		"middle_module_boxes" => array(
-			"extra_class" => array(
-				"full" => "col-sm-12 text-right",
-				"_l" => "col-xs-12 col-sm-12 col-md-8 col-lg-8",
-				"_r" => "col-xs-12 col-sm-12 col-md-8 col-lg-8",
-				"_l_r" => "col-xs-12 col-sm-12 col-md-6 col-lg-6"
-			),
-			"order" => array(
-				"full" => 0,
-				"_l" => 0,
-				"_r" => 0,
-				"_l_r" => 0
-			),
-			"push" => array(
-				"full" => "",
-				"_r" => "col-md-push-4",
-				"_l" => "",
-				"_l_r" => "col-md-push-3"
-			)
+			"_full" => "text-right",
+			"_l" => "col-md-8",
+			"_r" => "col-md-8 col-md-push-4",
+			"_l_r" => "col-md-6 col-md-push-3"
 		),
 		"left_module_boxes" => array(
-			"extra_class" => array(
-				"_l" => "col-xs-12 col-sm-12 col-md-4 col-lg-4",
-				"_l_r" => "col-xs-12 col-sm-12 col-md-3 col-lg-3",
-			),
-			"order" => array(
-				"_l" => 2,
-				"_l_r" => 2
-			),
+			"_l" => "col-md-4",
+			"_l_r" => "col-md-3",
 		),
-		"top_middle_moldule_boxes" => array(
-			"extra_class" => "",
-		),
-		"main_middle_moldule_boxes" => array(
-			"extra_class" => "",
-		),
-		"bottom_middle_moldule_boxes" => array(
-			"extra_class" => "",
-		),
-		"bottom_full_moldule_boxes" => array(
-			"extra_class" => "",
-		)
+		"top_middle_module_boxes" => "",
+		"main_middle_module_boxes" => "",
+		"bottom_middle_module_boxes" => "",
+		"bottom_full_module_boxes" => ""
 	),
 	'caspian_configs' => isset($nuke_configs['caspian_configs']) ? phpnuke_unserialize($nuke_configs['caspian_configs']):array(
 		'active_slider' => 0,

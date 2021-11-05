@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
 * @package   s9e\RegexpBuilder
-* @copyright Copyright (c) 2016-2020 The s9e authors
+* @copyright Copyright (c) 2016-2021 The s9e authors
 * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
 */
 namespace s9e\RegexpBuilder\Output;
@@ -17,7 +17,7 @@ class Utf8 extends BaseImplementation
 	/**
 	* {@inheritdoc}
 	*/
-	protected function outputValidValue($value)
+	protected function outputValidValue(int $value): string
 	{
 		if ($value < 0x80)
 		{
@@ -42,7 +42,7 @@ class Utf8 extends BaseImplementation
 	/**
 	* {@inheritdoc}
 	*/
-	protected function validate($value)
+	protected function validate(int $value): void
 	{
 		if ($value >= 0xD800 && $value <= 0xDFFF)
 		{

@@ -1,14 +1,13 @@
-Subject: گزارش پیام خصوصی بسته شد - "{SUBJECT}"
+Subject: Private message report closed - "{SUBJECT}"
 
-سلام {USERNAME}،
+Hello {USERNAME},
 
-گزارش شما از پیام خصوصی با عنوان "{SUBJECT}" نوشته شده توسط "{AUTHOR_NAME}" در سایت "{SITENAME}" توسط مدیر و یا مدیر انجمن بررسی و بعد از آن بسته شد.
+You are receiving this notification because the report you filed on the private message "{SUBJECT}" by "{AUTHOR_NAME}" at "{SITENAME}" was handled by a moderator or by an administrator. The report was afterwards closed. If you have further questions contact {CLOSER_NAME} with a personal message.
 
-اگر سوال بیشتری دارید از طریق پیام خصوصی با {CLOSER_NAME} تماس بگیرید.
+You can view your reported private message by clicking on the following link:
 
-برای مشاهده پیام خصوصی گزارش شده بر روی لینک زیر کلیک کنید:
 {U_VIEW_MESSAGE}
 
-شما این اطلاعیه را دریافت کردید چون شما آن پیام خصوصی را گزارش کردید، به یاد داشته باشد که میتوانید در تنظیمات نمایه خود انتخاب کنید که هنگام بستن پیام خصوصی گزارش شده به شما پیام ندهد.
+You have requested that you be notified on this event, remember that you can always choose not to be notified of closed private message reports by changing the appropriate setting in your profile.
 
 {EMAIL_SIG}

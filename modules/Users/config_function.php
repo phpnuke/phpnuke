@@ -291,12 +291,6 @@ function _check_register_fields($field = 'username', $value = '', $default_value
 		die($response);
 }
 
-function users_infoitems($list_group_item, $user_data)
-{
-	return $list_group_item;
-}
-$hooks->add_filter("users_info_items", "users_infoitems", 10);
-
 function users_infoops($list_group_ops, $user_data)
 {
 	return $list_group_ops;
@@ -466,7 +460,7 @@ function users_config()
 	 return $contents;
 }
 
-$other_admin_configs['users_config'] = array("title" => "_USERS_CONFIGS", "function" => "users_config", "God" => false);
+$other_admin_configs['users_config'] = array("title" => _USERS_CONFIGS, "function" => "users_config", "God" => false);
 
 function users_boxes_parts($nuke_modules_boxes_parts)
 {
@@ -480,5 +474,30 @@ function users_boxes_parts($nuke_modules_boxes_parts)
 }
 
 $hooks->add_filter("modules_boxes_parts", "users_boxes_parts", 10);
+
+function users_info_items_parse($list_group_items, $user_data)
+{
+	$return = array();
+	foreach($list_group_items as $key => $list_group_item)
+	{
+		$list_group_item['field_value'] = (isset($list_group_item['color']) && $list_group_item['color'] != '') ? "<span style=\"color:".$list_group_item['color']."\">".$list_group_item['field_value']."</span>":$list_group_item['field_value'];
+		
+		if(is_array($list_group_item['field_value']))
+		{
+			$url = $list_group_item['field_value']['url'];
+			$title = (isset($list_group_item['field_value']['title']) && list_group_item['field_value'][1] != '') ? $list_group_item['field_value'][1]:$list_group_item['field_text'];
+
+			$return[$key] = "<a href=\"".$url."\" class=\"list-group-item\"><i class=\"".$list_group_item['icon']."\"></i> ".$title."</a>";
+		}
+		else
+		{
+			$return[$key] = "<div class=\"list-group-item\"><i class=\"".$list_group_item['icon']."\"></i> ".$list_group_item['field_text']." : ".$list_group_item['field_value']."</div>";
+		}
+	}
+	
+	return $return;
+}
+
+$hooks->add_filter("users_info_items", "users_info_items_parse", 10);
 
 ?>

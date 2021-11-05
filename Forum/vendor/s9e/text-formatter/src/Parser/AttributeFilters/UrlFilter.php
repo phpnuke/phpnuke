@@ -61,7 +61,7 @@ class UrlFilter
 		$tokens = ['scheme', 'user', 'pass', 'host', 'port', 'path', 'query', 'fragment'];
 		foreach ($tokens as $i => $name)
 		{
-			$parts[$name] = (isset($m[$i + 1])) ? $m[$i + 1] : '';
+			$parts[$name] = $m[$i + 1] ?? '';
 		}
 
 		/**
@@ -195,7 +195,7 @@ class UrlFilter
 	public static function sanitizeUrl($url)
 	{
 		return preg_replace_callback(
-			'/%(?![0-9A-Fa-f]{2})|[^!#-&*-;=?-Z_a-z]/S',
+			'/%(?![0-9A-Fa-f]{2})|[^!#-&*-;=?-Z_a-z~]/',
 			function ($m)
 			{
 				return rawurlencode($m[0]);
