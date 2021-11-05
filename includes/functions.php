@@ -3813,7 +3813,7 @@ function parse_GT_link($REQUESTURL)
 
 	$REQUESTURL = trim($REQUESTURL,'/');
 
-	if ($nuke_configs['gtset'] == "1" && !file_exists($REQUESTURL))
+	if ($nuke_configs['gtset'] == "1" && $REQUESTURL != '' && !file_exists($REQUESTURL))
 	{
 		$matched_rule = '';
 		$matched_query = '';
@@ -3879,19 +3879,20 @@ function parse_GT_link($REQUESTURL)
 		}
 		$result = array($parsed_vars, $REQUESTURL, $matched_rule, $unfriendly_link, $matched_query);
 	}
-	else
+	elseif(isset($_GET) && is_array($_GET) && !empty($_GET))
 	{
-		if(isset($_GET) && is_array($_GET))
+		$i=0;
+		foreach($_GET as $key => $val)
 		{
-			$i=0;
-			foreach($_GET as $key => $val)
-			{
-				$par = ($i == 0) ? "?":"&";
-				$REQUESTURL .= $par."$key=$val";
-				$i++;
-			}
+			$par = ($i == 0) ? "?":"&";
+			$REQUESTURL .= $par."$key=$val";
+			$i++;
 		}
 		$result = array($_GET, $REQUESTURL, '', $REQUESTURL, '');
+	}
+	else
+	{
+		$result = array(array(), "/", '', 'index.php', 'index.php');
 	}
 	$result = $hooks->apply_filters("parse_GT_link_filter", $result, $REQUESTURL);
 	
