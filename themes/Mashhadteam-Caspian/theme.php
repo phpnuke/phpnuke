@@ -46,7 +46,7 @@ function _theme_header()
 
 function themeheader()
 {
-	global $userinfo, $nuke_configs, $search_query, $theme_setup, $users_system;
+	global $userinfo, $nuke_configs, $search_query, $theme_setup, $users_system, $hooks;
 	
 	$caspian_configs = $theme_setup['caspian_configs'];
 	
@@ -55,18 +55,21 @@ function themeheader()
     $real_name = (isset($userinfo['name'])) ? mres($userinfo['name']):"";
 	$dateTime = nuketimes();
 	$now = date("H:i");
-	$time = "<clock".((_DIRECTION == 'ltr') ? "dir=\"ltr\"":"")." class=\"nukeclock\"></clock>";
+	$time = "<clock class=\"nukeclock\"></clock>";
 	
 	$search_query = (isset($search_query) && $search_query != '') ? $search_query:"";
 	
-	$body_class = (_DIRECTION == 'ltr') ? " class=\"ltr\"":"";
+	$body_class = array();
+	$body_class[] = (_DIRECTION == 'ltr') ? "ltr":"rtl";
+	
+	$body_class = $hooks->apply_filters("body_classes", $body_class);
 	
 	if(file_exists("themes/".$nuke_configs['ThemeSel']."/theme_header.php"))
 		include("themes/".$nuke_configs['ThemeSel']."/theme_header.php");
 	else
 	{
 		$contents .= "
-	<body".$body_class.">
+	<body class=\"".implode(" ", $body_class)."\">
 		<header>
 			<div class=\"GSTop\">
 				<div class=\"container GSTopHeader\">
