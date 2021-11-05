@@ -369,7 +369,7 @@ function article_index($article_info)
 		}
 	}
 	
-	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:right;margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".LinkToGT($article_info['post_image'])."&h=155&w=230&q=90&a=c")."\" width=\"230\" height=\"155\" />":"";
+	$post_imge = (isset($article_info['post_image']) && $article_info['post_image'] != '') ? "<img class=\"img-thumbnail\" style=\"float:"._TEXTALIGN1.";margin:0 7px 7px 7px;\" src=\"".LinkToGT("index.php?timthumb=true&src=".LinkToGT($article_info['post_image'])."&h=155&w=230&q=90&a=c")."\" width=\"230\" height=\"155\" />":"";
 	
 	$content = "
 	<article>

@@ -1,14 +1,17 @@
 * {
 	margin: 0;
 	padding: 0;
-	font-family: Vazir, Tahoma, Arial;
 }
 html,
 body {
 	height: 100%;
+	font-family: Vazir, Tahoma, Arial;
 }
 body {
 	color: #393939;
+}
+body.ltr {
+	font-family: Arial, Tahoma;
 }
 /* GENERAL --------------------------------------------------------*/
 
@@ -43,7 +46,6 @@ table {
 a {
 	outline: none;
 	text-decoration: none;
-	font-family: Vazir;
 }
 a:hover {} .clear {
 	clear: both;
@@ -80,7 +82,6 @@ form {
 }
 h1 {
 	color: #4b4b4b;
-	font-family: Vazir, Tahoma;
 	font-size: 15px;
 	line-height: 24px;
 	font-weight: bold;
@@ -463,7 +464,6 @@ header nav ul li a:hover {
 }
 #content {
 	color: #333;
-	font-family: Vazir, Tahoma, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	line-height: 18px;
 	margin: 0 auto 0 auto;
@@ -473,7 +473,6 @@ header nav ul li a:hover {
 }
 #content-inner {
 	color: #333;
-	font-family: Vazir, Tahoma, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	line-height: 18px;
 	margin: 0 auto 0px auto;
@@ -580,7 +579,6 @@ header nav ul li a:hover {
 }
 .message-alert,
 .message-alert a {
-	font-family: Vazir, Tahoma;
 	font-weight: bold;
 }
 .message-green,
@@ -712,7 +710,6 @@ header nav ul li a:hover {
 	background-color: #8c8c8c;
 	border: 1px solid #767676;
 	color: #fff;
-	font-family: Vazir, Tahoma, Arial;
 	font-size: 10px;
 	font-weight: normal;
 	opacity: 0.85;
@@ -726,7 +723,6 @@ header nav ul li a:hover {
 }
 #tooltip h6,
 #tooltip div {
-	font-family: Vazir, Tahoma, Arial;
 	font-size: 11px;
 	line-height: 20px;
 	margin: 0;
@@ -812,7 +808,6 @@ td.checkbox-width {} .table-header-check {
 .table-header-repeat {
 	text-align: center;
 	color: #fff;
-	font-family: Vazir, Tahoma;
 	font-size: 13px;
 	font-weight: bold;
 	line-height: 14px;
@@ -826,7 +821,6 @@ td.checkbox-width {} .table-header-check {
 .table-header-options a,
 .table-header-repeat a {
 	color: #fff;
-	font-family: Vazir, Tahoma;
 	font-size: 13px;
 	font-weight: bold;
 	line-height: 14px;
@@ -1175,7 +1169,6 @@ a:hover.action-delete {
 	border: 1px solid #ccc;
 	border-radius: 5px;
 	color: #393939;
-	font-family: Vazir, Tahoma, Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	min-height: 97px;
 	overflow: auto;
@@ -1209,7 +1202,6 @@ a:hover.action-delete {
 	min-width: 200px;
 }
 #step-holder {
-	font-family: Vazir, Tahoma;
 	height: 39px;
 	margin-bottom: 20px;
 }
@@ -1541,7 +1533,6 @@ Copyright (c) 2005-2007 Stu Nicholls. All rights reserved. This stylesheet and t
 
 .nav {
 	float: right;
-	font-family: Vazir, Tahoma;
 	font-size: 13px;
 	height: 38px;
 	position: relative;
@@ -1840,7 +1831,6 @@ div.selectbox-wrapper ul li {
 	color: #fff;
 	cursor: pointer;
 	display: block;
-	font-family: Vazir, Tahoma, Arial;
 	font-size: 12px;
 	height: 20px;
 	margin: 0px 0px 0px 0px;
@@ -1973,7 +1963,6 @@ div.selectbox-wrapper ul li {
 }
 #login-inner {
 	color: #161616;
-	font-family: Vazir, Tahoma;
 	font-size: 13px;
 	line-height: 12px;
 	margin: 0 auto;
@@ -1995,7 +1984,6 @@ div.selectbox-wrapper ul li {
 #login-inner label {
 	color: #161616;
 	cursor: pointer;
-	font-family: Vazir, Tahoma;
 	font-weight: bold;
 	line-height: 12px;
 	padding-left: 10px;
@@ -2056,7 +2044,6 @@ div.selectbox-wrapper ul li {
 a.forgot-pwd {
 	bottom: 30px;
 	color: #161616;
-	font-family: Vazir, Tahoma;
 	font-size: 11px;
 	font-weight: bold;
 	line-height: 12px;
@@ -2072,7 +2059,6 @@ a:hover.forgot-pwd {
 }
 #forgotbox-text {
 	color: #161616;
-	font-family: Vazir, Tahoma;
 	font-size: 13px;
 	font-weight: bold;
 	line-height: 12px;
@@ -2081,7 +2067,6 @@ a:hover.forgot-pwd {
 }
 #forgot-inner {
 	color: #161616;
-	font-family: Vazir, Tahoma;
 	font-size: 13px;
 	line-height: 12px;
 	margin: 0 auto;
@@ -2090,7 +2075,6 @@ a:hover.forgot-pwd {
 #forgot-inner label {
 	color: #161616;
 	cursor: pointer;
-	font-family: Vazir, Tahoma;
 	font-weight: bold;
 	line-height: 12px;
 	padding-left: 10px;
@@ -2110,7 +2094,6 @@ a.back-login {
 	background: url(../images/login/icon_back_login.gif) no-repeat 0 4px;
 	bottom: 30px;
 	color: #161616;
-	font-family: Vazir, Tahoma;
 	font-size: 11px;
 	font-weight: bold;
 	line-height: 12px;
