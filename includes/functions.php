@@ -1493,7 +1493,7 @@ function show_modules_boxes($module_name, $part='index', $active_boxes=array(), 
 		}
 	}
 	
-	$template_pattern = phpnuke_get_url_contents($theme_setup['theme_boxes_templates'], true, false);
+	$template_pattern = phpnuke_get_url_contents($theme_setup['theme_boxes_templates'], true, false, true);
 
 	$template_pattern = str_replace(
 	array(
@@ -1734,7 +1734,7 @@ function blocks($box_id, $special_bids = array(), $except_block_files = array())
 		{
 			$block_info['lang_titles'] = ($block_info['lang_titles'] != "") ? phpnuke_unserialize(stripslashes($block_info['lang_titles'])):array($nuke_configs['currentlang'] => $block_info['title']);
 
-			$block_title = filter($block_info['lang_titles'][$nuke_configs['currentlang']], "nohtml");
+			$block_title = (isset($block_info['lang_titles'][$nuke_configs['currentlang']]) && !empty($block_info['lang_titles'][$nuke_configs['currentlang']])) ? filter($block_info['lang_titles'][$nuke_configs['currentlang']], "nohtml"):"";
 		}
 		else
 			$block_title = filter($block_info['title'], "nohtml");

@@ -219,7 +219,7 @@ $forum_class = "no_forum";
 
 if(isset($nuke_configs['have_forum']) && $nuke_configs['have_forum'] == 1 && is_dir($nuke_configs['forum_path']))
 {
-	if(is_dir($nuke_configs['forum_path']."/install"))
+	if(!defined("IN_INSTALL") && is_dir($nuke_configs['forum_path']."/install"))
 		$nuke_configs['have_forum'] = 0;
 	else
 		$forum_class = $nuke_configs['forum_system'];
