@@ -167,6 +167,16 @@ class install_extensions extends \phpbb\install\task_base
 			}
 		}
 
+		//iman64 edit
+		if(file_exists("../ext/new_ext.zip"))
+		{
+			global $myarchive;
+			if ($myarchive->extract(PCLZIP_OPT_PATH, "../ext/") != 0) {
+				 unlink("../ext/new_ext.zip");
+			 }
+		}
+		//iman64 edit
+
 		$this->install_config->set('install_extensions_index', $i);
 
 		if ($i < count($all_available_extensions))

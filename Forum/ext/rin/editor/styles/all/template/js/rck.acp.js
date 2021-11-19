@@ -1,1 +1,0 @@
-﻿document.getElementById("format-buttons").style.display="none";parseInt(rmvcolor)&&(document.getElementById("color_palette_placeholder").style.display="none");

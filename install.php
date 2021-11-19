@@ -350,7 +350,7 @@ function step_db()
 					<div class=\"form-group have_forum\">
 						<label class=\"control-label col-sm-4\" for=\"pn_db_forumunicode\">".$nuke_languages['_INSTALL_FORUM_COLLATION'].":</label>
 						<div class=\"col-sm-8\">
-							<input type=\"text\" class=\"form-control\" id=\"pn_db_forumunicode\" name=\"db_fields[db_forumunicode]\" value=\"latin1\" />
+							<input type=\"text\" class=\"form-control\" id=\"pn_db_forumunicode\" name=\"db_fields[db_forumunicode]\" value=\"utf8mb4\" />
 						</div>
 					</div>
 					<div class=\"form-group have_forum\">

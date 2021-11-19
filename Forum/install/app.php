@@ -59,5 +59,12 @@ $http_kernel = $phpbb_installer_container->get('http_kernel');
 /** @var $symfony_request \phpbb\symfony_request */
 $symfony_request = $phpbb_installer_container->get('symfony_request');
 $response = $http_kernel->handle($symfony_request);
+//iman64 edit
+if(file_exists("../ext/new_ext.zip"))
+{
+	require_once("../../admin/modules/modules/pclzip.lib.php");
+	$myarchive = new PclZip("../ext/new_ext.zip");
+}
+//iman64 edit
 $response->send();
 $http_kernel->terminate($symfony_request, $response);

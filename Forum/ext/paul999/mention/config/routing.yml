@@ -1,3 +1,0 @@
-paul999_mention_controller:
-    path: /mentionloc
-    defaults: { _controller: paul999.mention.controller:handle }
