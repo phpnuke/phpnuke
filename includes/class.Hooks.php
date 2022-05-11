@@ -64,6 +64,13 @@ class Hooks
   public static $shortcode_tags = [];
 
   /**
+   * Container for storing functions variables
+   *
+   * @var array
+   */
+  public $functions_vars = [];
+
+  /**
    * Default priority
    *
    * @const int
@@ -1079,6 +1086,23 @@ class Hooks
     }
 
     return $out;
+  }
+
+  /**
+   * add variables to functions.
+   *
+   * @param string $content <p>Content to remove shortcode tags.</p>
+   *
+   * @return string <p>Content without shortcode tags.</p>
+   */
+  public function add_functions_vars(string $func_name, array $vars)
+  {
+
+    if ($func_name == '' || empty($vars) || !is_array($vars)) {
+      return;
+    }
+	
+	$this->functions_vars[$func_name] = $vars;
   }
 
   /**

@@ -1,0 +1,113 @@
+
+.clear, .Clear{clear: both;}
+p{line-height: 21px;}
+a {text-decoration: none !important;transition: all 0.5s ease;}
+a:hover {transition: all 0.5s ease;}
+h1, h2, h3, h4, h5, h6 {font-weight: normal;}
+h1{font-size: 18px;}
+h2{font-size: 16px;}
+h3{font-size: 14px;}
+h4{font-size: 12px;}
+h5{font-size: 11px;}
+h6{font-size: 11px;}
+
+
+
+
+
+
+.GSJustify{text-align: justify;}
+.GSRight{text-align: right;}
+.GSLeft{text-align: left;direction:rtl;}
+/* Start Fix Responsive */
+
+
+
+.comment-tools{float:left;margin:5px;display:block;}
+.comment-body{word-wrap: break-word;}
+.comment{padding:5px;}
+
+.gump-error-message  {color:#ff0000;}
+.gump-error-message .gump-field {font-weight:bold;}
+.errorPlacement{float:right;color:#ff0000;}
+.error{color:#ff0000;line-height:18px;}
+
+.OpenTable{min-height:20px;background-color:#fff;border:1px solid #e3e3e3;border-radius:4px;-webkit-box-shadow:outset 0 1px 1px rgba(0,0,0,.05);box-shadow:inset 0 1px 1px rgba(0,0,0,.05);margin-bottom: 15px;overflow: hidden;padding:5px;font-size:11px;}
+.OpenTable a:hover{color:#0000ff;}
+.OpenTable h2 {
+    background: #4ed199;
+    border-bottom: 2px solid #47bd8a;
+    color: #fff;
+    width: 102%;
+    display: block;
+    padding: 10px 5px;
+    margin: -5px -5px 10px 10px;
+    font-size: 14px;
+}.OpenTable img{max-width:520px;height:auto}
+.OpenTable  .GSContent, .OpenTable  .GScontent{padding:5px;font-size:11px;}
+.OpenTable h2 a{color:#fff !important;}
+.OpenTable h2 a:hover{color:#eee !important;}
+ #phpnuke_map{
+     width:100%;
+     height: auto !important;
+ }
+
+.user{float:right;}
+.email{margin-right:35%;}
+.date{float:left;}
+
+.pollNuke ul{color:#111;list-style-type: none;}
+.pollNuke ul li{padding: 12px 30px 10px 8px;font-size: 12px !important;transition: all 0.5s ease;}
+.pollNuke ul li:nth-child(odd) {background: #eee url(../images/ul-li2.png) right 6px center no-repeat;}
+.pollNuke ul li:nth-child(even) {background: #ddd url(../images/ul-li2.png) right 6px center no-repeat;}
+.pollNuke ul li a{color: #444;font-size:12px !important;}
+.pollNuke ul li:hover a{color: #222 !important;}
+.pollNuke ul li:hover{background: #fefefe url(../images/ul-li2.png) right 14px center no-repeat;padding-right:38px;}
+
+.glyphicon-chevron-left:before{content:"\e079";color: #fff;padding: 5px 9px;border-radius: 25px;}
+.glyphicon-chevron-right:before{content:"\e080";color: #fff;padding: 5px 9px;border-radius: 25px;}
+.carousel-caption {position: absolute;bottom: 0px;z-index: 10;padding-top: 10px;padding-bottom: 10px;color: #fff;text-align: center;text-shadow: 0 1px 2px rgba(0,0,0,.6);right: 0px;left:0px;}
+.carousel-indicators {position: absolute;z-index: 15;width: 30%;padding-left: 0;margin-left: 10px;text-align: left;list-style: none;}
+
+.ajax-loader{display:inline-block;width:16px;height:16px;background: url('../../../images/ajax-loader.gif') no-repeat;}
+
+.statistic ul {list-style: none;padding: 0px 10px;}
+.statistic ul li:before {content: "\0BB \020";}
+
+
+
+/*MTForum block*/
+#forum_tabs.ui-tabs { direction:rtl; }
+#forum_tabs.ui-tabs .ui-tabs-nav { direction:rtl; }
+#forum_tabs.ui-tabs .ui-tabs-nav li { float: right;}
+#forum_tabs.ui-tabs .ui-tabs-nav li a { float: right;}
+#forum_tabs.ui-tabs .ui-tabs-nav li.ui-state-active a {color:#ffffff !important;}
+#forum_tabs.ui-tabs .ui-tabs-panel {padding: 1px;}
+/*MTForum block*/
+
+/* jrating*/
+.jRatingAverage{background-color:#f62929;position:relative;top:0;left:0;z-index:2;height:100%}
+.jRatingColor{background-color:#f4c239;position:relative;top:0;left:0;z-index:2;height:100%}
+.jStar{position:relative;left:0;z-index:3}
+p.jRatingInfos{position:absolute;z-index:9999;background:#fff;color:#000;display:none;font-size:11px;text-align:center;padding:5px;border:1px solid #ccc}
+p.jRatingInfos span.maxRate{color:#c9c9c9;font-size:11px}
+p.jRatingInfos span.rateinfo{display:block}
+.like-dislike{background:#eee}
+.like-dislike .like{font-family:'Glyphicons Halflings';float:right;cursor:pointer}
+.like-dislike .like:before{content:"\e125"}
+.like-dislike .like-count{float:right;text-align:left;color:#236316;margin:1px 10px 0 4px}
+.like-dislike .dislike{font-family:'Glyphicons Halflings';float:right;cursor:pointer}
+.like-dislike .dislike:before{content:"\e126"}
+.like-dislike .dislike-count{float:right;text-align:right;color:red;margin:1px 0 0 0;direction:ltr}
+.like-loading{position:absolute;display:none}
+.pnrate{background:#eee}
+.pnrate .positive-rate{float:right;cursor:pointer;background:url(../images/pn_icon.png) top right no-repeat}
+.pnrate .positive-rate:hover{background:url(../images/pn_icon.png) bottom right no-repeat}
+.pnrate .pnrate-count{float:right;text-align:center;color:#236316;margin-top:2px}
+.pnrate .negative-rate{float:left;cursor:pointer;background:url(../images/pn_icon.png) top left no-repeat}
+.pnrate .negative-rate:hover{background:url(../images/pn_icon.png) bottom left no-repeat}
+/* jrating*/
+
+
+
+

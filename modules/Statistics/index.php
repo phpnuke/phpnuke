@@ -19,7 +19,8 @@ if (!defined('MODULE_FILE')) {
 require_once("mainfile.php");
 $module_name = basename(dirname(__FILE__));
 
-define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
+if(!defined("INDEX_FILE"))
+	define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 function statistics()
 {
@@ -193,33 +194,18 @@ function statistics()
 	$all_rows = array();
 	if($statistics_result->count() > 0)
 		$all_rows = $statistics_result->results()[0];
+	
+	$hooks->add_functions_vars(
+		'statistics_assets',
+		array(
+			"module_name" => $module_name,
+			"main_chart_data" => $main_chart_data,
+			"browsers_chart_data" => $browsers_chart_data,
+			"os_chart_data" => $os_chart_data,
+		)
+	);
 
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name, $main_chart_data, $browsers_chart_data, $os_chart_data)
-	{
-		$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/style.css\">";
-		
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/amcharts.js\"></script>";
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/serial.js\"></script>";
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/pie.js\"></script>";
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/themes/light.js\"></script>";
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/plugins/responsive/responsive.min.js\"></script>";
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/charts.js\"></script>";
-		$defer_js[] = "<script>
-		$(document).ready(function(){
-			var main_chart_data = $main_chart_data;
-			var browsers_chart_data = $browsers_chart_data;
-			var os_chart_data = $os_chart_data;
-			main_chart('serial_chart', main_chart_data);
-			pie_chart('browsers_chart', browsers_chart_data, 'browser', 'value');
-			pie_chart('os_chart', os_chart_data, 'os', 'value');
-		});
-		</script>";
-		$theme_setup = array_merge_recursive($theme_setup, array(
-			"default_css" => $default_css,
-			"defer_js" => $defer_js
-		));
-		return $theme_setup;
-	}, 10);
+	$hooks->add_filter("site_theme_headers", "statistics_assets", 10);
 
 	$meta_tags = array(
 		"title" 				=> _VIEWERS_STATISTICS,
@@ -233,14 +219,7 @@ function statistics()
 		return array_merge($all_meta_tags, $meta_tags);
 	}, 10);
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents){
-		$breadcrumbs['statistics'] = array(
-			"name" => _VIEWERS_STATISTICS,
-			"link" => LinkToGT("index.php?modname=Statistics"),
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);	
+	$hooks->add_filter("site_breadcrumb", "statistics_breadcrumb", 10);	
 	unset($meta_tags);
 	
 	include("header.php");
@@ -560,25 +539,16 @@ function advanced_statistics($year=0, $month=0, $day=0)
 		$back_link = "<a href=\"".LinkToGT("index.php?modname=$module_name&op=advanced_statistics&year=$year&month=$month")."\">"._SHOW_STATISTICS." ".get_month_name($month)." $year</a>";
 	}
 	
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name, $script_array)
-	{
-			$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/style.css\">";
-			
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/amcharts.js\"></script>";
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/serial.js\"></script>";
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/pie.js\"></script>";
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/themes/light.js\"></script>";
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/plugins/responsive/responsive.min.js\"></script>";
-			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/charts.js\"></script>";
-			$defer_js[] = $script_array;
-			
-		$theme_setup = array_merge_recursive($theme_setup, array(
-			"default_css" => $default_css,
-			"defer_js" => $defer_js
-		));
-		return $theme_setup;
-	}, 10);
+	$hooks->add_functions_vars(
+		'adv_statistics_assets',
+		array(
+			"module_name" => $module_name,
+			"script_array" => $script_array,
+		)
+	);
 
+	$hooks->add_filter("site_theme_headers", "adv_statistics_assets", 10);
+	
 	$meta_tags = array(
 		"title" 				=> ""._VIEWERS_STATISTICS." $visits_time_text",
 		"description" 			=> _SٍEPRATE_STATISTICS,
@@ -590,27 +560,16 @@ function advanced_statistics($year=0, $month=0, $day=0)
 	{
 		return array_merge($all_meta_tags, $meta_tags);
 	}, 10);		
-	unset($meta_tags);	
+	unset($meta_tags);
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($breadcrumb_data){
+	$hooks->add_functions_vars(
+		'adv_statistics_breadcrumb',
+		array(
+			"breadcrumb_data" => $breadcrumb_data,
+		)
+	);
 	
-		$breadcrumbs['statistics'] = array(
-			"name" => _VIEWERS_STATISTICS,
-			"link" => LinkToGT("index.php?modname=Statistics"),
-			"itemtype" => "WebPage"
-		);
-		
-		foreach($breadcrumb_data as $key => $breadcrumb)
-		{
-			$breadcrumbs["statistics_$key"] = array(
-				"name" => $breadcrumb[0],
-				"link" => $breadcrumb[1],
-				"itemtype" => "WebPage"
-			);
-		}
-		
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_filter("site_breadcrumb", "adv_statistics_breadcrumb", 10);
 	
 	include("header.php");
 

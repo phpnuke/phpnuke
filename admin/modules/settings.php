@@ -28,9 +28,11 @@ if (check_admin_permission($filename))
 
 	function settings()
 	{
-		global $admin_file, $nuke_configs, $hooks, $other_admin_configs;
+		global $admin_file, $nuke_configs, $hooks;
 		
 		$hooks->add_filter("set_page_title", function(){return array("settings" => _GENERAL_SYSTEM_SETTINGS);});
+		
+		$other_admin_configs = $hooks->apply_filters("other_admin_configs", []);
 		
 		$contents = '';
 		$contents .="
@@ -103,12 +105,14 @@ if (check_admin_permission($filename))
 
 	function save_configs($submit, $config_fields, $return_op = 'settings', $log_message = '', $array_level = array())
 	{
-		global $db, $admin_file, $pn_Sessions, $pn_Cookies;
+		global $db, $admin_file, $hooks, $pn_Sessions, $pn_Cookies;
 		
 		$nuke_configs = get_cache_file_contents('nuke_configs');
 		
 		if(isset($submit) && isset($config_fields))
 		{
+			$config_fields = $hooks->apply_filters("save_cinfigs", $config_fields, $return_op, $log_message, $array_level);
+			
 			$insert_query = array();
 			$query_set = array();
 			$query_IN = array();
@@ -141,6 +145,10 @@ if (check_admin_permission($filename))
 				$params_index[] = "?";
 				$query_IN[] = $key;
 			}
+			
+			$query_set = $hooks->apply_filters("save_cinfigs_update", $query_set, $config_fields);
+			$insert_query = $hooks->apply_filters("save_cinfigs_insert", $insert_query, $config_fields);
+			
 			if(!empty($query_set))
 			{
 				$query_set = implode("\n", $query_set);
@@ -162,17 +170,20 @@ if (check_admin_permission($filename))
 			if(isset($config_fields['language']))
 				$pn_Cookies->set("nukelang",$config_fields['language'],(365*24*3600));
 				
+			$hooks->do_action("save_cinfigs_after", $config_fields, $return_op, $log_message, $array_level);
+			
 			cache_system("nuke_configs");
 			$pn_Sessions->destroy();
 			$log_message = ($log_message != '') ? $log_message:_CONFIGS_LOG;
 			add_log($log_message, 1);
 			redirect_to("".$admin_file.".php?op=$return_op");
+			die();
 		}	
 	}
 	
 	function general_config()
 	{
-		global $nuke_configs, $admin_file;
+		global $nuke_configs, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 		
@@ -250,12 +261,16 @@ if (check_admin_permission($filename))
 		$contents .="</td></tr>
 		<tr><td>&nbsp;</td><td halign=\"left\"><input type='hidden' name='op' value='save_configs'><input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		<br><br><input class=\"form-submit\" type='submit' name='submit' name='submit' value='" . _SAVECHANGES . "'></form></td></tr></table>";
+		$contents = $hooks->apply_filters("general_config", $contents);
 		die($contents);
 	}
 	
 	function themes_config()
 	{
-		global $admin_file, $nuke_configs, $other_admin_configs;
+		global $admin_file, $nuke_configs, $hooks;
+		
+		$other_admin_configs = $hooks->apply_filters("other_admin_configs", []);
+		
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 		$contents .="
@@ -309,12 +324,13 @@ if (check_admin_permission($filename))
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		</form>
 		</table>";
+		$contents = $hooks->apply_filters("themes_config", $contents);
 		die($contents);		
 	}
 		
 	function comments_config()
 	{
-		global $nuke_configs, $admin_file;
+		global $nuke_configs, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 		$comments_configs = phpnuke_unserialize(stripslashes($nuke_configs['comments']));
@@ -429,12 +445,13 @@ if (check_admin_permission($filename))
 		<tr><td colspan=\"2\"><input type='hidden' name='op' value='comments_delete'>
 		<input type='hidden' name='return_op' value='settings#comments_config'><input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
+		$contents = $hooks->apply_filters("comments_config", $contents);
 		die($contents);		
 	}
 		
 	function language_config()
 	{
-		global $nuke_configs, $admin_file;
+		global $nuke_configs, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 			
@@ -479,12 +496,13 @@ if (check_admin_permission($filename))
 		<input type='hidden' name='return_op' value='settings#language_config'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
+		$contents = $hooks->apply_filters("language_config", $contents);
 		die($contents);		
 	}
 			
 	function referers_config()
 	{
-		global $nuke_configs, $admin_file;
+		global $nuke_configs, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 		
@@ -513,12 +531,13 @@ if (check_admin_permission($filename))
 		<input type='hidden' name='return_op' value='settings#referers_config'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
+		$contents = $hooks->apply_filters("referers_config", $contents);
 		die($contents);		
 	}
 	
 	function mailing_config()
 	{
-		global $nuke_configs, $admin_file;
+		global $nuke_configs, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 
@@ -593,12 +612,13 @@ if (check_admin_permission($filename))
 		<input type='hidden' name='return_op' value='settings#mailing_config'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
+		$contents = $hooks->apply_filters("mailing_config", $contents);
 		die($contents);		
 	}
 	
 	function uploads_config()
 	{
-		global $admin_file;
+		global $admin_file, $hooks;
 		$contents = '';
 		if(is_God())
 		{
@@ -632,17 +652,19 @@ if (check_admin_permission($filename))
 			<input type='hidden' name='return_op' value='settings#uploads_config'>
 			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 			<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
+			$contents = $hooks->apply_filters("uploads_config", $contents);
 			die($contents);
 		}
 		else
 		{
+			$contents = $hooks->apply_filters("uploads_config_permission", $contents);
 			die('no God');
 		}
 	}
 	
 	function forums_config()
 	{
-		global $nuke_configs, $db, $pn_dbname, $users_system, $admin_file;
+		global $nuke_configs, $db, $pn_dbname, $users_system, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 						
@@ -745,14 +767,17 @@ if (check_admin_permission($filename))
 		<input type='hidden' name='return_op' value='settings#forums_config'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
+		$contents = $hooks->apply_filters("forums_config", $contents);
 		die($contents);
 	}
 	
 	function others_config($other_admin_config = '')
 	{
-		global $nuke_configs, $admin_file, $other_admin_configs;
+		global $nuke_configs, $admin_file, $other_admin_configs, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
+		
+		$other_admin_configs = $hooks->apply_filters("other_admin_configs", []);
 		
 		if($other_admin_config != '' && isset($other_admin_configs[$other_admin_config]) && isset($other_admin_configs[$other_admin_config]['function']) && function_exists($other_admin_configs[$other_admin_config]['function'])) 
 		{
@@ -833,15 +858,16 @@ if (check_admin_permission($filename))
 			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 			<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>
 			
-			<script src=\"admin/template/js/jquery/jquery.selection.js\" type=\"text/javascript\"></script>
-			";
+			<script src=\"admin/template/js/jquery/jquery.selection.js\" type=\"text/javascript\"></script>";
 		}
+		$contents = $hooks->apply_filters("others_config", $contents, $other_admin_config);
+		
 		die($contents);
 	}
 	
 	function smilies_config()
 	{
-		global $nuke_configs, $admin_file;
+		global $nuke_configs, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 		$nuke_configs['smilies'] = (isset($nuke_configs['smilies'])) ? $nuke_configs['smilies']:"";
@@ -853,10 +879,18 @@ if (check_admin_permission($filename))
 		<table border=\"0\" align=\"center\" cellpadding=\"3\" class=\"id-form product-table no-border\" width=\"100%\">
 		
 		<tr>
-			<th>"._SMILIES_FIELDS." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\"></span></th>
+			<th>"._SMILIES_FIELDS." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\" data-fields-max=\"1000\" data-fields-wrapper=\".input_fields_wrap\" data-fields-html=\"#input_fields_wrap_html\"></span></th>
 			<td>
+				<template id=\"input_fields_wrap_html\">
+					<div style=\"margin-bottom:3px;\">
+						<input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][name]\" size=\"20\" />&nbsp;
+						<input placeholder=\""._CODE."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][code]\" size=\"20\" />&nbsp;
+						<input placeholder=\""._URL."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][url]\" size=\"30\" />&nbsp;
+						<input placeholder=\""._DIMENTIONS."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][dimentions]\" size=\"10\" />&nbsp; &nbsp; 
+						<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+					</div>
+				</template>
 				<div class=\"input_fields_wrap\">";
-					$x1 = 1;
 					if(!empty($smilies_configs))
 					{
 						foreach($smilies_configs as $x1 => $smilie_data)
@@ -873,8 +907,13 @@ if (check_admin_permission($filename))
 							$width = (isset($option_dimentions_arr[0])) ? $option_dimentions_arr[0]:20;
 							$height = (isset($option_dimentions_arr[1])) ? $option_dimentions_arr[1]:20;
 							$contents .= "
-							<div style=\"margin-bottom:3px;\">
-								<input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form-ltr\" value=\"$smilie_name\" name=\"config_fields[smilies][$x1][name]\" size=\"20\" />&nbsp;<input placeholder=\""._CODE."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_code\" name=\"config_fields[smilies][$x1][code]\" size=\"20\" />&nbsp;<input placeholder=\""._URL."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_url\" name=\"config_fields[smilies][$x1][url]\" size=\"30\" />&nbsp;<input placeholder=\""._DIMENTIONS."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_dimentions\" name=\"config_fields[smilies][$x1][dimentions]\" size=\"10\" />&nbsp; &nbsp; <img src=\"".LinkToGT($option_url)."\" width=\"$width\" height=\"$height\" /> <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+							<div style=\"margin-bottom:3px;\" data-key=\"$x1\">
+								<input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form-ltr\" value=\"$smilie_name\" name=\"config_fields[smilies][$x1][name]\" size=\"20\" />&nbsp;
+								<input placeholder=\""._CODE."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_code\" name=\"config_fields[smilies][$x1][code]\" size=\"20\" />&nbsp;
+								<input placeholder=\""._URL."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_url\" name=\"config_fields[smilies][$x1][url]\" size=\"30\" />&nbsp;
+								<input placeholder=\""._DIMENTIONS."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_dimentions\" name=\"config_fields[smilies][$x1][dimentions]\" size=\"10\" />&nbsp; &nbsp; 
+								<img src=\"".LinkToGT($option_url)."\" width=\"$width\" height=\"$height\" /> 
+								<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
 							</div>";
 						}
 					}
@@ -884,26 +923,15 @@ if (check_admin_permission($filename))
 		<tr><td colspan=\"2\"><input type='hidden' name='op' value='save_configs'>
 		<input type='hidden' name='return_op' value='settings#smilies_config'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
-		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>
-		<script>
-			$(document).ready(function(){
-				$(\".input_fields_wrap\").add_field({ 
-					maxField : 1000,
-					addButton: $(\".add_field_button\"),
-					remove_button: '.remove_field',
-					fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][name]\" size=\"20\" />&nbsp;<input placeholder=\""._CODE."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][code]\" size=\"20\" />&nbsp;<input placeholder=\""._URL."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][url]\" size=\"30\" />&nbsp;<input placeholder=\""._DIMENTIONS."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][dimentions]\" size=\"10\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-					x: $x1,
-				});
-			});
-		</script>		
-		<script src=\"admin/template/js/jquery/jquery.selection.js\" type=\"text/javascript\"></script>
-		";
+		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>		
+		<script src=\"admin/template/js/jquery/jquery.selection.js\" type=\"text/javascript\"></script>";
+		$contents = $hooks->apply_filters("smilies_config", $contents);
 		die($contents);
 	}
 	
 	function sms_config()
 	{
-		global $nuke_configs, $admin_file;
+		global $nuke_configs, $admin_file, $hooks;
 		$contents = '';
 		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
 		$nuke_configs['pn_sms'] = (isset($nuke_configs['pn_sms'])) ? $nuke_configs['pn_sms']:"";
@@ -967,15 +995,15 @@ if (check_admin_permission($filename))
 		<tr><td colspan=\"2\"><input type='hidden' name='op' value='save_configs'>
 		<input type='hidden' name='return_op' value='settings#sms_config'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
-		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>
-		";
+		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
+		$contents = $hooks->apply_filters("sms_config", $contents);
 		die($contents);
 	}
 	
 	$submit				= (isset($submit))				? filter($submit, "nohtml"):'';
 	$log_message		= (isset($log_message))			? filter($log_message, "nohtml"):'';
 	$return_op			= (isset($return_op))			? filter($return_op, "nohtml"):'settings';
-	$other_admin_config	= (isset($other_admin_config))	? filter($other_admin_config, "nohtml"):'settings';
+	$other_admin_config	= (isset($other_admin_config))	? filter($other_admin_config, "nohtml"):'';
 	$config_fields		= (isset($config_fields))		? $config_fields:array();
 	$array_level		= (isset($array_level))			? $array_level:array();
 	

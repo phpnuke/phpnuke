@@ -1,0 +1,32 @@
+/*********************************************************/
+/*    Theme for PHPNUKE 8.4	                             */
+/*    http://www.phpnuke.ir                              */
+/*    Theme Name: Mashhadteam-Default                    */
+/*    Author: MJr-{TOPTEMP}                              */
+/*    Author URI:  http://toptemp.ir/                    */
+/*    Version: 1.0                                       */
+/*********************************************************/
+
+.MTForumBlock ,.MTForumBlock ul li a ,.heading-font,.secondary-font,h1,h2,h3,h4,h5,h6{font-family:Vazir!important}body{font-family:Vazir!important}.gw-left{text-align:left!important}.gw-right{text-align:right!important}.mjr-mr-10,.mjr-mx-10{margin-left:10px!important}.btn-md,.post-password-form input[type=submit]{padding:.625rem 0;padding-top:.625rem;padding-right:0;padding-bottom:.625rem;padding-left:0;font-size:1rem;line-height:1.8;border-radius:.25rem;padding-left:1.5rem}.btn,.navigation.comment-navigation a,.post-password-form input[type=submit]{margin-left:10px!important}.mjr-menu-box .mjr-box-title{padding-left:10px!important}.bg-heading-default{text-align:right!important}.mjr-sidebar{left:-380px!important}.mjr-hover-item .mjr-hover-right,.mjr-hover-item.mjr-hover-right{transform:rotate(180deg)}.comment-navigation .nav-next,.post-navigation .nav-next,.posts-navigation .nav-next{float:right;text-align:left!important}.gw-white{color:#fff!important}.widget{margin:0 0 30px;display:inline-block;width:100%;box-shadow:0 1px 5px 0 rgba(0,0,0,.15)!important;padding:8px 15px;border-radius:0 0 5px 5px}.widget ul li{list-style-type:none}nav ul{padding:0;margin:0;list-style:none;position:relative}nav ul li{display:inline-block}nav ul li ul{background-color:#fff}nav a{display:block;padding:0 10px;font-size:16px;line-height:60px;text-decoration:none}.nav-link{display:block;padding:0 1rem!important}nav ul ul{display:none;position:absolute;top:60px}nav ul li:hover>ul{display:inherit}nav ul ul li{width:auto;float:none;display:list-item;position:relative;min-width:200px}nav ul.fade-in{margin-top:0;-webkit-transition:opacity .4s cubic-bezier(.165,.84,.44,1);transition:opacity .4s cubic-bezier(.165,.84,.44,1);min-width:240px}nav ul ul ul li{position:relative;top:-60px;left:170px}nav ul ul li{border-top:1px dashed #ededed}nav ul ul li:first-child{border-top:none}h1,h2,h3,h4,h5,h6{line-height:2!important}.h4,h4{font-size:16px!important}.mjr-pr-5,.mjr-px-5{padding-left:5px!important}.btn-success{color:#fff;background-color:#4ed199;border-color:#4ed199}@media (min-width:992px){.nav-style-megamenu>li.nav-item{padding:0!important}}.ui-button:active,a.ui-button:active{border:1px solid #4bca94;background:#4bca94;font-weight:400;color:#fff}.ui-button{font-family:iranyekan,iranyekan!important}.ui-widget-content{border:1px solid #ddd;background:#fff;color:#333}.ui-widget{font-size:13px}.btn-lg{padding:.75rem 1rem;font-size:17px;line-height:1.5;border-radius:.3rem}.pdrow{margin-right:15px;margin-left:15px}.h5,h5{font-size:15px}.bootstrap-select>.dropdown-toggle:after{margin-top:-15px;float:left}
+.post-metas.caption-meta ul li {
+    direction: rtl;
+}
+.post-metas li {
+    position: relative;
+    margin-left: 1.2rem;
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+.widget-prop-image-wrap {
+    padding: 0 0 8px 8px;
+}
+.widget-prop-image-wrap img{
+    border-radius: 5px;
+}
+.media-content.font-weight-small {
+    font-size: 14px;
+}
+.media.side-item.fly-sm.overflow-hidden.w-100 {
+    background: #fefdfd;
+    margin: 0 0 8px 0;
+}

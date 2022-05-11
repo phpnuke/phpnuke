@@ -247,18 +247,14 @@ function themefooter()
 
 function _theme_footer()
 {
-	global $db, $nuke_configs, $theme_setup;
+	global $db, $nuke_configs, $theme_setup, $hooks;
 	
 	$caspian_configs = $theme_setup['caspian_configs'];
 	
 	$defer_js_contents = '';
 	
-	foreach($theme_setup as $skey => $sval)
-	{
-		if(!in_array($skey, array('defer_js')))
-			continue;
-		$theme_setup[$skey] = array_unique($sval);
-	}
+	$theme_setup = $hooks->apply_filters("site_theme_footer", $theme_setup);
+	$theme_setup = array_unique_recursive($theme_setup);
 	
 	if(isset($theme_setup['defer_js']) && !empty($theme_setup['defer_js']))		
 		foreach($theme_setup['defer_js'] as $defer_js)
@@ -442,42 +438,49 @@ function article_more($article_info)
 		$post_files .="</ul>";
 	}
 	
-	$content = "
-	<article>
-		<h2><i class=\"fa fa-th\"></i><a href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">".$article_info['title']."</a></h2>";
-		if(!empty($cats_name)){
-		$content .="<div class=\"GScat\">
-			<i class=\"fa fa-comment\"></i> "._CATEGORIES." : ".implode(", ", $cats_name)."
-		</div>";
-		}
-		$content .="<div class=\"GSContent\">
-			$post_imge
-			<p class=\"GSJustify\">
-			".$article_info['hometext']."<br />
-			".$article_info['bodytext']."<br />
-			".$post_files."<br />
-			<div id=\"article-more-share\">
-				<div class=\"form-inline\">
-					<div class=\"input-group\">
-						<span class=\"input-group-addon btn copytoClipboard\" data-clipboard-target=\"#copytoClipboard\"><i class=\"fa fa-copy\"></i> "._COPY."</span>
-							<input class=\"form-control\" id=\"copytoClipboard\" value=\"".$article_info['article_short_link']."\" type=\"text\" readonly />
-						<div class=\"input-group-addon copytoClipboard\" data-clipboard-target=\"#copytoClipboard\">لینک اشتراک گذاری</div>
+	if(isset($article_info['post_html']) && $article_info['post_html'] != '')
+	{
+		$content = "<style>".$article_info['post_css']."</style>".text_rel2abs($article_info['post_html'])."";
+	}
+	else
+	{
+		$content = "
+		<article>
+			<h2><i class=\"fa fa-th\"></i><a href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">".$article_info['title']."</a></h2>";
+			if(!empty($cats_name)){
+			$content .="<div class=\"GScat\">
+				<i class=\"fa fa-comment\"></i> "._CATEGORIES." : ".implode(", ", $cats_name)."
+			</div>";
+			}
+			$content .="<div class=\"GSContent\">
+				$post_imge
+				<p class=\"GSJustify\">
+				".$article_info['hometext']."<br />
+				".$article_info['bodytext']."<br />
+				".$post_files."<br />
+				<div id=\"article-more-share\">
+					<div class=\"form-inline\">
+						<div class=\"input-group\">
+							<span class=\"input-group-addon btn copytoClipboard\" data-clipboard-target=\"#copytoClipboard\"><i class=\"fa fa-copy\"></i> "._COPY."</span>
+								<input class=\"form-control\" id=\"copytoClipboard\" value=\"".$article_info['article_short_link']."\" type=\"text\" readonly />
+							<div class=\"input-group-addon copytoClipboard\" data-clipboard-target=\"#copytoClipboard\">لینک اشتراک گذاری</div>
+						</div>
 					</div>
 				</div>
+				<div class=\"clear\"></div>
+				<div class=\"article-tags\">$htmltags</div></p>
 			</div>
-			<div class=\"clear\"></div>
-			<div class=\"article-tags\">$htmltags</div></p>
-		</div>
-		<div class=\"meta\">
-			<ul>
-				<li class=\"hidden-xs\"><i class=\"fa fa-user\"></i> <a href=\"".$article_info['aid_url']."\"> ".$article_info['aid']."</a></li>
-				<li class=\"hidden-xs\"><i class=\"fa fa-calendar\"></i> ".$article_info['datetime']."</li>
-				<li><i class=\"fa fa-eye\"></i> ".$article_info['counter']."</li>
-				<li><i class=\"fa fa-comment\"></i> <a href=\"".$article_info['article_link']."#comments\">".$article_info['comments']."</a></li>
-				".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\" onclick=\"return confirm('"._DELETE_THIS_SURE."');\"><i class=\"fa fa-remove\"></i></a></li>":"")."
-			</ul>
-		</div>
-	</article>";
+			<div class=\"meta\">
+				<ul>
+					<li class=\"hidden-xs\"><i class=\"fa fa-user\"></i> <a href=\"".$article_info['aid_url']."\"> ".$article_info['aid']."</a></li>
+					<li class=\"hidden-xs\"><i class=\"fa fa-calendar\"></i> ".$article_info['datetime']."</li>
+					<li><i class=\"fa fa-eye\"></i> ".$article_info['counter']."</li>
+					<li><i class=\"fa fa-comment\"></i> <a href=\"".$article_info['article_link']."#comments\">".$article_info['comments']."</a></li>
+					".((is_admin()) ? "<li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=edit&sid=".$article_info['sid']."")."\"><i class=\"fa fa-edit\"></i></a></li><li><a href=\"".LinkToGT($admin_file.".php?op=article_admin&mode=delete&sid=".$article_info['sid']."&csrf_token="._PN_CSRF_TOKEN."")."\" onclick=\"return confirm('"._DELETE_THIS_SURE."');\"><i class=\"fa fa-remove\"></i></a></li>":"")."
+				</ul>
+			</div>
+		</article>";
+	}
 	return $content;
 }
 
@@ -622,7 +625,9 @@ function print_theme($pagetitle, $print_data)
 
 function die_error($error_message)
 {
-	global $nuke_configs;
+	global $nuke_configs, $hooks;	
+	
+	$hooks->do_action('die_error_action', $error_message);
 	
 	$error = false;
 

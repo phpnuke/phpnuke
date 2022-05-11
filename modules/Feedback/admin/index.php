@@ -406,10 +406,21 @@ if (check_admin_permission($module_name, false, true))
 		<form action=\"".$admin_file.".php\" method=\"post\" id=\"feedback_form\">
 			<table width=\"100%\" class=\"id-form product-table no-border\">
 				<tr>
-					<th>"._FEEDBACK_CUSTOM_FIELDS." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\"></span></th>
+					<th>"._FEEDBACK_CUSTOM_FIELDS." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\" data-fields-wrapper=\".input_fields_wrap\" data-fields-html=\"#input_post_fields_items\" data-fields-max=\"1000\"></span></th>
 					<td>
+						<template id=\"input_post_fields_items\" data-key=\"{X}\">
+							<div style=\"margin-bottom:3px;\">
+								<input placeholder=\""._LATIN_NAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][name]\" size=\"10\" />&nbsp;
+								<input placeholder=\""._SUBJECT."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][title]\" size=\"10\" />&nbsp;
+								<input placeholder=\""._DESCRIPTIONS."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][desc]\" size=\"10\" />&nbsp;
+								<select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][{X}][required]\" style=\"width:100px;\"><option value=\"1\">"._REQUIRED."</option><option value=\"0\">"._NOT_REQUIRED."</option></select>&nbsp;
+								<select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][{X}][data-rule]\" style=\"width:100px;\"><option value=\"number\">"._NUMERIC."</option><option value=\"string\">"._STRING."</option></select>&nbsp;
+								<input placeholder=\""._FEEDBACK_ERROR_MESSAGE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][data-msg]\" size=\"10\" />&nbsp;
+								<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+							</div>
+						</template>
 						<div class=\"input_fields_wrap\">";
-						$x1 = 1;
+						
 						if(isset($feedback_configs['custom_fields']) && !empty($feedback_configs['custom_fields']))
 						{
 							foreach($feedback_configs['custom_fields'] as $x1 => $custom_fields_data)
@@ -429,8 +440,14 @@ if (check_admin_permission($module_name, false, true))
 								$option_data_rule_check1 = ($custom_fields_data['data-rule'] == "number") ? "selected":"";
 								$option_data_rule_check2 = ($custom_fields_data['data-rule'] == "string") ? "selected":"";
 								$contents .= "
-								<div style=\"margin-bottom:3px;\">
-									<input placeholder=\""._LATIN_NAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_name\" name=\"config_fields[feedbacks][custom_fields][$x1][name]\" size=\"10\" />&nbsp;<input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form\" value=\"$option_title\" name=\"config_fields[feedbacks][custom_fields][$x1][title]\" size=\"10\" />&nbsp;<input placeholder=\""._DESCRIPTIONS."\" type=\"text\" class=\"inp-form\" value=\"$option_desc\" name=\"config_fields[feedbacks][custom_fields][$x1][desc]\" size=\"10\" />&nbsp;<select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][$x1][required]\" style=\"width:100px;\"><option value=\"1\" $option_required_check1>"._REQUIRED."</option><option value=\"0\" $option_required_check2>"._NOT_REQUIRED."</option></select><select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][$x1][data-rule]\" style=\"width:100px;\"><option value=\"number\" $option_data_rule_check1>"._NUMERIC."</option><option value=\"string\" $option_data_rule_check2>"._STRING."</option></select>&nbsp;<input placeholder=\""._FEEDBACK_ERROR_MESSAGE."\" type=\"text\" class=\"inp-form\" value=\"$option_data_msg\" name=\"config_fields[feedbacks][custom_fields][$x1][data-msg]\" size=\"10\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+								<div style=\"margin-bottom:3px;\" data-key=\"$x1\">
+									<input placeholder=\""._LATIN_NAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_name\" name=\"config_fields[feedbacks][custom_fields][$x1][name]\" size=\"10\" /> 
+									<input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form\" value=\"$option_title\" name=\"config_fields[feedbacks][custom_fields][$x1][title]\" size=\"10\" /> 
+									<input placeholder=\""._DESCRIPTIONS."\" type=\"text\" class=\"inp-form\" value=\"$option_desc\" name=\"config_fields[feedbacks][custom_fields][$x1][desc]\" size=\"10\" /> 
+									<select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][$x1][required]\" style=\"width:100px;\"><option value=\"1\" $option_required_check1>"._REQUIRED."</option><option value=\"0\" $option_required_check2>"._NOT_REQUIRED."</option></select> 
+									<select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][$x1][data-rule]\" style=\"width:100px;\"><option value=\"number\" $option_data_rule_check1>"._NUMERIC."</option><option value=\"string\" $option_data_rule_check2>"._STRING."</option></select> 
+									<input placeholder=\""._FEEDBACK_ERROR_MESSAGE."\" type=\"text\" class=\"inp-form\" value=\"$option_data_msg\" name=\"config_fields[feedbacks][custom_fields][$x1][data-msg]\" size=\"10\" /> 
+									<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
 								</div>";
 							}
 						}
@@ -439,10 +456,19 @@ if (check_admin_permission($module_name, false, true))
 					</td>
 				</tr>
 				<tr>
-					<th>"._RESPONSIBLES." <span class=\"add_field_icon add_dept_field_button\" title=\""._ADD_NEW_RESPONSIBLE."\"></span></th>
+					<th>"._RESPONSIBLES." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_RESPONSIBLE."\" data-fields-wrapper=\".input_dept_fields_wrap\" data-fields-html=\"#input_dept_fields_items\" data-fields-max=\"1000\"></span></th>
 					<td>
+						<template id=\"input_dept_fields_items\" data-key=\"{X}\">
+							<div style=\"margin-bottom:3px;\">
+								<input placeholder=\""._NAME_FAMILY."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][name]\" />&nbsp;
+								<input placeholder=\""._RESPONSIBILITY."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][responsibility]\" />&nbsp;
+								<input placeholder=\""._EMAIL."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][email]\" />&nbsp;
+								<input placeholder=\""._MOBILE_PHONE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][mobile]\" />&nbsp;
+								<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+							</div>
+						</template>
 						<div class=\"input_dept_fields_wrap\">";
-						$x2 = 1;
+						
 						if(isset($feedback_configs['depts']) && !empty($feedback_configs['depts']))
 						{
 							foreach($feedback_configs['depts'] as $x2 => $depts_data)
@@ -456,8 +482,12 @@ if (check_admin_permission($module_name, false, true))
 								$option_email = $depts_data['email'];
 								$option_mobile = $depts_data['mobile'];
 								$contents .= "
-								<div style=\"margin-bottom:3px;\">
-									<input placeholder=\""._NAME_FAMILY."\" type=\"text\" class=\"inp-form\" value=\"$option_name\" name=\"config_fields[feedbacks][depts][$x2][name]\" />&nbsp;<input placeholder=\""._RESPONSIBILITY."\" type=\"text\" class=\"inp-form\" value=\"$option_responsibility\" name=\"config_fields[feedbacks][depts][$x2][responsibility]\" />&nbsp;&nbsp;<input placeholder=\""._EMAIL."\" type=\"text\" class=\"inp-form\" value=\"$option_email\" name=\"config_fields[feedbacks][depts][$x2][email]\" />&nbsp;&nbsp;<input placeholder=\""._MOBILE_PHONE."\" type=\"text\" class=\"inp-form\" value=\"$option_mobile\" name=\"config_fields[feedbacks][depts][$x2][mobile]\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+								<div style=\"margin-bottom:3px;\" data-key=\"$x2\">
+									<input placeholder=\""._NAME_FAMILY."\" type=\"text\" class=\"inp-form\" value=\"$option_name\" name=\"config_fields[feedbacks][depts][$x2][name]\" />&nbsp;
+									<input placeholder=\""._RESPONSIBILITY."\" type=\"text\" class=\"inp-form\" value=\"$option_responsibility\" name=\"config_fields[feedbacks][depts][$x2][responsibility]\" />&nbsp;
+									<input placeholder=\""._EMAIL."\" type=\"text\" class=\"inp-form\" value=\"$option_email\" name=\"config_fields[feedbacks][depts][$x2][email]\" />&nbsp;
+									<input placeholder=\""._MOBILE_PHONE."\" type=\"text\" class=\"inp-form\" value=\"$option_mobile\" name=\"config_fields[feedbacks][depts][$x2][mobile]\" />&nbsp;
+									<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
 								</div>";
 							}
 						}
@@ -564,21 +594,7 @@ if (check_admin_permission($module_name, false, true))
 			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" />
 		</form>
 		<script>
-			$(document).ready(function(){
-				
-				$(\".input_fields_wrap\").add_field({ 
-					addButton: $(\".add_field_button\"),
-					remove_button: '.remove_field',
-					fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._LATIN_NAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][name]\" size=\"10\" />&nbsp;<input placeholder=\""._SUBJECT."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][title]\" size=\"10\" />&nbsp;<input placeholder=\""._DESCRIPTIONS."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][desc]\" size=\"10\" />&nbsp;<select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][{X}][required]\" style=\"width:100px;\"><option value=\"1\">"._REQUIRED."</option><option value=\"0\">"._NOT_REQUIRED."</option></select><select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][{X}][data-rule]\" style=\"width:100px;\"><option value=\"number\">"._NUMERIC."</option><option value=\"string\">"._STRING."</option></select>&nbsp;<input placeholder=\""._FEEDBACK_ERROR_MESSAGE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][data-msg]\" size=\"10\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-					x: ".($x1+1).",
-				});
-				
-				$(\".input_dept_fields_wrap\").add_field({ 
-					addButton: $(\".add_dept_field_button\"),
-					remove_button: '.remove_field',
-					fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._NAME_FAMILY."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][name]\" />&nbsp;<input placeholder=\""._RESPONSIBILITY."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][responsibility]\" />&nbsp;&nbsp;<input placeholder=\""._EMAIL."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][email]\" />&nbsp;&nbsp;<input placeholder=\""._MOBILE_PHONE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][mobile]\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-					x: ".($x2+1).",
-				});";
+			$(document).ready(function(){";
 				if(isset($feedback_configs['google_api']) && $feedback_configs['google_api'] != '')
 				{
 					$contents .= "

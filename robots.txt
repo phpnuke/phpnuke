@@ -4,10 +4,6 @@ Disallow:
 User-agent: *
 Disallow: /admin.php
 Disallow: /admin/
-Disallow: /images/
-Disallow: /includes/
 Disallow: /install/
-Disallow: /themes/
 Disallow: /blocks/
-Disallow: /modules/
 Disallow: /language/

@@ -1069,17 +1069,29 @@ a:hover.action-delete {
 /* FORM ------------------------------------------------------- */
 
 .form-submit {
-	background: url(../images/forms/form_submit.gif) no-repeat;
-	border: none;
-	cursor: pointer;
-	height: 30px;
-	margin: 0 4px 0 0;
-	padding: 0;
-	text-indent: -3000px;
-	width: 80px;
+	background:linear-gradient(to bottom, #89c403 5%, #77a809 100%);
+	background-color:#89c403;
+	border-radius:6px;
+	border:1px solid #74b807;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	padding:10px 20px;
+	text-decoration:none;
 }
-.ltr .form-submit {
-	margin: 0 0 0 4px;
+.form-submit:hover {
+	background:linear-gradient(to bottom, #77a809 5%, #89c403 100%);
+	background-color:#77a809;
+	color:#444;
+}
+.form-submit:disabled {
+	background:linear-gradient(to bottom, #ccc 5%, #aaa 100%);
+	background-color:#ccc;
+	color:#444;
+}
+.form-submit:active {
+	position:relative;
+	top:1px;
 }
 .form-search {
 	background: url(../images/forms/form_search.gif) no-repeat;
@@ -1304,48 +1316,43 @@ a:hover.action-delete {
 	float: right;
 }
 .bubble {
-	display: inline-block;
+    display: inline-block;
 	float: left;
-	padding: 6px;
+    position: relative;
+    background: #e4edf5;
+    text-align: center;
+    height: 29px;
+    border-radius: 5px;
+    padding: 10px 8px 0 8px;
+	color: #2e74b2;
+	font-size: 11px;
+}
+.bubble a{
+	color: #0f4d83 !important;
+}
+.bubble a:hover{
+	color: #9f10db !important;
 }
 .ltr .bubble {
 	float: right;
 }
-.bubble-right {
-	float: right;
-	width: 13px;
-	height: 29px;
-	margin-right: 5px;
-	background: url(../images/forms/rtl-bubble-right.gif) right no-repeat;
+.bubble:after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    z-index: 1;
+    border-style: solid;
+    border-color: transparent #e4edf5;
+    border-width: 8px 0 8px 8px;
+    top: 50%;
+    right: -8px;
+    margin-top: -8px;
 }
-.ltr .bubble-right {
-	float: left;
-	margin-right: 0px;
-	margin-left: 5px;
-	background: url(../images/forms/ltr-bubble-left.gif) right no-repeat;
-}
-.bubble-left {
-	float: right;
-	width: 13px;
-	height: 29px;
-	background: url(../images/forms/rtl-bubble-left.gif) no-repeat;
-	background: url(../images/forms/ltr-bubble-right.gif) right no-repeat;
-}
-.ltr .bubble-left {
-	float: left;
-}
-.bubble-inner {
-	float: right;
-	padding: 7px 2px 0 0px;
-	color: #2e74b2;
-	line-height: 14px;
-	font-size: 11px;
-	height: 22px;
-	background: url(../images/forms/bubble_inner.gif) repeat-x;
-}
-.ltr .bubble-inner {
-	float: left;
-	padding: 7px 0px 0 2px;
+.ltr .bubble:after {
+    border-width: 8px 8px 8px 0;
+    right: auto;
+    left: -8px;
 }
 .error-left {
 	float: left;
@@ -2661,3 +2668,7 @@ label {
 .GSAbout .GSPR ul li:hover i {
 	color: #fff;
 }
+
+.btn{cursor:pointer;padding:8px 10px;border:1px solid #ccc !important;color:#fff !important;font-weight:bold;border-radius:8px;transition:0.2s}
+.btn:hover{padding:8px 10px;border:1px solid #ccc !important;color:#fff000 !important;font-weight:bold;border-radius:8px;transition:0.2s}
+.btn-lightblue{background:#0cb5df !important;}

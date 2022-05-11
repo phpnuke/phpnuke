@@ -1,0 +1,8 @@
+{% if S_BOARD_ANNOUNCEMENT %}
+	{% INCLUDECSS '@phpbb_boardannouncements/boardannouncements.css' %}
+	{% INCLUDEJS '@phpbb_boardannouncements/js/boardannouncements.js' %}
+	<div id="phpbb_announcement"{% if BOARD_ANNOUNCEMENT_BGCOLOR %} style="background-color:#{{ BOARD_ANNOUNCEMENT_BGCOLOR }}"{% endif %}>
+		{% if S_BOARD_ANNOUNCEMENT_DISMISS %}<a href="{{ U_BOARD_ANNOUNCEMENT_CLOSE }}" data-ajax="close_announcement" data-overlay="false" class="close clearfix" title="{{ lang('BOARD_ANNOUNCEMENT_CLOSE') }}"></a>{% endif %}
+		<div>{{ BOARD_ANNOUNCEMENT }}</div>
+	</div>
+{% endif %}

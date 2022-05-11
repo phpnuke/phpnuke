@@ -1114,6 +1114,7 @@ return array(
     'Twig\\Node\\BlockNode' => $vendorDir . '/twig/twig/src/Node/BlockNode.php',
     'Twig\\Node\\BlockReferenceNode' => $vendorDir . '/twig/twig/src/Node/BlockReferenceNode.php',
     'Twig\\Node\\BodyNode' => $vendorDir . '/twig/twig/src/Node/BodyNode.php',
+    'Twig\\Node\\CheckSecurityCallNode' => $vendorDir . '/twig/twig/src/Node/CheckSecurityCallNode.php',
     'Twig\\Node\\CheckSecurityNode' => $vendorDir . '/twig/twig/src/Node/CheckSecurityNode.php',
     'Twig\\Node\\CheckToStringNode' => $vendorDir . '/twig/twig/src/Node/CheckToStringNode.php',
     'Twig\\Node\\DeprecatedNode' => $vendorDir . '/twig/twig/src/Node/DeprecatedNode.php',

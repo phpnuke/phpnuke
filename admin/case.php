@@ -189,6 +189,11 @@ switch($op) {
 	case "nav_menus_admin":
 		include("admin/modules/nav_menus.php");
 	break;
+	
+	//grapesjs
+	case "grapesjs":
+		grapesjs_admin();
+	break;
 }
 
 ?>

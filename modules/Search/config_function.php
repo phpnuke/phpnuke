@@ -27,7 +27,7 @@ function parse_search_link($matches)
 	if(isset($output['search_query']))
 		$return .= urlencode($output['search_query'])."/";
 	
-	if(isset($output['search_module']))
+	if(isset($output['search_query']) && isset($output['search_module']))
 		$return .= "".$output['search_module']."/";
 	
 	if(isset($output['search_category']))
@@ -55,5 +55,53 @@ function search_boxes_parts($nuke_modules_boxes_parts)
 }
 
 $hooks->add_filter("modules_boxes_parts", "search_boxes_parts", 10);
+
+function search_form_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$modules_search_data = $hooks->functions_vars['search_form_assets']['modules_search_data'];
+	$module = $hooks->functions_vars['search_form_assets']['module'];
+	$module_name = $hooks->functions_vars['search_form_assets']['module_name'];
+	$category = $hooks->functions_vars['search_form_assets']['category'];
+	
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"defer_js" => array(
+			"<script>
+				var first_module = '$module';
+				var selected_category = '$category';
+				var search_data = ".((!empty($modules_search_data)) ? json_encode($modules_search_data):"[]").";
+				var search_language = {
+					all_categories : '"._ALL_CATEGORIES."'
+				}
+			</script>",
+			"<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/search.js\"></script>"
+		)
+	));
+	return $theme_setup;
+}
+
+function search_main_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	global $hooks;
+	$search_module = $hooks->functions_vars['search_main_breadcrumb']['search_module'];
+	$search_data = $hooks->functions_vars['search_main_breadcrumb']['search_data'];
+	$meta_tags = $hooks->functions_vars['search_main_breadcrumb']['meta_tags'];
+	
+	$breadcrumbs['search'] = array(
+		"name" => _SEARCH,
+		"link" => LinkToGT("index.php?modname=Search&search_module=$search_module"),
+		"itemtype" => "WebPage"
+	);
+	if($search_data['search_query'] != '')
+	{
+		$breadcrumbs['search-query'] = array(
+			"name" => $search_data['search_query'],
+			"link" => $meta_tags['url'],
+			"itemtype" => "WebPage"
+		);
+	}
+	return $breadcrumbs;
+}
 
 ?>

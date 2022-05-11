@@ -1,0 +1,9 @@
+
+alg_addonforthanksforposts_controller_main:
+    path: /addonforthanksforposts/
+    defaults: { _controller: alg.addonforthanksforposts.thanks_ajax_handler:main }
+alg_addonforthanksforposts_controller:
+    path: /addonforthanksforposts/{action}/{poster}/{forum}/{topic}/{post}
+    defaults: { _controller: alg.addonforthanksforposts.thanks_ajax_handler:main }
+    requirements:
+        post: \d+

@@ -22,7 +22,7 @@ if (empty($nuke_languages['farsi']) || !is_array($nuke_languages['farsi']))
 }
 
 $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
-	"_CREDITS_ADMIN" => "سیستم اعتبارات",
+	"_CREDITS_ADMIN" => "مدیریت کیف پول",
 	"_CREDITS_NORMAL" => "انجام نشده",
 	"_CREDITS_OK" => "تأیید شده",
 	"_CREDITS_PENDING" => "در انتظار بررسی",
@@ -66,7 +66,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_CREDITS_FORM" => "صفحه پرداخت",
 	"_CREDITS_LIST" => "لیست تراکنشها",
 	"_CREDITS_VIEW_DETAILS" => "مشاهده جزئیات تراکنش",
-	"_CREDITS_SETTINGS" => "تنظیمات سیستم اعتبارات",
+	"_CREDITS_SETTINGS" => "تنظیمات سیسستم کیف پول",
 	"_CREDIT_CHART_USERS_TITLE" => "آمار بالاترین تراکنشهای کاربران طی 30 روز اخیر",
 	"_CREDIT_CHART_USERS" => "<b>[[value]]</b> ریال طی [[transactions]] تراکنش",
 	"_CREDITS_SORT_LIST_BY" => "نمایش تراکنشها بر اساس",

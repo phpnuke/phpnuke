@@ -1,0 +1,20 @@
+<!-- IF S_QR_AJAX_SUBMIT -->
+<dl>
+	<dt><label for="qr_ajax_submit">{L_ACP_QR_FORUM_AJAX_SUBMIT}{L_COLON}</label><br /><span>{L_ACP_QR_FORUM_AJAX_SUBMIT_EXPLAIN}</span></dt>
+	<dd><label><input type="radio" class="radio" name="qr_ajax_submit" value="1"<!-- IF S_ENABLE_QR_AJAX_SUBMIT --> id="qr_ajax_submit" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label><input type="radio" class="radio" name="qr_ajax_submit" value="0"<!-- IF not S_ENABLE_QR_AJAX_SUBMIT --> id="qr_ajax_submit" checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+</dl>
+<!-- ENDIF -->
+<dl>
+	<dt><label for="qr_form_type">{L_ACP_QR_FORM_TYPE}{L_COLON}</label></dt>
+	<dd>
+		<select id="qr_form_type" name="qr_form_type">
+			<option value="0"<!-- IF S_QR_FORM_TYPE == 0 --> selected="selected"<!-- ENDIF -->>
+				{L_ACP_QR_FORM_TYPE_STANDARD}
+			</option>
+			<option value="1"<!-- IF S_QR_FORM_TYPE == 1 --> selected="selected"<!-- ENDIF -->>
+				{L_ACP_QR_FORM_TYPE_FIXED}
+			</option>
+		</select>
+	</dd>
+</dl>

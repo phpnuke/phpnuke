@@ -1,0 +1,51 @@
+<!-- IF S_SO_STATUS -->
+	<!-- IF S_SO_TYPE == '0' || postrow.S_FIRST_ROW -->
+		<br />
+		<ul class="share-buttons">
+			<!-- IF S_SO_FACEBOOK -->
+				<li><a href="{postrow.U_FACEBOOK}" title="{L_SHARE_ON_FACEBOOK}" class="share-button share-icon-button facebook-icon js-newWindow" data-popup="width=580,height=325"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_TWITTER -->
+				<li><a href="{postrow.U_TWITTER}" title="{L_SHARE_ON_TWITTER}" class="share-button share-icon-button twitter-icon js-newWindow" data-popup="width=550,height=300"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_TUENTI -->
+				<li><a href="{postrow.U_TUENTI}" title="{L_SHARE_ON_TUENTI}" class="share-button share-icon-button tuenti-icon js-newWindow" data-popup="width=741,height=551"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_DIGG -->
+				<li><a href="{postrow.U_DIGG}" title="{L_SHARE_ON_DIGG}" class="share-button share-icon-button digg-icon" onclick="target='_blank';"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_REDDIT -->
+				<li><a href="{postrow.U_REDDIT}" title="{L_SHARE_ON_REDDIT}" class="share-button share-icon-button reddit-icon" onclick="target='_blank';"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_DELICIOUS -->
+				<li><a href="{postrow.U_DELICIOUS}" title="{L_SHARE_ON_DELICIOUS}" class="share-button share-icon-button delicious-icon js-newWindow" data-popup="width=540,height=500"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_VK -->
+				<li><a href="{postrow.U_VK}" title="{L_SHARE_ON_VK}" class="share-button share-icon-button vk-icon js-newWindow" data-popup="width=607,height=510"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_TUMBLR -->
+				<li><a href="{postrow.U_TUMBLR}" title="{L_SHARE_ON_TUMBLR}" class="share-button share-icon-button tumblr-icon js-newWindow" data-popup="width=542,height=460"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_GOOGLE -->
+				<li><a href="{postrow.U_GOOGLE}" title="{L_SHARE_ON_GOOGLE}" class="share-button share-icon-button google-icon" onclick="target='_blank';"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_WHATSAPP -->
+				<li><a href="{postrow.U_WHATSAPP}" title="{L_SHARE_ON_WHATSAPP}" class="share-button share-icon-button whatsapp-icon" onclick="target='_blank';"></a></li>
+			<!-- ENDIF -->
+
+			<!-- IF S_SO_POCKET -->
+				<li><a href="{postrow.U_POCKET}" title="{L_SHARE_ON_POCKET}" class="share-button share-icon-button pocket-icon" onclick="target='_blank';"></a></li>
+			<!-- ENDIF -->
+		</ul>
+		<br />
+	<!-- ENDIF -->
+<!-- ENDIF -->

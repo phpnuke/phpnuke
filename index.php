@@ -129,6 +129,8 @@ if(isset($redirect) && filter($redirect,"nohtml") != '' AND is_admin($admin))
 	die();
 }*/
 
+$hooks->add_filter("html_output", "pn_admin_bar", 10);
+
 if(($main_module == "" && $modname == '') || $modname != $_REQUEST['modname'])
 {
 	include("header.php");

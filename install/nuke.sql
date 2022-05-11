@@ -1,22 +1,22 @@
--- PHPNUKE MT-Edition 8.4.2 Sql file
+-- PHPNUKE MT-Edition 8.4.5 Sql file
 -- phpMyAdmin SQL Dump
 -- https://www.phpmyadmin.net/
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_admins_menu`
+-- Table structure for table `admins_menu`
 --
 
 CREATE TABLE `{NUKEPREFIX}admins_menu` (
   `amid` int(10) NOT NULL AUTO_INCREMENT,
-  `atitle` text COLLATE utf8mb4_unicode_ci,
-  `admins` text COLLATE utf8mb4_unicode_ci,
+  `atitle` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `admins` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`amid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `nuke_admins_menu`
+-- Dumping data for table `admins_menu`
 --
 
 INSERT INTO `{NUKEPREFIX}admins_menu` (`amid`, `atitle`, `admins`) VALUES
@@ -39,7 +39,7 @@ INSERT INTO `{NUKEPREFIX}admins_menu` (`amid`, `atitle`, `admins`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_authors`
+-- Table structure for table `authors`
 --
 
 CREATE TABLE `{NUKEPREFIX}authors` (
@@ -49,13 +49,14 @@ CREATE TABLE `{NUKEPREFIX}authors` (
   `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `phone` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `rule` text COLLATE utf8mb4_unicode_ci,
+  `rule` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pwd` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `counter` int(11) NOT NULL DEFAULT '0',
-  `radminsuper` tinyint(1) NOT NULL DEFAULT '1',
+  `counter` int(11) NOT NULL DEFAULT 0,
+  `radminsuper` tinyint(1) NOT NULL DEFAULT 1,
   `admlanguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `aadminsuper` int(1) NOT NULL DEFAULT '0',
-  `password_reset` text COLLATE utf8mb4_unicode_ci,
+  `aadminsuper` int(1) NOT NULL DEFAULT 0,
+  `password_reset` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`aid`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -63,7 +64,7 @@ CREATE TABLE `{NUKEPREFIX}authors` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_banned_ip`
+-- Table structure for table `banned_ip`
 --
 
 CREATE TABLE `{NUKEPREFIX}banned_ip` (
@@ -78,16 +79,16 @@ CREATE TABLE `{NUKEPREFIX}banned_ip` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_blocks`
+-- Table structure for table `blocks`
 --
 
 CREATE TABLE `{NUKEPREFIX}blocks` (
   `bid` int(10) NOT NULL AUTO_INCREMENT,
   `title` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `content` text COLLATE utf8mb4_unicode_ci,
+  `content` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `url` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `refresh` int(11) NOT NULL DEFAULT '0',
-  `last_refresh` int(11) NOT NULL DEFAULT '0',
+  `refresh` int(11) NOT NULL DEFAULT 0,
+  `last_refresh` int(11) NOT NULL DEFAULT 0,
   `blockfile` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`bid`),
   KEY `title` (`title`),
@@ -97,22 +98,22 @@ CREATE TABLE `{NUKEPREFIX}blocks` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_blocks_boxes`
+-- Table structure for table `blocks_boxes`
 --
 
 CREATE TABLE `{NUKEPREFIX}blocks_boxes` (
   `box_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `box_blocks` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `box_blocks_data` text COLLATE utf8mb4_unicode_ci,
-  `box_status` int(11) NOT NULL DEFAULT '0',
+  `box_blocks_data` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `box_status` int(11) NOT NULL DEFAULT 0,
   `box_theme_location` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `box_theme_priority` int(11) NOT NULL DEFAULT '0',
+  `box_theme_priority` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`box_id`),
   KEY `box_theme_location` (`box_theme_location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `nuke_blocks_boxes`
+-- Dumping data for table `blocks_boxes`
 --
 
 INSERT INTO `{NUKEPREFIX}blocks_boxes` (`box_id`, `box_blocks`, `box_blocks_data`, `box_status`, `box_theme_location`, `box_theme_priority`) VALUES
@@ -125,7 +126,7 @@ INSERT INTO `{NUKEPREFIX}blocks_boxes` (`box_id`, `box_blocks`, `box_blocks_data
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_blocks_themes`
+-- Table structure for table `blocks_themes`
 --
 
 CREATE TABLE `{NUKEPREFIX}blocks_themes` (
@@ -135,7 +136,7 @@ CREATE TABLE `{NUKEPREFIX}blocks_themes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `nuke_blocks_themes`
+-- Dumping data for table `blocks_themes`
 --
 
 INSERT INTO `{NUKEPREFIX}blocks_themes` (`sideid`, `sidename`) VALUES
@@ -144,21 +145,21 @@ INSERT INTO `{NUKEPREFIX}blocks_themes` (`sideid`, `sidename`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_bookmarksite`
+-- Table structure for table `bookmarksite`
 --
 
 CREATE TABLE `{NUKEPREFIX}bookmarksite` (
   `bid` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` text COLLATE utf8mb4_unicode_ci,
-  `iconpath` text COLLATE utf8mb4_unicode_ci,
-  `active` smallint(5) UNSIGNED NOT NULL DEFAULT '0',
-  `url` text COLLATE utf8mb4_unicode_ci,
-  `weight` int(2) NOT NULL DEFAULT '1',
+  `title` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `iconpath` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `active` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `url` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `weight` int(2) NOT NULL DEFAULT 1,
   PRIMARY KEY (`bid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `nuke_bookmarksite`
+-- Dumping data for table `bookmarksite`
 --
 
 INSERT INTO `{NUKEPREFIX}bookmarksite` (`bid`, `title`, `iconpath`, `active`, `url`, `weight`) VALUES
@@ -179,19 +180,19 @@ INSERT INTO `{NUKEPREFIX}bookmarksite` (`bid`, `title`, `iconpath`, `active`, `u
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_categories`
+-- Table structure for table `categories`
 --
 
 CREATE TABLE `{NUKEPREFIX}categories` (
   `catid` int(10) NOT NULL AUTO_INCREMENT,
-  `type` tinyint(1) NOT NULL DEFAULT '0',
+  `type` tinyint(1) NOT NULL DEFAULT 0,
   `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `catname` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `catimage` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `cattext` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `catdesc` text COLLATE utf8mb4_unicode_ci,
-  `parent_id` int(10) NOT NULL DEFAULT '0',
-  `imported_id` int(10) NOT NULL DEFAULT '0',
+  `catdesc` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `parent_id` int(10) NOT NULL DEFAULT 0,
+  `imported_id` int(10) NOT NULL DEFAULT 0,
   PRIMARY KEY (`catid`),
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -199,15 +200,15 @@ CREATE TABLE `{NUKEPREFIX}categories` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_comments`
+-- Table structure for table `comments`
 --
 
 CREATE TABLE `{NUKEPREFIX}comments` (
   `cid` int(11) NOT NULL AUTO_INCREMENT,
-  `pid` int(11) NOT NULL DEFAULT '0',
-  `main_parent` int(11) NOT NULL DEFAULT '0',
+  `pid` int(11) NOT NULL DEFAULT 0,
+  `main_parent` int(11) NOT NULL DEFAULT 0,
   `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `post_id` int(11) NOT NULL DEFAULT '0',
+  `post_id` int(11) NOT NULL DEFAULT 0,
   `post_title` varchar(600) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -215,14 +216,14 @@ CREATE TABLE `{NUKEPREFIX}comments` (
   `email` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `url` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ip` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `comment` text COLLATE utf8mb4_unicode_ci,
-  `ratings` int(11) NOT NULL DEFAULT '0',
-  `score` tinyint(4) NOT NULL DEFAULT '0',
-  `reason` text COLLATE utf8mb4_unicode_ci,
+  `comment` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ratings` int(11) NOT NULL DEFAULT 0,
+  `score` tinyint(4) NOT NULL DEFAULT 0,
+  `reason` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `last_replay_time` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
-  `status` int(1) NOT NULL DEFAULT '0',
-  `reported` tinyint(1) NOT NULL DEFAULT '0',
-  `imported_id` int(11) NOT NULL DEFAULT '0',
+  `status` int(1) NOT NULL DEFAULT 0,
+  `reported` tinyint(1) NOT NULL DEFAULT 0,
+  `imported_id` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`cid`),
   KEY `pid` (`pid`),
   KEY `post_id` (`post_id`),
@@ -235,23 +236,23 @@ CREATE TABLE `{NUKEPREFIX}comments` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_config`
+-- Table structure for table `config`
 --
 
 CREATE TABLE `{NUKEPREFIX}config` (
   `config_id` int(11) NOT NULL AUTO_INCREMENT,
   `config_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `config_value` text COLLATE utf8mb4_unicode_ci,
+  `config_value` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`config_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `nuke_config`
+-- Dumping data for table `config`
 --
 
 INSERT INTO `{NUKEPREFIX}config` (`config_name`, `config_value`) VALUES
-('sitename', ''),
-('nukeurl', ''),
+('sitename', 'nuke 8.4.5'),
+('nukeurl', 'http://localhost/845/'),
 ('site_logo', ''),
 ('site_description', 'شرح مختصری در مورد سایت'),
 ('slogan', ''),
@@ -288,9 +289,9 @@ INSERT INTO `{NUKEPREFIX}config` (`config_name`, `config_value`) VALUES
 ('httprefmax', '1000'),
 ('httprefmode', '1'),
 ('copyright', 'VUVkU2NHUnBRbkJhUkRCcFZGWlJkRkV5T1hkbFdFcHdXakpvTUVscU5WRlRSa0YwVkc1V2NscFRRbEZqYlRseFdsZE9NRWxGU2pWSlJIaG9TVWRvZVZwWFdUbEpiV2d3WkVoQk5reDVPVE5rTTJOMVkwZG9kMkp1Vm5KYVV6VndZMmxKWjJSSFJubGFNbFl3VUZOS1psbHRlR2hpYlhOcFNVaEtiR0pFTUdsWk1qbDNaVmhLY0ZveWFEQkphalZSVTBaQ1QyUlhkR3hNYld4NVVFTTVhRkJxZDNaYVIyd3lVR2M5UFE9PQ=='),
-('Version_Num', '8.4.2'),
+('Version_Num', '8.4.5'),
 ('nuke_editor', '1'),
-('display_errors', '0'),
+('display_errors', '1'),
 ('gtset', '1'),
 ('userurl', '4'),
 ('align', 'rtl'),
@@ -359,16 +360,15 @@ http://ping.feedburner.com'),
 ('future_pings', ''),
 ('future_ping_time', ''),
 ('ping_num', '0'),
-('have_forum', 0),
+('have_forum', '0'),
 ('forum_path', ''),
 ('forum_system', ''),
-('forum_prefix', "phpbb_"),
+('forum_prefix', 'phpbb_'),
 ('forum_db', ''),
 ('mtsn_search_skipwords', 'است,این'),
-('feedbacks', 'a:13:{s:10:"letreceive";s:1:"1";s:5:"delay";s:3:"600";s:6:"notify";a:1:{s:3:"sms";s:1:"1";}s:11:"description";s:77:"<p>به سیستم مدیریت محتوای نیوک خوش آمدید</p>
-";s:5:"phone";s:0:"";s:6:"mobile";s:0:"";s:3:"fax";s:0:"";s:7:"address";s:0:"";s:16:"meta_description";s:86:"بخش ارتباط با ما سیستم مدیریت محتوای نیوک فارسی";s:13:"meta_keywords";a:3:{i:0;s:22:"ارتباط با ما";i:1;s:18:"تماس با ما";i:2;s:11:"فید بک";}s:10:"map_active";s:1:"1";s:10:"google_api";s:0:"";s:12:"map_position";s:35:"36.28795445718431,59.61575198173523";}'),
+('feedbacks', 'a:13:{s:10:"letreceive";s:1:"1";s:5:"delay";s:3:"600";s:6:"notify";a:1:{s:3:"sms";s:1:"1";}s:11:"description";s:77:"<p>به سیستم مدیریت محتوای نیوک خوش آمدید</p>";s:5:"phone";s:0:"";s:6:"mobile";s:0:"";s:3:"fax";s:0:"";s:7:"address";s:0:"";s:16:"meta_description";s:86:"بخش ارتباط با ما سیستم مدیریت محتوای نیوک فارسی";s:13:"meta_keywords";a:3:{i:0;s:22:"ارتباط با ما";i:1;s:18:"تماس با ما";i:2;s:11:"فید بک";}s:10:"map_active";s:1:"1";s:10:"google_api";s:0:"";s:12:"map_position";s:35:"36.28795445718431,59.61575198173523";}'),
 ('forum_GTlink_active', '1'),
-('forum_collation', 'latin1'),
+('forum_collation', 'utf8mb4'),
 ('website_index_theme', '0'),
 ('session_last_gc', '1498217142'),
 ('mtsn_captcha_charset', ''),
@@ -386,24 +386,24 @@ http://ping.feedburner.com'),
 ('forum_seo_register_link', ''),
 ('forum_seo_passlost_link', ''),
 ('timthumb_allowed', 'phpnuke.ir'),
-('lock_siteurl', 1),
+('lock_siteurl', '1'),
 ('smilies', 'a:21:{i:0;a:4:{s:4:"name";s:10:"icon_arrow";s:4:"code";s:2:";)";s:3:"url";s:28:"images/smiles/icon_arrow.gif";s:10:"dimentions";s:5:"19*19";}i:1;a:4:{s:4:"name";s:13:"icon_confused";s:4:"code";s:2:"|)";s:3:"url";s:31:"images/smiles/icon_confused.gif";s:10:"dimentions";s:5:"19*19";}i:2;a:4:{s:4:"name";s:9:"icon_cool";s:4:"code";s:2:":-";s:3:"url";s:27:"images/smiles/icon_cool.gif";s:10:"dimentions";s:5:"19*19";}i:3;a:4:{s:4:"name";s:8:"icon_cry";s:4:"code";s:2:":(";s:3:"url";s:26:"images/smiles/icon_cry.gif";s:10:"dimentions";s:5:"19*19";}i:4;a:4:{s:4:"name";s:8:"icon_eek";s:4:"code";s:2:":0";s:3:"url";s:26:"images/smiles/icon_eek.gif";s:10:"dimentions";s:5:"19*19";}i:5;a:4:{s:4:"name";s:9:"icon_evil";s:4:"code";s:2:":#";s:3:"url";s:27:"images/smiles/icon_evil.gif";s:10:"dimentions";s:5:"19*19";}i:6;a:4:{s:4:"name";s:12:"icon_exclaim";s:4:"code";s:2:"*)";s:3:"url";s:30:"images/smiles/icon_exclaim.gif";s:10:"dimentions";s:5:"19*19";}i:7;a:4:{s:4:"name";s:9:"icon_razz";s:4:"code";s:2:"^)";s:3:"url";s:27:"images/smiles/icon_razz.gif";s:10:"dimentions";s:5:"19*19";}i:8;a:4:{s:4:"name";s:14:"icon_surprised";s:4:"code";s:3:"+))";s:3:"url";s:32:"images/smiles/icon_surprised.gif";s:10:"dimentions";s:5:"19*19";}i:9;a:4:{s:4:"name";s:10:"icon_smile";s:4:"code";s:2:":}";s:3:"url";s:28:"images/smiles/icon_smile.gif";s:10:"dimentions";s:5:"19*19";}i:10;a:4:{s:4:"name";s:8:"icon_sad";s:4:"code";s:3:"|((";s:3:"url";s:26:"images/smiles/icon_sad.gif";s:10:"dimentions";s:5:"19*19";}i:11;a:4:{s:4:"name";s:13:"icon_rolleyes";s:4:"code";s:2:"@:";s:3:"url";s:31:"images/smiles/icon_rolleyes.gif";s:10:"dimentions";s:5:"19*19";}i:12;a:4:{s:4:"name";s:12:"icon_redface";s:4:"code";s:3:"(:)";s:3:"url";s:30:"images/smiles/icon_redface.gif";s:10:"dimentions";s:5:"19*19";}i:13;a:4:{s:4:"name";s:13:"icon_question";s:4:"code";s:2:":?";s:3:"url";s:31:"images/smiles/icon_question.gif";s:10:"dimentions";s:5:"19*19";}i:14;a:4:{s:4:"name";s:5:"heart";s:4:"code";s:3:")*(";s:3:"url";s:23:"images/smiles/heart.gif";s:10:"dimentions";s:5:"19*19";}i:15;a:4:{s:4:"name";s:4:"kiss";s:4:"code";s:3:"#%^";s:3:"url";s:22:"images/smiles/kiss.gif";s:10:"dimentions";s:5:"19*19";}i:16;a:4:{s:4:"name";s:9:"thumbs_up";s:4:"code";s:3:"@@#";s:3:"url";s:27:"images/smiles/thumbs_up.gif";s:10:"dimentions";s:5:"19*19";}i:17;a:4:{s:4:"name";s:11:"thumbs_down";s:4:"code";s:4:")))&";s:3:"url";s:29:"images/smiles/thumbs_down.gif";s:10:"dimentions";s:5:"19*19";}i:18;a:4:{s:4:"name";s:16:"embaressed_smile";s:4:"code";s:3:"^^*";s:3:"url";s:34:"images/smiles/embaressed_smile.gif";s:10:"dimentions";s:5:"19*19";}i:19;a:4:{s:4:"name";s:13:"regular_smile";s:4:"code";s:2:"!^";s:3:"url";s:31:"images/smiles/regular_smile.gif";s:10:"dimentions";s:5:"19*19";}i:20;a:4:{s:4:"name";s:10:"wink_smile";s:4:"code";s:3:"%&^";s:3:"url";s:28:"images/smiles/wink_smile.gif";s:10:"dimentions";s:5:"19*19";}}'),
 ('forum_last_number', '15'),
 ('nukecdnurl', ''),
 ('users', 'a:32:{s:19:"login_sign_up_theme";s:1:"1";s:12:"allowuserreg";s:1:"1";s:5:"coppa";s:1:"1";s:3:"tos";s:1:"1";s:10:"invitation";s:1:"0";s:14:"max_invitation";s:1:"5";s:8:"nick_max";s:2:"25";s:8:"nick_min";s:1:"3";s:8:"pass_max";s:2:"25";s:8:"pass_min";s:1:"3";s:16:"doublecheckemail";s:1:"1";s:8:"bad_mail";s:0:"";s:12:"bad_username";s:0:"";s:8:"bad_nick";s:0:"";s:12:"requireadmin";s:1:"1";s:18:"email_activatation";s:1:"1";s:17:"send_email_af_reg";s:1:"1";s:11:"sendaddmail";s:1:"1";s:11:"avatar_salt";s:8:"sdfsdwfs";s:11:"avatar_path";s:30:"modules/Users/includes/avatar/";s:12:"allow_avatar";s:1:"1";s:19:"allow_avatar_upload";s:1:"1";s:19:"allow_avatar_remote";s:1:"1";s:14:"allow_gravatar";s:1:"1";s:15:"allowmailchange";s:1:"1";s:16:"avatar_max_width";s:3:"180";s:17:"avatar_max_height";s:3:"180";s:16:"avatar_min_width";s:2:"40";s:17:"avatar_min_height";s:2:"40";s:15:"avatar_filesize";s:6:"102400";s:5:"mttos";s:28:"<p>قوانين سايت</p>";s:6:"notify";a:2:{s:3:"sms";s:1:"1";s:5:"email";s:1:"1";}}'),
 ('minify_src', '1'),
-('pn_credits', 'a:7:{s:10:"min_amount";s:5:"10000";s:10:"max_amount";s:9:"500000000";s:6:"notify";a:1:{s:3:"sms";s:1:"1";}s:18:"credits_direct_msg";s:0:"";s:16:"credits_list_msg";s:0:"";s:10:"currencies";a:5:{i:0;a:3:{s:4:"code";s:3:"USD";s:4:"name";s:21:"دلار آمريکا";s:12:"rial_ex_rate";s:0:"";}i:1;a:3:{s:4:"code";s:3:"EUR";s:4:"name";s:8:"يورو";s:12:"rial_ex_rate";s:0:"";}i:2;a:3:{s:4:"code";s:3:"AED";s:4:"name";s:21:"درهم امارات";s:12:"rial_ex_rate";s:0:"";}i:3;a:3:{s:4:"code";s:3:"GBP";s:4:"name";s:21:"پوند انگليس";s:12:"rial_ex_rate";s:0:"";}i:4;a:3:{s:4:"code";s:3:"KWD";s:4:"name";s:19:"دينار کويت";s:12:"rial_ex_rate";s:0:"";}}s:8:"gateways";a:0:{}}'),
+('pn_credits', 'a:7:{s:10:"min_amount";s:5:"10000";s:10:"max_amount";s:9:"500000000";s:6:"notify";a:1:{s:3:"sms";s:1:"1";}s:18:"credits_direct_msg";s:0:"";s:16:"credits_list_msg";s:0:"";s:10:"currencies";a:5:{i:0;a:3:{s:4:"code";s:3:"USD";s:4:"name";s:21:"دلار آمريکا";s:12:"rial_ex_rate";s:0:"";}i:1;a:3:{s:4:"code";s:3:"EUR";s:4:"name";s:8:"يورو";s:12:"rial_ex_rate";s:0:"";}i:2;a:3:{s:4:"code";s:3:"AED";s:4:"name";s:21:"درهم امارات";s:12:"rial_ex_rate";s:0:"";}i:3;a:3:{s:4:"code";s:3:"GBP";s:4:"name";s:21:"پوند انگليس";s:12:"rial_ex_rate";s:0:"";}i:4;a:3:{s:4:"code";s:3:"KWD";s:4:"name";s:19:"دينار کويت";s:12:"rial_ex_rate";s:0:"";}}s:8:"gateways";a:2:{s:5:"idpay";a:1:{s:6:"apikey";s:0:"";}s:6:"mellat";a:3:{s:10:"terminalId";s:0:"";s:8:"userName";s:0:"";s:12:"userPassword";s:0:"";}}}'),
 ('sms', '0'),
 ('pn_sms', 'a:5:{s:8:"operator";s:5:"opsms";s:8:"username";s:0:"";s:8:"password";s:0:"";s:14:"default_number";s:0:"";s:10:"recipients";s:0:"";}'),
 ('csrf_token_time', '1800'),
 ('statistics_refresh', '1800'),
-('breadcrumb_cat', '1');
+('breadcrumb_cat', '1'),
+('giapi_settings', '');
 
 -- --------------------------------------------------------
 
-
 --
--- Table structure for table `nuke_feedbacks`
+-- Table structure for table `feedbacks`
 --
 
 CREATE TABLE `{NUKEPREFIX}feedbacks` (
@@ -411,10 +411,10 @@ CREATE TABLE `{NUKEPREFIX}feedbacks` (
   `sender_name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `sender_email` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `subject` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `message` text COLLATE utf8mb4_unicode_ci,
-  `custom_fields` text COLLATE utf8mb4_unicode_ci,
-  `responsibility` int(10) NOT NULL DEFAULT '0',
-  `replys` text COLLATE utf8mb4_unicode_ci,
+  `message` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `custom_fields` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `responsibility` int(10) NOT NULL DEFAULT 0,
+  `replys` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `added_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`fid`),
@@ -424,24 +424,23 @@ CREATE TABLE `{NUKEPREFIX}feedbacks` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_groups`
+-- Table structure for table `groups`
 --
 
 CREATE TABLE `{NUKEPREFIX}groups` (
   `group_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `group_type` tinyint(4) NOT NULL DEFAULT '1',
+  `group_type` tinyint(4) NOT NULL DEFAULT 1,
   `group_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `group_lang_titles` text COLLATE utf8mb4_unicode_ci,
-  `group_options` int(11) UNSIGNED NOT NULL DEFAULT '7',
+  `group_lang_titles` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `group_options` int(11) UNSIGNED NOT NULL DEFAULT 7,
   `group_colour` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
    PRIMARY KEY (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_headlines`
+-- Table structure for table `headlines`
 --
 
 CREATE TABLE `{NUKEPREFIX}headlines` (
@@ -455,13 +454,13 @@ CREATE TABLE `{NUKEPREFIX}headlines` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_languages`
+-- Table structure for table `languages`
 --
 
 CREATE TABLE `{NUKEPREFIX}languages` (
   `lid` int(11) NOT NULL AUTO_INCREMENT,
   `main_word` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `equals` text COLLATE utf8mb4_unicode_ci,
+  `equals` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`lid`),
   KEY `main_word` (`main_word`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -469,16 +468,16 @@ CREATE TABLE `{NUKEPREFIX}languages` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_log`
+-- Table structure for table `log`
 --
 
 CREATE TABLE `{NUKEPREFIX}log` (
   `lid` int(11) NOT NULL AUTO_INCREMENT,
-  `log_type` tinyint(1) NOT NULL DEFAULT '1',
+  `log_type` tinyint(1) NOT NULL DEFAULT 1,
   `log_by` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `log_time` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `log_ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `log_message` text COLLATE utf8mb4_unicode_ci,
+  `log_message` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`lid`),
   KEY `log_type` (`log_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -486,20 +485,20 @@ CREATE TABLE `{NUKEPREFIX}log` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_modules`
+-- Table structure for table `modules`
 --
 
 CREATE TABLE `{NUKEPREFIX}modules` (
   `mid` int(10) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `lang_titles` text COLLATE utf8mb4_unicode_ci,
-  `active` int(1) NOT NULL DEFAULT '0',
+  `lang_titles` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `active` int(1) NOT NULL DEFAULT 0,
   `mod_permissions` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `admins` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `all_blocks` int(1) NOT NULL DEFAULT '0',
-  `main_module` int(1) NOT NULL DEFAULT '0',
-  `in_menu` int(1) NOT NULL DEFAULT '0',
-  `module_boxes` text COLLATE utf8mb4_unicode_ci,
+  `all_blocks` int(1) NOT NULL DEFAULT 0,
+  `main_module` int(1) NOT NULL DEFAULT 0,
+  `in_menu` int(1) NOT NULL DEFAULT 0,
+  `module_boxes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`mid`),
   KEY `title` (`title`(191)),
   KEY `active` (`active`),
@@ -510,14 +509,14 @@ CREATE TABLE `{NUKEPREFIX}modules` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_mtsn`
+-- Table structure for table `mtsn`
 --
 
 CREATE TABLE `{NUKEPREFIX}mtsn` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `server` char(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ip` char(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `time` int(12) NOT NULL DEFAULT '0',
+  `time` int(12) NOT NULL DEFAULT 0,
   `method` char(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -525,16 +524,16 @@ CREATE TABLE `{NUKEPREFIX}mtsn` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_mtsn_ipban`
+-- Table structure for table `mtsn_ipban`
 --
 
 CREATE TABLE `{NUKEPREFIX}mtsn_ipban` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `blocker` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ipaddress` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `reason` text COLLATE utf8mb4_unicode_ci,
-  `time` int(12) NOT NULL DEFAULT '0',
-  `status` tinyint(4) NOT NULL DEFAULT '0',
+  `reason` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `time` int(12) NOT NULL DEFAULT 0,
+  `status` tinyint(4) NOT NULL DEFAULT 0,
   `expire` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ipaddress` (`ipaddress`),
@@ -546,39 +545,38 @@ CREATE TABLE `{NUKEPREFIX}mtsn_ipban` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_nav_menus`
+-- Table structure for table `nav_menus`
 --
 
 CREATE TABLE `{NUKEPREFIX}nav_menus` (
   `nav_id` int(11) NOT NULL AUTO_INCREMENT,
   `nav_title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `lang_nav_title` text COLLATE utf8mb4_unicode_ci,
+  `lang_nav_title` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nav_location` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `status` int(11) NOT NULL DEFAULT '0',
+  `status` int(11) NOT NULL DEFAULT 0,
   `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`nav_id`),
   KEY `status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_nav_menus_data`
+-- Table structure for table `nav_menus_data`
 --
 
 CREATE TABLE `{NUKEPREFIX}nav_menus_data` (
   `nid` int(11) NOT NULL AUTO_INCREMENT,
-  `status` tinyint(1) NOT NULL DEFAULT '0',
-  `nav_id` int(11) NOT NULL DEFAULT '0',
-  `pid` int(11) NOT NULL DEFAULT '0',
-  `weight` int(11) NOT NULL DEFAULT '1',
+  `status` tinyint(1) NOT NULL DEFAULT 0,
+  `nav_id` int(11) NOT NULL DEFAULT 0,
+  `pid` int(11) NOT NULL DEFAULT 0,
+  `weight` int(11) NOT NULL DEFAULT 1,
   `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `url` text COLLATE utf8mb4_unicode_ci,
-  `attributes` text COLLATE utf8mb4_unicode_ci,
+  `url` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `attributes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `type` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `part_id` int(11) NOT NULL DEFAULT '0',
+  `part_id` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`nid`),
   KEY `status` (`status`),
   KEY `nav_id` (`nav_id`),
@@ -592,21 +590,21 @@ CREATE TABLE `{NUKEPREFIX}nav_menus_data` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_points_groups`
+-- Table structure for table `points_groups`
 --
 
 CREATE TABLE `{NUKEPREFIX}points_groups` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `type` int(1) NOT NULL DEFAULT '0',
+  `type` int(1) NOT NULL DEFAULT 0,
   `title` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `points` int(10) NOT NULL DEFAULT '0',
+  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `points` int(10) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `nuke_points_groups`
+-- Dumping data for table `points_groups`
 --
 
 INSERT INTO `{NUKEPREFIX}points_groups` (`id`, `type`, `title`, `description`, `points`) VALUES
@@ -636,40 +634,40 @@ INSERT INTO `{NUKEPREFIX}points_groups` (`id`, `type`, `title`, `description`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_posts`
+-- Table structure for table `posts`
 --
 
 CREATE TABLE `{NUKEPREFIX}posts` (
   `sid` int(11) NOT NULL AUTO_INCREMENT,
   `status` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `post_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'articles',
+  `post_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Articles',
   `aid` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `title` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `title_lead` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `title_color` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `hometext` text COLLATE utf8mb4_unicode_ci,
-  `bodytext` text COLLATE utf8mb4_unicode_ci,
+  `hometext` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bodytext` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `post_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `comments` int(11) DEFAULT '0',
-  `counter` mediumint(8) UNSIGNED DEFAULT '0',
+  `comments` int(11) DEFAULT 0,
+  `counter` mediumint(8) UNSIGNED DEFAULT 0,
   `cat` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `informant` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `tags` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `ihome` int(1) NOT NULL DEFAULT '0',
+  `ihome` int(1) NOT NULL DEFAULT 0,
   `alanguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `allow_comment` int(1) NOT NULL DEFAULT '0',
-  `position` int(2) NOT NULL DEFAULT '1',
-  `post_pass` text COLLATE utf8mb4_unicode_ci,
-  `post_image` text COLLATE utf8mb4_unicode_ci,
-  `cat_link` int(5) NOT NULL DEFAULT '1',
-  `permissions` text COLLATE utf8mb4_unicode_ci,
-  `score` int(11) NOT NULL DEFAULT '0',
-  `ratings` int(11) NOT NULL DEFAULT '0',
-  `micro_data` text COLLATE utf8mb4_unicode_ci,
-  `download` longtext COLLATE utf8mb4_unicode_ci,
-  `imported_id` int(2) NOT NULL DEFAULT '0',
+  `allow_comment` int(1) NOT NULL DEFAULT 0,
+  `position` int(2) NOT NULL DEFAULT 1,
+  `post_pass` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `post_image` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cat_link` int(5) NOT NULL DEFAULT 1,
+  `permissions` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `score` int(11) NOT NULL DEFAULT 0,
+  `ratings` int(11) NOT NULL DEFAULT 0,
+  `micro_data` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `download` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `imported_id` int(2) NOT NULL DEFAULT 0,
   PRIMARY KEY (`sid`),
   KEY `title` (`title`(191)),
   KEY `cat` (`cat`(191)),
@@ -685,15 +683,15 @@ CREATE TABLE `{NUKEPREFIX}posts` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_postsmeta`
+-- Table structure for table `postsmeta`
 --
 
 CREATE TABLE `{NUKEPREFIX}postsmeta` (
   `mid` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `post_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `post_id` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `meta_part` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `meta_key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `meta_value` longtext COLLATE utf8mb4_unicode_ci,
+  `meta_value` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`mid`),
   KEY `post_id` (`post_id`),
   KEY `meta_key` (`meta_key`(191)),
@@ -703,13 +701,13 @@ CREATE TABLE `{NUKEPREFIX}postsmeta` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_referrer`
+-- Table structure for table `referrer`
 --
 
 CREATE TABLE `{NUKEPREFIX}referrer` (
   `rid` int(11) NOT NULL AUTO_INCREMENT,
-  `url` text COLLATE utf8mb4_unicode_ci,
-  `path` text COLLATE utf8mb4_unicode_ci,
+  `url` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `path` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`rid`),
@@ -719,17 +717,17 @@ CREATE TABLE `{NUKEPREFIX}referrer` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_reports`
+-- Table structure for table `reports`
 --
 
 CREATE TABLE `{NUKEPREFIX}reports` (
   `rid` int(11) NOT NULL AUTO_INCREMENT,
-  `post_id` int(11) NOT NULL DEFAULT '0',
-  `user_id` int(11) NOT NULL DEFAULT '0',
+  `post_id` int(11) NOT NULL DEFAULT 0,
+  `user_id` int(11) NOT NULL DEFAULT 0,
   `post_title` varchar(750) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `post_link` text COLLATE utf8mb4_unicode_ci,
+  `post_link` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subject` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `message` text COLLATE utf8mb4_unicode_ci,
+  `message` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `ip` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -741,19 +739,19 @@ CREATE TABLE `{NUKEPREFIX}reports` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_scores`
+-- Table structure for table `scores`
 --
 
 CREATE TABLE `{NUKEPREFIX}scores` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `votetype` int(11) NOT NULL DEFAULT '1',
-  `post_id` int(11) NOT NULL DEFAULT '0',
+  `votetype` int(11) NOT NULL DEFAULT 1,
+  `post_id` int(11) NOT NULL DEFAULT 0,
   `db_table` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `rating_ip` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `vote_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `score` tinyint(1) NOT NULL DEFAULT '0',
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  `gust` tinyint(4) NOT NULL DEFAULT '0',
+  `score` tinyint(1) NOT NULL DEFAULT 0,
+  `user_id` int(11) NOT NULL DEFAULT 0,
+  `gust` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `post_id` (`post_id`),
   KEY `db_table` (`db_table`(191)),
@@ -765,13 +763,13 @@ CREATE TABLE `{NUKEPREFIX}scores` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_sessions`
+-- Table structure for table `sessions`
 --
 
 CREATE TABLE `{NUKEPREFIX}sessions` (
   `session_id` varchar(100) COLLATE utf8_bin NOT NULL DEFAULT '',
-  `session_user_id` mediumint(8) UNSIGNED NOT NULL DEFAULT '0',
-  `session_time` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  `session_user_id` mediumint(8) UNSIGNED NOT NULL DEFAULT 0,
+  `session_time` int(11) UNSIGNED NOT NULL DEFAULT 0,
   `session_ip` varchar(40) COLLATE utf8_bin NOT NULL DEFAULT '',
   `session_browser` varchar(150) COLLATE utf8_bin NOT NULL DEFAULT '',
   `session_page` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
@@ -784,18 +782,18 @@ CREATE TABLE `{NUKEPREFIX}sessions` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_statistics`
+-- Table structure for table `statistics`
 --
 
 CREATE TABLE `{NUKEPREFIX}statistics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `year` int(11) NOT NULL DEFAULT '0',
-  `month` int(11) NOT NULL DEFAULT '0',
-  `day` int(11) NOT NULL DEFAULT '0',
-  `hourly_info` text COLLATE utf8mb4_unicode_ci,
-  `visitor_ips` longtext COLLATE utf8mb4_unicode_ci,
-  `visitors` int(11) NOT NULL DEFAULT '0',
-  `hits` int(11) NOT NULL DEFAULT '0',
+  `year` int(11) NOT NULL DEFAULT 0,
+  `month` int(11) NOT NULL DEFAULT 0,
+  `day` int(11) NOT NULL DEFAULT 0,
+  `hourly_info` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `visitor_ips` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `visitors` int(11) NOT NULL DEFAULT 0,
+  `hits` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `year` (`year`),
   KEY `month` (`month`),
@@ -805,17 +803,17 @@ CREATE TABLE `{NUKEPREFIX}statistics` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_statistics_counter`
+-- Table structure for table `statistics_counter`
 --
 
 CREATE TABLE `{NUKEPREFIX}statistics_counter` (
   `type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `var` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `count` int(11) NOT NULL DEFAULT '0'
+  `count` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `nuke_statistics_counter`
+-- Dumping data for table `statistics_counter`
 --
 
 INSERT INTO `{NUKEPREFIX}statistics_counter` (`type`, `var`, `count`) VALUES
@@ -844,7 +842,7 @@ INSERT INTO `{NUKEPREFIX}statistics_counter` (`type`, `var`, `count`) VALUES
 ('browser', 'Msie', 0),
 ('browser', 'Firefox', 0),
 ('browser', 'Safari', 0),
-('browser', 'Chrome', 0),
+('browser', 'Chrome', 5),
 ('browser', 'Opera', 0),
 ('browser', 'Netscape', 0),
 ('browser', 'Maxthon', 0),
@@ -861,32 +859,32 @@ INSERT INTO `{NUKEPREFIX}statistics_counter` (`type`, `var`, `count`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_surveys`
+-- Table structure for table `surveys`
 --
 
 CREATE TABLE `{NUKEPREFIX}surveys` (
   `pollID` int(11) NOT NULL AUTO_INCREMENT,
-  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `status` tinyint(1) NOT NULL DEFAULT 0,
   `aid` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `canVote` tinyint(1) NOT NULL DEFAULT '0',
-  `main_survey` tinyint(1) NOT NULL DEFAULT '0',
+  `canVote` tinyint(1) NOT NULL DEFAULT 0,
+  `main_survey` tinyint(1) NOT NULL DEFAULT 0,
   `module` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `post_id` int(10) NOT NULL DEFAULT '0',
+  `post_id` int(10) NOT NULL DEFAULT 0,
   `pollTitle` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `pollUrl` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `planguage` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `voters` int(11) NOT NULL DEFAULT '0',
+  `voters` int(11) NOT NULL DEFAULT 0,
   `start_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `end_time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `to_main` tinyint(1) NOT NULL DEFAULT '0',
-  `allow_comment` tinyint(1) NOT NULL DEFAULT '0',
-  `comments` int(11) DEFAULT '0',
-  `options` text COLLATE utf8mb4_unicode_ci,
-  `multi_vote` int(2) NOT NULL DEFAULT '1',
-  `show_voters_num` tinyint(1) NOT NULL DEFAULT '0',
-  `show_result` tinyint(1) NOT NULL DEFAULT '1',
-  `permissions` text COLLATE utf8mb4_unicode_ci,
+  `to_main` tinyint(1) NOT NULL DEFAULT 0,
+  `allow_comment` tinyint(1) NOT NULL DEFAULT 0,
+  `comments` int(11) DEFAULT 0,
+  `options` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `multi_vote` int(2) NOT NULL DEFAULT 1,
+  `show_voters_num` tinyint(1) NOT NULL DEFAULT 0,
+  `show_result` tinyint(1) NOT NULL DEFAULT 1,
+  `permissions` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`pollID`),
   KEY `pollID` (`pollID`),
   KEY `status` (`status`),
@@ -901,28 +899,28 @@ CREATE TABLE `{NUKEPREFIX}surveys` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_surveys_check`
+-- Table structure for table `surveys_check`
 --
 
 CREATE TABLE `{NUKEPREFIX}surveys_check` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `time` varchar(14) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `pollID` int(10) NOT NULL DEFAULT '0',
+  `pollID` int(10) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_tags`
+-- Table structure for table `tags`
 --
 
 CREATE TABLE `{NUKEPREFIX}tags` (
   `tag_id` int(11) NOT NULL AUTO_INCREMENT,
   `tag` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `counter` int(20) NOT NULL DEFAULT '0',
-  `visits` int(11) NOT NULL DEFAULT '0',
+  `counter` int(20) NOT NULL DEFAULT 0,
+  `visits` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`tag_id`),
   KEY `tag` (`tag`(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -930,27 +928,27 @@ CREATE TABLE `{NUKEPREFIX}tags` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_transactions`
+-- Table structure for table `transactions`
 --
 
 CREATE TABLE `{NUKEPREFIX}transactions` (
   `tid` int(11) NOT NULL AUTO_INCREMENT,
   `aid` varchar(200) NOT NULL DEFAULT '',
-  `user_id` int(11) NOT NULL DEFAULT '0',
-  `rel_user_id` int(11) NOT NULL DEFAULT '0',
-  `factor_number` int(11) NOT NULL DEFAULT '0',
-  `create_time` int(11) NOT NULL DEFAULT '0',
-  `update_time` int(11) NOT NULL DEFAULT '0',
-  `status` int(11) NOT NULL DEFAULT '0',
-  `type` int(11) NOT NULL DEFAULT '0',
+  `user_id` int(11) NOT NULL DEFAULT 0,
+  `rel_user_id` int(11) NOT NULL DEFAULT 0,
+  `factor_number` int(11) NOT NULL DEFAULT 0,
+  `create_time` int(11) NOT NULL DEFAULT 0,
+  `update_time` int(11) NOT NULL DEFAULT 0,
+  `status` int(11) NOT NULL DEFAULT 0,
+  `type` int(11) NOT NULL DEFAULT 0,
   `gateway` varchar(20) NOT NULL DEFAULT '',
   `data` text NOT NULL,
   `fish_image` longblob NOT NULL,
-  `amount` bigint(20) NOT NULL DEFAULT '0',
+  `amount` bigint(20) NOT NULL DEFAULT 0,
   `title` varchar(250) NOT NULL DEFAULT '',
   `description` text NOT NULL,
   `order_part` varchar(20) NOT NULL DEFAULT '',
-  `order_id` int(11) NOT NULL DEFAULT '0',
+  `order_id` int(11) NOT NULL DEFAULT 0,
   `order_link` varchar(500) NOT NULL DEFAULT '',
   `order_data` text NOT NULL,
   PRIMARY KEY (`tid`),
@@ -967,45 +965,45 @@ CREATE TABLE `{NUKEPREFIX}transactions` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `{NUKEPREFIX}users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_id` int(11) NOT NULL DEFAULT '2',
+  `group_id` int(11) NOT NULL DEFAULT 2,
   `user_groups` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_status` int(10) NOT NULL DEFAULT '1',
+  `user_status` int(10) NOT NULL DEFAULT 1,
   `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_password` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `password_reset` text COLLATE utf8mb4_unicode_ci,
+  `password_reset` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_ip` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_regdate` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_birthday` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_realname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_lastvisit` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  `user_lastvisit` int(11) UNSIGNED NOT NULL DEFAULT 0,
   `user_lastpage` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_login_attempts` tinyint(4) NOT NULL DEFAULT '0',
+  `user_login_attempts` tinyint(4) NOT NULL DEFAULT 0,
   `user_login_block_expire` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_inactive_reason` tinyint(2) NOT NULL DEFAULT '0',
-  `user_inactive_time` int(11) UNSIGNED NOT NULL DEFAULT '0',
+  `user_inactive_reason` tinyint(2) NOT NULL DEFAULT 0,
+  `user_inactive_time` int(11) UNSIGNED NOT NULL DEFAULT 0,
   `user_lang` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_allow_viewonline` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
+  `user_allow_viewonline` tinyint(1) UNSIGNED NOT NULL DEFAULT 1,
   `user_avatar` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_avatar_type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'upload',
-  `user_sig` mediumtext COLLATE utf8mb4_unicode_ci,
+  `user_sig` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_address` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_phone` VARCHAR(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_phone` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_website` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_interests` text COLLATE utf8mb4_unicode_ci,
+  `user_interests` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_femail` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_newsletter` int(1) NOT NULL DEFAULT '0',
-  `user_points` int(10) DEFAULT '0',
+  `user_newsletter` int(1) NOT NULL DEFAULT 0,
+  `user_points` int(10) DEFAULT 0,
   `check_num` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `user_gender` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `user_about` text COLLATE utf8mb4_unicode_ci,
-  `user_credit` bigint(20) NOT NULL DEFAULT '0',
-  `user_referrer` int(11) NOT NULL DEFAULT '0',
+  `user_about` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_credit` bigint(20) NOT NULL DEFAULT 0,
+  `user_referrer` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`),
   KEY `user_id` (`user_id`),
   KEY `username` (`username`(191)),
@@ -1014,8 +1012,10 @@ CREATE TABLE `{NUKEPREFIX}users` (
   KEY `user_regdate` (`user_regdate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
 --
--- Table structure for table `nuke_users_fields`
+-- Table structure for table `users_fields`
 --
 
 CREATE TABLE `{NUKEPREFIX}users_fields` (
@@ -1024,23 +1024,23 @@ CREATE TABLE `{NUKEPREFIX}users_fields` (
   `display` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `size` int(3) NOT NULL DEFAULT '0',
-  `need` int(1) NOT NULL DEFAULT '1',
-  `pos` int(3) NOT NULL DEFAULT '0',
-  `act` int(1) NOT NULL DEFAULT '1',
+  `size` int(3) NOT NULL DEFAULT 0,
+  `need` int(1) NOT NULL DEFAULT 1,
+  `pos` int(3) NOT NULL DEFAULT 0,
+  `act` int(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`fid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_users_fields_values`
+-- Table structure for table `users_fields_values`
 --
 
 CREATE TABLE `{NUKEPREFIX}users_fields_values` (
   `vid` int(10) NOT NULL AUTO_INCREMENT,
-  `uid` int(10) NOT NULL DEFAULT '0',
-  `fid` int(10) NOT NULL DEFAULT '0',
+  `uid` int(10) NOT NULL DEFAULT 0,
+  `fid` int(10) NOT NULL DEFAULT 0,
   `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`vid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1048,12 +1048,12 @@ CREATE TABLE `{NUKEPREFIX}users_fields_values` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `nuke_users_invites`
+-- Table structure for table `users_invites`
 --
 
 CREATE TABLE `{NUKEPREFIX}users_invites` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `rid` int(11) NOT NULL DEFAULT '0',
+  `rid` int(11) NOT NULL DEFAULT 0,
   `code` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `time` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',

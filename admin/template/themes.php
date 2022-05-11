@@ -129,46 +129,45 @@ $contents .= "<!DOCTYPE html>
 
 function adminheader($has_micrometa)
 {
-global $db, $this_place, $admin_file, $is_popup, $aid, $nuke_configs, $hooks;
+	global $db, $this_place, $admin_file, $is_popup, $aid, $nuke_configs, $hooks;
 
-$pagetitle = end($hooks->apply_filters("set_page_title", array()));
+	$pagetitle = end($hooks->apply_filters("set_page_title", array()));
 
-$contents = '';
-if(defined('IS_POPUP'))
-{
-	
-	$contents .= adminheader_popup($pagetitle);
-}
-else
-{
-if(!isset($this_place))
-{
-	$this_place = _ADMINISTRATION;
-}
+	$contents = '';
+	if(defined('IS_POPUP'))
+	{
+		$contents .= adminheader_popup($pagetitle);
+	}
+	else
+	{
+	if(!isset($this_place))
+	{
+		$this_place = _ADMINISTRATION." ".$nuke_configs['sitename'];
+	}
 
-$this_place .= ($pagetitle != '') ? " - $pagetitle":'';
+	$this_place .= ($pagetitle != '') ? " - $pagetitle":'';
 
-$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
+	$nuke_authors_cacheData = get_cache_file_contents('nuke_authors', true);
 
-$admin_realname = ($nuke_authors_cacheData[$aid]['realname'] != "") ? $nuke_authors_cacheData[$aid]['realname']:$aid;
-$upload_allowed_info = phpnuke_unserialize(stripslashes($nuke_configs['upload_allowed_info']));
-$default_folder = is_God() ? 'files':(($upload_allowed_info[$aid]['path'] != '') ? $upload_allowed_info[$aid]['path']:"files/uploads/$aid");
-	
-if(!defined("_DIRECTION"))
-{
-	define("_DIRECTION", "rtl");
-}
+	$admin_realname = (isset($nuke_authors_cacheData[$aid]['realname']) && $nuke_authors_cacheData[$aid]['realname'] != "") ? $nuke_authors_cacheData[$aid]['realname']:$aid;
+	$upload_allowed_info = phpnuke_unserialize(stripslashes($nuke_configs['upload_allowed_info']));
+	$default_folder = is_God() ? 'files':((isset($upload_allowed_info[$aid]['path']) && $upload_allowed_info[$aid]['path'] != '') ? $upload_allowed_info[$aid]['path']:"files/uploads/$aid");
+		
+	if(!defined("_DIRECTION"))
+	{
+		define("_DIRECTION", "rtl");
+	}
 
-$top_admin_menus_output = '';
-$args = (object) array(
-	'list_type'			=> "ul",
-	'before'			=> '<a href="%1$s"><i class="fa fa-%2$s"></i> ',
-	'after'				=> '</a>', 
-);
+	$top_admin_menus_output = '';
+	$args = (object) array(
+		'list_type'			=> "ul",
+		'before'			=> '<a href="%1$s"><i class="fa fa-%2$s"></i> ',
+		'after'				=> '</a>', 
+	);
 
-$admin_top_menus = array();
-$admin_top_menus = $hooks->apply_filters("admin_top_menus", $admin_top_menus);
-$admin_top_menus = array_flatten($admin_top_menus, 0, 'id', 'parent_id', 'children', array('title','url','icon'), array());
+	$admin_top_menus = array();
+	$admin_top_menus = $hooks->apply_filters("admin_top_menus", $admin_top_menus);
+	$admin_top_menus = array_flatten($admin_top_menus, 0, 'id', 'parent_id', 'children', array('title','url','icon'), array());
 
 $admin_top_menus = arrayToObject($admin_top_menus);
 
@@ -259,7 +258,7 @@ $contents .="<!DOCTYPE html>
 		<div class=\"topnav\">
 			<nav>
 				<ul>
-					<li><a target=\"_blank\" href=\"".$nuke_configs['nukeurl']."\"><i class=\"fa fa-desktop\"></i> "._SHOW_FRONTPAGE."</a></li>
+					<li><a target=\"_blank\" href=\"".$nuke_configs['nukeurl']."\"><i class=\"fa fa-desktop\"></i> "._SHOW_FRONTPAGE." ".$nuke_configs['sitename']."</a></li>
 				</ul>
 			</nav>
 			<span><i class=\"fa fa-calendar\"></i> "._TODAY." : ".nuketimes(_NOWTIME, false, false, false, 3)."</span>
@@ -327,7 +326,7 @@ function adminfooter()
 	<script src=\"includes/Ajax/jquery/select2.min.js\" type=\"text/javascript\"></script>
 	<script src=\"admin/template/js/jquery/jquery.filestyle.js\" type=\"text/javascript\"></script>
 	<script src=\"admin/template/js/jquery/jquery.tooltip.js\" type=\"text/javascript\"></script>
-	<script src=\"admin/template/js/jquery/jquery.dimensions.js\" type=\"text/javascript\"></script>
+	<!--<script src=\"admin/template/js/jquery/jquery.dimensions.js\" type=\"text/javascript\"></script>-->
 	<script src=\"admin/template/js/jquery/jquery.pngFix.pack.js\" type=\"text/javascript\"></script>
 	<script src=\"admin/template/js/jquery/custom_jquery.js\" type=\"text/javascript\"></script>\n";
 	$contents .= jquery_codes_load();
@@ -416,8 +415,9 @@ function pageselector($linkto , $rows, $pageNow = 1, $nbTotalPage = 1, $showAll 
 	return $gotopage;
 }
 
-function admin_pagination($total_rows, $entries_per_page, $current_page, $link_to, $pageid="", $page_name="")
+function admin_pagination($total_rows=0, $entries_per_page=20, $current_page=1, $link_to='', $pageid="", $page_name="")
 {
+	global $hooks;
 	$total_page = ceil($total_rows / $entries_per_page);
 	$str_page  = (strpos($link_to, "?") === false) ? "?page$pageid" : "&amp;page$pageid";
 	$page_name = (isset($page_name) && $page_name != "") ? "#$page_name":"";
@@ -511,7 +511,8 @@ function admin_pagination($total_rows, $entries_per_page, $current_page, $link_t
 				<div class=\"clear\"></div>
 			</div>
 			</td></tr></table></div>";
-	
+
+	$paginate_links = $hooks->apply_filters("admin_pagination", $paginate_links, $total_rows, $entries_per_page, $current_page, $link_to, $pageid, $page_name);
 
   return $paginate_links;
   
@@ -565,7 +566,7 @@ function CloseTable()
 	return $contents;
 }
 
-function themesidebox($title, $content, $themeview=1, $themetype)
+function themesidebox($title, $content, $themeview=1, $themetype=0)
 {
 	$contents = '';
 	$contents .="
@@ -584,13 +585,11 @@ function themesidebox($title, $content, $themeview=1, $themetype)
 function bubble_show($content)
 {
 	$contents = '';
-	$contents .= "<span class=\"bubble\"><div class=\"bubble-right\"></div>
-		<div class=\"bubble-inner\">$content</div>
-		<div class=\"bubble-left\"></div><span>";
+	$contents .= "<span class=\"bubble\">$content<span>";
 	return $contents;
 }
 
-function themecenterbox($title, $content, $themeview=1, $themetype)
+function themecenterbox($title, $content, $themeview=1, $themetype=0)
 {
 	$contents = '';
 	$contents .="

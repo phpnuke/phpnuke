@@ -551,6 +551,7 @@ class phpnuke_comments
 					
 					phpnuke_db_error();
 					redirect_to($this->Req_URIs_2."#comment-$cid");
+					die();
 				}
 				else
 				{

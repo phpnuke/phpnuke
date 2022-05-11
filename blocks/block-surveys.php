@@ -20,15 +20,9 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $module_name, $nuke_configs, $block_global_contents, $comments_op, $hooks;
-
-$content = "";
-
-$block_global_contents = array();
-$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
-
-$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+function surveys_block_assets($theme_setup)
 {
+	global $nuke_configs;
 	$theme_setup = array_merge_recursive($theme_setup, array(
 		"defer_js" => array(
 			"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap-progressbar.js\" type=\"text/javascript\"></script>",
@@ -36,7 +30,16 @@ $hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_confi
 		)
 	));
 	return $theme_setup;
-}, 10);
+}
+
+global $db, $module_name, $nuke_configs, $block_global_contents, $comments_op, $hooks;
+
+$content = "";
+
+$block_global_contents = array();
+$block_global_contents = $hooks->apply_filters("global_contents", $block_global_contents);
+
+$hooks->add_filter("site_theme_headers", 'surveys_block_assets', 10);
 	
 $nuke_surveys_cacheData = change_poll_status();
  

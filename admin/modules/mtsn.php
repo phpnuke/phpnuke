@@ -251,7 +251,7 @@ if (check_admin_permission($filename))
 		</form>";
 		$contents .= CloseAdminTable();
 		$contents .= "<br>";
-
+		$contents = $hooks->apply_filters("mtsn_admin", $contents);
 
 		$contents .= OpenAdminTable();
 		$contents .= "<div class=\"text-center\">"._ATACKS_ARCHIVE."</div><br>
@@ -333,7 +333,7 @@ if (check_admin_permission($filename))
 		Header("Location: ".$admin_file.".php?op=mtsn_admin");
 	}*/
 
-	function ip_ban_page($id=0,$ipsearch=array(), $ipsearch2, $ipaddress='')
+	function ip_ban_page($id=0,$ipsearch=array(), $ipsearch2='', $ipaddress='')
 	{
 		global $db, $admin_file, $hooks, $nuke_configs;
 
@@ -423,7 +423,7 @@ if (check_admin_permission($filename))
 			</tr>
 			<tr>
 				<td colspan=\"2\">
-					<input type='submit' value='' class=\"form-submit\">
+					<input type='submit' value='"._SEND."' class=\"form-submit\">
 				</td>
 			</tr>
 		</table>
@@ -484,7 +484,7 @@ if (check_admin_permission($filename))
 						</span>
 						&nbsp; &nbsp;
 						<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
-						<input type='submit' value='' class=\"form-submit\">
+						<input type='submit' value='"._SEND."' class=\"form-submit\">
 					</form>
 				</td>
 			</tr>
@@ -561,8 +561,10 @@ if (check_admin_permission($filename))
 	function deleteip($id, $baned_ip_list)
 	{
 		csrfProtector::authorisePost(true);
-		global $db, $admin_file;
+		global $db, $admin_file, $hooks;
 		$ips = '';
+		
+		$hooks->do_action("deleteip_before", $id, $baned_ip_list);
 		
 		if(is_array($baned_ip_list) && !empty($baned_ip_list))
 		{
@@ -580,6 +582,7 @@ if (check_admin_permission($filename))
 				->delete();
 			$ips = $id;
 		}
+		$hooks->do_action("deleteip_after", $id, $baned_ip_list, $ips);
 		cache_system("nuke_mtsn_ipban");
 		add_log(sprintf(_DELETE_BANED_IP, $ips), 1);
 		Header("Location: ".$admin_file.".php?op=ip_ban_page");
@@ -587,8 +590,9 @@ if (check_admin_permission($filename))
 	
 	function clearallip()
 	{
-		global $db, $admin_file;
+		global $db, $admin_file, $hooks;
 		$db->query("TRUNCATE TABLE  ".MTSN_IPBAN_TABLE."");
+		$hooks->do_action("clearallip_after", $id, $baned_ip_list, $ips);
 		cache_system("nuke_mtsn_ipban");
 		add_log(_DELETE_ALLBANED_IP, 1);
 		Header("Location: ".$admin_file.".php?op=ippage");
@@ -620,6 +624,7 @@ if (check_admin_permission($filename))
 		}
 		else
 		{
+			$hooks->do_action("addnewip_before", $ipaddress, $reason, $status, $expire, $edited_id);
 			$expire = ($expire != 0) ? to_mktime($expire):0;
 			if($edited_id > 0)
 			{
@@ -648,6 +653,9 @@ if (check_admin_permission($filename))
 					]);
 				add_log(sprintf(_ADD_BANEDIP, $ipaddress), 1);
 			}
+			
+			$hooks->do_action("addnewip_after", $ipaddress, $reason, $status, $expire, $edited_id);			
+			
 			cache_system("nuke_mtsn_ipban");
 			header("Location: ".$admin_file.".php?op=ip_ban_page");
 		}

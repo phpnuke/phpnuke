@@ -1,0 +1,25 @@
+imports:
+    - { resource: tables.yml }
+
+services:
+    alg.addonforthanksforposts.listener:
+        class: alg\addonforthanksforposts\event\listener
+        arguments:
+            - '@template'
+            - '@controller.helper'
+        tags:
+            - { name: event.listener }
+    alg.addonforthanksforposts.thanks_ajax_handler:
+        class: alg\addonforthanksforposts\controller\thanks_ajax_handler
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@auth'
+            - '@user'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '@controller.helper'
+            - '%tables.thanks%'
+            - '%tables.users%'
+            - '%tables.posts%'
+            - '@?gfksx.thanksforposts.helper'

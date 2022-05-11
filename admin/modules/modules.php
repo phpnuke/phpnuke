@@ -315,7 +315,7 @@ if (check_admin_permission($filename))
 	function home_module($mid)
 	{
 		csrfProtector::authorisePost(true);
-		global  $admin_file, $db, $nuke_configs;
+		global  $admin_file, $db, $nuke_configs, $hooks;
 		$mid = intval($mid);
 		
 		$db->table(MODULES_TABLE)
@@ -331,7 +331,8 @@ if (check_admin_permission($filename))
 				'main_module' => 1,
 				'mod_permissions' => '',
 			]);
-			
+		
+		$hooks->do_action("home_module", $mid);
 		cache_system('nuke_modules');
 		@Header("Location: ".$admin_file.".php?op=modules");
 	}
@@ -339,7 +340,7 @@ if (check_admin_permission($filename))
 	function module_status($mid, $active)
 	{
 		csrfProtector::authorisePost(true);
-		global  $admin_file, $db, $nuke_configs;
+		global  $admin_file, $db, $nuke_configs, $hooks;
 		$mid = intval($mid);
 		
 		$result = $db->table(MODULES_TABLE)
@@ -352,6 +353,7 @@ if (check_admin_permission($filename))
 			->where('mid', $mid)
 			->update(['active' => $active]);
 		
+		$hooks->do_action("module_status", $mid, $active);
 		cache_system('nuke_modules');
 		add_log(sprintf(_ACTIVATEMODULELOG, (($active == 1) ? _ACTIVATE:_DEACTIVATE), $result['title']), 1);
 		@Header("Location: ".$admin_file.".php?op=module_edit&mid=$mid");
@@ -369,6 +371,7 @@ if (check_admin_permission($filename))
 		$contents = '';
 		if(isset($submit) && $submit != '' && is_array($module_data) && !empty($module_data))
 		{
+			$module_data = $hooks->apply_filters("module_edit_save", $module_data, $mid);
 			$mod_permissions = (is_array($module_data['mod_permissions']) && !empty($module_data['mod_permissions'])) ? implode(",", $module_data['mod_permissions']):"";
 			$in_menu = intval($module_data['in_menu']);
 			$all_blocks = intval($module_data['all_blocks']);		
@@ -389,7 +392,7 @@ if (check_admin_permission($filename))
 					'all_blocks' => $all_blocks,
 					'active' => $activemodule,
 				]);
-			
+			$hooks->apply_filters("module_edit_after", $module_data, $mid);
 			cache_system('nuke_modules');
 			add_log(sprintf(_EDITMODULETATA, $modules_row['title']), 1);
 			header("Location: ".$admin_file.".php?op=module_edit&mid=$mid");
@@ -507,6 +510,7 @@ if (check_admin_permission($filename))
 		<input type='hidden' name='op' value='module_edit'>
 		<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		</form></div>";
+		$contents = $hooks->apply_filters("module_edit_form", $contents);
 		$contents .= CloseAdminTable();
 		
 		include("header.php");
@@ -548,6 +552,7 @@ if (check_admin_permission($filename))
 			$module_part = str_replace(".php","", $module_part);
 			$all_module_boxes[$module_part] = $module_boxes;
 			
+			$module_boxes = $hooks->apply_filters("module_edit_boxess", $module_boxes, $mid, $module_part, $special_page);
 			if($special_page != '')
 			{
 				$special_page_arr = explode("_", $special_page);
@@ -587,6 +592,8 @@ if (check_admin_permission($filename))
 					]);
 			}
 			
+			$hooks->do_action("module_edit_boxess_after", $module_boxes, $mid, $module_part, $special_page);
+			
 			cache_system('nuke_modules');
 			add_log(sprintf(_EDITMODULEBOXESLAYOUTS, $modules_row['title']), 1);
 			Header("Location: ".$admin_file.".php?op=module_edit&mid=$mid");
@@ -611,6 +618,9 @@ if (check_admin_permission($filename))
 				$all_boxes[] = $box;
 			}
 		}
+		
+		$all_boxes = $hooks->apply_filters("module_edit_all_boxess", $all_boxes, $module_boxes, $mid, $module_part, $special_page);
+		
 		$all_boxes = array_filter($all_boxes);
 		$contents = '';
 		$contents .= GraphicAdmin();
@@ -790,6 +800,8 @@ if (check_admin_permission($filename))
 			sortable_handle();
 
 		</script>";
+		
+		$contents = $hooks->apply_filters("module_edit_boxess_form", $contents, $all_boxes, $module_boxes, $mid, $module_part, $special_page);
 		$contents .= CloseAdminTable();
 		
 		include("header.php");

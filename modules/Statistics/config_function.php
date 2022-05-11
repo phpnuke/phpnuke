@@ -76,6 +76,104 @@ function statistics_boxes_parts($nuke_modules_boxes_parts)
 
 $hooks->add_filter("modules_boxes_parts", "statistics_boxes_parts", 10);
 
-//$other_admin_configs['statistics'] = array("title" => "_VIEWERS_STATISTICS", "function" => "statistics_config", "God" => false);
+function statistics_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$main_chart_data = $hooks->functions_vars['statistics_assets']['main_chart_data'];
+	$browsers_chart_data = $hooks->functions_vars['statistics_assets']['browsers_chart_data'];
+	$module_name = $hooks->functions_vars['statistics_assets']['module_name'];
+	$os_chart_data = $hooks->functions_vars['statistics_assets']['os_chart_data'];
+	
+	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/style.css\">";
+		
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/amcharts.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/serial.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/pie.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/themes/light.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/plugins/responsive/responsive.min.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/charts.js\"></script>";
+	$defer_js[] = "<script>
+	$(document).ready(function(){
+		var main_chart_data = $main_chart_data;
+		var browsers_chart_data = $browsers_chart_data;
+		var os_chart_data = $os_chart_data;
+		main_chart('serial_chart', main_chart_data);
+		pie_chart('browsers_chart', browsers_chart_data, 'browser', 'value');
+		pie_chart('os_chart', os_chart_data, 'os', 'value');
+	});
+	</script>";
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"default_css" => $default_css,
+		"defer_js" => $defer_js
+	));
+	return $theme_setup;
+}
+
+function adv_statistics_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$module_name = $hooks->functions_vars['adv_statistics_assets']['module_name'];
+	$script_array = $hooks->functions_vars['adv_statistics_assets']['script_array'];
+	
+	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/style.css\">";
+			
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/amcharts.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/serial.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/pie.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/themes/light.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/amcharts/plugins/responsive/responsive.min.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/charts.js\"></script>";
+	$defer_js[] = $script_array;
+		
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"default_css" => $default_css,
+		"defer_js" => $defer_js
+	));
+	return $theme_setup;
+}
+
+function statistics_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	$breadcrumbs['statistics'] = array(
+		"name" => _VIEWERS_STATISTICS,
+		"link" => LinkToGT("index.php?modname=Statistics"),
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+}
+
+function adv_statistics_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	global $hooks;
+	$breadcrumb_data = $hooks->functions_vars['adv_statistics_breadcrumb']['breadcrumb_data'];
+	
+	$breadcrumbs['statistics'] = array(
+		"name" => _VIEWERS_STATISTICS,
+		"link" => LinkToGT("index.php?modname=Statistics"),
+		"itemtype" => "WebPage"
+	);
+	
+	foreach($breadcrumb_data as $key => $breadcrumb)
+	{
+		$breadcrumbs["statistics_$key"] = array(
+			"name" => $breadcrumb[0],
+			"link" => $breadcrumb[1],
+			"itemtype" => "WebPage"
+		);
+	}
+	
+	return $breadcrumbs;
+}
+
+/*
+function statistics_settings($other_admin_configs){
+	//$other_admin_configs['statistics'] = array("title" => "_VIEWERS_STATISTICS", "function" => "statistics_config", "God" => false);
+	return $other_admin_configs;
+}
+
+$hooks->add_filter("other_admin_configs", "statistics_settings", 10);
+*/
 
 ?>

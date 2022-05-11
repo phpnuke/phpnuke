@@ -251,19 +251,48 @@ if(!function_exists("articles_search"))
 	}
 }
 
+function _article_select_month_breadcrump($breadcrumbs, $block_global_contents)
+{
+	global $nuke_configs, $hooks;
+	
+	$post_type = $hooks->functions_vars['_article_select_month_breadcrump']['post_type'];
+	
+	$breadcrumbs['category'] = array(
+		"name" => _STORIESARCHIVE,
+		"link" => LinkToGT("index.php?modname=".$post_type."&op=article_select_month"),
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+}
+
+function article_categories_breadcrump($breadcrumbs, $block_global_contents)
+{
+	global $nuke_configs, $hooks;
+	
+	$main_module = $hooks->functions_vars['article_categories_breadcrump']['main_module'];
+	
+	$breadcrumbs['category'] = array(
+		"name" => _CATEGORIES,
+		"link" => LinkToGT("index.php?modname=".$main_module."&op=article_categories"),
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+}
+
 function _article_select_month($in = 0, $post_type = 'Articles')
 {
 	global $db, $nuke_configs, $module_name, $HijriCalendar, $hooks;
 	
-	$arcjive_list = array();
+	$archive_list = array();
 	$contents = "";
 	
 	$result = $db->query("SELECT 
 	YEAR(FROM_UNIXTIME(time)) AS `year`, 
 	MONTH(FROM_UNIXTIME(time)) AS `month`, 
+	DAY(FROM_UNIXTIME(time)) AS `day`, 
 	count(sid) as posts 
 	FROM ".POSTS_TABLE." where post_type = '$post_type' AND status = 'publish' 
-	GROUP BY YEAR(FROM_UNIXTIME(time)), MONTH(FROM_UNIXTIME(time)) 
+	GROUP BY YEAR(FROM_UNIXTIME(time)), MONTH(FROM_UNIXTIME(time)) , DAY(FROM_UNIXTIME(time)) 
 	ORDER BY time DESC");
 
 	$module_name = (isset($post_type) && $post_type != 'Articles') ? $module:$module_name;
@@ -274,7 +303,7 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 		{
 			if($nuke_configs['datetype'] == 1)
 			{
-				$jalalidate = gregorian_to_jalali($row['year'],$row['month'],1);
+				$jalalidate = gregorian_to_jalali($row['year'],$row['month'],$row['day']);
 				$year = $jalalidate[0];
 				$month = $jalalidate[1];
 				$month2 = $nuke_configs['j_month_name'][$month];
@@ -282,7 +311,7 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 			}
 			elseif($nuke_configs['datetype'] == 2)
 			{
-				$a_time = to_mktime("".$row['year']."-".$row['month']."-1");
+				$a_time = to_mktime("".$row['year']."-".$row['month']."-".$row['day']);
 				$dateTimes = $HijriCalendar->GregorianToHijri($a_time);
 				$year = $jalalidate[2];
 				$month = $dateTimes[0]-1;
@@ -297,7 +326,11 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 				$month_l = str_replace(" ","-",$month2);
 			}
 			
-			$archive_list[] = array('url' => LinkToGT("index.php?modname=$module_name&op=article_archive&year=$year&month=$month&month_l=$month_l"), 'title' => "$month2, $year", 'count' => $row['posts']);
+			$archive_list[$year][$month] = array(
+				'url' => LinkToGT("index.php?modname=$module_name&op=article_archive&year=$year&month=$month&month_l=$month_l"), 
+				'title' => "$month2, $year",
+				'count' => (isset($archive_list[$year][$month]['count'])) ? ($archive_list[$year][$month]['count']+$row['posts']):$row['posts']
+			);
 		}
 	}
 
@@ -317,9 +350,12 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 	{
 		$contents .= OpenTable(_SELECTMONTH2VIEW);
 		$contents .= "<ul>";
-		foreach($archive_list as $lists)
+		foreach($archive_list as $year => $lists)
 		{
-			$contents .= "<li><a href=\"".$lists['url']."\">".$lists['title']." (".$lists['count'].")</a></li>";
+			foreach($lists as $month => $list)
+			{
+				$contents .= "<li><a href=\"".$list['url']."\">".$list['title']." (".$list['count'].")</a></li>";
+			}
 		}
 		$contents .= "</ul>";
 		$contents .= CloseTable();
@@ -343,14 +379,14 @@ function _article_select_month($in = 0, $post_type = 'Articles')
 		}, 10);		
 		unset($meta_tags);
 		
-		$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($post_type){
-			$breadcrumbs['category'] = array(
-				"name" => _STORIESARCHIVE,
-				"link" => LinkToGT("index.php?modname=".$post_type."&op=article_select_month"),
-				"itemtype" => "WebPage"
-			);
-			return $breadcrumbs;
-		}, 10);
+		$hooks->add_functions_vars(
+			'_article_select_month_breadcrump',
+			array(
+				"post_type" => $post_type,
+			)
+		);
+		
+		$hooks->add_filter("site_breadcrumb", "_article_select_month_breadcrump", 10);
 		
 		$contents = show_modules_boxes($module_name, "archive", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 		
@@ -615,14 +651,24 @@ function article_result_parse(&$article_info = array(), $query_set = array(), $q
 	$article_info = $hooks->apply_filters("post_info_parse", $article_info);
 }
 
-function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name)
+function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name='articles_fields')
 {
 	global $nuke_configs;
 	
 	$contents = "
 	<a href=\"#\" class=\"table-icon icon-6 post-files-btn\"></a>
 	<div id=\"post-files-dialog\" style=\"display:none;\">
-		"._ADD_NEW_FIELD." <span class=\"add_field_icon add_post_field_button\" title=\""._ADD_NEW_FIELD."\"></span>
+		"._ADD_NEW_FIELD." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\" data-fields-wrapper=\".input_post_fields_wrap\" data-fields-html=\"#input_post_fields_items\" data-fields-max=\"1000\"></span>
+		<template id=\"input_post_fields_items\">
+			<div style=\"margin-bottom:3px;\" data-key=\"{X}\">
+				<input placeholder=\""._FILENAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"".$form_field_name."[{X}][]\" />&nbsp;
+				<input placeholder=\""._FILELINK."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"".$form_field_name."[{X}][]\" size=\"30\" />&nbsp;
+				<input placeholder=\""._FILESIZE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"".$form_field_name."[{X}][]\" size=\"8\" />&nbsp;
+				<input placeholder=\""._FILEDESC."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"".$form_field_name."[{X}][]\" />&nbsp;
+				"._FILETYPE." <select class=\"styledselect-select field_type_select\" name=\"".$form_field_name."[{X}][]\" style=\"width:120px;\"><option value=\"files\" selected>"._FILES."</option><option value=\"images\">"._IMAGES."</option><option value=\"audios\">"._AUDIOS."</option><option value=\"videos\">"._VIDEOS."</option></select>&nbsp;
+				<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+			</div>
+		</template>
 		<div class=\"input_post_fields_wrap\">";
 		$i = 0;
 		
@@ -643,8 +689,13 @@ function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name
 				$sel3 = ($filetype == "audios") ? "selected":"";
 				$sel4 = ($filetype == "videos") ? "selected":"";
 				$contents .= "
-				<div style=\"margin-bottom:3px;\">
-					<input placeholder=\""._FILENAME."\" type=\"text\" class=\"inp-form\" value=\"$filename\" name=\"".$form_field_name."[$i][]\" />&nbsp;<input placeholder=\""._FILELINK."\" type=\"text\" class=\"inp-form-ltr\" value=\"$filelink\" name=\"".$form_field_name."[$i][]\" size=\"40\" />&nbsp;&nbsp;<input placeholder=\""._FILESIZE."\" type=\"text\" class=\"inp-form\" value=\"$filesize\" name=\"".$form_field_name."[$i][]\" size=\"8\" />&nbsp;&nbsp;<input placeholder=\""._FILEDESC."\" type=\"text\" class=\"inp-form\" value=\"$filedesc\" name=\"".$form_field_name."[$i][]\" />&nbsp;&nbsp;"._FILETYPE." <select class=\"styledselect-select field_type_select\" name=\"".$form_field_name."[$i][]\" style=\"width:120px;\"><option value=\"files\" $sel1>"._FILES."</option><option value=\"images\" $sel2>"._IMAGES."</option><option value=\"audios\" $sel3>"._AUDIOS."</option><option value=\"videos\" $sel4>"._VIDEOS."</option></select>&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+				<div style=\"margin-bottom:3px;\" data-key=\"$i\">
+					<input placeholder=\""._FILENAME."\" type=\"text\" class=\"inp-form\" value=\"$filename\" name=\"".$form_field_name."[$i][]\" />&nbsp;
+					<input placeholder=\""._FILELINK."\" type=\"text\" class=\"inp-form-ltr\" value=\"$filelink\" name=\"".$form_field_name."[$i][]\" size=\"30\" />&nbsp;
+					<input placeholder=\""._FILESIZE."\" type=\"text\" class=\"inp-form\" value=\"$filesize\" name=\"".$form_field_name."[$i][]\" size=\"8\" />&nbsp;
+					<input placeholder=\""._FILEDESC."\" type=\"text\" class=\"inp-form\" value=\"$filedesc\" name=\"".$form_field_name."[$i][]\" />&nbsp;
+					"._FILETYPE." <select class=\"styledselect-select field_type_select\" name=\"".$form_field_name."[$i][]\" style=\"width:120px;\"><option value=\"files\" $sel1>"._FILES."</option><option value=\"images\" $sel2>"._IMAGES."</option><option value=\"audios\" $sel3>"._AUDIOS."</option><option value=\"videos\" $sel4>"._VIDEOS."</option></select>&nbsp;
+					<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
 				</div>";
 				$i++;
 			}	
@@ -682,14 +733,6 @@ function get_post_download_files($files, $title=_ARTICLE_FILES, $form_field_name
 					var this_name = $(this).attr('name');
 					$(this).attr('name', this_name.replace(/{FIELD_TYPE}/g, new_type))
 				});
-			});
-			
-			$(\".input_post_fields_wrap\").add_field({ 
-				addButton: $(\".add_post_field_button\"),
-				maxField: 1000,
-				remove_button: '.remove_field',
-				fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._FILENAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"'+fields_name+'\" />&nbsp;<input placeholder=\""._FILELINK."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"'+fields_name+'\" size=\"40\" />&nbsp;&nbsp;<input placeholder=\""._FILESIZE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"'+fields_name+'\" size=\"8\" />&nbsp;&nbsp;<input placeholder=\""._FILEDESC."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"'+fields_name+'\" />&nbsp;&nbsp;"._FILETYPE." <select class=\"styledselect-select field_type_select\" name=\"'+fields_name+'\" style=\"width:120px;\"><option value=\"files\" selected>"._FILES."</option><option value=\"images\">"._IMAGES."</option><option value=\"audios\">"._AUDIOS."</option><option value=\"videos\">"._VIDEOS."</option></select>&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-				x: '$i',
 			});
 		});
 	</script>";
@@ -1325,5 +1368,42 @@ function posts_breadcrumb($breadcrumb, $article_info)
 }
 
 $hooks->add_filter("site_breadcrumb", "posts_breadcrumb", 10);
+	
+function posts_grapesjs($article_info)
+{
+	global $nuke_configs, $op, $page, $hooks;
+	
+	if(isset($article_info) && !empty($article_info))
+	{
+		foreach($article_info as $sid => $post)
+		{
+			if($sid != 'total_rows' && isset($post['grapesjs']) && $post['grapesjs'] != '')
+			{
+				$post['grapesjs'] = objectToArray(json_decode($post['grapesjs']));
+				$post_css = $post['grapesjs']['gjs-css'];
+				$post_html = $post['grapesjs']['gjs-html'];
+				unset($article_info[$sid]['grapesjs']);
+				$article_info[$sid]['post_css'] = $post_css;
+				$article_info[$sid]['post_html'] = $post_html;
+			}
+		}
+	}
+	return $article_info;
+}
 
+$hooks->add_filter("post_info_parse", "posts_grapesjs", 10);
+
+function send_article_assets($theme_setup)
+{
+	global $nuke_configs;
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"default_css" => array(
+			"<link href=\"".INCLUDE_PATH."/Ajax/jquery/jquery-checktree.css\" rel=\"stylesheet\" type=\"text/css\">"
+		),
+		"defer_js" => array(
+			"<script src=\"".INCLUDE_PATH."/Ajax/jquery/jquery-checktree.js\"></script>"
+		)
+	));
+	return $theme_setup;
+}
 ?>

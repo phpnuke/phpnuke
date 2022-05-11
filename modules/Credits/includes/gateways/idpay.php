@@ -262,7 +262,7 @@ class idpay_gateway{
 	function set_configs($gateways_configs){
 	
 		$checke1 = (isset($gateways_configs['gateways'][$this->gateway_name]['status']) && $gateways_configs['gateways'][$this->gateway_name]['status'] == 1) ? "checked":"";
-		$checke2 = (isset($gateways_configs['gateways'][$this->gateway_name]['status']) && $gateways_configs['gateways'][$this->gateway_name]['status'] == 0) ? "checked":"";
+		$checke2 = (!isset($gateways_configs['gateways'][$this->gateway_name]['status']) || (isset($gateways_configs['gateways'][$this->gateway_name]['status']) && $gateways_configs['gateways'][$this->gateway_name]['status'] == 0)) ? "checked":"";
 		$configs = "
 				<tr>
 					<td align=\"center\" colspan=\"2\"><b>".$this->gateway_title."</b></td>

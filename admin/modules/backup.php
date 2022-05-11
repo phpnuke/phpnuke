@@ -49,7 +49,7 @@ if (check_admin_permission($filename)) {
 		return $contents;
 	}
 
-	function backup_tables($tables = '*', $comments)
+	function backup_tables($tables = '*', $comments='')
 	{
 		global $db, $aid, $DB_obj;
 
@@ -429,7 +429,7 @@ if (check_admin_permission($filename)) {
 
 	$op = (isset($op)) ? filter($op, "nohtml"):'';
 	$comments = (isset($comments)) ? filter($comments, "nohtml"):'';
-	$tables = (isset($tables)) ? $tables:array();
+	$tables = (isset($tables)) ? $tables:'*';
 	
 	switch($op)
 	{

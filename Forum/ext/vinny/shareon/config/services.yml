@@ -1,0 +1,10 @@
+services:
+    vinny.shareon.listener:
+        class: vinny\shareon\event\listener
+        arguments:
+            - '@template'
+            - '@config'
+            - '@user'
+            - '%core.php_ext%'
+        tags:
+            - { name: event.listener }

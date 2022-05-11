@@ -20,17 +20,20 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $nuke_configs, $users_system, $hooks;
-
-$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+function invitation_block_assets($theme_setup)
 {
+	global $nuke_configs;
 	$theme_setup = array_merge_recursive($theme_setup, array(
 		"defer_js" => array(
 			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>"
 		)
 	));
 	return $theme_setup;
-}, 10);
+}
+
+global $db, $nuke_configs, $users_system, $hooks;
+
+$hooks->add_filter("site_theme_headers", "invitation_bloc_assets", 10);
 
 $content = "
 <div id=\"invitation_message\"></div>

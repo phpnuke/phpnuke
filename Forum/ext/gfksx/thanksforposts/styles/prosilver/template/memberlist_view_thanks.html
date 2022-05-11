@@ -1,0 +1,61 @@
+{% if THANKS_PROFILELIST_VIEW and (POSTER_GIVE_COUNT or POSTER_RECEIVE_COUNT) %}
+<div class="panel bg1">
+	<div class="inner">
+	<h3>{{ lang('GRATITUDES') }}</h3>
+		{% if POSTER_GIVE_COUNT %}
+		<div class="column1">
+			{% if S_MOD_THANKS %}
+			<ul class="post-buttons" style="float:left">
+				<li>
+					<a href="{{ U_CLEAR_LIST_THANKS_GIVE }}" title="{{ lang('CLEAR_LIST_THANKS') }}" class="button button-icon-only" style="float:left">
+						<i class="icon fa-times fa-fw" aria-hidden="true"></i><span class="sr-only">{{ lang('CLEAR_LIST_THANKS') }}</span>
+					</a>
+				</li>
+			</ul>
+			{% endif %}
+			<dl>
+				<dt>{{ lang('GIVEN') }}{{ lang('COLON') }} {{ POSTER_GIVE_COUNT }}</dt>
+				<dd>
+					<a href="#" onclick="phpbb.toggleDisplay('show_thanks'); return false;">{{ lang('THANKS_LIST') }}</a>
+					<div id="show_thanks" style="display: none;">
+						<span style="float: left;">
+							{% for thanks_row in loops.thanks_row %}
+								&nbsp;&nbsp;&bull;&nbsp;&nbsp;{{ thanks_row.USERNAME_FULL }} &#8594; <a href="{{ thanks_row.U_POST_LINK }}">{{ lang('FOR_MESSAGE') }}</a><br />{% if thanks_row.S_SWITCH_COLUMN and not thanks_row.S_LAST_ROW %}&nbsp;</span><span style="float: left;">{% endif %}
+							{% endfor %}
+						</span>
+						{% if FURTHER_THANKS_TEXT %}<span style="float: left;">&nbsp;{{ FURTHER_THANKS_TEXT }}</span>{% endif %}
+					</div>
+				</dd>
+			</dl>
+		</div>
+		{% endif %}
+		{% if POSTER_RECEIVE_COUNT %}
+		<div class="{% if not POSTER_GIVE_COUNT %}column1{% else %}column2{% endif %}">
+			{% if S_MOD_THANKS %}
+			<ul class="post-buttons" style="float:left">
+				<li>
+					<a href="{{ U_CLEAR_LIST_THANKS_RECEIVE }}" title="{{ lang('CLEAR_LIST_THANKS') }}" class="button button-icon-only" style="float:left">
+						<i class="icon fa-times fa-fw" aria-hidden="true"></i><span class="sr-only">{{ lang('CLEAR_LIST_THANKS') }}</span>
+					</a>
+				</li>
+			</ul>
+			{% endif %}
+			<dl>
+				<dt>{{ lang('RECEIVED') }}{{ lang('COLON') }} {{ POSTER_RECEIVE_COUNT }}</dt>
+				<dd>
+					<a href="#" onclick="phpbb.toggleDisplay('show_thanked'); return false;">{{ lang('THANKS_LIST') }}</a>
+					<div id="show_thanked" style="display: none;">
+						<span style="float: left;">
+							{% for thanked_row in loops.thanked_row %}
+								&nbsp;&nbsp;&bull;&nbsp;&nbsp;{{ thanked_row.USERNAME_FULL }} &#8594; <a href="{{ thanked_row.U_POST_LINK }}">{{ lang('FOR_MESSAGE') }}</a><br />{% if thanked_row.S_SWITCH_COLUMN and not thanked_row.S_LAST_ROW %}&nbsp;</span><span style="float: left;">{% endif %}
+							{% endfor %}
+						</span>
+						{% if FURTHER_THANKS_TEXT %}<span style="float: left;">&nbsp;{{ FURTHER_THANKS_TEXT }}</span>{% endif %}
+					</div>
+				</dd>
+			</dl>
+		</div>
+		{% endif %}
+	</div>
+</div>
+{% endif %}

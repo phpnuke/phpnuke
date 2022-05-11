@@ -19,7 +19,8 @@ if (!defined('MODULE_FILE')) {
 require_once("mainfile.php");
 $module_name = basename(dirname(__FILE__));
 
-define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
+if(!defined("INDEX_FILE"))
+	define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 function search_form($search_query='', $module = 'Articles', $author = '', $category = 0, $time = 0)
 {
@@ -30,23 +31,16 @@ function search_form($search_query='', $module = 'Articles', $author = '', $cate
 	$modules_search_data = array();
 	$modules_search_data = $hooks->apply_filters("modules_search_data", $modules_search_data);
 	
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $modules_search_data, $module, $category, $module_name)
-	{
-		$theme_setup = array_merge_recursive($theme_setup, array(
-			"defer_js" => array(
-				"<script>
-					var first_module = '$module';
-					var selected_category = '$category';
-					var search_data = ".((!empty($modules_search_data)) ? json_encode($modules_search_data):"[]").";
-					var search_language = {
-						all_categories : '"._ALL_CATEGORIES."'
-					}
-				</script>",
-				"<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/search.js\"></script>"
-			)
-		));
-		return $theme_setup;
-	}, 10);
+	$hooks->add_functions_vars(
+		'search_form_assets',
+		array(
+			"modules_search_data" => $modules_search_data,
+			"module" => $module,
+			"category" => $category,
+			"module_name" => $module_name,
+		)
+	);
+	$hooks->add_filter("site_theme_headers", "search_form_assets", 10);
 
 	$st_sel1 = ($search_type == 1) ? "selected":"";
 	$st_sel2 = ($search_type == 2) ? "selected":"";
@@ -393,22 +387,16 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 		return array_merge($all_meta_tags, $meta_tags);
 	}, 10);		
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($search_module, $meta_tags, $search_data){
-		$breadcrumbs['search'] = array(
-			"name" => _SEARCH,
-			"link" => LinkToGT("index.php?modname=Search&search_module=$search_module"),
-			"itemtype" => "WebPage"
-		);
-		if($search_data['search_query'] != '')
-		{
-			$breadcrumbs['search-query'] = array(
-				"name" => $search_data['search_query'],
-				"link" => $meta_tags['url'],
-				"itemtype" => "WebPage"
-			);
-		}
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_functions_vars(
+		'search_main_breadcrumb',
+		array(
+			"search_module" => $search_module,
+			"search_data" => $search_data,
+			"meta_tags" => $meta_tags,
+		)
+	);
+	
+	$hooks->add_filter("site_breadcrumb", "search_main_breadcrumb", 10);
 	unset($meta_tags);
 	
 	$contents = show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), search_form($search_data['search_query'], $search_data['module'], $search_data['author'], $search_data['category'], $search_data['time']).$contents);

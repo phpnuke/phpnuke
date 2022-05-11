@@ -1,0 +1,40 @@
+{% INCLUDE 'overall_header.html' %}
+
+<a name="maincontent"></a>
+
+<h1>{{ lang('TRUNCATE_THANKS') }}</h1>
+
+<form id="acp_thanks_truncate" method="post" action="{{ U_ACTION }}">
+<fieldset>
+	<legend>{{ lang('TRUNCATE_THANKS') }}</legend>
+	{% if  not S_TRUNCATE %}
+	<div class="errorbox">
+		<h3>{{ lang('WARNING') }}</h3>
+		<p>{{ lang('TRUNCATE_THANKS_EXPLAIN') }}</p>
+	</div>
+	{% else %}
+	<div class="successbox">
+		<h3>{{ lang('NOTIFY') }}</h3>
+		<p>{{ lang('TRUNCATE_THANKS_MSG') }}</p>
+	</div>
+	{% endif %}
+	<dl>
+		<dt>
+			{% if  not S_TRUNCATE %}{{ lang('ACP_ALLTHANKS') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_USERSTHANKS') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_POSTSTHANKS') }}{{ lang('COLON') }}
+			{% else %}{{ lang('ACP_THANKSEND') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_USERSEND') }}{{ lang('COLON') }}<br /><br />{{ lang('ACP_POSTSEND') }}{{ lang('COLON') }}{% endif %}
+		</dt>
+		<dd>
+			{% if  not S_TRUNCATE %}{{ ALLTHANKS }}<br /><br />{{ USERSTHANKS }}<br /><br />{{ POSTSTHANKS }}
+			{% else %}{{ THANKSEND }}<br /><br />{{ USERSEND }}<br /><br />{{ POSTSEND }}{% endif %}
+		</dd>
+	</dl>
+</fieldset>
+{% if not S_TRUNCATE %}
+<fieldset class="submit-buttons">
+	<legend>{{ lang('SUBMIT') }}</legend>
+	<input class="button1" type="submit" id="truncate" name="truncate" value="{{ lang('TRUNCATE') }}" />
+</fieldset>
+{% endif %}
+</form>
+
+{% INCLUDE 'overall_footer.html' %}

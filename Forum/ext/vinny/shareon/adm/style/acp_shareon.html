@@ -1,0 +1,91 @@
+<!-- INCLUDE overall_header.html -->
+
+<h1>{L_SO_TITLE}</h1>
+<p>{L_SO_EXPLAIN}</p>
+
+
+<form id="acp_shareon" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_SO_CONFIG}</legend>
+		<dl>
+			<dt><label id="so_status" for="so_status">{L_SO_STATUS}{L_COLON}</label></dt>
+			<dd><input type="radio" class="radio" name="so_status" value="1" <!-- IF SO_STATUS -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp; 
+				<input type="radio" class="radio" name="so_status" value="0" <!-- IF not SO_STATUS -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_type" for="so_type">{L_SO_TYPE}{L_COLON}</label><br /><span>{L_SO_TYPE_EXPLAIN}</span></dt>
+			<dd><input type="radio" class="radio" name="so_type" value="1" <!-- IF SO_TYPE -->checked="checked"<!-- ENDIF -->/> {L_TOPIC} &nbsp; 
+				<input type="radio" class="radio" name="so_type" value="0" <!-- IF not SO_TYPE -->checked="checked"<!-- ENDIF --> /> {L_POST}</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{L_SO_SELECT}{L_COLON}</legend>
+		<dl>
+			<dt><label id="so_facebook" for="so_facebook">{L_SO_FACEBOOK}</label></dt>
+			<dd><input type="radio" class="radio" name="so_facebook" value="1" <!-- IF SO_FACEBOOK -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp; 
+				<input type="radio" class="radio" name="so_facebook" value="0" <!-- IF not SO_FACEBOOK -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_twitter" for="so_twitter">{L_SO_TWITTER}</label></dt>
+			<dd><input type="radio" class="radio" name="so_twitter" value="1" <!-- IF SO_TWITTER -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_twitter" value="0" <!-- IF not SO_TWITTER -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_tuenti" for="so_tuenti">{L_SO_TUENTI}</label></dt>
+			<dd><input type="radio" class="radio" name="so_tuenti" value="1" <!-- IF SO_TUENTI -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_tuenti" value="0" <!-- IF not SO_TUENTI -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_digg" for="so_digg">{L_SO_DIGG}</label></dt>
+			<dd><input type="radio" class="radio" name="so_digg" value="1" <!-- IF SO_DIGG -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_digg" value="0" <!-- IF not SO_DIGG -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_reddit" for="so_reddit">{L_SO_REDDIT}</label></dt>
+			<dd><input type="radio" class="radio" name="so_reddit" value="1" <!-- IF SO_REDDIT -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_reddit" value="0" <!-- IF not SO_REDDIT -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_delicious" for="so_delicious">{L_SO_DELICIOUS}</label></dt>
+			<dd><input type="radio" class="radio" name="so_delicious" value="1" <!-- IF SO_DELICIOUS -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_delicious" value="0" <!-- IF not SO_DELICIOUS -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_vk" for="so_vk">{L_SO_VK}</label></dt>
+			<dd><input type="radio" class="radio" name="so_vk" value="1" <!-- IF SO_VK -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_vk" value="0" <!-- IF not SO_VK -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_tumblr" for="so_tumblr">{L_SO_TUMBLR}</label></dt>
+			<dd><input type="radio" class="radio" name="so_tumblr" value="1" <!-- IF SO_TUMBLR -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_tumblr" value="0" <!-- IF not SO_TUMBLR -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_google" for="so_google">{L_SO_GOOGLE}</label></dt>
+			<dd><input type="radio" class="radio" name="so_google" value="1" <!-- IF SO_GOOGLE -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_google" value="0" <!-- IF not SO_GOOGLE -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_whatsapp" for="so_whatsapp">{L_SO_WHATSAPP}</label></dt>
+			<dd><input type="radio" class="radio" name="so_whatsapp" value="1" <!-- IF SO_WHATSAPP -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_whatsapp" value="0" <!-- IF not SO_WHATSAPP -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+		<dl>
+			<dt><label id="so_pocket" for="so_pocket">{L_SO_POCKET}</label></dt>
+			<dd><input type="radio" class="radio" name="so_pocket" value="1" <!-- IF SO_POCKET -->checked="checked"<!-- ENDIF -->/> {L_YES} &nbsp;
+				<input type="radio" class="radio" name="so_pocket" value="0" <!-- IF not SO_POCKET -->checked="checked"<!-- ENDIF --> /> {L_NO}</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{L_ACP_SUBMIT_CHANGES}</legend>
+
+		<p class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+			<input class="button2" type="reset" id="reset" name="reset" value="{L_RESET}" />
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+<!-- INCLUDE overall_footer.html -->

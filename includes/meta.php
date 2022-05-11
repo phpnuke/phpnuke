@@ -189,13 +189,7 @@ if(isset($all_meta_tags['extra_meta_tags']) && !empty($all_meta_tags['extra_meta
 
 $block_global_contents['module_name'] = $modname;
 $theme_setup = $hooks->apply_filters("site_theme_headers", $theme_setup);
-
-foreach($theme_setup as $skey => $sval)
-{
-	if(!in_array($skey, array('default_meta','default_link_rel','default_css','default_js')))
-		continue;
-	$theme_setup[$skey] = array_unique($sval);
-}
+$theme_setup = array_unique_recursive($theme_setup);
 
 $meta_contents['default_meta'] = $meta_contents['default_link_rel'] = $meta_contents['default_css'] = $meta_contents['default_js'] = '';
 if(isset($theme_setup['default_meta']) && !empty($theme_setup['default_meta']))

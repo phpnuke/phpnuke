@@ -391,7 +391,7 @@ class Database implements \IteratorAggregate, \ArrayAccess
      * return instace
      * @return object
      */
-    public static function connect($pn_dbhost = "localhost", $pn_dbuname = "root" , $pn_dbpass = "", $pn_dbname, $pn_dbtype ="mysql", $pn_dbfetch = "PDO::FETCH_ASSOC", $pn_dbcharset = "utf8mb4", $persistency = false)
+    public static function connect($pn_dbhost = "localhost", $pn_dbuname = "root" , $pn_dbpass = "", $pn_dbname = "", $pn_dbtype ="mysql", $pn_dbfetch = "PDO::FETCH_ASSOC", $pn_dbcharset = "utf8mb4", $persistency = false)
     {
 	    // do deny duplicate connection
 	    // check if $_instance is null or not

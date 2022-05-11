@@ -59,4 +59,32 @@ function feedback_boxes_parts($nuke_modules_boxes_parts)
 
 $hooks->add_filter("modules_boxes_parts", "feedback_boxes_parts", 10);
 
+function feedback_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$json_feedback_data = $hooks->functions_vars['feedback_assets']['json_feedback_data'];
+	$module_name = $hooks->functions_vars['feedback_assets']['module_name'];
+	$feedback_configs = $hooks->functions_vars['feedback_assets']['feedback_configs'];
+	
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"defer_js" => array(
+			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
+			"<script>var feedback_data=JSON.parse('".$json_feedback_data."');</script>",
+			"<script src=\"".$nuke_configs['nukecdnurl']."modules/".$module_name."/includes/feedback.js\"></script>",
+			"".((isset($feedback_configs['map_active']) && $feedback_configs['map_active'] == 1) ? "<script src=\"https://maps.googleapis.com/maps/api/js?callback=phpnukeMap&key=".$feedback_configs['google_api']."\"></script>":"").""
+		)
+	));
+	return $theme_setup;
+}
+
+function feedback_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	$breadcrumbs['feedback'] = array(
+		"name" => _CONTACT_US,
+		"link" => LinkToGT("index.php?modname=Feedback"),
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+}
 ?>

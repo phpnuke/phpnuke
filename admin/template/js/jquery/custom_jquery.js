@@ -253,42 +253,33 @@ function custom_jquery(nuke_options)
 }
 
 (function($) {
-    $.fn.add_field = function(options)
-	{
-        var add_field_settings = {
-            maxField : 20,
-            addButton : $('.add_button'),
-            remove_button : '.remove_button',
-            fieldHTML : '',
-            x : 1,
-        };
-                
-        if(options) {
-            $.extend(add_field_settings, options);
-        };
-				
-		var self = this;
-		$(add_field_settings.addButton).click(function(e){
-			e.preventDefault();
-			if(add_field_settings.x < add_field_settings.maxField)
-			{
-				$(self).append(add_field_settings.fieldHTML.replace(/\{X\}/g,add_field_settings.x)+"\n");
-				add_field_settings.x++; //Increment field counter
-				if($(this).find('.styledselect-select'))
-				{
-					$(this).parent().parent().find('.styledselect-select').select2({
-						dir: ((options.nuke_date == 3) ? 'ltr':'rtl')
-					});
-				}
-				custom_jquery();
-			}
-		});
-		$(self).on('click', add_field_settings.remove_button, function(e){
-			e.preventDefault();
-			$(this).parent('div').remove();
-			//add_field_settings.x--;
-		});
-    };
+	$(".grapesjs-btn").click(function(e){
+		e.preventDefault();
+		var grapesjs_link = $(this).data('href');
+		settings = 'height='+screen.availHeight+',width='+screen.availwidth+',top=0,left=0,scrollbars=true,resizable'
+		popupWindow = window.open($(this).attr('href'),'grapesjs',settings);
+		return false;
+	});
+	$(document).on('click', '.add_field_button', function(e){
+		e.preventDefault();
+		let fields_wrapper = $(this).data('fields-wrapper');
+		let maxField = $(this).data('fields-max') ? $(this).data('fields-max'):20;
+		let field_HTML = $($(this).data('fields-html')).html() ? $($(this).data('fields-html')).html():'';
+		let key = $(fields_wrapper).children().last().data('key') ? ($(fields_wrapper).children().last().data('key')+1):1;
+		let pkey = $(this).data('fields-parent');
+		let fields_count = $(this).data('fields-count') ? ($(this).data('fields-count')+1):key;
+		if(fields_count <= maxField)
+		{
+			$(fields_wrapper).append(field_HTML.replace(/\{X\}/g,fields_count).replace(/\{PX\}/g,pkey));
+			custom_jquery();
+			key++;
+		}
+		$(this).data('fields-count', fields_count);
+	});
+	$(document).on("click", ".remove_field", function (e) { //user click on remove text
+        e.preventDefault();
+        $(this).parent().remove();
+    })
 })(jQuery);
 
 

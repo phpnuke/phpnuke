@@ -90,6 +90,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_HOME" => "صفحه اصلی",
 	"_PAGES" => "صفحه",
 	"_PHPNUKE_MT_EDITION" => "نیوک فارسی 8.4",
+	"_DASHBORAD" => "داشبورد",
 	"_ADMINISTRATION" => "مدیریت سایت",
 	"_ADMINLOGIN" => "ورود به بخش مدیریت",
 	"_SHOW_FRONTPAGE" => "نمایش سایت",
@@ -842,7 +843,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_UNBAN_CONFIRM" => "آیا از رفع انسداد این آی پی اطمینان دارید",
 	"_UNBANS_CONFIRM" => "آیا از رفع انسداد این آی پی ها اطمینان دارید",
 	"_DELETE_SELECTED" => "حذف موارد انتخابی",
-	"_DELETE_BANED_IP " => "حذف آی پی %s مسدود شده",
+	"_DELETE_BANED_IP" => "حذف آی پی %s مسدود شده",
 	"_DELETE_ALLBANED_IP" => "حذف همه آی پی های مسدود شده",
 	"_ADD_IP" => "افزودن آی پی",
 	"_IPMUSTHAVEVALUE" => "آی پی ارسالی باید مقدار داشته باشد",
@@ -1431,6 +1432,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_INSTALL_FIRST_POLL_TITLE" => "نظر شما در مورد این سایت ؟",
 	"_INSTALL_FIRST_POLL_LINK" => "نظر-شما-در-مورد-این-سایت",
 	"_INSTALL_RENAME_ERROR" => "فایل و پوشه install قابل تغییر نام نیستند. لطفاً ابتدا این فایل و پوشه را حذف یا تغییر نام دهید و سپس به بخشهای دیگر بروید",
+	"_TEMPLATE" => "قالب",
 ));
 
 $nuke_configs['formatBytes'] = array(

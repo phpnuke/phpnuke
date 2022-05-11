@@ -19,7 +19,8 @@ if (!defined('MODULE_FILE')) {
 require_once("mainfile.php");
 $module_name = basename(dirname(__FILE__));
 
-define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
+if(!defined("INDEX_FILE"))
+	define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 function feed($module_link = 'Articles', $mode = 'ATOM')
 {

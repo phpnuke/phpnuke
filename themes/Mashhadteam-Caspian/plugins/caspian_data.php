@@ -4,18 +4,13 @@ if (!defined('NUKE_FILE')) {
 	die ("You can't access this file directly...");
 }
 
-if((isset($op) && $op == 'article_admin' && isset($submit) && isset($article_fields) && !empty($article_fields)) || !$cache->isCached("caspian_data"))
-{
-	if($cache->isCached("caspian_data"))
-		csrfProtector::authorisePost(true);
-	cache_caspian_data();
-}
-
 function cache_caspian_data()
 {
-	global $db, $nuke_configs, $cache, $caspian_configs, $theme_setup;
+	global $db, $nuke_configs, $cache, $theme_setup, $op;
 	
-	if($cache->isCached("caspian_data") && ((_NOWTIME-$cache->retrieve("caspian_data", true)) <= 3600))
+	$op = isset($op) ? filter($op, "nohtml") : "";
+	
+	if($cache->isCached("caspian_data") && ((_NOWTIME-$cache->retrieve("caspian_data", true)) <= 3600) && $op != 'article_admin')
 	{
 		$caspian_data = $cache->retrieve("caspian_data");
 	}
@@ -26,7 +21,7 @@ function cache_caspian_data()
 		if($cache->isCached('caspian_data'))
 			$cache->erase('caspian_data');
 
-		$caspian_configs = (isset($caspian_configs) && !empty($caspian_configs)) ? $caspian_configs:$theme_setup['caspian_configs'];
+		$caspian_configs = $theme_setup['caspian_configs'];
 		
 		$result = $db->query("
 		(SELECT 1 as articles_mode, sid, title, cat_link, time, post_url, comments, counter,hometext, post_image, post_type FROM ".POSTS_TABLE." WHERE status = 'publish' AND post_type = 'Articles' AND ihome = '1' ORDER BY counter DESC LIMIT 0, 5)
@@ -60,5 +55,6 @@ function cache_caspian_data()
 	
 	return $caspian_data;
 }
+$hooks->add_action("post_save_finish", "cache_caspian_data", 10);
 
 ?>

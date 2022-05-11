@@ -25,11 +25,13 @@ if ( !defined('MODULE_FILE') ) {
 require_once("mainfile.php");
 $module_name = basename(dirname(__FILE__));
 
-define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
+if(!defined("INDEX_FILE"))
+	define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 if(!is_user())
 {
 	redirect_to(LinkToGT("index.php?modname=Users"));
+	die();
 }
 
 global $db, $nuke_configs;
@@ -110,20 +112,8 @@ function credits_list($sort = 'DESC', $order_by = '')
 		return array_merge($all_meta_tags, $meta_tags);
 	}, 10);		
 	unset($meta_tags);
-
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents){
-		$breadcrumbs['credits'] = array(
-			"name" => _CREDITS_ADMIN,
-			"link" => LinkToGT("index.php?modname=Credits"),
-			"itemtype" => "WebPage"
-		);
-		$breadcrumbs['credits-list'] = array(
-			"name" => _CREDITS_LIST,
-			"link" => LinkToGT("index.php?modname=Credits&op=credits_list"),
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);
+	
+	$hooks->add_filter("site_breadcrumb", "credits_list_breadcrumb", 10);
 	
 	include("header.php");
 	$html_output .= $boxes_contents;
@@ -393,6 +383,8 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 				redirect_to($order_link);
 			else
 				redirect_to(LinkToGT("index.php?modname=$module_name&op=credits_list"));
+			
+			die();
 		}
 		elseif($credit_method == 3)
 		{
@@ -461,6 +453,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			$hooks->do_action("credits_action_after_deposit");
 			
 			redirect_to($order_link);
+			die();
 		}
 	}
 
@@ -696,6 +689,7 @@ function delete_all_filters($in_admin)
 	$link = ($in_admin == "") ? LinkToGT("index.php?modname=Credits&op=credits_list"):$admin_file.".php?op=credits_list";
 	
 	redirect_to($link);
+	die();
 }
 
 $tid							= (isset($tid)) ? intval($tid):1;

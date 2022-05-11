@@ -22,103 +22,6 @@ $module_name = basename(dirname(__FILE__));
 if(!defined("INDEX_FILE"))
 	define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
-if(!function_exists("article_index"))
-{
-	function article_index($article_info)
-	{
-		global $ShowTopic,$tipath,$nuke_configs;
-		
-		$article_info['comments'] = ($article_info['comments']==0) ? "0":$article_info['comments'];
-		
-		$contents = "
-			<!--Articles-->
-
-			<div class=\"Articles\">
-			  <div class=\"ArticlesTitle\">
-				<div class=\"ArticlesRating\">
-					".$article_info['rating_box']."
-				</div>
-				<div>
-				  <h2 class=\"ArticlesTitleText\"><a href=\"".$article_info['article_link']."\" rel=\"bookmark\" title=\"".$article_info['title']."\">
-					".$article_info['title']."
-					</a></h2>
-				</div>
-			  </div>
-			  <div class=\"ArticlesBody\">
-				<div class=\"ArticlesBodyText\">
-				  <p>
-					".$article_info['hometext']."
-				  </p>
-				</div>
-			  </div>
-			  <div class=\"ArticlesFoot\"><a class=\"MoreArticles\" href=\"".$article_info['article_link']."\" title=\"".$article_info['title']."\">
-				"._MORE."
-				</a>
-				<div class=\"ArticlesFootText\">
-				  ".$article_info['datetime']."
-				  |
-				  ".$article_info['comments']."
-				  "._COMMENTS."
-				  |
-				  "._VISITS."
-				  [
-				  ".$article_info['counter']."
-				  ]</div>
-			  </div>
-			</div>
-			<br />";
-		return $contents;
-	}
-}
-
-if(!function_exists("article_more"))
-{
-	function article_more($article_info)
-	{
-		global $nuke_configs;
-		$contents = '';
-		$htmltags = '';
-		$posted = _POSTEDON." ".$article_info['datetime']." "._BY." "; 
-		$posted .= get_author($article_info['aid']);
-		$posted .= "&nbsp;&nbsp;<a href=\"".$article_info['print_link']."\" target=\"_blank\"><img border=\"0\" src=\"".$nuke_configs['nukecdnurl']."images/print.gif\" width=\"16\" height=\"16\" alt=\""._PRINT."\" title=\""._PRINT."\"></a>";
-		$tags = str_replace(" ","-",$article_info['tags']);
-		$tags = explode(",",$tags);
-		$tags = array_filter($tags);
-		foreach($tags as $tag)
-			$htmltags .= "<i><a href=\"".LinkToGT("index.php?modname=Articles&tags=$tag")."\">".str_replace("_"," ",$tag)."</a></i> ";
-
-		$contents .= "
-		<div class=\"Articles\">
-			<div class=\"ArticlesTitle\">
-				<a href=\"".$article_info['report_link']."\" data-mode=\"inline\" data-toggle=\"modal\" data-target=\"#sitemodal\">"._POST_REPORT."</a>
-				<a href=\"".$article_info['friend_link']."\" data-mode=\"inline\" data-toggle=\"modal\" data-target=\"#sitemodal\">"._INTRODUCE_TO_FRIENDS."</a>
-				<a href=\"".$article_info['pdf_link']."\">"._PDFFILE."</a>
-				<a href=\"".$article_info['print_link']."\">"._PRINT."</a>
-				<div class=\"ArticlesRating\">".$article_info['rating_box']."</div>
-				<h1 class=\"ArticlesTitleText\"><a href=\"".$article_info['article_link']."\" rel=\"bookmark\" title=\"".$article_info['title']."\">".$article_info['title']."</a></h1>
-			</div>
-			<div class=\"ArticlesBody\">
-				<div class=\"ArticlesBodyText\">
-					".$article_info['hometext']."
-					<br />
-					<br />
-					".$article_info['bodytext']."
-					<br />
-					<br />
-					$htmltags
-				</div>
-			</div>
-			<div class=\"ArticlesFoot\">
-				<div class=\"ArticlesFootText\">
-					$posted
-				</div>
-			</div>
-		</div>
-		<br />";
-		return $contents;
-	}
-}
-
 function articles_home($category='', $tags='', $orderby = '', $year = 0, $month = 0, $month_l = '', $mode = '', $main_module = 'Articles')
 {
 	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_configs, $hooks, $op;
@@ -145,6 +48,7 @@ function articles_home($category='', $tags='', $orderby = '', $year = 0, $month 
 	
 	$month_names = ($nuke_configs['datetype'] == 1) ? "j_month_name":(($nuke_configs['datetype'] == 2) ? "h_month_name":"g_month_name");
 		
+	$module_name_title = "";	
 	switch($main_module)
 	{
 		case"Downloads":
@@ -163,6 +67,8 @@ function articles_home($category='', $tags='', $orderby = '', $year = 0, $month 
 			$module_name_title = _FAQS;
 		break;
 	}
+	
+	$module_name_title = $hooks->apply_filters("articles_home_module_name_title", $module_name_title, $main_module);
 	
 	if ($nuke_configs['multilingual'] == 1)
 	{
@@ -273,11 +179,12 @@ function articles_home($category='', $tags='', $orderby = '', $year = 0, $month 
 		{
 			$tags = $tags_arr[1];
 			$tags	= htmlentities(trim($tags), ENT_QUOTES,"utf-8");
-			$tags2	= str_replace(_FAANDAR1,_FAANDAR11,$tags);
-			$tags2	= str_replace(_FAANDAR2,_FAANDAR22,$tags2);
-			$tags3	= str_replace(_FAANDAR11, _FAANDAR1,$tags);
-			$tags3	= str_replace(_FAANDAR22, _FAANDAR2,$tags3);
 			
+			$tags = $hooks->apply_filters("articles_home_tags", $tags, $main_module);
+			
+			$tags2 = fix_persion_kbd($tags);
+			$tags3 = fix_persion_kbd($tags, false);
+		
 			$tagresult = $db->table(TAGS_TABLE)
 				->Where('tag', $tags)
 				->orWhere('tag', $tags2)
@@ -373,8 +280,10 @@ function articles_home($category='', $tags='', $orderby = '', $year = 0, $month 
 				$cat_contents .= $sub_cats_contents; 
 			$cat_contents .= CloseTable();
 		}
+		$cat_contents = $hooks->apply_filters("post_subcats", $cat_contents, $catid);
+		
 		$contents = $contents.$cat_contents;
-		$contents = $hooks->apply_filters("post_subcats", $contents, $catid);
+		
 		$link_to['category'] = $cat_title;
 		
 		$hooks->add_filter("global_contents", function ($block_global_contents) use($catid, $main_module)
@@ -416,14 +325,14 @@ function articles_home($category='', $tags='', $orderby = '', $year = 0, $month 
 			elseif(function_exists("".$main_module."_index"))
 			{
 				$module_function_name = "".$main_module."_index";
-				$contents .= $module_function_name($row);
+				$contents .= $hooks->apply_filters("posts_contents_body", $module_function_name($row), $row);
 			}
 			elseif(!function_exists("".$main_module."_index"))
 			{
-				$contents .= article_index($row);
+				$contents .= $hooks->apply_filters("posts_contents_body", article_index($row), $row);
 			}
 			else
-				$contents .= "";
+				$contents .= $hooks->apply_filters("posts_contents_body", '', $row);
 				
 			$contents = $hooks->apply_filters("posts_contents_after", $contents, $row);
 		}
@@ -433,7 +342,7 @@ function articles_home($category='', $tags='', $orderby = '', $year = 0, $month 
 	
 	if(isset($op) && $op == "article_archive")
 	{
-		$extra_meta_tags[] = "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - "._STORIESARCHIVE." - ".(($month_l != '') ? " - $month_l $year":"")."\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n";
+		$extra_meta_tags['article_archive'] = "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom - "._STORIESARCHIVE." - ".(($month_l != '') ? " - $month_l $year":"")."\" href=\"".LinkToGT("index.php?modname=Feed&module_link=".$nuke_configs['REQUESTURL']."")."\" />\n";
 		
 		$module_title = _STORIESARCHIVE."".(($month_l != '') ? " - $month_l $year":"");
 		
@@ -576,7 +485,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 			
 			if($true_link != trim(rawurldecode($REQUESTURL), "/")."/")
 			{
-			    redirect_to($true_link);
+			    redirect_to($true_link, 410, 0);
 				die();
 			}
 		}
@@ -588,6 +497,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 	}
 	else
 	{
+		$hooks->do_action("post_url_related", $post_url, $REQUESTURL, $main_module);
 		//check if link is related to another module
 		$result = $db->table(POSTS_TABLE)
 					->where('post_url',$post_url)
@@ -595,7 +505,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 		if($result->count() == 1)
 		{
 			$sid = intval($result->results()[0]['sid']);
-			redirect_to(LinkToGT(articleslink($sid)));
+			redirect_to(LinkToGT(articleslink($sid)), 410, 0);
 			die();
 		}
 		die_error("404");
@@ -640,7 +550,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 	$this_article_pass = $pn_Cookies->get("this_article_pass".$article_info['sid']);
 	$this_article_pass = intval($this_article_pass);
 
-	$this_article_pass = $hooks->apply_filters("post_more_article_pass", $this_article_pass, $main_module);
+	$this_article_pass = $hooks->apply_filters("post_more_article_pass", $this_article_pass, $main_module, $article_info['sid']);
 	
 	if($article_info['post_pass'] != "" && $this_article_pass != "1" && !is_admin())
 	{
@@ -726,14 +636,14 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 			elseif(function_exists("".$article_info['post_type']."_more"))
 			{
 				$module_func_name = "".$article_info['post_type']."_more";
-				$contents .= $module_func_name($article_info);
+				$contents .= $hooks->apply_filters("posts_more_body", $module_func_name($article_info), $article_info);
 			}
 			elseif(!function_exists("".$article_info['post_type']."_more"))
 			{
-				$contents .= article_more($article_info);
+				$contents .= $hooks->apply_filters("posts_more_body", article_more($article_info), $article_info);
 			}
 			else 
-				$contents .= "";
+				$contents .= $hooks->apply_filters("posts_more_body", '', $article_info);
 				
 			$main_module_box = (($main_module != 'Articles')) ? strtolower($main_module)."_more":"more";
 			$boxes_contents = show_modules_boxes($module_name, $main_module_box, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
@@ -843,14 +753,14 @@ function article_categories($main_module = 'Articles')
 	}, 10);		
 	unset($meta_tags);
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($main_module){
-		$breadcrumbs['category'] = array(
-			"name" => _CATEGORIES,
-			"link" => LinkToGT("index.php?modname=".$main_module."&op=article_categories"),
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_functions_vars(
+		'article_categories_breadcrump',
+		array(
+			"main_module" => $main_module,
+		)
+	);
+	
+	$hooks->add_filter("site_breadcrumb", "article_categories_breadcrump", 10);
 	
 	$contents = title($nuke_configs['sitename']." : "._ARTICLES_CATEGORIES."").$contents;
 	
@@ -1095,18 +1005,7 @@ function send_article($preview = '', $submit = '', $article_fields = array(), $s
 		$contents .= CloseTable();	
 	}
 	
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
-	{
-		$theme_setup = array_merge_recursive($theme_setup, array(
-			"default_css" => array(
-				"<link href=\"".INCLUDE_PATH."/Ajax/jquery/jquery-checktree.css\" rel=\"stylesheet\" type=\"text/css\">"
-			),
-			"defer_js" => array(
-				"<script src=\"".INCLUDE_PATH."/Ajax/jquery/jquery-checktree.js\"></script>"
-			)
-		));
-		return $theme_setup;
-	}, 10);
+	$hooks->add_filter("site_theme_headers", "send_article_assets", 10);
 	
 	$meta_tags = array(
 		"url" => LinkToGT("index.php?modname=$main_module&op=send_article"),

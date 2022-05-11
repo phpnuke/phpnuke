@@ -170,6 +170,8 @@ if (check_admin_permission($filename))
 					$file_name = $filename.$i.".".$extension;
 				}
 				
+				$hooks->do_action("media_upload_before", $upload_dir, $file_name, $ckeditor);
+				
 				if(move_uploaded_file($_FILES['file_upload']['tmp_name'], $upload_dir.$file_name))
 				{
 					add_log(sprintf(_UPLOAD_LOG, $file_name), 1);
@@ -239,7 +241,10 @@ if (check_admin_permission($filename))
 
 	function delete_media($file_name)
 	{
-		global $nuke_configs;
+		global $nuke_configs, $hooks;
+		
+		$hooks->do_action("media_delete_before", $file_name);
+		
 		if(is_array($file_name))
 		{
 			$file_name = array_filter($file_name);
@@ -286,6 +291,8 @@ if (check_admin_permission($filename))
 		$response['this_dir'] = $directory;
 		$response['message'] = $message;
 		$response['status'] = $status;
+		
+		$hooks->do_action("media_delete_after", $file_name);
 		
 		die(json_encode($response));
 	}

@@ -249,7 +249,7 @@ function feedback($submit = '', $feedback_fields = array())
 		include("themes/".$nuke_configs['ThemeSel']."/feedback.php");
 	else
 	{
-		$map_position = ($feedback_configs['map_position'] != '') ? explode(",", $feedback_configs['map_position']):array('36.28795445718431','59.61575198173523');
+		$map_position = (isset($feedback_configs['map_position']) && $feedback_configs['map_position'] != '') ? explode(",", $feedback_configs['map_position']):array('36.28795445718431','59.61575198173523');
 		
 		$feedback_data['mapid'] = "phpnuke_map";
 		$feedback_data['responseid'] = "feedback_response";
@@ -287,29 +287,24 @@ function feedback($submit = '', $feedback_fields = array())
 		}
 		
 		$json_feedback_data = json_encode($feedback_data);
-		
-		$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name, $feedback_configs, $json_feedback_data)
-		{
-			$theme_setup = array_merge_recursive($theme_setup, array(
-				"defer_js" => array(
-					"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
-					"<script>var feedback_data=JSON.parse('$json_feedback_data');</script>",
-					"<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/feedback.js\"></script>",
-					"".(($feedback_configs['map_active'] == 1) ? "<script src=\"https://maps.googleapis.com/maps/api/js?callback=phpnukeMap&key=".$feedback_configs['google_api']."\"></script>":"").""
-				)
-			));
-			
-			return $theme_setup;
-		}, 10);
+		$hooks->add_functions_vars(
+			'feedback_assets',
+			array(
+				"module_name" => $module_name,
+				"feedback_configs" => $feedback_configs,
+				"json_feedback_data" => $json_feedback_data,
+			)
+		);
+		$hooks->add_filter("site_theme_headers", "feedback_assets", 10);
 		
 		$contents = '';
 		$contents .= OpenTable($nuke_configs['sitename'].":&nbsp;"._FEEDBACKTITLE);
 		$contents .= "
 		<p>";
-			$contents .= ($feedback_configs['description'] != '') ? "".$feedback_configs['description']."<br>":"";
-			$contents .= ($feedback_configs['phone'] != '') ? "<span class=\"glyphicon glyphicon-phone-alt\"></span> "._LANDLINE_PHONE." : ".$feedback_configs['phone']."<br>":"";
-			$contents .= ($feedback_configs['mobile'] != '') ? "<span class=\"glyphicon glyphicon-phone\"></span> "._MOBILE_PHONE." : ".$feedback_configs['mobile']." <br>":"";
-			$contents .= ($feedback_configs['address'] != '') ? "<span class=\"glyphicon glyphicon-map-marker\"></span> "._ADDRESS." : ".$feedback_configs['address']." <br>":"";
+			$contents .= (isset($feedback_configs['description']) && $feedback_configs['description'] != '') ? "".$feedback_configs['description']."<br>":"";
+			$contents .= (isset($feedback_configs['phone']) && $feedback_configs['phone'] != '') ? "<span class=\"glyphicon glyphicon-phone-alt\"></span> "._LANDLINE_PHONE." : ".$feedback_configs['phone']."<br>":"";
+			$contents .= (isset($feedback_configs['mobile']) && $feedback_configs['mobile'] != '') ? "<span class=\"glyphicon glyphicon-phone\"></span> "._MOBILE_PHONE." : ".$feedback_configs['mobile']." <br>":"";
+			$contents .= (isset($feedback_configs['address']) && $feedback_configs['address'] != '') ? "<span class=\"glyphicon glyphicon-map-marker\"></span> "._ADDRESS." : ".$feedback_configs['address']." <br>":"";
 		$contents .= "</p> 
 		<div class=\"distribution\">"._FEEDBACK_HEADER_MESSAGE."</div><br>
 		<form role=\"form\" class=\"form-horizontal\" id=\"feedback_form\">
@@ -380,7 +375,7 @@ function feedback($submit = '', $feedback_fields = array())
 	$meta_tags = array(
 		"url" => LinkToGT("index.php?modname=Feedback"),
 		"title" => _CONTACT_US,
-		"description" => $feedback_configs['meta_description'],
+		"description" => ((isset($feedback_configs['meta_description']) && $feedback_configs['meta_description'] != '') ? $feedback_configs['meta_description']:""),
 		"extra_meta_tags" => array()
 	);
 	$meta_tags = $hooks->apply_filters("feedback_header_meta", $meta_tags);
@@ -391,14 +386,7 @@ function feedback($submit = '', $feedback_fields = array())
 	}, 10);		
 	unset($meta_tags);
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents){
-		$breadcrumbs['feedback'] = array(
-			"name" => _CONTACT_US,
-			"link" => LinkToGT("index.php?modname=Feedback"),
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_filter("site_breadcrumb", "feedback_breadcrumb", 10);
 	
 	include("header.php");
 	$html_output .= show_modules_boxes($module_name, "index", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);

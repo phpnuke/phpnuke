@@ -312,6 +312,7 @@ if (check_admin_permission($filename))
 				comments_status(0, $cids, (($mode == 'approve') ? 1:0), '', $comment_fields['status']);
 				
 			redirect_to("".$admin_file.".php?op=comments");
+			die();
 		}	
 		
 		if(isset($update) && $update != "" && isset($comment_fields) && is_array($comment_fields) && !empty($comment_fields))
@@ -464,7 +465,7 @@ if (check_admin_permission($filename))
 		die();
 	}
 
-	function comments_status($cid = 0, $cids = array(), $new_status, $comment_username='', $status = 1)
+	function comments_status($cid = 0, $cids = array(), $new_status=0, $comment_username='', $status = 1)
 	{
 		global $db, $admin_file, $nuke_configs;
 

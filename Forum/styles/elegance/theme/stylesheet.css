@@ -1038,6 +1038,8 @@ fieldset.polls dd div { text-align: right; font-family: Arial, Helvetica, sans-s
 
 .postprofile dt.no-profile-rank, .postprofile dd.profile-rank, .postprofile .search-result-date { margin-bottom: 10px; }
 
+.profile-rank img {	max-width: 160px; }
+
 .postprofile .has-avatar .avatar-container { margin-bottom: 3px; overflow: hidden; }
 
 .postprofile .avatar { display: block; float: left; max-width: 100%; }

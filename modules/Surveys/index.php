@@ -19,7 +19,8 @@ if (!defined('MODULE_FILE')) {
 require_once("mainfile.php");
 $module_name = basename(dirname(__FILE__));
 
-define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
+if(!defined("INDEX_FILE"))
+	define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 if (isset($pollID)) {
 	$pollID = intval($pollID);
@@ -94,14 +95,14 @@ function pollList()
 		return array_merge($all_meta_tags, $meta_tags);
 	}, 10);
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($meta_tags){
-		$breadcrumbs['surveys'] = array(
-			"name" => $meta_tags['title'],
-			"link" => $meta_tags['url'],
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_functions_vars(
+		'pollList_breadcrumb',
+		array(
+			"meta_tags" => $meta_tags,
+		)
+	);
+	$hooks->add_filter("site_breadcrumb", "pollList_breadcrumb", 10);
+	
 	unset($meta_tags);
 	
 	include("header.php");
@@ -158,39 +159,20 @@ function poll_show($pollUrl, $mode="")
 		return array_merge($all_meta_tags, $meta_tags);
 	}, 10);
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($poll_data, $meta_tags, $mode){
-		$breadcrumbs['surveys'] = array(
-			"name" => _SURVEYS,
-			"link" => LinkToGT("index.php?modname=Surveys"),
-			"itemtype" => "WebPage"
-		);
-		$breadcrumbs['surveys-name'] = array(
-			"name" => $poll_data['pollTitle'],
-			"link" => $poll_data['survey_link'][0],
-			"itemtype" => "WebPage"
-		);
-		if($mode == "result")
-		{
-			$breadcrumbs['surveys-result'] = array(
-				"name" => _RESULTS,
-				"link" => $poll_data['survey_link'][1],
-				"itemtype" => "WebPage"
-			);
-		}
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_functions_vars(
+		'poll_show_breadcrumb',
+		array(
+			"poll_data" => $poll_data,
+			"meta_tags" => $meta_tags,
+			"mode" => $mode,
+		)
+	);
+	
+	$hooks->add_filter("site_breadcrumb", "poll_show_breadcrumb", 10);
+	
 	unset($meta_tags);	
 	
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
-	{
-		$theme_setup = array_merge_recursive($theme_setup, array(
-			"defer_js" => array(
-				"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap-progressbar.js\" type=\"text/javascript\"></script>",
-				'<script>$(document).ready(function() {$(\'.progress .progress-bar\').progressbar();});</script>'
-			)
-		));
-		return $theme_setup;
-	}, 10);
+	$hooks->add_filter("site_theme_headers", "poll_show_assets", 10);
 	
 	include("header.php");
 	

@@ -253,7 +253,7 @@ if (check_admin_permission($module_name, false, true))
 		include("footer.php");
 	}
 	
-	function surveys_admin($pollID = 0, $mode = "new", $submit, $surveys_fields=array())
+	function surveys_admin($pollID = 0, $mode = "new", $submit='', $surveys_fields=array())
 	{
 		global $db, $aid, $visitor_ip, $hooks, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
@@ -723,8 +723,14 @@ if (check_admin_permission($module_name, false, true))
 					$contents .= "</td>					
 				</tr>
 				<tr>
-					<th>"._OPTIONS." <button type=\"button\" class=\"add_field_button\">"._ADD_NEW_OPTION."</button></th>
+					<th>"._OPTIONS." <button type=\"button\" class=\"add_field_button\" data-fields-wrapper=\".input_fields_wrap\" data-fields-html=\"#input_fields_items\" data-fields-max=\"1000\">"._ADD_NEW_OPTION."</button></th>
 					<td>
+						<template id=\"input_fields_items\" data-key=\"{X}\">
+							<div style=\"margin-bottom:3px;\">
+								<input placeholder=\""._OPTION_NAME."\" type=\"text\" class=\"inp-form\" id=\"option_text_{X}\" value=\"\" name=\"surveys_fields[options][{X}][]\" />&nbsp; 0 "._VOTE."&nbsp;&nbsp; 
+								<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+							</div>
+						</template>
 						<div class=\"input_fields_wrap\">";
 						if(empty($surveys_fields['options']))
 						{
@@ -739,7 +745,10 @@ if (check_admin_permission($module_name, false, true))
 							$option_text = $option_data[0];
 							$option_counter = $option_data[1];
 							$contents .= "
-							<div style=\"margin-bottom:3px;\"><input placeholder=\""._OPTION_NAME."\" type=\"text\" class=\"inp-form\" id=\"option_text_$voteID\" value=\"$option_text\" name=\"surveys_fields[options][$voteID][]\" />&nbsp; $option_counter "._VOTE."".(($key > 1) ? " &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>":"")."</div>";
+							<div style=\"margin-bottom:3px;\" data-key=\"$voteID\">
+								<input placeholder=\""._OPTION_NAME."\" type=\"text\" class=\"inp-form\" id=\"option_text_$voteID\" value=\"$option_text\" name=\"surveys_fields[options][$voteID][]\" />&nbsp; $option_counter "._VOTE."".(($key > 1) ? "&nbsp;&nbsp; 
+								<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>":"")."
+							</div>";
 							$key++;
 						}
 						$contents .= "
@@ -805,13 +814,6 @@ if (check_admin_permission($module_name, false, true))
 						});
 					});
 				}
-				
-				var add_field_load = $(\".input_fields_wrap\").add_field({ 
-					addButton: $(\".add_field_button\"),
-					remove_button: '.remove_field',
-					fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._OPTION_NAME."\" type=\"text\" class=\"inp-form\" id=\"option_text_{X}\" value=\"\" name=\"surveys_fields[options][{X}][]\" />&nbsp; 0 "._VOTE." &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div></div>',
-					x: $key,
-				});
 			});
 		</script>";
 		$contents .= CloseAdminTable();

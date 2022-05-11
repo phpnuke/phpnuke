@@ -1,7 +1,7 @@
 <?php
 
-// 8.4.4 installer
-// 8.3.7 to 8.4.4 upgrader
+// 8.4.5 installer
+// 8.3.7 to 8.4.5 upgrader
 
 if(version_compare(PHP_VERSION, '5.4.0', "<"))
 {
@@ -9,7 +9,7 @@ if(version_compare(PHP_VERSION, '5.4.0', "<"))
 }
 
 define("IN_INSTALL", true);
-define("_NEW_VERSION", '8.4.4');
+define("_NEW_VERSION", '8.4.5');
 
 // Try to override some limits - maybe it helps some...
 @set_time_limit(0);
@@ -500,7 +500,6 @@ function step_server_check()
 	{
 		$configstatus = "<span class=\"pass\"><strong>".$nuke_languages['_INSTALL_PERM_OK']."</strong></span>";
 	}
-	@fclose($configwritable);
 
 	// Check cache directory is writable
 	if(!is_writable(dirname('cache/')))
@@ -992,6 +991,19 @@ $timthumb_allowed = array();
     fputs($fp, $file_contents);
     fclose($fp);
 	return $pn_salt;
+}
+
+function change_htacces_RewriteBase()
+{
+	$SCRIPT_NAME = str_replace("install.php","", $_SERVER['SCRIPT_NAME']);
+	
+    $handle = fopen('.htaccess', 'r');
+	$file_contents = fread($handle,filesize('.htaccess'));
+    fclose($handle);
+	$file_contents = str_replace("RewriteBase /","RewriteBase $SCRIPT_NAME", $file_contents);
+    $handle = fopen('.htaccess', 'w');
+    fputs($handle, $file_contents);
+    fclose($handle);
 }
 
 function upgrade_progress_output($pagetitle = '', $total_rows = 0, $fetched_rows = 0, $start = 0, $finish_page = '', $in_progress_page = '', $total_progress = 0, $total_proccess = 500)
@@ -3933,7 +3945,9 @@ function upgrade_final()
 		array(6, 'Statistics', 'a:2:{s:7:"english";s:10:"Statistics";s:5:"farsi";s:21:"آمار بازدید";}', 1, '0', '', 1, 0, 1, 'a:2:{s:5:"index";s:10:"right|||||";s:8:"advanced";s:10:"right|||||";}'),
 		array(8, 'Feed', 'a:2:{s:7:"english";s:4:"feed";s:5:"farsi";s:14:"خبرخوان";}', 1, '0', '', 0, 0, 0, ''),
 		array(9, 'Users', 'a:2:{s:7:"english";s:5:"users";s:5:"farsi";s:23:"سیستم کاربری";}', 0, '0', '', 1, 0, 0, 'a:3:{s:12:"login_signup";s:10:"right|||||";s:4:"edit";s:10:"right|||||";s:7:"profile";s:10:"right|||||";}'),
-		array(10, 'Credits', 'a:2:{s:7:"english";s:14:"credits system";s:5:"farsi";s:27:"سیستم اعتبارات";}', 1, '0', '', 1, 0, 1, 'a:2:{s:4:"list";s:10:"right|||||";s:4:"form";s:10:"right|||||";}')
+		array(10, 'Credits', 'a:2:{s:7:"english";s:14:"credits system";s:5:"farsi";s:27:"سیستم اعتبارات";}', 1, '0', '', 1, 0, 1, 'a:2:{s:4:"list";s:10:"right|||||";s:4:"form";s:10:"right|||||";}'),
+		array(11, 'Giapi', 'a:2:{s:7:"english";s:15:"Google Indexing";s:5:"farsi";s:15:"Google Indexing";}', 1, '', '', 0, 0, 0, NULL),
+		array(12, 'UrlManager', 'a:2:{s:7:"english";s:10:"UrlManager";s:5:"farsi";s:36:"لینکهای تغییر یافته";}', 1, '', '', 0, 0, 0, NULL)
 	);
 	
 	$db->table(MODULES_TABLE)
@@ -4013,6 +4027,8 @@ function upgrade_final()
 	END
 	WHERE config_name IN ('Version_Num', 'lock_siteurl', 'nukeurl', 'sitename', 'have_forum', 'forum_system', 'forum_prefix', 'forum_db', 'forum_path', 'forum_collation', 'language')");
 
+	change_htacces_RewriteBase();
+	
 	$rename_error = '';
 	$random_install_folder_name = "install".rand(1,1000);
 	define("_INSTALL_FOLDER", $random_install_folder_name);

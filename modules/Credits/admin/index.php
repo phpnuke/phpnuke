@@ -536,7 +536,7 @@ if (check_admin_permission($module_name, false, true))
 		include("footer.php");
 	}
 		
-	function credits_users_op($tid = 0, $mode = '', $sort = 'DESC', $order_by = '', $form_type)
+	function credits_users_op($tid = 0, $mode = '', $sort = 'DESC', $order_by = '', $form_type=1)
 	{
 		global $db, $admin_file, $nuke_configs, $module_name, $pn_credits_config, $userinfo, $page, $search_data, $hooks;
 		
@@ -666,6 +666,12 @@ if (check_admin_permission($module_name, false, true))
 					"id" => "create_time",
 					"text" => _CREATIONDATE,
 				),
+				array(
+					"width" => "120px",
+					"op" => "",
+					"id" => "",
+					"text" => _OPERATION,
+				),
 			);		
 			
 			$contents .= "
@@ -673,7 +679,6 @@ if (check_admin_permission($module_name, false, true))
 				<thead>
 					<tr>
 						".admin_tables_sortable($table_fields, $sort, $link_to_more, $order_by)."
-						<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:120px;\">"._OPERATION."</th>
 					</tr>
 				</thead>
 				<tbody>";
@@ -726,7 +731,7 @@ if (check_admin_permission($module_name, false, true))
 		}	
 	}
 	
-	function credits_admin($tid=0, $mode="view", $submit, $credits_fields=array())
+	function credits_admin($tid=0, $mode="view", $submit='', $credits_fields=array())
 	{
 		global $db, $hooks, $aid, $ya_config, $admin_file, $nuke_configs, $PnValidator, $module_name, $userinfo, $pn_credits_config, $reason, $users_system;
 		
@@ -1098,6 +1103,7 @@ if (check_admin_permission($module_name, false, true))
 			}
 			$hooks->do_action("credits_admin_after_unsuspend", $tid, $mode, $credits_fields);
 			redirect_to("".$admin_file.".php?op=credits_users_op&mode=suspend_list");
+			die();
 		}
 	}
 

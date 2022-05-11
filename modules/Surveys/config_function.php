@@ -114,7 +114,7 @@ function change_poll_status()
 	return $nuke_surveys_cacheData;
 }
 
-function pollMain($nuke_surveys_cacheData = '', $pollID, $in_block = false)
+function pollMain($nuke_surveys_cacheData = '', $pollID=0, $in_block = false)
 {
 	global $module_name, $db, $admin_file, $userinfo, $visitor_ip, $nuke_configs, $pn_Cookies, $hooks;
 	
@@ -211,7 +211,7 @@ function pollMain($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 	return $contents;
 }
 
-function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
+function pollResults($nuke_surveys_cacheData = '', $pollID=0, $in_block = false)
 {
 	global $nuke_configs, $module_name, $visitor_ip, $db, $admin_file, $userinfo, $hooks;
 	
@@ -287,12 +287,11 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 			
 		$contents .= "<div class=\"col-sm-12\">";
 		
-		$striped_classes = array("striped", "success", "info", "warning", "danger");
 		foreach($poll_data['options_data'] as $option_data)
 		{
 			$contents .="		
 			<div class=\"progress progress-striped "._TEXTALIGN1."\">
-				<div class=\"progress-bar progress-bar-".$striped_classes[rand(0,4)]."\" role=\"progressbar\" data-transitiongoal=\"$option_data[2]\"><i class=\"val\">$option_data[2]%</i><span class=\"skill\">$option_data[0] ".(($poll_data['show_voters_num']) ? "($option_data[1] "._VOTERS.")":"")."</span></div>
+				<div class=\"progress-bar progress-bar-striped\" role=\"progressbar\" data-transitiongoal=\"$option_data[2]\"><i class=\"val\">$option_data[2]%</i><span class=\"skill\">$option_data[0] ".(($poll_data['show_voters_num']) ? "($option_data[1] "._VOTERS.")":"")."</span></div>
 			</div>";
 		}
 		$contents .= "
@@ -429,5 +428,58 @@ function surveys_boxes_parts($nuke_modules_boxes_parts)
 }
 
 $hooks->add_filter("modules_boxes_parts", "surveys_boxes_parts", 10);
+
+function poll_show_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"defer_js" => array(
+			"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap-progressbar.js\" type=\"text/javascript\"></script>",
+			'<script>$(document).ready(function() {$(\'.progress .progress-bar\').progressbar();});</script>'
+		)
+	));
+	return $theme_setup;
+}
+
+function pollList_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	global $nuke_configs, $hooks;
+	$meta_tags = $hooks->functions_vars['pollList_breadcrumb']['meta_tags'];
+	
+	$breadcrumbs['surveys'] = array(
+		"name" => $meta_tags['title'],
+		"link" => $meta_tags['url'],
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+}
+function poll_show_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	global $nuke_configs, $hooks;
+	$poll_data = $hooks->functions_vars['poll_show_breadcrumb']['poll_data'];
+	$meta_tags = $hooks->functions_vars['poll_show_breadcrumb']['meta_tags'];
+	$mode = $hooks->functions_vars['poll_show_breadcrumb']['mode'];
+	
+	$breadcrumbs['surveys'] = array(
+		"name" => _SURVEYS,
+		"link" => LinkToGT("index.php?modname=Surveys"),
+		"itemtype" => "WebPage"
+	);
+	$breadcrumbs['surveys-name'] = array(
+		"name" => $poll_data['pollTitle'],
+		"link" => $poll_data['survey_link'][0],
+		"itemtype" => "WebPage"
+	);
+	if($mode == "result")
+	{
+		$breadcrumbs['surveys-result'] = array(
+			"name" => _RESULTS,
+			"link" => $poll_data['survey_link'][1],
+			"itemtype" => "WebPage"
+		);
+	}
+	return $breadcrumbs;
+}
 
 ?>

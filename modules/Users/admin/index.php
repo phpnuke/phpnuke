@@ -288,7 +288,7 @@ if (check_admin_permission($module_name, false, true))
 		include("footer.php");
 	}
 	
-	function users_admin($user_id=0, $mode="new", $submit, $users_fields=array(), $uploadfile = array())
+	function users_admin($user_id=0, $mode="new", $submit='', $users_fields=array(), $uploadfile = array())
 	{
 		global $db, $hooks, $aid, $ya_config, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
@@ -466,7 +466,7 @@ if (check_admin_permission($module_name, false, true))
 			phpnuke_mail($userinfo['user_email'], sprintf(_REGISTRATIONSUB, $userinfo['username'], $nuke_configs['sitename']), $message);
 			add_log(sprintf(_USER_EMAIL_ACTIVATION_RESENT, $userinfo['username']), 1);
 			echo sprintf(_USER_EMAIL_ACTIVATION_RESENT, $userinfo['username']);
-			redirect_to("".$admin_file.".php?op=users", 5);
+			redirect_to("".$admin_file.".php?op=users", 301, 5);
 			die();
 		}
 		
@@ -1249,7 +1249,7 @@ if (check_admin_permission($module_name, false, true))
 		include("footer.php");
 	}
 
-	function users_groups_admin($group_id=0, $mode="new", $submit, $group_fields=array())
+	function users_groups_admin($group_id=0, $mode="new", $submit='', $group_fields=array())
 	{
 		global $db, $aid, $visitor_ip, $hooks, $admin_file, $nuke_configs, $PnValidator, $module_name;
 		
@@ -1565,7 +1565,7 @@ if (check_admin_permission($module_name, false, true))
 		
 		// submit edited data
 		
-		if(isset($submit) && isset($users_fields) && !empty($users_fields))
+		if(isset($submit) && $submit != '' && isset($users_fields))
 		{
 			$deleted_fields = $added_fields = array();
 			
@@ -1636,12 +1636,23 @@ if (check_admin_permission($module_name, false, true))
 		<form action=\"".$admin_file.".php\" method=\"post\" enctype=\"multipart/form-data\" id=\"user_fileds_form\">
 			<table width=\"100%\" class=\"id-form product-table no-border\">
 				<tr>
-					<td align=\"center\">"._ADD_NEW_FIELD." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\"></td>
+					<td align=\"center\">"._ADD_NEW_FIELD." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\" data-fields-wrapper=\".input_fields_wrap\" data-fields-html=\"#input_fields_items\" data-fields-max=\"1000\"></span></td>
 				</tr>
 				<tr>
 					<td>
+						<template id=\"input_fields_items\">
+							<div style=\"margin:3px 0;\" data-key=\"{X}\">
+								"._USER_FILED_NAME." <input type=\"text\" name=\"users_fields[{X}][name]\" class=\"inp-form-ltr\" size=\"6\" value=\"\">&nbsp;
+								"._USER_FILED_DISPLAY." <input type=\"text\" name=\"users_fields[{X}][display]\" class=\"inp-form\" size=\"7\" value=\"\">&nbsp;
+								"._USER_FILED_VALUE." <select class=\"styledselect-select tag-input\" name=\"users_fields[{X}][value][]\" multiple=\"multiple\" style=\"width:130px\"></select>&nbsp;
+								"._USER_FILED_TYPE." <select class=\"styledselect-select\" name=\"users_fields[{X}][type]\" style=\"width:85px\"><option value=\"text\">text</option><option value=\"select\">select</option><option value=\"radio\">radio</option><option value=\"checkbox\">checkbox</option><option value=\"textarea\">textarea</option></select>&nbsp;
+								"._USER_FILED_SIZE." <input type=\"text\" name=\"users_fields[{X}][size]\" size=\"4\" class=\"inp-form-ltr\" value=\"\">&nbsp;
+								"._USER_FILED_REQUIERD." <select class=\"styledselect-select\" name=\"users_fields[{X}][need]\" style=\"width:60px\"><option value=\"1\">"._YES."</option><option value=\"0\">"._NO."</option></select>&nbsp;
+								"._USER_FILED_ACTIVE." <select class=\"styledselect-select\" name=\"users_fields[{X}][act]\" style=\"width:60px\"><option value=\"1\">"._YES."</option><option value=\"0\">"._NO."</option></select>&nbsp;
+								<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+							</div>
+						</template>
 						<div class=\"input_fields_wrap\">";
-						$x = 1;
 						if(intval($result->count()) > 0)
 						{
 							$key = 0;
@@ -1673,10 +1684,11 @@ if (check_admin_permission($module_name, false, true))
 								}
 								
 								
-								$contents .="<div style=\"margin:3px 0;\">
-									"._USER_FILED_NAME." <input type=\"text\" name=\"users_fields[$key][name]\" class=\"inp-form-ltr\" size=\"6\" value=\"".$row['name']."\"> &nbsp;
-									"._USER_FILED_DISPLAY." <input type=\"text\" name=\"users_fields[$key][display]\" class=\"inp-form\" size=\"7\" value=\"".$row['display']."\"> &nbsp;
-									"._USER_FILED_VALUE." <select class=\"styledselect-select tag-input\" name=\"users_fields[$key][value][]\" multiple=\"multiple\" style=\"width:130px\">$values_contents</select>&nbsp; 
+								$contents .="
+								<div style=\"margin:3px 0;\" data-key=\"$key\">
+									"._USER_FILED_NAME." <input type=\"text\" name=\"users_fields[$key][name]\" class=\"inp-form-ltr\" size=\"6\" value=\"".$row['name']."\">&nbsp;
+									"._USER_FILED_DISPLAY." <input type=\"text\" name=\"users_fields[$key][display]\" class=\"inp-form\" size=\"7\" value=\"".$row['display']."\">&nbsp;
+									"._USER_FILED_VALUE." <select class=\"styledselect-select tag-input\" name=\"users_fields[$key][value][]\" multiple=\"multiple\" style=\"width:130px\">$values_contents</select>&nbsp;
 									"._USER_FILED_TYPE." <select class=\"styledselect-select\" name=\"users_fields[$key][type]\" style=\"width:85px\">
 										<option value=\"text\"$text_sel>text</option>
 										<option value=\"select\"$select_sel>select</option>
@@ -1684,18 +1696,18 @@ if (check_admin_permission($module_name, false, true))
 										<option value=\"checkbox\"$checkbox_sel>checkbox</option>
 										<option value=\"textarea\"$textarea_sel>textarea</option>
 									</select>&nbsp;
-									"._USER_FILED_SIZE." <input type=\"text\" name=\"users_fields[$key][size]\" size=\"4\" class=\"inp-form-ltr\" value=\"".$row['size']."\"> &nbsp; 
+									"._USER_FILED_SIZE." <input type=\"text\" name=\"users_fields[$key][size]\" size=\"4\" class=\"inp-form-ltr\" value=\"".$row['size']."\">&nbsp;
 									"._USER_FILED_REQUIERD." <select class=\"styledselect-select\" name=\"users_fields[$key][need]\" style=\"width:60px\">>
 										<option value=\"1\"$need_sel>"._YES."</option>
 										<option value=\"0\"$noneed_sel>"._NO."</option>
-									</select> &nbsp; 
+									</select>&nbsp;
 									"._USER_FILED_ACTIVE." <select class=\"styledselect-select\" name=\"users_fields[$key][act]\" style=\"width:60px\">>
 										<option value=\"1\"$act_sel>"._YES."</option>
 										<option value=\"0\"$noact_sel>"._NO."</option>
-									</select>&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
-									</div>";
+									</select>&nbsp;
+									<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+								</div>";
 							}
-							$x = $key+1;
 						}
 						$contents .="</div>
 					</td>
@@ -1708,17 +1720,7 @@ if (check_admin_permission($module_name, false, true))
 			</table>
 			<input type=\"hidden\" name=\"op\" value=\"users_fields_admin\" />
 			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
-		</form>
-		<script>
-			$(document).ready(function(){
-				$(\".input_fields_wrap\").add_field({ 
-					addButton: $(\".add_field_button\"),
-					remove_button: '.remove_field',
-					fieldHTML: '<div style=\"margin:3px 0;\">"._USER_FILED_NAME." <input type=\"text\" name=\"users_fields[{X}][name]\" class=\"inp-form-ltr\" size=\"6\" value=\"\"> &nbsp; "._USER_FILED_DISPLAY." <input type=\"text\" name=\"users_fields[{X}][display]\" class=\"inp-form\" size=\"7\" value=\"\"> &nbsp; "._USER_FILED_VALUE." <select class=\"styledselect-select tag-input\" name=\"users_fields[{X}][value][]\" multiple=\"multiple\" style=\"width:130px\"></select>&nbsp; "._USER_FILED_TYPE." <select class=\"styledselect-select\" name=\"users_fields[{X}][type]\" style=\"width:85px\"><option value=\"text\">text</option><option value=\"select\">select</option><option value=\"radio\">radio</option><option value=\"checkbox\">checkbox</option><option value=\"textarea\">textarea</option></select> &nbsp; "._USER_FILED_SIZE." <input type=\"text\" name=\"users_fields[{X}][size]\" size=\"4\" class=\"inp-form-ltr\" value=\"\"> &nbsp; "._USER_FILED_REQUIERD." <select class=\"styledselect-select\" name=\"users_fields[{X}][need]\" style=\"width:60px\"><option value=\"1\">"._YES."</option><option value=\"0\">"._NO."</option></select> &nbsp; "._USER_FILED_ACTIVE." <select class=\"styledselect-select\" name=\"users_fields[{X}][act]\" style=\"width:60px\"><option value=\"1\">"._YES."</option><option value=\"0\">"._NO."</option></select>&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-					x: $x,
-				});
-			});
-		</script>";
+		</form>";
 		$contents .= CloseAdminTable();
 		
 

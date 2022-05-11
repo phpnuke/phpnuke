@@ -33,10 +33,10 @@ define("PHPNUKE_ROOT_PATH", dirname(__FILE__));
 
 $nuke_root = str_replace(array( '\\', '../' ),array( '/',  '' ), PHPNUKE_ROOT_PATH );
 
-define("PHPNUKE_ROOT_MAIN_PATH", trim(str_replace($_SERVER['DOCUMENT_ROOT'], "", str_replace(array( '\\', '../' ),array( '/',  '' ), PHPNUKE_ROOT_PATH )) ,"/"));
+define("PHPNUKE_ROOT_MAIN_PATH", trim(str_replace($_SERVER['DOCUMENT_ROOT'], "", str_replace(array( '\\', '../' ),array( '/',  '' ), dirname($_SERVER['SCRIPT_FILENAME']) )) ,"/"));
 
 // Absolute Phoenix Directory And Includes
-define('PHOENIX_INCLUDE_DIR', PHPNUKE_ROOT_PATH."/".INCLUDE_PATH.'/');
+define('PHOENIX_INCLUDE_DIR', $nuke_root."/".INCLUDE_PATH.'/');
 
 // End the transaction
 if(!defined('END_TRANSACTION'))
@@ -176,11 +176,6 @@ foreach(get_modules_list() as $modulename)
 
 //$row = $db->sql_fetchrow($db->sql_query("SET NAMES `utf8`"));
 
-if(is_array($cache_systems) && !empty($cache_systems))
-	foreach($cache_systems as $cache_system_name => $cache_system)
-		if($cache_system['auto_load'])
-			eval('$'.$cache_system_name.'_cacheData = get_cache_file_contents("'.$cache_system_name.'");');
-
 $visitor_ip = get_client_ip();
 
 $nuke_configs = get_cache_file_contents('nuke_configs');
@@ -231,8 +226,6 @@ unset($forum_class);
 $users_system = new users_system();
 
 $userinfo = (isset($users_system->data) && is_array($users_system->data)) ? $users_system->data:array();
-		
-cache_system();
 
 define("_PN_CSRF_TOKEN", get_form_token());
 
@@ -286,95 +279,50 @@ elseif(isset($cdatetype))
 $nuke_configs['ThemeSel'] = get_theme();
 
 /* define languages */
-global $nukelang;
 require_once("language/alphabets.php");
 
-if(isset($lang) && $lang == "default" && !isset($captcha))
-{
-	$pn_Cookies->set("nukelang",false,'');
-	header("location: ".LinkToGT("index.php")."");
-}
+start_nuke_language($nuke_configs);
+/* define languages */
 
-if ((isset($lang)) AND (!stristr($lang,".")) && !isset($captcha))
-{
-	global $currentpage;
-	$lang = filter($lang, "nohtml");
-	if (file_exists("language/".$lang.".php"))
-	{
-		$pn_Cookies->set("nukelang",$lang,(365*24*3600));
-		$nuke_configs['currentlang'] = $lang;
-	}
-	else
-	{
-		$pn_Cookies->set("nukelang",$nuke_configs['language'],(365*24*3600));
-		$nuke_configs['currentlang'] = $nuke_configs['language'];
-	}
-	$currentpage = (isset($currentpage) && $currentpage != '') ? $currentpage:"index.php";
-	header("location: ".LinkToGT($currentpage)."");
-}
-elseif (isset($nukelang) && $nukelang != '')
-{
-	$nukelang = filter($nukelang, "nohtml");
-	$nuke_configs['currentlang'] = $nukelang;
-}
-else
-{
-	if(!isset($captcha) && !$pn_Cookies->exists("nukelang"))
-	{
-		$pn_Cookies->set("nukelang",$nuke_configs['language'],(365*24*3600));
-	}
-	$nuke_configs['currentlang'] = $nuke_configs['language'];
-}
-
-$nuke_configs['currentlang'] = $hooks->apply_filters("set_current_language", $nuke_configs['currentlang']);
-
-define("NUKE_LANG_FILE", true);
-
-$nuke_languages = get_languages_data();
-$nuke_languages = $hooks->apply_filters("set_languages_data", $nuke_languages);
-
-foreach($nuke_languages[$nuke_configs['currentlang']] as $nuke_language_key => $nuke_language_val)
-{
-	if(!defined($nuke_language_key))
-		define($nuke_language_key, $nuke_language_val);
-}
-unset($nuke_languages);
-
+/* Ping System */
 $PingOptimizer = new PingOptimizer();
-
-if(_DIRECTION == "rtl")
-{
-	define("_TEXTALIGN1","right");
-	define("_TEXTALIGN2","left");
-	define("_RTL_TEXT",true);
-}
-else
-{
-	define("_TEXTALIGN1","left");
-	define("_TEXTALIGN2","right");
-	define("_LTR_TEXT",true);
-}
+/* Ping System */
 
 $all_post_types = array();
 $all_post_types = $hooks->apply_filters("set_all_post_types", $all_post_types);
 
-/* define languages */
-
 /* define theme */
-if(defined('ADMIN_FILE') && !defined("IN_INSTALL"))
-  include_once("admin/template/themes.php");
-
-if(file_exists("themes/".$nuke_configs['ThemeSel']."/theme_setup.php") && !defined("IN_INSTALL"))
-	require_once("themes/".$nuke_configs['ThemeSel']."/theme_setup.php");
+if(!defined("IN_INSTALL"))
+{
+	if(file_exists("themes/".$nuke_configs['ThemeSel']."/theme_setup.php"))
+		require_once("themes/".$nuke_configs['ThemeSel']."/theme_setup.php");
 	
-if(!defined('ADMIN_FILE') && file_exists("themes/".$nuke_configs['ThemeSel']."/theme.php") && !defined("IN_INSTALL"))
-  require_once("themes/".$nuke_configs['ThemeSel']."/theme.php");
-
+	if(defined('ADMIN_FILE'))
+	{
+	  include_once("admin/template/themes.php");
+	}
+	else
+	{
+		if(file_exists("themes/".$nuke_configs['ThemeSel']."/theme.php"))
+		  require_once("themes/".$nuke_configs['ThemeSel']."/theme.php");
+	}
+}
 /* define theme */
 
-$HijriCalendar = new HijriCalendar();
-$hijri = $HijriCalendar->GregorianToHijri( _NOWTIME );
+$cache_systems = $hooks->apply_filters("cache_systems", []);
 
+if(is_array($cache_systems) && !empty($cache_systems))
+	foreach($cache_systems as $cache_system_name => $cache_system)
+		if(isset($cache_system['auto_load']) && $cache_system['auto_load'])
+			eval('$'.$cache_system_name.'_cacheData = get_cache_file_contents("'.$cache_system_name.'");');
+
+cache_system();
+
+if($nuke_configs['datetype'] == 2)
+{
+	$HijriCalendar = new HijriCalendar();
+	$hijri = $HijriCalendar->GregorianToHijri( _NOWTIME );
+}
 
 ///////////////////////////////// MTSN Code Start
 mtsn_check();
@@ -413,26 +361,26 @@ captcha_check();
 
 suspend_site_show();
 
-$plugin_files = get_dir_list(INCLUDE_PATH.'/plugins', 'files', false, array(".","..","index.html",".htaccess"));
-$plugin_files2 = get_dir_list('themes/'.$nuke_configs['ThemeSel'].'/plugins', 'files', false, array(".","..","index.html",".htaccess"));
+$main_plugin_files = array();
+$theme_plugin_files = array();
+$main_plugin_files = get_dir_list(INCLUDE_PATH.'/plugins', 'files', false, array(".","..","index.html",".htaccess"), true);
+$theme_plugin_files = get_dir_list('themes/'.$nuke_configs['ThemeSel'].'/plugins', 'files', false, array(".","..","index.html",".htaccess"), true);
+$plugin_files = $hooks->apply_filters("plugin_files", array_merge($main_plugin_files, $theme_plugin_files));
+
 if(!empty($plugin_files))
 {
 	define("PLUGIN_FILE", true);
 	foreach($plugin_files as $plugin_file)
-		if(file_exists(INCLUDE_PATH."/plugins/".$plugin_file))
-			@include(INCLUDE_PATH."/plugins/".$plugin_file);
+	{
+		if(file_exists($plugin_file))
+		{
+			include($plugin_file);
+		}
+	}
 }
-if(!empty($plugin_files2))
-{
-	if(!defined("PLUGIN_FILE"))
-		define("PLUGIN_FILE", true);
-	foreach($plugin_files2 as $plugin_file)
-		if(file_exists('themes/'.$nuke_configs['ThemeSel'].'/plugins/'.$plugin_file))
-			@include('themes/'.$nuke_configs['ThemeSel'].'/plugins/'.$plugin_file);
-}
-unset($plugin_file);
 unset($plugin_files);
-unset($plugin_files2);
+unset($main_plugin_files);
+unset($theme_plugin_files);
 
 $sop = (isset($sop)) ? filter($sop, "nohtml"):"";
 if($sop != '')
@@ -447,7 +395,10 @@ if($sop != '')
 			report_friend_form(false, $sop, $post_id, $post_title, $module_name, '', '', $post_link, '', '');
 		break;
 	}
+	$hooks->do_action("run_sop_requests", $sop);
 	die();
 }
+
+$hooks->do_action("run_plugins");
 
 ?>

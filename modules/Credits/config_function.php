@@ -138,7 +138,7 @@ function credit_get_gateways_list($html=false)
 			{
 				$gateway_class = new $func_name();
 				
-				if(isset($pn_credits_config['gateways'][$gateway_class->gateway_name]) && $pn_credits_config['gateways'][$gateway_class->gateway_name]['status'] == 1 && $html)
+				if(isset($pn_credits_config['gateways'][$gateway_class->gateway_name]['status']) && $pn_credits_config['gateways'][$gateway_class->gateway_name]['status'] == 1 && $html)
 				{
 					$hav_gateway = true;
 					$create_options[$gateway_class->gateway_name] = array("title" => $gateway_class->gateway_title, "icon" => $gateway_class->gateway_icon);
@@ -603,7 +603,17 @@ function credits_settings()
 		".wysiwyg_textarea("config_fields[pn_credits][credits_list_msg]", $pn_credits_config['credits_list_msg'], "PHPNukeAdmin", "50", "12")."
 	</td></tr>
 	<tr><td colspan=\"2\"><hr /></td></tr>
-	<tr><th colspan=\"2\" style=\"text-align:center\">"._CREDITS_CURRENCY_SETTINGS." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\"></span></th></tr><tr><th></th><td><div class=\"input_fields_wrap\">";
+	<tr><th colspan=\"2\" style=\"text-align:center\">"._CREDITS_CURRENCY_SETTINGS." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\" data-fields-wrapper=\".input_fields_wrap\" data-fields-html=\"#input_fields_items\" data-fields-max=\"1000\"></span></th></tr>
+	<tr><th></th><td>
+	<template id=\"input_fields_items\">
+		<div style=\"margin:3px 0;\" data-key=\"{X}\">
+			"._CREDITS_CUR_CODE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][{X}][code]\" class=\"inp-form-ltr\" size=\"5\" value=\"\">&nbsp;
+			"._CREDITS_CUR_NAME." <input type=\"text\" name=\"config_fields[pn_credits][currencies][{X}][name]\" class=\"inp-form\" size=\"20\" value=\"\">&nbsp;
+			"._CREDITS_CUR_EXRATE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][{X}][rial_ex_rate]\" class=\"inp-form-ltr\" size=\"10\" value=\"\"> "._RIAL."&nbsp;
+			<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+		</div>
+	</template>
+	<div class=\"input_fields_wrap\">";
 	
 	$all_currencies = $pn_credits_config['currencies'];
 	
@@ -642,13 +652,15 @@ function credits_settings()
 	
 	foreach($all_currencies as $key => $currency_data)
 	{
-		$remove = (isset($default_currency[$currency_data['code']])) ? "":"&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>";
-		$contents .="<div style=\"margin:3px 0;\">
-			"._CREDITS_CUR_CODE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][$key][code]\" class=\"inp-form-ltr\" size=\"5\" value=\"".$currency_data['code']."\"> &nbsp; 
-			"._CREDITS_CUR_NAME." <input type=\"text\" name=\"config_fields[pn_credits][currencies][$key][name]\" class=\"inp-form\" size=\"20\" value=\"".$currency_data['name']."\"> &nbsp; 
-			"._CREDITS_CUR_EXRATE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][$key][rial_ex_rate]\" class=\"inp-form-ltr\" size=\"10\" value=\"".$currency_data['rial_ex_rate']."\"> "._RIAL."".$remove."</div>";
+		$remove = (isset($default_currency[$currency_data['code']])) ? "":"<a href=\"#\" class=\"remove_field\">"._REMOVE."</a>";
+		$contents .="
+		<div style=\"margin:3px 0;\" data-key=\"$key\">
+			"._CREDITS_CUR_CODE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][$key][code]\" class=\"inp-form-ltr\" size=\"5\" value=\"".$currency_data['code']."\">&nbsp;
+			"._CREDITS_CUR_NAME." <input type=\"text\" name=\"config_fields[pn_credits][currencies][$key][name]\" class=\"inp-form\" size=\"20\" value=\"".$currency_data['name']."\">&nbsp;
+			"._CREDITS_CUR_EXRATE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][$key][rial_ex_rate]\" class=\"inp-form-ltr\" size=\"10\" value=\"".$currency_data['rial_ex_rate']."\"> "._RIAL."&nbsp;
+			".$remove."
+		</div>";
 	}
-	$x = $key+1;
 	
 	$contents .= "</div>
 	
@@ -675,17 +687,7 @@ function credits_settings()
 	$contents.="<tr><td colspan=\"2\"><input type='hidden' name='op' value='save_configs'>
 	<input type='hidden' name='return_op' value='settings#credits_settings'>
 	<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
-	<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>
-	<script>
-		$(document).ready(function(){
-			$(\".input_fields_wrap\").add_field({ 
-				addButton: $(\".add_field_button\"),
-				remove_button: '.remove_field',
-				fieldHTML: '<div style=\"margin:3px 0;\">			"._CREDITS_CUR_CODE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][{X}][code]\" class=\"inp-form-ltr\" size=\"5\" value=\"\"> &nbsp; 			"._CREDITS_CUR_NAME." <input type=\"text\" name=\"config_fields[pn_credits][currencies][{X}][name]\" class=\"inp-form\" size=\"20\" value=\"\"> &nbsp; 			"._CREDITS_CUR_EXRATE." <input type=\"text\" name=\"config_fields[pn_credits][currencies][{X}][rial_ex_rate]\" class=\"inp-form-ltr\" size=\"10\" value=\"\"> "._RIAL."&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-				x: $x,
-			});
-		});
-	</script>";
+	<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>";
 	
 	$contents = $hooks->apply_filters("credits_settings_contents", $contents);
 	die($contents);		
@@ -710,7 +712,12 @@ function credits_currency_cal($amount, $in_currency='')
 	return $amount;
 }
 
-$other_admin_configs['credits_settings'] = array("title" => "_CREDITS_SETTINGS", "function" => "credits_settings", "God" => false);
+function credits_settings_func($other_admin_configs){
+	$other_admin_configs['credits_settings'] = array("title" => "_CREDITS_SETTINGS", "function" => "credits_settings", "God" => false);
+	return $other_admin_configs;
+}
+
+$hooks->add_filter("other_admin_configs", "credits_settings_func", 10);
 
 function credits_boxes_parts($nuke_modules_boxes_parts)
 {
@@ -786,4 +793,19 @@ function credits_theme_assets($theme_setup)
 	));
 	return $theme_setup;
 }
+
+function credits_list_breadcrumb($breadcrumbs){
+	$breadcrumbs['credits'] = array(
+		"name" => _CREDITS_ADMIN,
+		"link" => LinkToGT("index.php?modname=Credits"),
+		"itemtype" => "WebPage"
+	);
+	$breadcrumbs['credits-list'] = array(
+		"name" => _CREDITS_LIST,
+		"link" => LinkToGT("index.php?modname=Credits&op=credits_list"),
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+}
+
 ?>

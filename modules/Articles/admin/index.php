@@ -134,16 +134,51 @@ if (check_admin_permission($module_name, false, true))
 			ORDER BY s.$order_by $sort LIMIT $start_at, $entries_per_page
 		", $params);
 		
+		$table_fields = array(
+			array(
+				"width" => "70px",
+				"op" => "articles&post_type=$post_type",
+				"id" => "sid",
+				"text" => _ID,
+			),
+			array(
+				"width" => "auto",
+				"op" => "articles&post_type=$post_type",
+				"id" => "title",
+				"text" => _TITLE,
+			),
+			array(
+				"width" => "120px",
+				"op" => "articles&post_type=$post_type",
+				"id" => "time",
+				"text" => _PUBLISH_DATE,
+			),
+			array(
+				"width" => "70px",
+				"op" => "articles&post_type=$post_type",
+				"id" => "comments",
+				"text" => _COMMENTS,
+			),
+			array(
+				"width" => "120px",
+				"text" => _AUTHOR,
+			),
+			array(
+				"width" => "120px",
+				"text" => _CATEGORY,
+			),
+			array(
+				"width" => "120px",
+				"text" => _IN_MAIN_PAGE,
+			),
+			array(
+				"width" => "140px",
+				"text" => _OPERATION,
+			),
+		);
+		
 		$contents .= GraphicAdmin();
 		$contents .= articles_menu();
-		
-		$sel1 = (isset($post_type) && ($post_type == 'Articles' || $post_type == '')) ? "selected":"";
-		$sel2 = (isset($post_type) && ($post_type == 'Statics')) ? "selected":"";
-		$sel3 = (isset($post_type) && ($post_type == 'Downloads')) ? "selected":"";
-		$sel4 = (isset($post_type) && ($post_type == 'Gallery')) ? "selected":"";
-		$sel5 = (isset($post_type) && ($post_type == 'Pages')) ? "selected":"";
-		$sel6 = (isset($post_type) && ($post_type == 'Faqs')) ? "selected":"";
-		
 		$contents .= OpenAdminTable();
 		$contents .= "
 			<table align=\"center\" class=\"product-table no-border no-hover\" width=\"100%\">
@@ -184,14 +219,7 @@ if (check_admin_permission($module_name, false, true))
 			<table align=\"center\" class=\"product-table\" width=\"100%\">
 			<thead>
 			<tr>
-				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:70px;\"><a href=\"".$admin_file.".php?op=articles&post_type=$post_type&order_by=sid&sort=".$sort_reverse."".$link_to_more."\"".(($order_by == 'sid') ? " class=\"arrow_".strtolower($sort)."\"":"").">"._ID."</a></th>
-				<th class=\"table-header-repeat line-left\"><a href=\"".$admin_file.".php?op=articles&post_type=$post_type&order_by=title&sort=".$sort_reverse."".$link_to_more."\"".(($order_by == 'title') ? " class=\"arrow_".strtolower($sort)."\"":"").">"._TITLE."</a></th>
-				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:120px;\"><a href=\"".$admin_file.".php?op=articles&post_type=$post_type&order_by=time&sort=".$sort_reverse."".$link_to_more."\"".(($order_by == 'time') ? " class=\"arrow_".strtolower($sort)."\"":"").">"._PUBLISH_DATE."</a></th>
-				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:70px;\"><a href=\"".$admin_file.".php?op=articles&post_type=$post_type&order_by=comments&sort=".$sort_reverse."".$link_to_more."\"".(($order_by == 'comments') ? " class=\"arrow_".strtolower($sort)."\"":"").">"._COMMENTS."</a></th>
-				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:120px;\">"._AUTHOR."</th>
-				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:120px;\">"._CATEGORY."</th>
-				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:120px;\">"._IN_MAIN_PAGE."</th>
-				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:140px;\">"._OPERATION."</th>
+				".admin_tables_sortable($table_fields, $sort, $link_to_more, $order_by)."
 			</tr>
 			</thead>
 			<tbody>";
@@ -302,9 +330,9 @@ if (check_admin_permission($module_name, false, true))
 		include("footer.php");
 	}
 	
-	function article_admin($sid=0, $mode="new", $submit, $article_fields=array(), $article_image_upload=array(), $micro_data=array(), $go_to_pings=1, $post_type = 'Articles')
+	function article_admin($sid=0, $mode="new", $submit='', $article_fields=array(), $article_image_upload=array(), $micro_data=array(), $go_to_pings=1, $post_type = 'Articles')
 	{
-		global $db, $aid, $visitor_ip, $admin_file, $nuke_configs, $nuke_articles_configs_cacheData, $PnValidator, $module_name, $PingOptimizer, $nuke_meta_keys_parts, $all_post_types, $hooks;
+		global $db, $aid, $visitor_ip, $admin_file, $nuke_configs, $nuke_articles_configs_cacheData, $PnValidator, $module_name, $PingOptimizer, $nuke_meta_keys_parts, $all_post_types, $hooks, $cache;
 		
 		$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
@@ -313,14 +341,14 @@ if (check_admin_permission($module_name, false, true))
 		$sid = intval($sid);
 		$row = array();
 	
-		$mode = (!in_array($mode, array("new", "edit", "delete", "publish_now"))) ? "new":$mode;
+		$mode = (!in_array($mode, array("new", "edit", "delete", "publish_now", "grapesjs", "auto_save"))) ? "new":$mode;
 		$article_status = "publish";
 		$article_aid = '';
 		
 		$all_positions_data = (isset($nuke_configs['positions'])) ? phpnuke_unserialize(stripslashes($nuke_configs['positions'])):array();
 		
 		// determine radminsuper & article_aid & article_status & counter
-		if($mode == "delete" || $mode == 'edit' || $mode == 'publish_now')
+		if($mode == "delete" || $mode == 'edit' || $mode == 'auto_save' || $mode == 'publish_now' || $mode == 'grapesjs')
 		{
 			$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
 	
@@ -346,6 +374,21 @@ if (check_admin_permission($module_name, false, true))
 			$row = $db->table(POSTS_TABLE)
 							->where("sid", $sid)
 							->first();
+		}
+		elseif($sid == 0)
+		{
+			$db->table(POSTS_TABLE)
+				->insert(["sid" => null, 'status' => 'draft', 'time' => _NOWTIME]);
+			$sid = $db->lastInsertId();
+			$row['sid'] = $sid;
+			$row['status'] = 'draft';
+			$row['time'] = _NOWTIME;
+			
+			$db->table(POSTS_TABLE)
+				->where('status', 'draft')
+				->where('title', '')
+				->where('time', '<=', (_NOWTIME-86400))
+				->delete();
 		}
 		
 		if(isset($article_fields['post_type']) && $article_fields['post_type'] != '')
@@ -394,7 +437,7 @@ if (check_admin_permission($module_name, false, true))
 				$db->table(AUTHORS_TABLE)
 					->where("aid", $article_aid)
 					->update([
-						'counter' => ["+", 1]
+						'counter' => ["-", 1]
 					]);
 				$hooks->do_action("delete_post", $sid);	
 				cache_system("nuke_authors");
@@ -417,7 +460,7 @@ if (check_admin_permission($module_name, false, true))
 		}
 		
 		// check edit or publish permission
-		if($mode == "edit" || $mode == "publish_now")
+		if($mode == "edit" || $mode == "auto_save" || $mode == "publish_now")
 		{
 			if ((!$radminarticle OR $article_aid != $row['aid']) AND ($radminsuper != 1))
 			{
@@ -456,7 +499,7 @@ if (check_admin_permission($module_name, false, true))
 			$hooks->do_action("publish_post", $sid);	
 			header("location: ".$admin_file.".php?op=article_admin&mode=edit&sid=$sid");
 			die();			
-		}		
+		}
 		
 		$languageslists = get_dir_list('language', 'files');
 		
@@ -516,61 +559,64 @@ if (check_admin_permission($module_name, false, true))
 		{
 			$items	= array();
 			
-			$PnValidator->add_validator("in_languages", function($field, $input, $param = NULL)
+			if($mode != 'auto_save')
 			{
-				$param = explode("-", $param);
-				return in_array($input[$field], $param);
-			}); 
-			
-			$validation_rules = $hooks->apply_filters("post_validation_rules", array(
-				'title'			=> 'required',
-				'hometext'		=> 'required',
-				'post_type'		=> 'required',
-				'permission'	=> 'is_array',
-				'cat'			=> 'is_array',
-			));
-			
-			$filter_rules = $hooks->apply_filters("post_filter_rules", array(
-				'title'			=> 'sanitize_string|filter',
-				'post_url'		=> 'sanitize_title|str2url',
-				'title_lead'	=> 'sanitize_string|filter',
-				'title_color'	=> 'sanitize_string|filter',
-				'alanguage'		=> 'sanitize_string|filter',
-				'post_type'		=> 'sanitize_string|filter',
-				'hometext'		=> 'addslashes',
-				'bodytext'		=> 'addslashes',
-				'cat_link'		=> 'sanitize_numbers',
-				'ihome'			=> 'sanitize_numbers',
-				'allow_comment'	=> 'sanitize_numbers',
-				'haspoll'		=> 'sanitize_numbers',
-				'pollID'		=> 'sanitize_numbers',
-				'position'		=> 'sanitize_numbers',
-				'post_image'	=> 'filter',
-			));
-			
-			$PnValidator->validation_rules($validation_rules); 
-			
-			// Get or set the filtering rules
-			$PnValidator->filter_rules($filter_rules); 
+				$PnValidator->add_validator("in_languages", function($field, $input, $param = NULL)
+				{
+					$param = explode("-", $param);
+					return in_array($input[$field], $param);
+				}); 
+				
+				$validation_rules = $hooks->apply_filters("post_validation_rules", array(
+					'title'			=> 'required',
+					'hometext'		=> 'required',
+					'post_type'		=> 'required',
+					'permission'	=> 'is_array',
+					'cat'			=> 'is_array',
+				));
+				
+				$filter_rules = $hooks->apply_filters("post_filter_rules", array(
+					'title'			=> 'sanitize_string|filter',
+					'post_url'		=> 'sanitize_title|str2url',
+					'title_lead'	=> 'sanitize_string|filter',
+					'title_color'	=> 'sanitize_string|filter',
+					'alanguage'		=> 'sanitize_string|filter',
+					'post_type'		=> 'sanitize_string|filter',
+					'hometext'		=> 'addslashes',
+					'bodytext'		=> 'addslashes',
+					'cat_link'		=> 'sanitize_numbers',
+					'ihome'			=> 'sanitize_numbers',
+					'allow_comment'	=> 'sanitize_numbers',
+					'haspoll'		=> 'sanitize_numbers',
+					'pollID'		=> 'sanitize_numbers',
+					'position'		=> 'sanitize_numbers',
+					'post_image'	=> 'filter',
+				));
+				
+				$PnValidator->validation_rules($validation_rules); 
+				
+				// Get or set the filtering rules
+				$PnValidator->filter_rules($filter_rules); 
 
-			$article_fields = $PnValidator->sanitize($article_fields, array('title','title_lead','title_color','alanguage','post_type'), true, true);
-			$validated_data = $PnValidator->run($article_fields);
+				$article_fields = $PnValidator->sanitize($article_fields, array('title','title_lead','title_color','alanguage','post_type'), true, true);
+				$validated_data = $PnValidator->run($article_fields);
 
-			// validate submitted data
-			if($validated_data !== FALSE)
-			{
-				$article_fields = $validated_data;
-			}
-			else
-			{
-				$hooks->add_filter("set_page_title", function(){return array("articles_admins" => _ADD_NEW_ARTICLE);});
-				include("header.php");
-				$html_output .= GraphicAdmin();
-				$html_output .= articles_menu();
-				$html_output .= OpenAdminTable();
-				$html_output .= '<p align=\"center\">'._ERROR_IN_OP.' :<br /><Br />'.$PnValidator->get_readable_errors(true,'gump-field','gump-error-message','<br /><br />')._GOBACK."</p>";
-				$html_output .= CloseAdminTable();
-				include("footer.php");
+				// validate submitted data
+				if($validated_data !== FALSE)
+				{
+					$article_fields = $validated_data;
+				}
+				else
+				{
+					$hooks->add_filter("set_page_title", function(){return array("articles_admins" => _ADD_NEW_ARTICLE);});
+					include("header.php");
+					$html_output .= GraphicAdmin();
+					$html_output .= articles_menu();
+					$html_output .= OpenAdminTable();
+					$html_output .= '<p align=\"center\">'._ERROR_IN_OP.' :<br /><Br />'.$PnValidator->get_readable_errors(true,'gump-field','gump-error-message','<br /><br />')._GOBACK."</p>";
+					$html_output .= CloseAdminTable();
+					include("footer.php");
+				}
 			}
 			
 			if(!isset($article_fields['meta_fields']))
@@ -637,12 +683,13 @@ if (check_admin_permission($module_name, false, true))
 				$article_fields['tags'] = '';
 				$items['tags'] = '';
 			}
-			
-			$micro_data_type = $micro_data['_pnmm_type'];
-			$micro_data2 = (isset($micro_data[$micro_data_type])) ? $micro_data[$micro_data_type]:"";
-			unset($micro_data);
-			$micro_data[$micro_data_type] = $micro_data2;
-			
+			if($mode != "auto_save")
+			{
+				$micro_data_type = $micro_data['_pnmm_type'];
+				$micro_data2 = (isset($micro_data[$micro_data_type])) ? $micro_data[$micro_data_type]:"";
+				unset($micro_data);
+				$micro_data[$micro_data_type] = $micro_data2;
+			}
 			$items['micro_data'] = addslashes(phpnuke_serialize($micro_data));
 			$items['micro_data'] = $hooks->apply_filters("post_micro_data_parse", $items['micro_data'], $items, $article_fields);
 
@@ -652,12 +699,8 @@ if (check_admin_permission($module_name, false, true))
 				$items['time'] = str_replace("'", "", $items['time']);
 
 				$hooks->do_action("newpost_before_save", $items, $article_fields);
-				$insert_result = $db->table(POSTS_TABLE)
-									->insert($items);
-
-				$sid = intval($db->lastInsertId());
 				
-				if($insert_result && $mode != 'draft' && $mode != 'pending')
+				if($mode != 'draft' && $mode != 'pending')
 				
 					$db->table(AUTHORS_TABLE)
 						->where("aid", $items['aid'])
@@ -669,7 +712,7 @@ if (check_admin_permission($module_name, false, true))
 				
 				add_log(sprintf(_ADD_ARTICLE_LOG, "<a href=\"$post_url\" target=\"_blank\">".$items['title']."</a>"), 1);
 				
-				$hooks->do_action("newpost_after_save", $items, $article_fields);
+				$hooks->do_action("newpost_after_save", $sid, $items, $article_fields);
 				
 				if(($items['status'] == 'publish' || $items['status'] == 'future') && $go_to_pings == 1)
 				{
@@ -688,17 +731,18 @@ if (check_admin_permission($module_name, false, true))
 				}
 			}
 			
-			if($mode == "edit")
+			if($mode == "edit" || $mode == "auto_save")
 			{
-				$hooks->do_action("post_before_update", $items, $article_fields);
+				$hooks->do_action("post_before_update", $sid, $items, $article_fields);
 				
 				$db->table(POSTS_TABLE)
 					->where("sid", $sid)
 					->update($items);
-									
-				add_log(sprintf(_EDIT_ARTICLE_LOG, $items['title']), 1);
+					
+				if($mode != 'auto_save')
+					add_log(sprintf(_EDIT_ARTICLE_LOG, $items['title']), 1);
 				
-				$hooks->do_action("post_after_update", $items, $article_fields);
+				$hooks->do_action("post_after_update", $sid, $items, $article_fields);
 			}
 			
 			// add new tags
@@ -707,6 +751,11 @@ if (check_admin_permission($module_name, false, true))
 			update_tags($old_tags, $items['tags']);
 			
 			position_update($items['post_type']);
+			
+			if($mode == 'auto_save')
+			{
+				die('auto save ok');
+			}
 			
 			// upload image
 			if(isset($article_image_upload) && $article_image_upload['name'] != '')
@@ -758,7 +807,7 @@ if (check_admin_permission($module_name, false, true))
 			"download"		=> ((isset($row['download'])) ?			phpnuke_unserialize(stripslashes($row['download'])):array()),
 		);
 		
-		$article_fields = $hooks->apply_filters("post_set_article_fields", $article_fields);
+		$article_fields = $hooks->apply_filters("post_set_article_fields", $article_fields, $mode);
 		
 		$article_fields['meta_fields'] = $hooks->apply_filters("post_set_meta_fields", array());
 		
@@ -773,9 +822,24 @@ if (check_admin_permission($module_name, false, true))
 			{
 				$mid = intval($meta_row['mid']);
 				$meta_key = filter($meta_row['meta_key'], "nohtml");
-				$meta_value = stripslashes($meta_row['meta_value']);
+				$meta_value = $meta_row['meta_value'];
 				$article_fields['meta_fields'][$meta_key] = (is_serialized($meta_value)) ? phpnuke_unserialize($meta_value):(($meta_value != '') ? $meta_value:"");;
 			}
+		}
+		
+		if($mode == 'grapesjs')
+		{
+			if(isset($article_fields['meta_fields']['grapesjs']) && !$cache->isCached("grapesjs_".$article_fields['post_type']."_".$sid.""))
+				$cache->store("grapesjs_".$article_fields['post_type']."_".$sid."", $article_fields['meta_fields']['grapesjs']);
+			
+			$bodytext = $row['bodytext'];
+			if(isset($article_fields['meta_fields']['grapesjs']))
+			{
+				$grapesjs = objectToArray(json_decode($article_fields['meta_fields']['grapesjs']));
+				$bodytext = "<style>".$grapesjs['gjs-css']."</style>".$grapesjs['gjs-html']."";
+			}
+			
+			die(grapesjs($sid, $bodytext, $article_fields['post_type']));
 		}
 		
 		$ihome_checked1 = ($article_fields['ihome'] == 1) ? "checked":"";
@@ -823,6 +887,9 @@ if (check_admin_permission($module_name, false, true))
 		
 		$pagetitle = _ADD_NEW_ARTICLE." - ".$all_post_types[$post_type];
 		$hooks->add_filter("set_page_title", function() use($pagetitle){return array("articles_admins" => $pagetitle);});
+		
+		$grapesjs_btn = "<a class=\"grapesjs-btn\" href=\"".$admin_file.".php?op=article_admin&mode=grapesjs&sid=$sid\" target=\"grapesjs\" style=\"float:right;border:1px solid #ccc;border-radius:3px;padding:10px 6px;margin-left:2px;\"><i class=\"fa fa-edit\"></i> "._EDIT." "._IN." grapesjs</a>";
+		
 		$contents = '';
 		$contents .= GraphicAdmin();
 		$contents .= articles_menu();
@@ -853,6 +920,10 @@ if (check_admin_permission($module_name, false, true))
 				{
 				$contents .="<tr>
 					<td colspan=\"2\">".sprintf(_ADD_NEW_POST_IN_FORMAT, $all_post_types[$post_type])."</td>
+				</tr>
+				<tr>
+					<th style=\"width:200px\"></th>
+					<td class=\"dleft aright\">$grapesjs_btn</td>
 				</tr>";
 				}
 				
@@ -867,6 +938,7 @@ if (check_admin_permission($module_name, false, true))
 						<span style=\"float:left;cursor:pointer;border:1px solid #ccc;border-radius:3px;padding:10px 6px;margin-left:5px;\" class=\"copytoClipboard\" data-clipboard-target=\"#short_copytoClipboard\"><i class=\"fa fa-copy fa-2\"></i> "._COPY."</span>
 						
 						<a href=\"$post_link\" target=\"_blank\" style=\"float:right;border:1px solid #ccc;border-radius:3px;padding:10px 6px;margin-left:2px;\"><i class=\"fa fa-eye\"></i> "._VIEW."</a>
+						$grapesjs_btn
 					</td>
 				</tr>";
 				}
@@ -1066,12 +1138,15 @@ if (check_admin_permission($module_name, false, true))
 				</tr>";
 				if($mode == 'new' || $article_status == 'pending')
 				{
+					$check1 = ($article_fields['status'] == 'draft') ? "checked":"";
+					$check2 = ($article_fields['status'] == 'publish') ? "checked":"";
+					$check3 = ($article_fields['status'] == 'preview') ? "checked":"";
 				$contents .= "<tr>
 					<th>"._PUBLISH_AS."</th>
-					<td>
-						<input type=\"radio\" name=\"article_fields[status]\" value=\"draft\" class=\"styled\" data-label=\""._DRAFT."\" /> &nbsp; 
-						<input type=\"radio\" name=\"article_fields[status]\" value=\"publish\" class=\"styled\" data-label=\""._IMMEDIATE_PUBLISH."\" checked /> &nbsp; 
-						<input type=\"radio\" name=\"article_fields[status]\" value=\"preview\" class=\"styled\" data-label=\""._PREVIEW."\" /> &nbsp; 
+					<td id=\"publish_btns\">
+						<input type=\"radio\" name=\"article_fields[status]\" value=\"draft\" class=\"styled\" data-label=\""._DRAFT."\" $check1 /> &nbsp; 
+						<input type=\"radio\" name=\"article_fields[status]\" value=\"publish\" class=\"styled\" data-label=\""._IMMEDIATE_PUBLISH."\" $check2 /> &nbsp; 
+						<input type=\"radio\" name=\"article_fields[status]\" value=\"preview\" class=\"styled\" data-label=\""._PREVIEW."\" $check3 /> &nbsp; 
 					</td>					
 				</tr>
 				<tr>
@@ -1085,6 +1160,7 @@ if (check_admin_permission($module_name, false, true))
 				$contents .= "
 				<tr>
 					<td colspan=\"2\">
+						
 						<input type=\"submit\" name=\"submit\" value=\"submit\" class=\"form-submit\" />
 					</td>					
 				</tr>";
@@ -1121,6 +1197,7 @@ if (check_admin_permission($module_name, false, true))
 						$(\"#article_image_local\").show();
 					}
 				});
+				
 				$(\"#delete_image\").on('click', function(){
 					var confirm = confirm('"._DELETE_THIS_SURE."');
 					if(confirm)
@@ -1159,7 +1236,103 @@ if (check_admin_permission($module_name, false, true))
 						});
 					}
 				});
-			});
+				
+				$.fn.serializeObject = function() {
+					var data = {};
+
+					function buildInputObject(arr, val) {
+						if (arr.length < 1) {
+							return val;  
+						}
+						var objkey = arr[0];
+						if (objkey.slice(-1) == \"]\") {
+							objkey = objkey.slice(0,-1);
+						}  
+						var result = {};
+						if (arr.length == 1){
+							result[objkey] = val;
+						} else {
+							arr.shift();
+							var nestedVal = buildInputObject(arr,val);
+							result[objkey] = nestedVal;
+						}
+						return result;
+					}
+
+					function gatherMultipleValues( that ) {
+						var final_array = [];
+						$.each(that.serializeArray(), function( key, field ) {
+							// Copy normal fields to final array without changes
+							if( field.name.indexOf('[]') < 0 ){
+								final_array.push( field );
+								return true; // That's it, jump to next iteration
+							}
+
+							// Remove \"[]\" from the field name
+							var field_name = field.name.split('[]')[0];
+
+							// Add the field value in its array of values
+							var has_value = false;
+							$.each( final_array, function( final_key, final_field ){
+								if( final_field.name === field_name ) {
+									has_value = true;
+									final_array[ final_key ][ 'value' ].push( field.value );
+								}
+							});
+							// If it doesn't exist yet, create the field's array of values
+							if( ! has_value ) {
+								final_array.push( { 'name': field_name, 'value': [ field.value ] } );
+							}
+						});
+						return final_array;
+					}
+
+					// Manage fields allowing multiple values first (they contain \"[]\" in their name)
+					var final_array = gatherMultipleValues( this );
+
+					// Then, create the object
+					$.each(final_array, function() {
+						var val = this.value;
+						var c = this.name.split('[');
+						var a = buildInputObject(c, val);
+						$.extend(true, data, a);
+					});
+
+					return data;
+				};
+				var auto_save_timeOut;
+				function auto_save(){
+					let article_form_data = $('#article_form').serializeObject();
+					article_form_data['mode'] = 'auto_save';
+					article_form_data['article_fields']['hometext'] = CKEDITOR.instances.editor_articlefieldshometext.getData();
+					article_form_data['article_fields']['bodytext'] = CKEDITOR.instances.editor_articlefieldsbodytext.getData();
+					article_form_data['article_fields']['post_type'] = '$post_type';
+					
+					$.post(
+						'".$admin_file.".php',
+						{
+							'op':'article_admin', 
+							'submit' : 'submit', 
+							'mode' : 'auto_save', 
+							'article_fields' : article_form_data['article_fields'], 
+							'sid': '$sid', 
+							'post_type': '$post_type',
+							'csrf_token': pn_csrf_token
+						},
+						function (response) {
+							if(response != '')
+								console.log('post auto saved');
+						}
+					);
+					auto_save_timeOut = setTimeout(auto_save, 30000);
+				}
+				
+				auto_save();
+				
+				$(\"#publish_btns input\").on('click', function(){
+					clearTimeout(auto_save_timeOut);
+				});
+			});	
 		</script>";
 		$contents .= CloseAdminTable();
 		

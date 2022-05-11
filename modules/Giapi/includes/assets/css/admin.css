@@ -1,0 +1,61 @@
+#giapi-response-trigger {
+	background:linear-gradient(to bottom, #ae16ed 5%, #701696 100%);
+	background-color:#ae16ed;
+	border-radius:6px;
+	border:1px solid #74b807;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	padding:10px 20px;
+	text-decoration:none;
+	font-weight:bold;
+}
+#giapi-response-trigger:hover {
+	background:linear-gradient(to bottom, #701696 5%, #ae16ed 100%);
+	background-color:#701696;
+}
+
+#giapi-response-wrapper{
+    display:none
+}
+#giapi-response-userfriendly{
+    display:none
+}
+#giapi-response-userfriendly.ready{
+    display:block
+}
+.response-box{
+    background:#fff;
+    padding:18px 20px;
+    margin:20px 0;
+    text-align:center
+}
+.response-box .response-status{
+    font-size:16px;
+    line-height:25px;
+    margin:0 0 10px
+}
+.response-box .response-message{
+    margin:0
+}
+.response-box .response-status:before{
+    font-size:28px;
+    position:relative;
+    top:5px;
+    margin-right:2px
+}
+#giapi-submit{
+    margin-top:10px
+}
+.success .response-status:before{
+    content:"\2713"
+}
+.fail .response-status:before{
+    content:"\00D7"
+}
+.success .response-status{
+    color:#156115
+}
+.fail .response-status{
+    color:#bb2b2b
+}

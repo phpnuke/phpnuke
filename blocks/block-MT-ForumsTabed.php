@@ -27,14 +27,9 @@ if (!defined('BLOCK_FILE'))
     die();
 }
 
-global $db, $nuke_configs, $users_system, $hooks;
-
-$content = "";
-
-$latest_topics = new MTForumTabed();
-
-$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs)
+function MTForumBlock_assets($theme_setup)
 {
+	global $nuke_configs;
 	$theme_setup = array_merge_recursive($theme_setup, array(
 		"default_css" => array(),
 		"default_js" => array(),
@@ -56,8 +51,15 @@ $hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_confi
 		)
 	));
 	return $theme_setup;
-}, 10);
+}
 
+global $db, $nuke_configs, $users_system, $hooks;
+
+$content = "";
+
+$latest_topics = new MTForumTabed();
+
+$hooks->add_filter("site_theme_headers", "MTForumBlock_assets", 10);
 
 $content .= "
 <div id=\"forum_tabs\" style=\"display:none;\" class=\"MTForumBlock\">

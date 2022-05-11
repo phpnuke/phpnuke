@@ -1,0 +1,55 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<!-- IF S_STYLE_DETAILS -->
+	<a href="{U_ACTION}" style="float: {S_CONTENT_FLOW_END};">&laquo; {L_BACK}</a>
+<!-- ENDIF -->
+
+<!-- IF L_TITLE --><h1>{L_TITLE}</h1><!-- ENDIF -->
+
+<!-- IF L_EXPLAIN --><p>{L_EXPLAIN}</p><!-- ENDIF -->
+
+<!-- IF .results -->
+	<!-- BEGIN results -->
+		<!-- IF results.ERROR -->
+		<div class="errorbox">
+			<h3>{results.STYLE_NAME}</h3>
+			<p>{results.ERROR}</p>
+		</div>
+		<!-- ELSEIF results.SUCCESS -->
+		<div class="successbox">
+			<h3>{results.STYLE_NAME}</h3>
+			<p>{L_SCSS_COMPILED}</p>
+		</div>
+	<!-- ENDIF -->
+	<!-- END results -->
+<!-- ENDIF -->
+
+<!-- IF .styles_list -->
+	<table class="table1 styles">
+	<thead>
+	<tr>
+		<th>{L_STYLE_NAME}</th>
+		<th>{L_STATUS}</th>
+		<th width="25%" style="white-space: nowrap; text-align: center;">{L_ACTIONS}</th>
+	</tr>
+	</thead>
+	<!-- BEGIN styles_list -->
+	<tbody id="styles-list-{styles_list.S_ROW_COUNT}">
+	<tr<!-- IF styles_list.CSS_TIME > 0 and styles_list.CSS_TIME > styles_list.SCSS_TIME --> class="row-inactive"<!-- ENDIF -->>
+		<td>
+			{styles_list.STYLE_NAME}
+			<span class="style-path"><br />{L_STYLE_PATH}{L_COLON} styles/{styles_list.DIR}/</span>
+		</td>
+		<td>{styles_list.L_STATUS}</td>
+		<td class="actions">
+			<a href="{styles_list.U_COMPILE}"><!-- IF styles_list.CSS_TIME > 0 and styles_list.CSS_TIME > styles_list.SCSS_TIME -->{L_RECOMPILE_THEME}<!-- ELSE -->{L_COMPILE_THEME}<!-- ENDIF --></a>
+		</td>
+	</tr>
+	</tbody>
+	<!-- END styles_list -->
+	</table>
+<!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

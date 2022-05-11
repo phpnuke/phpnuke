@@ -130,7 +130,7 @@ function send_headers()
 // cache functions
 function cache_system($mode = "", $extra_code=array())
 {
-	global $db, $cache, $cache_systems, $users_system, $pn_Sessions;
+	global $db, $cache, $users_system, $pn_Sessions, $hooks;
 
 	$args = array_slice(func_get_args(), 2);
 	$exept_caches = (isset($args[0])) ? $args[0]:array();
@@ -657,6 +657,8 @@ function cache_system($mode = "", $extra_code=array())
 			//file_put_contents("cache/cache_nuke_subscriptions.php", '<?php if(!defined("NUKE_FILE")) exit;?>'.$nuke_subscriptions_cacheData);
 		}*/
 
+		$cache_systems = $hooks->apply_filters("cache_systems", []);
+		
 		if(is_array($cache_systems) && !empty($cache_systems))
 		{
 			foreach($cache_systems as $cache_system_name => $cache_system)
@@ -718,6 +720,7 @@ function cache_system($mode = "", $extra_code=array())
 		$Req_Uri		= $_SERVER['REQUEST_URI'];
 		$Req_URI		= $Req_Protocol . '://' . $Req_Host . $Req_Uri;
 		redirect_to($Req_URI);
+		die();
 	}
 }
 
@@ -1260,6 +1263,193 @@ function simple_output($message)
 	include("footer.php");
 	die();
 }
+
+function pn_admin_bar($html_output)
+{
+	global $admin_file, $hooks;
+	if(is_admin())
+	{
+		$items = array(
+			array(
+				"title" => _ADMINISTRATION,
+				"icon" => "fa fa-tachometer",
+				"url" => "",
+				"class" => "",
+				"subs" => array(
+					array(
+						"title" => _DASHBORAD,
+						"icon" => "fa fa-tachometer",
+						"url" => LinkToGT($admin_file.".php"),
+					),
+					array(
+						"title" => _SETTINGS,
+						"icon" => "fa fa-cog",
+						"url" => LinkToGT($admin_file.".php?op=settings"),
+					),
+					array(
+						"title" => _USERS,
+						"icon" => "fa fa-user-o",
+						"url" => LinkToGT($admin_file.".php?op=users"),
+					),
+					array(
+						"title" => _FEEDBACK_MESSAGES,
+						"icon" => "fa fa-envelope-o",
+						"url" => LinkToGT($admin_file.".php?op=feedbacks"),
+					),
+				),
+			),
+			array(
+				"title" => _CONTENTS,
+				"icon" => "fa fa-plus",
+				"url" => "",
+				"class" => "",
+				"subs" => array(
+					array(
+						"title" => _NEW_ARTICLE,
+						"icon" => "fa fa-pencil-square-o",
+						"url" => LinkToGT($admin_file.".php?op=article_admin"),
+					),
+					array(
+						"title" => _REPORTS,
+						"icon" => "fa fa-bullhorn",
+						"url" => LinkToGT($admin_file.".php?op=reports"),
+					),
+					array(
+						"title" => _PENDING_ARTICLES,
+						"icon" => "fa fa-paper-plane",
+						"url" => LinkToGT($admin_file.".php?op=articles&status=pending"),
+					),
+				),
+			),
+			array(
+				"title" => _COMMENTS,
+				"icon" => "fa fa-comments",
+				"url" => LinkToGT($admin_file.".php?op=comments"),
+				"class" => "",
+			),
+			array(
+				"title" => _LOGOUT,
+				"icon" => "fa fa-sign-out",
+				"url" => LinkToGT($admin_file.".php?op=logout"),
+				"class" => "adbar-logount",
+			)
+		);
+		
+		$items = $hooks->apply_filters("top_admin_bar_items", $items);
+		
+		$admin_bar = "
+		<style>
+			html{margin-top:32px;}
+			
+			#admin-bar{
+				position:fixed;
+				top:0;
+				background:#1d2327;
+				height:32px;
+				width:100%;
+				z-index:2001;
+			}
+			
+			#admin-bar ul{
+				list-style:none;
+				margin-right:-30px;
+			}
+			#admin-bar ul li{
+				float:right;
+				margin-left:15px;
+				color:#fff;
+				line-height:32px;
+				position:relative;
+				cursor:pointer;
+			}
+			#admin-bar i{
+				color:#999;
+			}
+			#admin-bar ul li:hover div{
+				display:block;
+			}
+			#admin-bar ul div{
+				display:none;
+				background:#1d2327;
+				width:190px;
+				position:absolute;
+				right:-5px;
+				margin-top:-1px;
+				padding:5px;
+			}
+			#admin-bar ul li a{
+				color:#fff !important;
+			}
+			#admin-bar ul li div a{
+				display:block;
+				padding:1px 0;
+				color:#fff !important;
+			}
+			#admin-bar ul li:hover, #admin-bar ul li div a:hover{
+				color:#72aee6 !important;
+			}
+			
+			@media screen and ( max-width: 782px ) {
+				html { margin-top: 46px !important; }
+				#admin-bar{height:46px;}
+				#admin-bar ul{margin-right:-20px;margin-top:5px;}
+				#admin-bar ul li{line-height:46px;margin-left:30px;}
+				#admin-bar ul li span {display:none;}
+				#admin-bar ul li i {font-size:25px;color:#c3c4c7 !important;}
+				#admin-bar .adbar-logount{
+					float:left;
+				}
+				#admin-bar ul div{
+					margin-top:-5px;
+				}
+			}
+		
+		</style>
+		<div id=\"admin-bar\">
+			<ul>";
+			foreach($items as $item)
+			{
+				$title = ($item['url'] != '') ? "<a href=\"".$item['url']."\"><i class=\"".$item['icon']."\" aria-hidden=\"true\"></i> <span> ".$item['title']."</span></a>":"<i class=\"".$item['icon']."\" aria-hidden=\"true\"></i> <span> ".$item['title']."</span>";
+				$class = ($item['class'] != '') ? " class=\"".$item['class']."\"":"";
+				$admin_bar .="
+				<li".$class.">
+					$title";
+				if(isset($item['subs']) && !empty($item['subs']))
+				{
+					$admin_bar .="
+					<div>";
+						foreach($item['subs'] as $sub)
+						{
+							$admin_bar .="<a href=\"".$sub['url']."\"><i class=\"".$sub['icon']."\" aria-hidden=\"true\"></i> ".$sub['title']."</a>";
+						}
+					$admin_bar .="</div>";
+				}
+				$admin_bar .="
+				</li>";
+			}
+			$admin_bar .="
+			</ul>
+		</div>
+		
+		<script>
+			$(document).ready(function(){
+				$(\"#admin-bar ul li\").on('click', function(){
+					let this_status = $(this).find('div').css('display');
+					$(\"#admin-bar ul li div\").hide(0);
+					if(this_status == 'none')
+						$(this).find('div').toggle(0);
+				});
+			});
+		</script>
+
+		</body>";
+		
+		$admin_bar = $hooks->apply_filters("top_admin_bar", $admin_bar);
+		$html_output = str_replace("</body>", $admin_bar, $html_output);
+	}
+	
+	return $html_output;
+}
 // outputs functions
 
 // db functions
@@ -1536,7 +1726,7 @@ function show_modules_boxes($module_name, $part='index', $active_boxes=array(), 
 	return $template_pattern;
 }
 
-function bulid_meta_fields($meta_part = 'Articles', $data)
+function bulid_meta_fields($meta_part = 'Articles', $data = [])
 {
 	global $nuke_meta_keys_parts, $nuke_configs;
 	$contents = '';
@@ -1634,6 +1824,8 @@ function admin_blocks_box_theme($title, $content, $theme_block)
 {
 	global $db, $align, $nuke_configs, $hooks;
 	$html_out = '';
+	$content = text_rel2abs($content);
+	
 	if($theme_block == "")
 	{
 		$html_out = "<div class=\"Block\">
@@ -1769,6 +1961,8 @@ function blocks($box_id, $special_bids = array(), $except_block_files = array())
 			{
 				$content = _BLOCKNOCONTENTS;
 			}
+			
+			$content = text_rel2abs($content);
 			
 			$contents .= (defined("ADMIN_FILE")) ? admin_blocks_box_theme($block_title, $content, $theme_block):blocks_box_theme($block_title, $content, $theme_block);
 		}
@@ -2086,9 +2280,9 @@ function wysiwyg_textarea($name, $value, $config = 'basic', $cols = 50, $rows = 
 		$plugins_configs = $hooks->apply_filters("wysiwyg_textarea_plugins_configs", $plugins_configs);
 		
 		$ckeditor = "<script src=\"".$nuke_configs['nukecdnurl']."includes/editors/ckeditor/ckeditor.js\"></script>
-		<textarea class=\"ckeditor$class\" cols=\"$cols\" id=\"editor_$name\" name=\"$name\" rows=\"$rows\">$value</textarea>
+		<textarea class=\"ckeditor$class\" cols=\"$cols\" id=\"editor_".sanitize($name)."\" name=\"$name\" rows=\"$rows\">$value</textarea>
 		<script>
-			CKEDITOR.replace('editor_$name', {
+			CKEDITOR.replace('editor_".sanitize($name)."', {
 				language : '".substr($nuke_configs['currentlang'], 0,2)."',
 				contentsLangDirection : '"._DIRECTION."',
 				dialog_buttonsOrder : '"._TEXTALIGN1."',
@@ -2108,10 +2302,220 @@ function wysiwyg_textarea($name, $value, $config = 'basic', $cols = 50, $rows = 
 		return $ckeditor;
     }
 }
+
+function grapesjs($post_id, $contents = '', $post_type='Articles')
+{
+	global $nuke_configs, $admin_file, $theme_setup;
+
+	$theme_setup = array_unique_recursive($theme_setup);
+
+	$canvas_styles = '';
+	$canvas_scripts = '';
+	$inline_scripts = '';
+	
+	if(isset($theme_setup['default_css']) && !empty($theme_setup['default_css']))
+		foreach($theme_setup['default_css'] as $key => $default_css)
+			if($default_css != '' && preg_match('#href=[\'|"]([^\"]*)[\'|"][^>]*>#', $default_css, $hrefs))
+			{
+				$canvas_styles .= '"'.$hrefs[1].'",'."\n";
+			}
+	if(isset($theme_setup['default_js']) && !empty($theme_setup['default_js']))
+		foreach($theme_setup['default_js'] as $key => $default_js)
+			if($default_js != '')
+			{
+				if(preg_match('#src=[\'|"]([^\"]*)[\'|"][^>]*>#', $default_js, $srcs))
+					$canvas_scripts .= '"'.$srcs[1].'",'."\n";
+				else
+					$inline_scripts .= $default_js."\n";
+			}
+	if(isset($theme_setup['defer_js']) && !empty($theme_setup['defer_js']))
+	{
+		foreach($theme_setup['defer_js'] as $key => $defer_js)
+		{
+			if($defer_js != '')
+			{
+				if(preg_match('#src=[\'|"]([^\"]*)[\'|"][^>]*>#', $defer_js, $srcs))
+					$canvas_scripts .= '"'.$srcs[1].'",'."\n";
+				else
+					$inline_scripts .= $defer_js."\n";
+			}
+		}
+	}
+	
+	$assets = '
+	<link rel="stylesheet" href="includes/fonts/vazir/style.css" type="text/css" media="screen" title="default" />
+	<link rel="stylesheet" href="includes/fonts/fontawesome/style.css" type="text/css" media="screen" title="default" />
+	<link rel="stylesheet" href="admin/template/css/screen.css" type="text/css" media="screen" title="default" />
+	<script src="includes/Ajax/jquery/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="includes/Ajax/jquery/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="includes/Ajax/jquery/jquery.ui.touch-punch.min.js"></script>
+	<script src="admin/template/js/jquery/prettyCheckable.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="includes/Ajax/jquery/thickbox.js"></script>
+	<link rel="stylesheet" href="includes/Ajax/jquery/thickbox.css" type="text/css" />
+	<link rel="stylesheet" href="includes/Ajax/jquery/jquery-ui.min.css" type="text/css" />
+	<link rel="stylesheet" href="includes/Ajax/jquery/datepicker/css/jquery-ui-1.8.14.css" type="text/css" />';
+	if(_DIRECTION == "ltr")
+	{
+	$assets .= "
+	<style>
+		#TB_ajaxContent{
+		text-align:left;
+		}
+	</style>\n";
+	}
+	else
+	{
+		$assets .="	<link rel=\"stylesheet\" href=\"includes/Ajax/jquery/jquery-ui.min.rtl.css\" type=\"text/css\" />";
+	}
+	$assets .='
+	<link rel="stylesheet" href="includes/Ajax/jquery/jquery-ui.theme.min.css" type="text/css" />
+	<link rel="stylesheet" href="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/toastr/toastr.min.css">
+    <link rel="stylesheet" href="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/css/grapes.min.css?v0.18.4">
+    <link rel="stylesheet" href="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/css/tooltip.css">
+    <link rel="stylesheet" href="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/component-code-editor/grapesjs-component-code-editor.min.css">
+	
+    <link href="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/grapick/grapick.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/css/demos.css?v3">
+
+    <!-- <script src="https://grapesjs.com/js/aviary.js"></script> old //feather.aviary.com/imaging/v3/editor.js -->
+    <!--  <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/js/jquery.min.js?v3.3.1"></script> -->
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/toastr/toastr.min.js"></script>
+
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/js/grapes.min.js?v0.18.4"></script>
+    <script type="module" src="'.INCLUDE_PATH.'/Ajax/grapesjs/src/i18n/locale/'.substr($nuke_configs['language'],0,2).'.js"></script>
+	
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/preset-webpage/grapesjs-preset-webpage.min.js?v0.1.11"></script>
+	<script src="'.INCLUDE_PATH.'/editors/ckeditor/ckeditor.js"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/ckeditor/grapesjs-plugin-ckeditor.min.js"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/tui-image-editor/grapesjs-tui-image-editor.min.js?v0.1.8"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/lory-slider/grapesjs-lory-slider.min.js?v0.1.5"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/tabs/grapesjs-tabs.min.js?v0.1.6"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/custom-code/grapesjs-custom-code.min.js?v0.1.3"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/touch/grapesjs-touch.min.js?v0.1.1"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/tooltip/grapesjs-tooltip.min.js?v0.1.5"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/typed/grapesjs-typed.min.js?v1.0.5"></script>
+	<script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/component-code-editor/grapesjs-component-code-editor.min.js"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/parser-postcss/grapesjs-parser-postcss.min.js?v0.1.1"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/script-editor/grapesjs-script-editor.min.js"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/grapick/grapick.min.js"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/page-break/grapesjs-page-break.min.js"></script>
+    <script src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/plugins/swiper-slider/grapesjs-swiper-slider.min.js"></script>
+	<script>
+		var g_post_id = "'.$post_id.'";
+		var g_post_type = "'.$post_type.'";
+		var g_pn_csrf_token = "'._PN_CSRF_TOKEN.'";
+		var g_admin_file = "'.$admin_file.'";
+		var g_nuke_language = "'.$nuke_configs['language'].'";
+		var phpnuke_url = "'.$nuke_configs['nukeurl'].'";
+		var g_site_direction = "'._DIRECTION.'";
+		var g1_locale = "'._LANGSMALLNAME.'";
+		const g_locale = "'._LANGSMALLNAME.'";
+		const langPath ="../../src/i18n/locale/'._LANGSMALLNAME.'.js";
+		var canvas_styles = ['.$canvas_styles.'];
+		var canvas_scripts = ['.$canvas_scripts.'];
+				var grapes_images = [];
+	</script>
+	'.$inline_scripts.'';
+	
+	$html = '<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>GrapesJs</title>
+		'.$assets.'
+	</head>
+	<body>
+		<div id="gjs" style="height:100%; overflow:hidden;">'.stripslashes($contents).'</div>
+		<div id="info-panel" style="display:none"></div>
+		<script type="module" src="'.INCLUDE_PATH.'/Ajax/grapesjs/assets/js/main.js"></script>
+	</body>
+</html>';
+	
+	return $html;
+}
+
+function grapesjs_admin()
+{
+	global $db, $cache, $nuke_configs, $admin_file, $mode, $post_id, $post_type, $gjs_data;
+	
+	$post_id = (isset($post_id) && $post_id != '') ? intval($post_id):0;
+	$post_type = (isset($post_type) && $post_type != '') ? filter($post_type, "nohtml"):"Articles";
+	$mode = (isset($mode) && $mode != '') ? filter($mode, "nohtml"):"load";
+	
+	$cache_file = "grapesjs_".$post_type."_".$post_id."";
+	
+	$result = $db->table(POSTS_META_TABLE)
+				->where('meta_key', 'grapesjs')
+				->where('post_id', $post_id)
+				->where('meta_part', $post_type)
+				->select(["mid","meta_value"]);
+
+	if($mode == "load" && $cache->isCached($cache_file))
+	{
+		$contents = $cache->retrieve($cache_file);
+		header('Content-Type: application/json');
+		
+		die($contents);
+	}
+	elseif($mode == "store")
+	{		
+		$data = objectToArray(json_decode(file_get_contents("php://input")));
+	
+		$response['id'] = $post_id;
+		$response['gjs-assets'] = $data['gjs-assets'];
+		$response['gjs-components'] = $data['gjs-components'];
+		$response['gjs-css'] = $data['gjs-css'];
+		$response['gjs-html'] = $data['gjs-html'];
+		$response['gjs-styles'] = $data['gjs-styles'];
+
+		$json_response = json_encode($response);
+		$cache->store($cache_file, $json_response);
+	}
+	elseif($mode == "save")
+	{
+		if($result->count() > 0)
+		{
+			$row = $result->results()[0];
+			$mid = intval($row['mid']);
+			$result = $db->table(POSTS_META_TABLE)
+				->where('mid', $mid)
+				->update(["meta_value" => $gjs_data]);
+		}
+		else
+		{
+			$db->table(POSTS_META_TABLE)
+				->insert([
+					'meta_key' => 'grapesjs',
+					'post_id' => $post_id,
+					'meta_part' => $post_type,
+					'meta_value' => $gjs_data,
+				]);
+		}
+		$cache->store($cache_file, $gjs_data);
+		$message = "operation successed";
+		
+		die($message);
+	}
+	elseif($mode == "delete")
+	{
+		$db->table(POSTS_META_TABLE)
+			->where('post_id', $post_id)
+			->where('meta_part', $post_type)
+			->where('meta_key', 'grapesjs')
+			->delete();
+		if($cache->isCached($cache_file))
+			$cache->erase($cache_file);
+		$message = "page deleted";
+		
+		die($message);
+	}
+	
+	return true;
+}
 // editor functions
 
 // other functions
-function headlines($bid, $cenbox=0, $themetype)
+function headlines($bid, $cenbox=0, $themetype=0)
 {
 	global $db;
 	$bid = intval($bid);
@@ -2387,7 +2791,7 @@ function codereplace($text,$sid, $title="")
 	return $text;
 }
 
-function clean_pagination($total_rows, $entries_per_page=20, $current_page, $link_to, $tagname="", $gtset_page_name = '')
+function clean_pagination($total_rows, $entries_per_page=20, $current_page=1, $link_to='index.php', $tagname="", $gtset_page_name = '')
 {
 	global $nuke_configs, $hooks;
 	
@@ -2520,7 +2924,7 @@ function upload_image($id,$image_file,$module_name)
 	return false;
 }
 
-function Resize($Dir,$Image,$NewDir,$NewImage,$MaxWidth,$MaxHeight,$Quality)
+function Resize($Dir,$Image,$NewDir,$NewImage,$MaxWidth,$MaxHeight,$Quality=90)
 {
 	list($ImageWidth,$ImageHeight,$TypeCode)=getimagesize($Dir.$Image);
 	$ImageType=($TypeCode==1) ? "gif":(($TypeCode==2) ? "jpeg":(($TypeCode == 3) ? "png":FALSE));
@@ -2700,35 +3104,116 @@ function suspend_site_show()
 	}
 }
 
-function redirect_to($location = null, $refresh = '')
+function rawurlencode_map($url)
+{
+	$url_encoded = implode('/', array_map(function ($v) {
+		return rawurlencode($v);
+	}, explode('/', $url)));
+	return $url_encoded;
+}
+
+function _deep_replace( $search, $subject ) {
+	$subject = (string) $subject;
+
+	$count = 1;
+	while ( $count ) {
+		$subject = str_replace( $search, '', $subject, $count );
+	}
+
+	return $subject;
+}
+
+function pn_sanitize_redirect( $location ) {
+	// Encode spaces.
+	$location = str_replace( ' ', '%20', $location );
+
+	$regex    = '/
+	(
+		(?: [\xC2-\xDF][\x80-\xBF]        # double-byte sequences   110xxxxx 10xxxxxx
+		|   \xE0[\xA0-\xBF][\x80-\xBF]    # triple-byte sequences   1110xxxx 10xxxxxx * 2
+		|   [\xE1-\xEC][\x80-\xBF]{2}
+		|   \xED[\x80-\x9F][\x80-\xBF]
+		|   [\xEE-\xEF][\x80-\xBF]{2}
+		|   \xF0[\x90-\xBF][\x80-\xBF]{2} # four-byte sequences   11110xxx 10xxxxxx * 3
+		|   [\xF1-\xF3][\x80-\xBF]{3}
+		|   \xF4[\x80-\x8F][\x80-\xBF]{2}
+	){1,40}                              # ...one or more times
+	)/x';
+	$location = preg_replace_callback( $regex, '_pn_sanitize_utf8_in_redirect', $location );
+	$location = preg_replace( '|[^a-z0-9-~+_.?#=&;,/:%!*\[\]()@]|i', '', $location );
+	$location = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $location );
+	$location = preg_replace( '/\\\\+0+/', '', $location );
+
+	// Remove %0D and %0A from location.
+	$strip = array( '%0d', '%0a', '%0D', '%0A' );
+	return _deep_replace( $strip, $location );
+}
+
+function _pn_sanitize_utf8_in_redirect( $matches ) {
+	return urlencode( $matches[0] );
+}
+
+
+function redirect_to( $location, $status = 302, $refresh = '', $x_redirect_by = 'phpnuke' )
 {
 	global $hooks;
+	$hooks->do_action("redirect_to_action", $location, $status, $refresh);
+
+	$redirect_data = array(
+		"location"		=> LinkToGT($location),
+		"status"		=> intval($status),
+		"x_redirect_by"	=> $x_redirect_by,
+		"refresh"		=> $refresh
+	);
+
+	$redirect_data = $hooks->apply_filters( 'redirect_to_data', $redirect_data, $location, $status, $refresh, $x_redirect_by );
 	
-	$hooks->do_action("redirect_to_action", $location, $refresh);
+	$location		= $redirect_data['location'];
+	$status			= $redirect_data['status'];
+	$x_redirect_by	= $redirect_data['x_redirect_by'];
+	$refresh		= $redirect_data['refresh'];
 	
+	$location = pn_sanitize_redirect( $location );
+
 	if (!$location || $location === null)
 		$location = "index.php";
-	
-	if (is_numeric($location)) {
-		switch ($location) {
-			case '404':
-				die_error("404");
-			break;
+
+	if (is_numeric($location))
+		die_error($location);
+
+	if (($status < 300 || 399 < $status) && $refresh === '')
+		die_error(_REDIERCT_CODE_ERROR);
+
+	if (!headers_sent())
+	{
+		if (is_string( $x_redirect_by ))
+			header( "X-Redirect-By: $x_redirect_by" );
+		
+		if ($refresh === '')
+		{
+			header( "Location: $location", true, $status );
+		}
+		else
+		{
+			$refresh = intval($refresh);
+			header( "Refresh:$refresh;url=$location", true, $status );
+			echo"<span style=\"display:none;\">You\'ll be redirected in about $refresh secs. If not, click <a href=\"$location\">here</a>.</span>"; 
+			exit;
 		}
 	}
-	$location = LinkToGT($location);
-	if (!headers_sent() && $refresh === ''){
-		header('Location: '.$location);
-		exit();
-	} else {
+	else
+	{
 		$refresh = intval($refresh);
 		echo '<script type="text/javascript">';
 		echo 'setTimeout(function(){location.href="'.$location.'"}, '.($refresh*1000).');';
 		echo '</script>';
 		echo '<noscript>';
-		echo '<meta http-equiv="refresh" content="'.intval($refresh).';url='.$location.'" />';
-		echo '</noscript>'; exit;
-	 }
+		echo '<meta http-equiv="refresh" content="'.$refresh.';url='.$location.'" />';
+		echo '</noscript>';
+		exit;
+	}
+ 
+    return true;
 }
 
 function get_modules_list()
@@ -2766,6 +3251,73 @@ function get_main_module()
 	return $main_module;
 }
 
+function pn_isset($var, $default='', $equal = true, $functions = array())
+{
+	$return = false;
+	if(isset($var))
+	{
+		if(!is_array($var))
+			$vars[] = $var;
+		else
+			$vars = $var;
+		$return = true;
+		if(!empty($functions))
+		{
+			foreach($functions as $function => $op)
+			{
+				if(function_exists($function))
+				{
+					if($op == "!")
+					{
+						foreach($vars as $var_val)
+						{
+							if($function($var_val))
+							{
+								$return = false;
+								break 2;
+							}
+						}
+					}
+					else
+					{
+						foreach($vars as $var_val)
+						{
+							if(!$function($var_val))
+							{
+								$return = false;
+								break 2;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if($return && isset($default))
+		{
+				
+			foreach($vars as $var_val)
+			{
+				if(is_array($default) && sizeof($default) == 2)
+				{
+					$var_val = $default[0]($var_val);
+					$default = $default[1];
+				}
+				if($equal && $var_val != $default)
+				{
+					$return = false;
+					break;
+				}
+				elseif(!$equal && $var_val == $default)
+				{
+					$return = false;
+					break;
+				}
+			}
+		}
+	}
+	return $return;
+}
 // other functions
 
 
@@ -2893,6 +3445,8 @@ function phpnuke_mail($to, $subject='' ,$message='' ,$from='', $from_desc='', $a
 	
 	if(function_exists('mail_theme'))
 		$message = mail_theme($subject, $logoimage, $message);
+	elseif(file_exists("themes/".$nuke_configs['ThemeSel']."/mail_theme.php"))
+		include("themes/".$nuke_configs['ThemeSel']."/mail_theme.php");
 	elseif(!$is_template)
 	{
 		$message = "
@@ -4195,6 +4749,16 @@ function captcha_check()
 	}
 }
 
+function pn_http_response_code($code = null)
+{
+	$http_status_codes = array(100 => "Continue", 101 => "Switching Protocols", 102 => "Processing", 200 => "OK", 201 => "Created", 202 => "Accepted", 203 => "Non-Authoritative Information", 204 => "No Content", 205 => "Reset Content", 206 => "Partial Content", 207 => "Multi-Status", 300 => "Multiple Choices", 301 => "Moved Permanently", 302 => "Found", 303 => "See Other", 304 => "Not Modified", 305 => "Use Proxy", 306 => "(Unused)", 307 => "Temporary Redirect", 308 => "Permanent Redirect", 400 => "Bad Request", 401 => "Unauthorized", 402 => "Payment Required", 403 => "Forbidden", 404 => "Not Found", 405 => "Method Not Allowed", 406 => "Not Acceptable", 407 => "Proxy Authentication Required", 408 => "Request Timeout", 409 => "Conflict", 410 => "Gone", 411 => "Length Required", 412 => "Precondition Failed", 413 => "Request Entity Too Large", 414 => "Request-URI Too Long", 415 => "Unsupported Media Type", 416 => "Requested Range Not Satisfiable", 417 => "Expectation Failed", 418 => "I'm a teapot", 419 => "Authentication Timeout", 420 => "Enhance Your Calm", 422 => "Unprocessable Entity", 423 => "Locked", 424 => "Failed Dependency", 424 => "Method Failure", 425 => "Unordered Collection", 426 => "Upgrade Required", 428 => "Precondition Required", 429 => "Too Many Requests", 431 => "Request Header Fields Too Large", 444 => "No Response", 449 => "Retry With", 450 => "Blocked by Windows Parental Controls", 451 => "Unavailable For Legal Reasons", 494 => "Request Header Too Large", 495 => "Cert Error", 496 => "No Cert", 497 => "HTTP to HTTPS", 499 => "Client Closed Request", 500 => "Internal Server Error", 501 => "Not Implemented", 502 => "Bad Gateway", 503 => "Service Unavailable", 504 => "Gateway Timeout", 505 => "HTTP Version Not Supported", 506 => "Variant Also Negotiates", 507 => "Insufficient Storage", 508 => "Loop Detected", 509 => "Bandwidth Limit Exceeded", 510 => "Not Extended", 511 => "Network Authentication Required", 598 => "Network read timeout error", 599 => "Network connect timeout error");
+	
+	$text = (isset($http_status_codes[$code])) ? $http_status_codes[$code]:"Unknown";
+	
+	return $text;
+
+}
+
 if(!function_exists('get_headers'))
 {
     function get_headers($url,$format=0)
@@ -5222,7 +5786,7 @@ function simple_array_flatten(array $array)
     return $return;
 }
 
-function array_flatten($array, $parent_id = 0, $main_key = 'id', $parent_key = 'parent_id', $child_key = 'children', array $specific_keys, array $return)
+function array_flatten($array, $parent_id = 0, $main_key = 'id', $parent_key = 'parent_id', $child_key = 'children', $specific_keys = array(), $return = array())
 {
 	foreach($array as $key => $val)
 	{
@@ -5345,7 +5909,7 @@ function array_to_nested($array=array(), $sub_array=array(), $level_by_key="pare
 	return $new_array;
 }
 
-function array_children_ids($array, &$output = array(), $parent_id = 0, $parent_id_name)
+function array_children_ids($array, &$output = array(), $parent_id = 0, $parent_id_name='parent_id')
 {
 	if($parent_id != 0 && !in_array($parent_id, $output))
 		$output[] = $parent_id;
@@ -5507,6 +6071,21 @@ function breadcrumb_build($breadcrumbs = array(), $separator = ' / ')
 	return $breadcrumb;
 }
 
+function array_unique_recursive($array, $sort_type=SORT_REGULAR)
+{
+    $marray = array_unique($array, $sort_type);
+	$return = array_combine(array_keys($array), array_fill(0,count($array),null));
+	
+	$array = array_replace($return, $marray);
+
+    foreach ($array as $key => $elem) {
+        if (is_array($elem)) {
+            $array[$key] = array_unique_recursive($elem, $sort_type);
+        }
+    }
+
+    return $array;
+}
 // array functions
 
 // security functions
@@ -6001,7 +6580,7 @@ function phpnuke_validate_user_cookie($user, $type="user", $userinfo=array())
 	return true;
 }
 
-function phpnuke_generate_user_cookie($type="user", $user_id=0, $username, $user_password, $expiration=3600, $set_cookie=true)
+function phpnuke_generate_user_cookie($type="user", $user_id=0, $username = '', $user_password = '', $expiration=3600, $set_cookie=true)
 {
 	global $pn_salt, $userinfo, $pn_Cookies;
 	
@@ -6210,37 +6789,45 @@ function check_requests()
 		
 		foreach ($_GET as $sec_key => $secvalue)
 		{
-			if((@preg_match("#<[^>]*script*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*object*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*iframe*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*applet*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*meta*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*style*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*form*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*img*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*onmouseover *\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#<[^>]*body *\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("#\([^>]*\"?[^)]*\)#i", $secvalue)) ||
-			(@preg_match("#\"#i", $secvalue)) ||
-			(@preg_match("#forum_admin#i", $sec_key)) ||
-			(@preg_match("#inside_mod#i", $sec_key)))
+			$secvalue = (is_array($secvalue)) ? $secvalue:array($secvalue);
+			foreach($secvalue as $secval)
 			{
-				die ($htmltags);
+				if((@preg_match("#<[^>]*script*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*object*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*iframe*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*applet*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*meta*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*style*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*form*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*img*\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*onmouseover *\"?[^>]*#i", $secval)) ||
+				(@preg_match("#<[^>]*body *\"?[^>]*#i", $secval)) ||
+				(@preg_match("#\([^>]*\"?[^)]*\)#i", $secval)) ||
+				(@preg_match("#\"#i", $secval)) ||
+				(@preg_match("#forum_admin#i", $sec_key)) ||
+				(@preg_match("#inside_mod#i", $sec_key)))
+				{
+					die ($htmltags);
+				}
 			}
 		}
 
 		foreach ($_POST as $secvalue)
 		{
-			if ((@preg_match("<[^>]*iframe*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("<[^>]*object*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("<[^>]*applet*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("<[^>]*meta*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("<[^>]*onmouseover*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("<[^>]script*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("<[^>]*body*\"?[^>]*#i", $secvalue)) ||
-			(@preg_match("<[^>]style*\"?[^>]*#i", $secvalue)))
+			$secvalue = (is_array($secvalue)) ? $secvalue:array($secvalue);
+			foreach($secvalue as $secval)
 			{
-				die ($htmltags);
+				if ((@preg_match("<[^>]*iframe*\"?[^>]*#i", $secval)) ||
+				(@preg_match("<[^>]*object*\"?[^>]*#i", $secval)) ||
+				(@preg_match("<[^>]*applet*\"?[^>]*#i", $secval)) ||
+				(@preg_match("<[^>]*meta*\"?[^>]*#i", $secval)) ||
+				(@preg_match("<[^>]*onmouseover*\"?[^>]*#i", $secval)) ||
+				(@preg_match("<[^>]script*\"?[^>]*#i", $secval)) ||
+				(@preg_match("<[^>]*body*\"?[^>]*#i", $secval)) ||
+				(@preg_match("<[^>]style*\"?[^>]*#i", $secval)))
+				{
+					die ($htmltags);
+				}
 			}
 		}
 	}
@@ -6473,22 +7060,17 @@ function validateLatin($string) {
 function text_rel2abs_call($matches)
 {
 	global $nuke_configs;
-	if (empty($base))
-		$base = $nuke_configs['nukeurl'];
-
-	// base url needs trailing /
-	if (substr($base, -1, 1) != "/")
-		$base .= "/";
-		
-	$matches[3] = rel2abs( $matches[3], $base);
 	
-	return $matches[1]."=".$matches[2].$matches[3].$matches[4];
+	$base = trim($nuke_configs['nukeurl'], "/")."/";
+	$matches[2] = rel2abs( $matches[2], $base);
+	
+	return $matches[1]."=\"".$matches[2]."\"";
 	
 }
 
 function text_rel2abs($text, $base = '')
 {
-	$pattern = "#(href|src)=('|\")(.*)('|\")#isU";
+	$pattern = "#(href|src)=['|\"](.*)['|\"]#isU";
 	$text = preg_replace_callback($pattern, "text_rel2abs_call", $text);
 	// Done
 	return $text;
@@ -6499,6 +7081,11 @@ function rel2abs($rel0, $base0)
 	// init
 	$base = parse_url($base0);
 	$rel = parse_url($rel0);
+
+	// if rel has scheme, it has everything
+	if (array_key_exists("scheme", $rel) ||(array_key_exists("fragment", $rel) && !array_key_exists("path", $rel)))
+		return $rel0;
+	
 	// init paths so we can blank the base path if we have a rel host
 	if (array_key_exists("path", $rel))
 		$relPath = $rel["path"];
@@ -6509,10 +7096,6 @@ function rel2abs($rel0, $base0)
 		$basePath = $base["path"];
 	else
 		$basePath = "";
-
-	// if rel has scheme, it has everything
-	if (array_key_exists("scheme", $rel))
-		return $rel0;
 		
 	// else use base scheme
 	if (array_key_exists("scheme", $base))
@@ -6738,7 +7321,7 @@ function filter($str , $strip="")
 		$str = strip_tags(trim($str));
 		return $str;
 	}else {
-		if(isset($_POST))
+		/*if(isset($_POST))
 		{
 			foreach ($_POST as $key => $value)							
 			$_POST[$key] =str_replace("'", '', $_POST[$key]);		
@@ -6747,7 +7330,7 @@ function filter($str , $strip="")
 		{
 			foreach ($_GET as $key => $value)							
 			$_GET[$key] =str_replace("'", '', $_GET[$key]);		
-		}
+		}*/
 		$str = addslashes(trim($str));
 		$str= mres($str);
 		return $str;
@@ -6761,6 +7344,21 @@ function FixQuotes ($what = "")
 		$what = str_replace("\\\\'","'",$what);
 	}
 	return $what;
+}
+
+function fix_persion_kbd($string, $to_persion=true)
+{
+	if($to_persion)
+	{
+		$string	= str_replace(_FAANDAR1,_FAANDAR11,$string);
+		$string	= str_replace(_FAANDAR2,_FAANDAR22,$string);
+	}
+	else
+	{
+		$string	= str_replace(_FAANDAR11,_FAANDAR1,$string);
+		$string	= str_replace(_FAANDAR22,_FAANDAR2,$string);
+	}
+	return $string;
 }
 
 function _truncate_post_slug($slug, $length = 200)
@@ -7200,26 +7798,26 @@ function selectlanguage()
 	}
 }
 
-function get_dir_list($path, $options='folders', $sort=false, $except_list = array(".","..",""))
+function get_dir_list($path, $options='folders', $sort=false, $except_list = array(".","..",""), $append_path = false)
 {
-	$path = trim($path, "/");
+	$path = trim($path, "/")."/";
 	$handle=opendir($path);
 	$dir_list = array();
 	while ($file = readdir($handle))
 	{
 		if(!in_array($file, $except_list))
 		{
-			if($options == "folders" && is_dir($path."/$file"))
+			if($options == "folders" && is_dir($path."$file"))
 			{    
-				$dir_list[] = "$file";
+				$dir_list[] = (($append_path) ? $path:"")."$file";
 			}
-			elseif($options == "files" && !is_dir($path."/$file"))
+			elseif($options == "files" && !is_dir($path."$file"))
 			{  
-				$dir_list[] = "$file";
+				$dir_list[] = (($append_path) ? $path:"")."$file";
 			}
 			elseif($options == "both")
 			{ 
-				$dir_list[] = "$file";
+				$dir_list[] = (($append_path) ? $path:"")."$file";
 			}
 		}
 	}
@@ -7308,6 +7906,73 @@ function get_languages_data($mode="")
 	}
 	
 	return $nuke_languages;
+}
+
+function start_nuke_language(&$nuke_configs)
+{
+	global $lang, $nukelang, $captcha, $currentpage, $pn_Cookies, $hooks;
+	
+	if(isset($lang) && $lang == "default" && !isset($captcha))
+	{
+		$pn_Cookies->set("nukelang",false,'');
+		header("location: ".LinkToGT("index.php")."");
+	}
+	
+	if ((isset($lang)) AND (!stristr($lang,".")) && !isset($captcha))
+	{
+		$lang = filter($lang, "nohtml");
+		if (file_exists("language/".$lang.".php"))
+		{
+			$pn_Cookies->set("nukelang",$lang,(365*24*3600));
+			$nuke_configs['currentlang'] = $lang;
+		}
+		else
+		{
+			$pn_Cookies->set("nukelang",$nuke_configs['language'],(365*24*3600));
+			$nuke_configs['currentlang'] = $nuke_configs['language'];
+		}
+		$currentpage = (isset($currentpage) && $currentpage != '') ? $currentpage:"index.php";
+		header("location: ".LinkToGT($currentpage)."");
+	}
+	elseif (isset($nukelang) && $nukelang != '')
+	{
+		$nukelang = filter($nukelang, "nohtml");
+		$nuke_configs['currentlang'] = $nukelang;
+	}
+	else
+	{
+		if(!isset($captcha) && !$pn_Cookies->exists("nukelang"))
+		{
+			$pn_Cookies->set("nukelang",$nuke_configs['language'],(365*24*3600));
+		}
+		$nuke_configs['currentlang'] = $nuke_configs['language'];
+	}
+	
+	$nuke_configs['currentlang'] = $hooks->apply_filters("set_current_language", $nuke_configs['currentlang']);
+
+	define("NUKE_LANG_FILE", true);
+
+	$nuke_languages = get_languages_data();
+	$nuke_languages = $hooks->apply_filters("set_languages_data", $nuke_languages);
+
+	foreach($nuke_languages[$nuke_configs['currentlang']] as $nuke_language_key => $nuke_language_val)
+	{
+		if(!defined($nuke_language_key))
+			define($nuke_language_key, $nuke_language_val);
+	}
+	
+	if(_DIRECTION == "rtl")
+	{
+		define("_TEXTALIGN1","right");
+		define("_TEXTALIGN2","left");
+		define("_RTL_TEXT",true);
+	}
+	else
+	{
+		define("_TEXTALIGN1","left");
+		define("_TEXTALIGN2","right");
+		define("_LTR_TEXT",true);
+	}
 }
 
 // languages functions

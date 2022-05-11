@@ -1,0 +1,113 @@
+{% if RCE_LOAD and RCE_BBCODE_STATUS %}
+<script type="text/javascript">
+RinEditor = {
+	"Video URL:": "{{ lang('RCE_VIDEO_URL') }}",
+	"Video Type:": "{{ lang('RCE_VIDEO_TYPE') }}",
+	"Insert": "{{ lang('RCE_INSERT') }}",
+	"Description (optional):": "{{ lang('RCE_DESCRIPTION_OPTIONAL') }}",
+	"Enter the image URL:": "{{ lang('RCE_ENTER_THE_IMAGE_URL') }}",
+	"Enter URL:": "{{ lang('RCE_ENTER_URL') }}",
+	"Dailymotion": "{{ lang('RCE_DAILYMOTION') }}",
+	"Vimeo": "{{ lang('RCE_VIMEO') }}",
+	"Youtube": "{{ lang('RCE_YOUTUBE') }}",
+	"Insert a video": "{{ lang('RCE_INSERT_A_VIDEO') }}",
+	"More": "{{ lang('RCE_MORE') }}",
+	"Restore": "{{ lang('RCE_RESTORE') }}",
+	"Quickquote": "{{ lang('RCE_QUICK_QUOTE') }}"
+};
+rce_sty = JSON.parse(localStorage.getItem('rce_mode'));
+if (!rce_sty) {
+	rce_sty = {};
+	rce_sty['mode'] = 'wysiwyg';
+	localStorage.setItem('rce_mode', JSON.stringify(rce_sty));
+}
+var dropdownsmiliesurl = [{% for RCE_EMOTICONS in loops.RCE_EMOTICONS %}"{{ RCE_EMOTICONS.url }}"{% if !RCE_EMOTICONS.S_LAST_ROW %}, {% endif %}{% endfor %}],
+dropdownsmiliesdes = [{% for RCE_EMOTICONS in loops.RCE_EMOTICONS %}"{{ RCE_EMOTICONS.code }}"{% if !RCE_EMOTICONS.S_LAST_ROW %}, {% endif %}{% endfor %}],
+dropdownsmiliesname = [{% for RCE_EMOTICONS in loops.RCE_EMOTICONS %}"{{ RCE_EMOTICONS.name }}"{% if !RCE_EMOTICONS.S_LAST_ROW %}, {% endif %}{% endfor %}],
+dropdownsmiliesurlmore = [{% for RCE_EMOTICONS_PLUS in loops.RCE_EMOTICONS_PLUS %}"{{ RCE_EMOTICONS_PLUS.url }}"{% if !RCE_EMOTICONS_PLUS.S_LAST_ROW %}, {% endif %}{% endfor %}],
+dropdownsmiliesdesmore = [{% for RCE_EMOTICONS_PLUS in loops.RCE_EMOTICONS_PLUS %}"{{ RCE_EMOTICONS_PLUS.code }}"{% if !RCE_EMOTICONS_PLUS.S_LAST_ROW %}, {% endif %}{% endfor %}],
+dropdownsmiliesnamemore = [{% for RCE_EMOTICONS_PLUS in loops.RCE_EMOTICONS_PLUS %}"{{ RCE_EMOTICONS_PLUS.name }}"{% if !RCE_EMOTICONS_PLUS.S_LAST_ROW %}, {% endif %}{% endfor %}],
+smileydirectory = "{{ RCE_SMILEY_PATH }}",
+rinsmileysc = '{{ RCE_SMILEY_SC }}',
+rinstartupmode = rce_sty['mode'],
+rinmobsms = '{{ RCE_MOBM_SOURCE }}',
+rinlanguage = '{{ RCE_LANGUAGE }}',
+rinheight = '{{ RCE_HEIGHT }}',
+rinmaxheight = '{{ RCE_MAX_HEIGHT }}',
+rinrmvbut = '{% for RCE_RMV_BUTTONS in loops.RCE_RMV_BUTTONS %}{{ RCE_RMV_BUTTONS.rule }}{% if !RCE_RMV_BUTTONS.S_LAST_ROW %},{% endif %}{% endfor %}',
+extrabut = {
+	{% for RCE_RULES in loops.RCE_RULES %}"{{ RCE_RULES.rule }}":"{{ RCE_RULES.help }}"{% if !RCE_RULES.S_LAST_ROW %},{% endif %}{% endfor %}
+},
+extrabutdesc = {
+	{% if RCE_FLASH_STATUS %}"flash":""{% endif %}{% for RCE_RULES_DES in loops.RCE_RULES_DES %}{% if !RCE_RULES_DES.S_FIRST_ROW or RCE_FLASH_STATUS %},{% endif %}"{{ RCE_RULES_DES.rule }}":"{{ RCE_RULES_DES.help }}"{% endfor %}
+},
+rinautosave = '{% if !RCE_URL_STATUS %}link,{% endif %}{% if !RCE_IMG_STATUS %}image,{% endif %}{% if !RCE_QUOTE_STATUS %}blockquote,{% endif %}{% if !RCE_AUTOSAVE %}autosave,{% endif %}{% if !RCE_SMILIES_STATUS %}smiley,emojione,{% endif %}{% for RCE_RMV_PLUGIN in loops.RCE_RMV_PLUGIN %}{{ RCE_RMV_PLUGIN.rule }}{% if !RCE_RMV_PLUGIN.S_LAST_ROW %},{% endif %}{% endfor %}',
+rinautosavemsg = '{{ RCE_AUTOSAVE_MESSAGE }}',
+rinskin = '{{ RCE_SKIN }}',
+rootpath = "{{ RCE_ROOT_PATH }}",
+rinimgur = '{{ RCE_IMGURAPI }}',
+maxncharc = '{{ RCE_MAX_NAME_CARACT }}',
+maxfontsize = '{{ RCE_MAX_FONT_SIZE }}',
+desnopop = '{{ RCE_DES_NOPOP }}',
+partialmode = '{{ RCE_PARTIAL }}',
+supext = '{{ RCE_SUP_EXT }}',
+seltext = '{{ RCE_SELTEXT }}',
+content_url = '{{ RCE_CONTENT_SKIN }}',
+rin_maxstatus = 0,
+fontsizes = '{% for font in RCE_FONT_SIZES %}{% if !loop.first and font.size <= RCE_MAX_FONT_SIZE %};{% endif %}{% if !loop.first and RCE_MAX_FONT_SIZE == 0 %};{% endif %}{% if font.size <= RCE_MAX_FONT_SIZE %}{{ font.size }}{% endif %}{% if RCE_MAX_FONT_SIZE == 0 %}{{ font.size }}{% endif %}{% endfor %}',
+postid = [{% for RCE_POST_ROW in loops.RCE_POST_ROW %}"{{ RCE_POST_ROW.RCE_POST_ID }}"{% if !RCE_POST_ROW.S_LAST_ROW %}, {% endif %}{% endfor %}],
+postuser = [{% for RCE_POST_ROW in loops.RCE_POST_ROW %}"{{ RCE_POST_ROW.RCE_USERNAME }}"{% if !RCE_POST_ROW.S_LAST_ROW %}, {% endif %}{% endfor %}],
+postdate = [{% for RCE_POST_ROW in loops.RCE_POST_ROW %}"{{ RCE_POST_ROW.RCE_POST_TIME }}"{% if !RCE_POST_ROW.S_LAST_ROW %}, {% endif %}{% endfor %}],
+postuid = [{% for RCE_POST_ROW in loops.RCE_POST_ROW %}"{{ RCE_POST_ROW.RCE_USER_ID }}"{% if !RCE_POST_ROW.S_LAST_ROW %}, {% endif %}{% endfor %}];
+
+($.fn.on || $.fn.live).call($(document), 'click', 'a[href*="mode=edit"]', function () {
+	var url = $(this).attr('href');
+	if (url.indexOf('sid') == -1) {
+		var n = url.lastIndexOf('p=');
+		var pid = url.substring(n + 2);
+	}
+	else {
+		var n = url.lastIndexOf('&sid');
+		var url2 = url.slice(0,n);
+		var n = url2.lastIndexOf('p=')
+		var pid = url2.substring(n + 2);
+	}
+	$( document ).ajaxComplete(function() {
+		$('#quickeditbox form fieldset div textarea').attr( 'id', 'message_'+pid );
+		setTimeout(function() {
+			CKEDITOR.replace( 'message_'+pid, rce_config );
+			if (CKEDITOR.instances['message_'+pid]) {
+				setTimeout(function() {
+					CKEDITOR.instances['message_'+pid].focus();
+				},1000);
+			}
+			offset = $('#message_'+pid).offset().top - 60;
+			setTimeout(function() {
+				$('html, body').animate({
+					scrollTop: offset
+				}, 700);
+			},200);
+		},400);
+	});
+});
+</script>
+{% if RCE_TXTA_BLACK %}
+<style type="text/css">
+textarea.cke_source {
+	background-color: #222222 !important;
+	height: 100% !important;
+	width: 100% !important;
+	color: #eeeeee !important;
+}
+.cke_wysiwyg_frame {
+	background-color: #222222 !important;
+}
+</style>
+{% endif %}
+{% include 'rineditor_config.html' %}
+{% INCLUDEJS '@rin_editor/js/rineditor.js' %}
+{% INCLUDEJS '@rin_editor/js/ckeditor.js' %}
+{% INCLUDEJS '@rin_editor/js/adapters/jquery.js' %}
+{% INCLUDEJS '@rin_editor/js/rck.init.js' %}
+{% if RCE_SUP_SMENT and UA_AJAX_MENTION_URL %}{% INCLUDEJS '@rin_editor/js/automention.js' %}{% endif %}
+{% endif %}

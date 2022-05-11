@@ -63,18 +63,18 @@ if (stristr(htmlentities($_SERVER["PHP_SELF"]), "config.php")) {
 $pn_dbhost = "localhost";
 $pn_dbuname = "root";
 $pn_dbpass = '';
-$pn_dbname = "844";
-$pn_prefix = "n844";
+$pn_dbname = "";
+$pn_prefix = "nuke";
 $pn_dbtype = "mysql";
 $pn_dbfetch = PDO::FETCH_ASSOC;
 $pn_dbcharset = "utf8mb4";
 
-$pn_sitekey = "TGbgmCAGMii2Hmx7lYzUzEq8shxigLwKWrSj1csw";
+$pn_sitekey = "rnLgC811OCScNKG5zr5cVBsS1Rahmt1Mdi5rWgaI";
 $pn_subscription_url = "";
 $pn_tipath = "images/topics/";
 $pn_cache_type = "MySQL";
 $admin_file = "admin";
-$pn_salt = 'RnEK*3odZoumPOn';
+$pn_salt = 'HTBeSJ-#pWA4)gk';
 $old_site_link = "";
 define("_MAX_CACHE_COUNTER_TIME", 3600);
 define("_MAX_CACHE_COUNTER_LINES", 1000);

@@ -168,13 +168,25 @@ function caspian_theme_config()
 	 return $contents;
 }
 
-$cache_systems['caspian_data'] = array(
-	'name'			=> "_CASPIAN_DATA",
-	'table'			=> 'caspian',
-	'auto_load'		=> true
-);
+function caspian_data_cache($cache_systems)
+{
+	$cache_systems['caspian_data'] = array(
+		'name'			=> "_CASPIAN_DATA",
+		'table'			=> 'caspian',
+		'auto_load'		=> true
+	);
+	return $cache_systems;
+}
 
-$other_admin_configs['themes']['Mashhadteam-Caspian'] = array("title" => _CASPIAN_THEME_SETTINGS, "function" => "caspian_theme_config", "God" => false);
+$hooks->add_filter("cache_systems", "caspian_data_cache", 10);
+
+function caspian_settings($other_admin_configs){
+	$other_admin_configs['themes']['Mashhadteam-Caspian'] = array("title" => _CASPIAN_THEME_SETTINGS, "function" => "caspian_theme_config", "God" => false);
+	return $other_admin_configs;
+}
+
+$hooks->add_filter("other_admin_configs", "caspian_settings", 10);
+
 
 function get_caspian_posts_media()
 {

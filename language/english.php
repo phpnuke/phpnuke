@@ -90,6 +90,7 @@ $nuke_languages['english'] = array_merge($nuke_languages['english'], array(
 	"_HOME" => "Home",
 	"_PAGES" => "Page",
 	"_PHPNUKE_MT_EDITION" => "Nuke 8.4",
+	"_DASHBORAD" => "Dashborad",
 	"_ADMINISTRATION" => "Administrator",
 	"_ADMINLOGIN" => "Admin Login",
 	"_SHOW_FRONTPAGE" => "View Site",
@@ -1429,6 +1430,7 @@ $nuke_languages['english'] = array_merge($nuke_languages['english'], array(
 	"_INSTALL_FIRST_POLL_TITLE" => "What do you think about this site ?",
 	"_INSTALL_FIRST_POLL_LINK" => "What-do-you-think-about-this-site",
 	"_INSTALL_RENAME_ERROR" => "The install file and folder cannot be renamed. Please delete or rename this file and folder first and then go to other sections ",
+	"_TEMPLATE" => "Template",
 ));
 
 $nuke_configs['formatBytes'] = array(

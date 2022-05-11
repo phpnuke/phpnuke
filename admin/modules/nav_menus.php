@@ -155,7 +155,7 @@ if (check_admin_permission($filename))
 		include("footer.php");
 	}
 	
-	function nav_menus_admin($nav_id=0, array $nav_fields, array $nav_menu_fields, $mode='add_nav')
+	function nav_menus_admin($nav_id=0, array $nav_fields = array(), array $nav_menu_fields = array(), $mode='add_nav')
 	{
 		global $db, $admin_file, $nuke_configs, $hooks, $theme_setup;
 		
@@ -166,6 +166,7 @@ if (check_admin_permission($filename))
 		// add menu to a nav
 		if($mode == "add_nav_menu" && !empty($nav_menu_fields))
 		{
+			$hooks->do_action("add_nav_menu_before", $nav_id, $nav_fields, $nav_menu_fields, $mode);
 			$result = $db->table(NAV_MENUS_DATA_TABLE)
 							->order_by(["nid" => "DESC"])
 							->limit(0, 1)
@@ -258,6 +259,8 @@ if (check_admin_permission($filename))
 					"status" => "error",
 					"message" => ""._ERROR_IN_OP." : ".$db->getErrors('last')['message'].""
 				));
+			
+			$hooks->do_action("add_nav_menu_after", $nav_id, $nav_fields, $nav_menu_fields, $mode);
 			die($response);
 		}
 		// add menu to a nav
@@ -265,6 +268,7 @@ if (check_admin_permission($filename))
 		// save a nav
 		if($mode == "save_nav" && !empty($nav_fields))
 		{
+			$hooks->do_action("save_nav_before", $nav_id, $nav_fields, $nav_menu_fields, $mode);
 			$update_query = array();
 			
 			$update_fields = array('status', 'pid', 'title', 'url', 'weight', 'attributes');
@@ -378,6 +382,7 @@ if (check_admin_permission($filename))
 						"message" => _EMPTY_NAV
 					));
 			}
+			$hooks->do_action("save_nav_after", $nav_id, $nav_fields, $nav_menu_fields, $mode);
 			die($response);
 		}
 		// save a nav
@@ -386,8 +391,10 @@ if (check_admin_permission($filename))
 		if($mode == "delete")
 		{
 			csrfProtector::authorisePost(true);
+			$hooks->do_action("delete_nav_before", $nav_id, $nav_fields, $nav_menu_fields, $mode);
 			$result1 = $db->sql_query("DELETE FROM ".NAV_MENUS_DATA_TABLE." WHERE nav_id = '$nav_id'");
 			$result1 = $db->sql_query("DELETE FROM ".NAV_MENUS_TABLE." WHERE nav_id = '$nav_id'");
+			$hooks->do_action("delete_nav_after", $nav_id, $nav_fields, $nav_menu_fields, $mode);
 			cache_system("nuke_nav_menus");
 			header("location: ".$admin_file.".php?op=nav_menus");
 		}
@@ -615,9 +622,9 @@ if (check_admin_permission($filename))
 						<tr>
 							<th class=\"table-header-repeat line-left\" style=\"text-align:center;\">"._STRAUCTURE."
 								<menu id=\"nestable-menu\">
-									<button type=\"button\" data-action=\"expand-all\">"._EXPAND_ALL."</button>
-									<button type=\"button\" data-action=\"collapse-all\">"._CLOSE_ALL."</button>
-									<button type=\"button\" data-action=\"save-nav\">"._SAVECHANGES."</button>
+									<button type=\"button\" class=\"form-submit\" data-action=\"expand-all\">"._EXPAND_ALL."</button>
+									<button type=\"button\" class=\" form-submit\" data-action=\"collapse-all\">"._CLOSE_ALL."</button>
+									<button type=\"button\" class=\" form-submit\" data-action=\"save-nav\">"._SAVECHANGES."</button>
 								</menu>
 							</th>
 						</tr>

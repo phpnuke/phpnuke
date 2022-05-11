@@ -1,0 +1,26 @@
+{
+    "name": "kirk/new_topic_button_in_topic",
+    "type": "phpbb-extension",
+    "description": "Adds in the Topic a new Topic Button.",
+    "homepage": "http://www.quad-atv-freunde-wunsiedel.de",
+    "version": "1.0.0",
+    "time": "2014-10-07",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Udo Ponader",
+            "email": "canam800er@googlemail.com",
+            "homepage": "http://www.quad-atv-freunde-wunsiedel.de",
+            "role": "Lead Developer"
+        }
+    ],
+   "require": {
+      "php": ">=5.3.3"
+   },
+    "extra": {
+        "display-name": "New Topic Button in Topic",
+            "soft-require": {
+                     "phpbb/phpbb": "3.1.*"
+            }
+    }
+}

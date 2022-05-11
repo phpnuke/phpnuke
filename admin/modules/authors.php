@@ -97,8 +97,7 @@ if (check_admin_permission($filename, true))
 		
 		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 		
-		if(!isset($main_menus));
-			include("admin/links.php");	
+		include("admin/links.php");	
 		
 		$hooks->add_filter("set_page_title", function(){return array("displayadmins" => _AUTHORS_AND_ADMINS);});
 		
@@ -113,10 +112,10 @@ if (check_admin_permission($filename, true))
 				$row = (isset($result->results()[0])) ? $result->results()[0]:array('','','','','');
 				
 				list($uname, $rname, $remail, $rsite, $rupass) = array_values($row);
-				$rphone = $rrule = "";
+				$rphone = $rimage = $rrule = "";
 			}
 			else
-				$uname = $rname = $remail = $rsite = $rupass = $rphone = $rrule = "";
+				$uname = $rname = $remail = $rsite = $rupass = $rphone = $rimage = $rrule = "";
 
 			$contents .= "<div class=\"text-center\"><font class=\"title\"><b>" . _AUTHORSADMIN . "</b></font></div>";
 			
@@ -137,7 +136,7 @@ if (check_admin_permission($filename, true))
 				<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:100px;\"><a>"._OPERATION."</a></th>
 			</tr>";
 			$result = $db->table(AUTHORS_TABLE)
-							->select(["aid", "name", "realname", "admlanguage", "radminsuper", "rule", "phone"]);
+							->select(["aid", "name", "realname", "admlanguage", "radminsuper", "rule", "phone", "image"]);
 			if($db->count() > 0)
 			{
 				foreach ($result as $row)
@@ -147,17 +146,16 @@ if (check_admin_permission($filename, true))
 					$realname = filter($row['realname'], "nohtml");
 					$rule = stripslashes($row['rule']);
 					$phone = stripslashes($row['phone']);
+					$image = stripslashes($row['image']);
 					$admlanguage = $row['admlanguage'];
 					$radminsuper = $row['radminsuper'];
 					$a_aid = substr("$a_aid", 0,25);
 					$name = substr("$name", 0,50);
-					if ($name == "God")
-					{
-						$contents .= "<tr><td align=\"center\">&nbsp;$a_aid<br /><i>("._SUPER_ADMIN.")</i>&nbsp;</td>";
-					} else
-					{
-						$contents .= "<tr><td align=\"center\">&nbsp;$a_aid&nbsp;</td>";
-					}
+					
+					$admin_image = ($image != '') ? "<img src=\"$image\" width=\"60\" height=\"60\" style=\"border-radius:50%;\" /><br />":"";
+					
+					$contents .= "<tr><td align=\"center\">".$admin_image."".$a_aid."".(($name == "God") ? "<br /><i>("._SUPER_ADMIN.")</i>":"")."</td>";
+					
 					if (empty($admlanguage))
 					{
 						$admlanguage = "" . _ALL . "";
@@ -185,7 +183,7 @@ if (check_admin_permission($filename, true))
 										$contents .= "
 										<li class=\"tagit-choice ui-widget-content ui-state-default ui-corner-all tagit-choice-editable\" id=\"perm_$amid\">
 											<span class=\"tagit-label\">$atitle2</span>
-											<a class=\"tagit-close\" data-aid=\"$a_aid\" data-amid=\"$amid\" data-type=\"admin\">
+											<a class=\"tagit-close\" data-aid=\"$a_aid\" data-amid=\"$amid\" data-type=\"admin\" data-parent=\"#perm_$amid\">
 												<span class=\"text-icon\">×</span>
 												<span class=\"ui-icon ui-icon-close\"></span>
 											</a>
@@ -216,7 +214,7 @@ if (check_admin_permission($filename, true))
 										$contents .= "
 										<li class=\"tagit-choice ui-widget-content ui-state-default ui-corner-all tagit-choice-editable\" id=\"mperm_$mid\">
 											<span class=\"tagit-label\">$lang_title</span>
-											<a class=\"tagit-close\" data-aid=\"$a_aid\" data-mid=\"$mid\" data-type=\"module\">
+											<a class=\"tagit-close\" data-aid=\"$a_aid\" data-mid=\"$mid\" data-type=\"module\" data-parent=\"#mperm_$mid\">
 												<span class=\"text-icon\">×</span>
 												<span class=\"ui-icon ui-icon-close\"></span>
 											</a>
@@ -228,11 +226,7 @@ if (check_admin_permission($filename, true))
 						$contents .="</td>";
 					$contents .= "<td align=\"center\">$admlanguage</td>";
 					$contents .= "<td align=\"center\"><a class=\"table-icon icon-1 info-tooltip\" href=\"".$admin_file.".php?op=modifyadmin&amp;chng_aid=$a_aid\" title=\""._EDIT_ADMIN."\"></a>";
-					if($name == "God")
-					{
-						$contents .= "<img src=\"images/delete_x.gif\" alt=\""._MAINACCOUNT."\" title=\""._MAINACCOUNT."\" border=\"0\" width=\"17\" height=\"17\"></a></td></tr>";
-					}
-					else
+					if($name != "God")
 					{
 						$contents .= "<a class=\"table-icon icon-2 info-tooltip\" href=\"".$admin_file.".php?op=deladmin&amp;del_aid=$a_aid&csrf_token="._PN_CSRF_TOKEN."\" title=\""._DELETE_ADMIN."\"></a></td></tr>";
 					}
@@ -243,10 +237,11 @@ if (check_admin_permission($filename, true))
 			<script>
 				$(document).ready(function(){
 					$(\".tagit-close\").on('click', function(){
-						var admin_id = $(this).attr('data-aid');
-						var amid = $(this).attr('data-amid');
-						var mid = $(this).attr('data-mid');
-						var type = $(this).attr('data-type');
+						var admin_id = $(this).data('aid');
+						var amid = $(this).data('amid');
+						var mid = $(this).data('mid');
+						var type = $(this).data('type');
+						var parent = $(this).data('parent');
 						
 						$.post(
 						'".$admin_file.".php',
@@ -255,8 +250,8 @@ if (check_admin_permission($filename, true))
 						{
 							if(data == 'true')
 							{
-								$(\"#\"+((type == 'admin') ? '':'m')+\"perm_\"+((type == 'admin') ? amid:mid)).fadeOut('1000', function(){
-									$(\"#\"+((type == 'admin') ? '':'m')+\"perm_\"+((type == 'admin') ? amid:mid)).remove();
+								$(parent).fadeOut('1000', function(){
+									$(parent).remove();
 								});
 							}
 						});
@@ -288,6 +283,10 @@ if (check_admin_permission($filename, true))
 					<tr>
 						<th>"._PHONE."</th>
 						<td><input type=\"text\" style=\"direction:ltr\" name=\"author_fields[add_phone]\" size=\"30\" maxlength=\"60\" class=\"inp-form-ltr\" value=\"$rphone\" /> <font class=\"tiny\">" . _REQUIRED . "</font></td>
+					</tr>
+					<tr>
+						<th>"._PICTURE."</th>
+						<td><input type=\"text\" style=\"direction:ltr\" name=\"author_fields[add_image]\" size=\"30\" class=\"inp-form-ltr\" value=\"$rimage\" /> </td>
 					</tr>
 					<tr>
 						<th>"._ADMIN_TASK."</th>
@@ -425,10 +424,12 @@ if (check_admin_permission($filename, true))
 						<td>" . _PASSWORD . "</td>
 						<td><input type=\"password\" name=\"author_fields[add_pwd]\" size=\"12\" maxlength=\"40\" class=\"inp-form\" value=\"$rupass\" /> <font class=\"tiny\">" . _REQUIRED . "</font></td>
 					</tr>
-					<input type=\"hidden\" name=\"op\" value=\"AddAuthor\">
-					<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" />
 					<tr>
-						<td colspan=\"2\"><input type=\"submit\" value=\"" . _ADD_ADMIN_SAVE . "\"></td>
+						<td colspan=\"2\">
+							<input type=\"submit\" value=\"" . _ADD_ADMIN_SAVE . "\" class=\"form-submit\">
+							<input type=\"hidden\" name=\"op\" value=\"AddAuthor\">
+							<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" />
+						</td>
 					</tr>
 				</table>
 			</form>
@@ -443,6 +444,8 @@ if (check_admin_permission($filename, true))
 				."Unauthorized editing of authors detected<br><br>"
 				.""._GOBACK."</div>";
 		}
+		
+		$contents = $hooks->apply_filters("display_admins", $contents, $user_id);
 		
 		include("header.php");
 		$html_output .= $contents;
@@ -476,6 +479,7 @@ if (check_admin_permission($filename, true))
 			$chng_email = filter($nuke_authors_cacheData[$adm_aid]['email'], "nohtml");
 			$chng_pwd = filter($nuke_authors_cacheData[$adm_aid]['pwd'], "nohtml");
 			$chng_phone = filter($nuke_authors_cacheData[$adm_aid]['phone'], "nohtml");
+			$chng_image = filter($nuke_authors_cacheData[$adm_aid]['image'], "nohtml");
 			$chng_rule = stripslashes($nuke_authors_cacheData[$adm_aid]['rule']);
 			$chng_radminsuper = intval($nuke_authors_cacheData[$adm_aid]['radminsuper']);
 			$chng_admlanguage = $nuke_authors_cacheData[$adm_aid]['admlanguage'];
@@ -502,6 +506,10 @@ if (check_admin_permission($filename, true))
 					<tr>
 						<th>"._PHONE."</th>
 						<td><input type=\"text\" style=\"direction:ltr\" name=\"author_fields[chng_phone]\" size=\"30\" maxlength=\"60\" class=\"inp-form-ltr\" value=\"$chng_phone\" /> <font class=\"tiny\">" . _REQUIRED . "</font></td>
+					</tr>
+					<tr>
+						<th>"._PICTURE."</th>
+						<td><input type=\"text\" style=\"direction:ltr\" name=\"author_fields[chng_image]\" size=\"30\" class=\"inp-form-ltr\" value=\"$chng_image\" /></td>
 					</tr>
 					<tr>
 						<th>"._ADMIN_TASK."</th>
@@ -650,6 +658,9 @@ if (check_admin_permission($filename, true))
 		
 			phpnuke_db_error();
 			
+			
+			$contents = $hooks->apply_filters("modify_admins", $contents, $chng_aid);
+			
 			include("header.php");
 			$html_output .= $contents;
 			include("footer.php");
@@ -669,9 +680,12 @@ if (check_admin_permission($filename, true))
 	
 	function updateadmin($author_fields)
 	{
-		global $admin, $aid, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		global $admin, $aid, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData, $hooks;
 		
 		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
+		
+		$hooks->do_action("update_admins_before", $author_fields);
+		$author_fields = $hooks->apply_filters("update_admins_fields", $author_fields);
 		
 		$contents = '';
 		if (is_God())
@@ -692,6 +706,7 @@ if (check_admin_permission($filename, true))
 			$sql_qrray['email'] = $chng_email;
 			$sql_qrray['url'] = $chng_url;
 			$sql_qrray['phone'] = $chng_phone;
+			$sql_qrray['image'] = $chng_image;
 			$sql_qrray['rule'] = $chng_rule;
 			$sql_qrray['admlanguage'] = $chng_admlanguage;
 			
@@ -834,6 +849,7 @@ if (check_admin_permission($filename, true))
 				cache_system('nuke_admins_menu');
 			}
 			
+			$hooks->do_action("update_admins_after", $author_fields);
 			phpnuke_db_error();
 			Header("Location: ".$admin_file.".php?op=mod_authors");
 		}
@@ -851,6 +867,9 @@ if (check_admin_permission($filename, true))
 	function addauthor($author_fields)
 	{
 		global $db, $aid, $hooks, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		
+		$hooks->do_action("add_admins_before", $author_fields);
+		$author_fields = $hooks->apply_filters("add_admins_fields", $author_fields);
 		
 		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 		
@@ -957,6 +976,7 @@ if (check_admin_permission($filename, true))
 				'url' => $add_url,
 				'email' => $add_email,
 				'phone' => $add_phone,
+				'image' => $add_image,
 				'rule' => $add_rule,
 				'pwd' => $add_pwd,
 				'radminsuper' => ((isset($add_radminsuper) && $add_radminsuper == 1) ? 1:0),
@@ -964,6 +984,7 @@ if (check_admin_permission($filename, true))
 				'aadminsuper' => $aadminsuper
 			]);
 		
+		$hooks->do_action("add_admins_after", $author_fields);
 		phpnuke_db_error();
 		cache_system('nuke_authors');
 		add_log(_ADD_ADMIN." $add_aid", 1);
@@ -972,7 +993,9 @@ if (check_admin_permission($filename, true))
 	
 	function remove_permission($admin_id, $amid, $mid, $type)
 	{
-		global $db, $aid, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		global $db, $aid, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData, $hooks;
+		
+		$hooks->do_action("remove_admins_permission_before", $admin_id, $amid, $mid, $type);
 		
 		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
 		
@@ -1002,11 +1025,13 @@ if (check_admin_permission($filename, true))
 			add_log(sprintf(_REMOVE_ADMIN_PERMISSIONS, $admin_id, $menu_title), 1);
 			
 			($type == 'admin') ?  cache_system("nuke_admins_menu"):cache_system("nuke_modules");
-
-			die("true");
+			
+			$return = 'true';
 		}
 		else
-			die("false");
+			$return = 'false';
+			
+		die($return);
 	}
 
 	function deladmin($del_aid)
@@ -1110,6 +1135,8 @@ if (check_admin_permission($filename, true))
 	{
 		global $admin, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
 		
+		$hooks->do_action("assignarticles_before", $del_aid, $newaid);
+		
 		$del_aid = trim($del_aid);
 		
 		$numrows = $db->table(POSTS_TABLE)
@@ -1134,6 +1161,8 @@ if (check_admin_permission($filename, true))
 		
 		$db->query("update ".AUTHORS_TABLE." set counter=counter+$numrows where aid=?", [$newaid]);
 		
+		$hooks->do_action("assignarticles_after", $del_aid, $newaid);
+		
 		phpnuke_db_error();
 		cache_system('nuke_authors');
 		Header("Location: ".$admin_file.".php?op=deladminconf&del_aid=$del_aid&csrf_token="._PN_CSRF_TOKEN."");
@@ -1142,7 +1171,10 @@ if (check_admin_permission($filename, true))
 	function deladminconf($del_aid)
 	{
 		csrfProtector::authorisePost(true);
-		global $admin, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData;
+		global $admin, $db, $admin_file, $nuke_configs, $nuke_admins_menu_cacheData, $hooks;
+		
+		$hooks->do_action("deladminconf_before", $del_aid);
+		
 		$del_aid = trim($del_aid);
 
 		$db->table(AUTHORS_TABLE)
@@ -1195,6 +1227,8 @@ if (check_admin_permission($filename, true))
 					"admins" => $admins
 				]);
 		}
+		$hooks->do_action("deladminconf_after", $del_aid);
+		
 		cache_system('nuke_modules');
 		
 		add_log(_DELETE_ADMIN." $del_aid", 1);
@@ -1204,6 +1238,7 @@ if (check_admin_permission($filename, true))
 	}
 	
 	$user_id = (isset($user_id)) ? intval($user_id):0;
+	$mid = (isset($mid)) ? intval($mid):0;
 	$amid = (isset($amid)) ? intval($amid):0;
 	$chng_radminsuper = (isset($chng_radminsuper)) ? intval($chng_radminsuper):0;
 	$auth_modules = (isset($auth_modules)) ? $auth_modules:array();

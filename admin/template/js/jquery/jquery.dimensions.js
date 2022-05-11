@@ -266,7 +266,7 @@ $.fn.extend({
 			st = elem.scrollTop;
 			
 		// Mozilla and IE do not add the border
-		if (browser[0] == 'mozilla' || browser[0] = 'msie') {
+		if (browser[0] == 'mozilla' || browser[0] == 'msie') {
 			// add borders to offset
 			x += num(elem, 'borderLeftWidth');
 			y += num(elem, 'borderTopWidth');

@@ -25,7 +25,8 @@ if ( !defined('MODULE_FILE') ) {
 require_once("mainfile.php");
 $module_name = basename(dirname(__FILE__));
 
-define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
+if(!defined("INDEX_FILE"))
+	define('INDEX_FILE', is_index_file($module_name));// to define INDEX_FILE status
 
 global $db, $user, $nuke_configs, $pn_Cookies, $pn_Sessions, $op, $userinfo, $username;
 
@@ -220,6 +221,7 @@ function userinfo($username='')
 			elseif(function_exists("userinfo_html"))
 				$contents .= userinfo_html($user_data);
 			else 
+			{
 				$contents .= "
 				<div class=\"container-fluid\">
 					<div class=\"row profile_page\">
@@ -251,6 +253,7 @@ function userinfo($username='')
 						</div> 
 					</div> 
 				</div>";
+			}
 		}
 		else
 		{
@@ -264,6 +267,7 @@ function userinfo($username='')
 				{
 					$user_id = $result->results()[0]['user_id'];
 					redirect_to(sprintf($users_system->profile_url, $user_id, $username));
+					die();
 				}
 			}
 			$contents .= OpenTable();
@@ -276,14 +280,14 @@ function userinfo($username='')
 	
 	$contents = show_modules_boxes($module_name, "profile", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
 	
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($username){
-		$breadcrumbs['userinfo'] = array(
-			"name" => _USERINFO.(($username != '') ? " $username":""),
-			"link" => LinkToGT("index.php?modname=users&op=userinfo".(($username != '') ? "&username=$username":"")),
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_functions_vars(
+		'userinfo_breadcrumb',
+		array(
+			"user_data" => $user_data,
+		)
+	);
+	
+	$hooks->add_filter("site_breadcrumb", "userinfo_breadcrumb", 10);
 	
 	include("header.php");
 	$html_output .= $contents;	
@@ -1574,7 +1578,7 @@ function reset_password($mode='', $credit_code='', $reset_password_username='', 
 	die(json_encode(array('message' => $contents, 'status' => (!empty($errors) ? "danger":"success"))));
 }
 
-function edit_user($user_configs = array(), $uploadfile = array(), $submit)
+function edit_user($user_configs = array(), $uploadfile = array(), $submit='')
 {
 	global $db, $user, $module_name, $users_system, $pn_Cookies, $pn_Sessions, $nuke_configs, $ya_config, $userinfo, $hooks;
 	
@@ -2184,43 +2188,15 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 				$contents .= _USERNAME_NOT_EXISTS;
 		}
 	}
-	
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $ya_config, $module_name)
-	{
-		$default_js = array();
-		$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
-		$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/fileinput.min.css\" rel=\"stylesheet\" type=\"text/css\">";
-		
-		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
-		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
-		$defer_js[] = "
-			<script>
-				var allowmailchange = ".(($ya_config['allowmailchange'] == 1) ? 'true':'false').";
-				var remote_url = '".LinkToGT("index.php?modname=$module_name&op=check_register_fields")."';
-				var pass_min = ".$ya_config['pass_min'].", pass_max = ".$ya_config['pass_max'].";
-			</script>";
-		$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
-		
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\"></script>";
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
-		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
-		
-		if($nuke_configs['multilingual'] == 1)
-		{
-			$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
-			if($nuke_configs['datetype'] == 1)
-				$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
-			elseif($nuke_configs['datetype'] == 2)
-				$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
-		}
-	
-		$theme_setup = array_merge_recursive($theme_setup, array(
-			"default_css" => $default_css,
-			"default_js" => $default_js,
-			"defer_js" => $defer_js
-		));
-		return $theme_setup;
-	}, 10);
+
+	$hooks->add_functions_vars(
+		'edit_users_assets',
+		array(
+			"module_name" => $module_name,
+			"ya_config" => $ya_config,
+		)
+	);
+	$hooks->add_filter("site_theme_headers", "edit_users_assets", 10);
 	
 	$contents = OpenTable(_USER_PROFILE_EDIT.' '.$user_data['username']).$contents.CloseTable();
 	
@@ -2242,14 +2218,13 @@ function edit_user($user_configs = array(), $uploadfile = array(), $submit)
 		return array_merge($all_meta_tags, $meta_tags);
 	}, 10);		
 	unset($meta_tags);
-	$hooks->add_filter("site_breadcrumb", function($breadcrumbs, $block_global_contents) use($user_data){
-		$breadcrumbs['userinfo'] = array(
-			"name" => _USER_PROFILE_EDIT,
-			"link" => LinkToGT("index.php?modname=users&op=edit_user"),
-			"itemtype" => "WebPage"
-		);
-		return $breadcrumbs;
-	}, 10);
+	$hooks->add_functions_vars(
+		'user_edit_breadcrumb',
+		array(
+			"user_data" => $user_data,
+		)
+	);
+	$hooks->add_filter("site_breadcrumb", "user_edit_breadcrumb", 10);
 	
 	include("header.php");
 	$html_output .= show_modules_boxes($module_name, "edit", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
@@ -2274,6 +2249,7 @@ function delete_cookies()
 	$pn_Cookies->delete("user");
 	$pn_Sessions->remove("userinfo");
 	redirect_to(LinkToGT("index.php?modname=$module_name"));
+	die();
 }
 
 function send_invitation_code($invited_email)

@@ -143,7 +143,7 @@ elseif(in_array($op, array("mod_authors", "modifyadmin", "UpdateAuthor", "AddAut
 
 if(!isset($pagetitle))
 {
-	$hooks->add_filter("set_page_title", function(){return array("admin_page" => "- "._ADMIN_PAGE."");});
+	$hooks->add_filter("set_page_title", function(){return array("admin_page" => '');});
 }
 
 $nuke_admins_menu_cacheData = add_remove_nuke_admins_menu();
@@ -660,7 +660,13 @@ function admin_tables_sortable($fields=array(), $sort = 'DESC', $link_to_more=''
 	{
 		foreach($fields as $field)
 		{
-			$contents .="<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:".$field['width'].";\"><a href=\"".$admin_file.".php?op=".$field['op']."&order_by=".$field['id']."&sort=".$sort_reverse."".$link_to_more."\"".(($order_by == $field['id']) ? " class=\"arrow_".strtolower($sort)."\"":"").">".$field['text']."</a></th>";
+			if(!isset($field['op']) || (isset($field['op']) && $field['op'] == ''))
+			{
+				$contents .="<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:".$field['width'].";\">".$field['text']."</th>";
+			}
+			else{
+				$contents .="<th class=\"table-header-repeat line-left\" style=\"text-align:center;width:".$field['width'].";\"><a href=\"".$admin_file.".php?op=".$field['op']."&order_by=".$field['id']."&sort=".$sort_reverse."".$link_to_more."\"".(($order_by == $field['id']) ? " class=\"arrow_".strtolower($sort)."\"":"").">".$field['text']."</a></th>";
+			}
 		}
 	}
 
@@ -1372,6 +1378,8 @@ function show_log_list($log_type=1)
 }
 
 unset($nuke_authors_cacheData);
+
+$hooks->do_action("run_admin_plugins");
 
 if($admintest)
 {	

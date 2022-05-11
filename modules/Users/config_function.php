@@ -32,56 +32,141 @@ define('CHMOD_READ', 4);
 define('CHMOD_WRITE', 2);
 define('CHMOD_EXECUTE', 1);
 
-$cache_systems['nuke_groups'] = array(
-	'name'			=> "_GROUPS",
-	"main_id"		=> 'group_id',
-	'table'			=> GROUPS_TABLE,
-	'where'			=> "group_id != '1'",
-	'order'			=> 'ASC',
-	'fetch_type'	=> \PDO::FETCH_ASSOC,
-	'first_code'	=> '',
-	'loop_code'		=> '',
-	'end_code'		=> '',
-	'auto_load'		=> true
-);
+function nuke_groups_cache($cache_systems)
+{
+	$cache_systems['nuke_groups'] = array(
+		'name'			=> "_GROUPS",
+		"main_id"		=> 'group_id',
+		'table'			=> GROUPS_TABLE,
+		'where'			=> "group_id != '1'",
+		'order'			=> 'ASC',
+		'fetch_type'	=> \PDO::FETCH_ASSOC,
+		'first_code'	=> '',
+		'loop_code'		=> '',
+		'end_code'		=> '',
+		'auto_load'		=> true
+	);
+	return $cache_systems;
+}
+
+$hooks->add_filter("cache_systems", "nuke_groups_cache", 10);
+
+function login_sign_up_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$module_name = $hooks->functions_vars['login_sign_up_assets']['module_name'];
+	
+	$theme_setup["default_css"] = array(
+		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\">",
+		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/vazir/style.css\" />",
+		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/fontawesome/style.css\" />",
+		"".((_DIRECTION == 'rtl') ? "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/bootstrap-rtl.css\">":"")."",
+		"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/CNBYA.css\">",
+	);
+
+	$theme_setup["default_js"] = array(
+		"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.min.js\"></script>",
+		"<script>var phpnuke_url = '".$nuke_configs['nukeurl']."', phpnuke_cdnurl = '".$nuke_configs['nukecdnurl']."', phpnuke_theme = '".$nuke_configs['ThemeSel']."', nuke_lang = '".(($nuke_configs['multilingual'] == 1) ? $nuke_configs['currentlang']:$nuke_configs['language'])."', nuke_date = ".$nuke_configs['datetype'].";var theme_languages = { success_voted : '"._SUCCESS_VOTED."', try_again : '"._ERROR_TRY_AGAIN."'};var pn_csrf_token = '"._PN_CSRF_TOKEN."';var module_name = '".$module_name."';var reset_password_url = '".LinkToGT("index.php?modname=$module_name&op=reset_password")."';</script>",
+		"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
+	);
+
+	$theme_setup["defer_js"] = array(
+		"<!--[if lt IE 9]> <script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/html5shiv/dist/html5shiv.js\"></script><script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/respond/respond.min.js\"></script> <![endif]-->",		
+		"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap.min.js\"></script>",
+		"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/script/script.js\"></script>",
+	);
+
+	$theme_setup["default_link_rel"] = array(
+		"<link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/114x114.png\">",
+		"<link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/72x72.png\">",
+		"<link rel=\"apple-touch-icon-precomposed\" sizes=\"57x57\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/57x57.png\">",
+		"<link rel=\"apple-touch-icon-precomposed\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/default.png\">",
+		"".((file_exists("themes/".$nuke_configs['ThemeSel']."/images/favicon.ico")) ? "<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\">":"")."",
+	);
+	return $theme_setup;
+}
+
+function ya_html_output_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$module_name = $hooks->functions_vars['ya_html_output_assets']['module_name'];
+	$ya_config = $hooks->functions_vars['ya_html_output_assets']['ya_config'];
+	
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"default_css" => array(
+			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/CNBYA_in.css\">",
+		),
+		"default_js" => array(
+			"<script>var module_name = '".$module_name."';</script>",
+			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
+		),
+		"default_link_rel" => array(),
+		"default_meta" => array()
+	));
+	
+	if(isset($ya_config['custom_theme_setup']) && !empty($ya_config['custom_theme_setup']))
+	foreach($ya_config['custom_theme_setup'] as $key => $value)
+		$theme_setup[$key] = array_merge_recursive($theme_setup[$key], $value);
+		
+	return $theme_setup;
+}
+
+function edit_users_assets($theme_setup)
+{
+	global $nuke_configs, $hooks;
+	
+	$module_name = $hooks->functions_vars['edit_users_assets']['module_name'];
+	$ya_config = $hooks->functions_vars['edit_users_assets']['ya_config'];
+
+	$default_js = array();
+	$default_css[] = "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.css\">";
+	$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/fileinput.min.css\" rel=\"stylesheet\" type=\"text/css\">";
+	
+	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.mockjax.js\"></script>";
+	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>";
+	$defer_js[] = "
+		<script>
+			var allowmailchange = ".(($ya_config['allowmailchange'] == 1) ? 'true':'false').";
+			var remote_url = '".LinkToGT("index.php?modname=$module_name&op=check_register_fields")."';
+			var pass_min = ".$ya_config['pass_min'].", pass_max = ".$ya_config['pass_max'].";
+		</script>";
+	$defer_js[] = "<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/users.js\"></script>";
+	
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/select2.min.js\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>";
+	$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/calendar.js\" type=\"text/javascript\"></script>";
+	
+	if($nuke_configs['multilingual'] == 1)
+	{
+		$default_css[] = "<link href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery-ui.min.rtl.css\" rel=\"stylesheet\" type=\"text/css\">";
+		if($nuke_configs['datetype'] == 1)
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-fa.js\" type=\"text/javascript\"></script>";
+		elseif($nuke_configs['datetype'] == 2)
+			$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc-ar.js\" type=\"text/javascript\"></script>";
+	}
+
+	$theme_setup = array_merge_recursive($theme_setup, array(
+		"default_css" => $default_css,
+		"default_js" => $default_js,
+		"defer_js" => $defer_js
+	));
+	return $theme_setup;
+}
 
 function login_sign_up_theme($mode="header")
 {
 	global $db, $op, $nuke_configs, $ya_config, $module_name, $hooks;
 	$content = '';
 	
-	$hooks->add_filter("site_theme_headers", function ($theme_setup) use($nuke_configs, $module_name)
-	{
-		$theme_setup["default_css"] = array(
-			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/bootstrap.min.css\">",
-			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/vazir/style.css\" />",
-			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."includes/fonts/fontawesome/style.css\" />",
-			"".((_DIRECTION == 'rtl') ? "<link rel=\"stylesheet\" href=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/css/bootstrap-rtl.css\">":"")."",
-			"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/CNBYA.css\">",
-		);
-
-		$theme_setup["default_js"] = array(
-			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/jquery.min.js\"></script>",
-			"<script>var phpnuke_url = '".$nuke_configs['nukeurl']."', phpnuke_cdnurl = '".$nuke_configs['nukecdnurl']."', phpnuke_theme = '".$nuke_configs['ThemeSel']."', nuke_lang = '".(($nuke_configs['multilingual'] == 1) ? $nuke_configs['currentlang']:$nuke_configs['language'])."', nuke_date = ".$nuke_configs['datetype'].";var theme_languages = { success_voted : '"._SUCCESS_VOTED."', try_again : '"._ERROR_TRY_AGAIN."'};var pn_csrf_token = '"._PN_CSRF_TOKEN."';var module_name = '".$module_name."';var reset_password_url = '".LinkToGT("index.php?modname=$module_name&op=reset_password")."';</script>",
-			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
-		);
-
-		$theme_setup["defer_js"] = array(
-			"<!--[if lt IE 9]> <script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/html5shiv/dist/html5shiv.js\"></script><script src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/plugins/respond/respond.min.js\"></script> <![endif]-->",		
-			"<script src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/bootstrap/js/bootstrap.min.js\"></script>",
-			"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/script/script.js\"></script>",
-		);
-
-		$theme_setup["default_link_rel"] = array(
-			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"114x114\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/114x114.png\">",
-			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"72x72\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/72x72.png\">",
-			"<link rel=\"apple-touch-icon-precomposed\" sizes=\"57x57\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/57x57.png\">",
-			"<link rel=\"apple-touch-icon-precomposed\" href=\"".$nuke_configs['nukeurl']."themes/".$nuke_configs['ThemeSel']."/images/icons/default.png\">",
-			"".((file_exists("themes/".$nuke_configs['ThemeSel']."/images/favicon.ico")) ? "<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukecdnurl']."themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\">":"")."",
-		);
-		
-		return $theme_setup;
-	}, 10);
+	$hooks->add_functions_vars(
+		'login_sign_up_assets',
+		array(
+			"module_name" => $module_name,
+		)
+	);
+	$hooks->add_filter("site_theme_headers", "login_sign_up_assets", 10);
 	
 	if($mode == "header")
 	{
@@ -162,27 +247,13 @@ function ya_html_output($ya_config, $contents)
 	}
 	else
 	{
-		
-		$hooks->add_filter("site_theme_headers", function ($theme_setup) use($module_name, $nuke_configs)
-		{
-			$theme_setup = array_merge_recursive($theme_setup, array(
-				"default_css" => array(
-					"<link rel=\"stylesheet\" type=\"text/css\" href=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/CNBYA_in.css\">",
-				),
-				"default_js" => array(
-					"<script>var module_name = '".$module_name."';</script>",
-					"<script type=\"text/javascript\" src=\"".$nuke_configs['nukecdnurl']."includes/Ajax/jquery/form-validator/jquery.form-validator.min.js\"></script>",
-				),
-				"default_link_rel" => array(),
-				"default_meta" => array()
-			));
-			
-			if(isset($ya_config['custom_theme_setup']) && !empty($ya_config['custom_theme_setup']))
-			foreach($ya_config['custom_theme_setup'] as $key => $value)
-				$theme_setup[$key] = array_merge_recursive($theme_setup[$key], $value);
-			
-			return $theme_setup;
-		}, 10);
+		$hooks->add_functions_vars(
+			'ya_html_output_assets',
+			array(
+				"ya_config" => $ya_config,
+			)
+		);
+		$hooks->add_filter("site_theme_headers", "ya_html_output_assets", 10);
 		
 		include("header.php");
 		
@@ -460,7 +531,12 @@ function users_config()
 	 return $contents;
 }
 
-$other_admin_configs['users_config'] = array("title" => _USERS_CONFIGS, "function" => "users_config", "God" => false);
+function users_settings($other_admin_configs){
+	$other_admin_configs['users_config'] = array("title" => "_USERS_CONFIGS", "function" => "users_config", "God" => false);
+	return $other_admin_configs;
+}
+
+$hooks->add_filter("other_admin_configs", "users_settings", 10);
 
 function users_boxes_parts($nuke_modules_boxes_parts)
 {
@@ -499,5 +575,30 @@ function users_info_items_parse($list_group_items, $user_data)
 }
 
 $hooks->add_filter("users_info_items", "users_info_items_parse", 10);
+
+function userinfo_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	global $hooks;
+	$user_data = $hooks->functions_vars['userinfo_breadcrumb']['user_data'];
+	$breadcrumbs['userinfo'] = array(
+		"name" => _USERINFO.(($user_data['username'] != '') ? " ".$user_data['username']."":""),
+		"link" => LinkToGT("index.php?modname=users&op=userinfo".(($user_data['username'] != '') ? "&username=".$user_data['username']."":"")),
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+}
+
+function user_edit_breadcrumb($breadcrumbs, $block_global_contents)
+{
+	global $hooks;
+	$user_data = $hooks->functions_vars['user_edit_breadcrumb']['user_data'];
+	$breadcrumbs['userinfo'] = array(
+		"name" => _USER_PROFILE_EDIT." (".$user_data['username'].")",
+		"link" => LinkToGT("index.php?modname=users&op=edit_user"),
+		"itemtype" => "WebPage"
+	);
+	return $breadcrumbs;
+	return $breadcrumbs;
+}
 
 ?>
