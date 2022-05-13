@@ -1270,64 +1270,64 @@ function pn_admin_bar($html_output)
 	if(is_admin())
 	{
 		$items = array(
-			array(
+			"admin" => array(
 				"title" => _ADMINISTRATION,
 				"icon" => "fa fa-tachometer",
 				"url" => "",
 				"class" => "",
 				"subs" => array(
-					array(
+					"dashboard" => array(
 						"title" => _DASHBORAD,
 						"icon" => "fa fa-tachometer",
 						"url" => LinkToGT($admin_file.".php"),
 					),
-					array(
+					"settings" => array(
 						"title" => _SETTINGS,
 						"icon" => "fa fa-cog",
 						"url" => LinkToGT($admin_file.".php?op=settings"),
 					),
-					array(
+					"users" => array(
 						"title" => _USERS,
 						"icon" => "fa fa-user-o",
 						"url" => LinkToGT($admin_file.".php?op=users"),
 					),
-					array(
+					"feedback" => array(
 						"title" => _FEEDBACK_MESSAGES,
 						"icon" => "fa fa-envelope-o",
 						"url" => LinkToGT($admin_file.".php?op=feedbacks"),
 					),
 				),
 			),
-			array(
+			"contents" => array(
 				"title" => _CONTENTS,
 				"icon" => "fa fa-plus",
 				"url" => "",
 				"class" => "",
 				"subs" => array(
-					array(
+					"posts" => array(
 						"title" => _NEW_ARTICLE,
 						"icon" => "fa fa-pencil-square-o",
 						"url" => LinkToGT($admin_file.".php?op=article_admin"),
 					),
-					array(
+					"reports" => array(
 						"title" => _REPORTS,
 						"icon" => "fa fa-bullhorn",
 						"url" => LinkToGT($admin_file.".php?op=reports"),
 					),
-					array(
+					"pending" => array(
 						"title" => _PENDING_ARTICLES,
 						"icon" => "fa fa-paper-plane",
 						"url" => LinkToGT($admin_file.".php?op=articles&status=pending"),
 					),
 				),
 			),
-			array(
+			"comments" => array(
 				"title" => _COMMENTS,
 				"icon" => "fa fa-comments",
 				"url" => LinkToGT($admin_file.".php?op=comments"),
 				"class" => "",
 			),
-			array(
+			"admin_action" => array(
 				"title" => _LOGOUT,
 				"icon" => "fa fa-sign-out",
 				"url" => LinkToGT($admin_file.".php?op=logout"),
