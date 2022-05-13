@@ -92,18 +92,12 @@ class RM_GIAPI {
 	 *
 	 * @var string
 	 */
-	public $google_guide_url = 'https://rankmath.com/blog/google-indexing-api/?utm_source=Instant+Indexing+Plugin&utm_medium=Setup+Guide+Button&utm_campaign=WP';
-
-	/**
-	 * URL of the Bing plugin setup guide on rankmath.com.
-	 *
-	 * @var string
-	 */
-	public $bing_guide_url = 'https://rankmath.com/blog/bing-indexing-api/?utm_source=Instant+Indexing+Plugin&utm_medium=Setup+Guide+Button&utm_campaign=WP';
+	public $google_guide_url = 'https://developers.google.com/search/apis/indexing-api/v3/prereqs';
 
 	/**
 	 * Constructor method.
 	 */
+	 
 	public function __construct() {
 		global $hooks, $nuke_configs, $action;
 		$this->debug             = ( defined( 'GIAPI_DEBUG' ) && GIAPI_DEBUG );
