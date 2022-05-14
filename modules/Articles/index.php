@@ -501,6 +501,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 		//check if link is related to another module
 		$result = $db->table(POSTS_TABLE)
 					->where('post_url',$post_url)
+					->where('status', 'publish')
 					->select(['sid']);
 		if($result->count() == 1)
 		{

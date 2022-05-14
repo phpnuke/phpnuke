@@ -181,6 +181,7 @@ class RM_GIAPI {
 		$this->log_request( $action, $urls_count );
 
 		if ( $this->debug ) {
+			$data = objectToArray($data);
 			$message = (isset($data['error']) && isset($data['error']['message'])) ? $data['error']['message']:"";
 			add_log(
 				sprintf(
