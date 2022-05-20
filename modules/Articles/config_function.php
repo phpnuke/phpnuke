@@ -1377,7 +1377,7 @@ function posts_grapesjs($article_info)
 	{
 		foreach($article_info as $sid => $post)
 		{
-			if($sid != 'total_rows' && isset($post['grapesjs']) && $post['grapesjs'] != '')
+			if(isset($post['grapesjs']) && $post['grapesjs'] != '')
 			{
 				$post['grapesjs'] = objectToArray(json_decode($post['grapesjs']));
 				$post_css = $post['grapesjs']['gjs-css'];

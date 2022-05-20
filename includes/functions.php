@@ -916,9 +916,10 @@ function makePass($cid, $custum_options = array(), $google_recaptcha = false)
 	
 	if(($nuke_configs['seccode_type'] == 2 || $google_recaptcha) && $nuke_configs['google_recaptcha_sitekey'] != '')
 	{
+		$compact_type = (isset($custum_options['compact']) && $custum_options['compact']) ? " data-size=\"compact\"":"";
 		$security_code['input'] = '';
 		$security_code['image'] = "<script src=\"https://www.google.com/recaptcha/api.js?hl="._GOOGLE_RECAPTCHA_LANG."\"></script>
-		<div id=\"security_code_$cid\" class=\"security_code_container\"><div class=\"g-recaptcha\" data-sitekey=\"".$nuke_configs['google_recaptcha_sitekey']."\" data-size=\"compact\"></div></div>";
+		<div id=\"security_code_$cid\" class=\"security_code_container\"><div class=\"g-recaptcha\" data-sitekey=\"".$nuke_configs['google_recaptcha_sitekey']."\"".$compact_type."></div></div>";
 	}
 	elseif(extension_loaded("gd") && $nuke_configs['seccode_type'] == 1)
 	{
