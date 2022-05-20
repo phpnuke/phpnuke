@@ -1217,15 +1217,33 @@ function phpnuke_permissions_check($permissions)
 // permissions functions
 
 // outputs functions
-function title($text)
+function title($title = '', $text = '', $menu = '')
 {
 	global $hooks;
 	$contents = '';
-	$contents .= (defined("ADMIN_FILE")) ? OpenAdminTable():OpenTable();
-	$contents .= "<div class=\"text-center\"><span class=\"title\"><strong>$text</strong></span></div>";
-	$contents .= (defined("ADMIN_FILE")) ? CloseAdminTable():CloseTable();
-	$contents .= "<br>";
+	$contents .= (defined("ADMIN_FILE")) ? GraphicAdmin():"";
+	
+	if($menu != '')
+	{
+		$contents .= $menu;
+	}
+	
+	if($title != '')
+	{
+		$contents .= (defined("ADMIN_FILE")) ? OpenAdminTable():OpenTable();
+		$contents .= "<div class=\"text-center\" align=\"center\"><span class=\"title\"><b>".$title."</b></span></div>";
+		$contents .= (defined("ADMIN_FILE")) ? CloseAdminTable():CloseTable();
+	}
+	
+	if($text != '')
+	{
+		$contents .= (defined("ADMIN_FILE")) ? OpenAdminTable():OpenTable();
+		$contents .= "<div class=\"text-center\" align=\"center\"><span class=\"title-content\">$text</span><br>"._GOBACK."</div>";
+		$contents .= (defined("ADMIN_FILE")) ? CloseAdminTable():CloseTable();
+	}
+	
 	$contents = $hooks->apply_filters("title_filter", $contents, $text);
+	
 	return $contents;
 }
 
@@ -1266,8 +1284,8 @@ function simple_output($message)
 
 function pn_admin_bar($html_output)
 {
-	global $admin_file, $hooks;
-	if(is_admin())
+	global $admin_file, $nuke_configs, $hooks;
+	if(is_admin() && (isset($nuke_configs['admin_bar']) && $nuke_configs['admin_bar'] == 1))
 	{
 		$items = array(
 			"admin" => array(
@@ -4908,7 +4926,7 @@ function _pn_object_name_sort_cb( $a, $b )
 
 function _pn_object_count_sort_cb( $a, $b )
 {
-	return ( $a['counter'] > $b['counter'] );
+	return ( $a['counter'] <=> $b['counter'] );
 }
 
 function default_topic_count_scale( $counter )

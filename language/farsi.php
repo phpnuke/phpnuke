@@ -927,6 +927,7 @@ $nuke_languages['farsi'] = array_merge($nuke_languages['farsi'], array(
 	"_POSITIVEANDNEGATIVE_VOTE" => "مثبت و منفی",
 	"_LIKE_DISLIKE_VOTE" => "لایک و دیسلایک",
 	"_ENABLE_MOBILE_MODE" => "ماژول موبایل",
+	"_ENABLE_ADMIN_BAR" => "نوار مدیریت",
 	"_SELECT_SITE_TEMPLATE" => "انتخاب پوسته سایت",
 	"_DEFAULTTHEME" => "پوسته پیشفرض",
 	"_THEME_COLOR" => "رنگ قالب",

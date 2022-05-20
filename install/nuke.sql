@@ -398,7 +398,8 @@ http://ping.feedburner.com'),
 ('csrf_token_time', '1800'),
 ('statistics_refresh', '1800'),
 ('breadcrumb_cat', '1'),
-('giapi_settings', '');
+('giapi_settings', ''),
+('admin_bar', '1');
 
 -- --------------------------------------------------------
 

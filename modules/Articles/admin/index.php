@@ -90,8 +90,6 @@ if (check_admin_permission($module_name, false, true))
 			$link_to_more .= "&status=$status";
 			$params[":status"] = $status;
 			$where[] = "s.status = :status";
-			if(in_array($status , array("future","draft")))
-				$publish_now = "<a href=\"".$admin_file.".php?op=article_admin&mode=publish_now&sid={SID}&csrf_token="._PN_CSRF_TOKEN."\" title=\""._PUBLISH."\" class=\"table-icon icon-5 info-tooltip\"></a>";
 		}
 		
 		$module = (isset($post_type) && $post_type != '') ? $post_type:"Articles";
@@ -172,7 +170,7 @@ if (check_admin_permission($module_name, false, true))
 				"text" => _IN_MAIN_PAGE,
 			),
 			array(
-				"width" => "140px",
+				"width" => "160px",
 				"text" => _OPERATION,
 			),
 		);
@@ -257,6 +255,8 @@ if (check_admin_permission($module_name, false, true))
 					}
 					
 					$title_link = ($this_status == 'pending' | $this_status == 'draft') ? "".$title."":"<a href=\"$article_link\" target=\"_blank\">$title</a>";
+					
+					$publish_now = (in_array($this_status , array("future","draft"))) ? "<a href=\"".$admin_file.".php?op=article_admin&mode=publish_now&sid=$sid&csrf_token="._PN_CSRF_TOKEN."\" title=\""._PUBLISH."\" class=\"table-icon icon-5 info-tooltip\"></a>":"";
 			
 					$contents .= "<tr>
 						<td>$sid</td>
@@ -270,7 +270,7 @@ if (check_admin_permission($module_name, false, true))
 							<a href=\"".$admin_file.".php?op=article_admin&mode=edit&sid=$sid\" title=\""._EDIT."\" class=\"table-icon icon-1 info-tooltip\"></a>
 							<a href=\"".$admin_file.".php?op=article_admin&mode=delete&sid=$sid&csrf_token="._PN_CSRF_TOKEN."\" title=\""._DELETE."\" class=\"table-icon icon-2 info-tooltip\" onclick=\"return confirm('"._ARTICLE_DELETE_SURE."');\"></a>
 							<a href=\"#\" title=\""._CHANGE_AUTHOR."\" class=\"table-icon icon-6 info-tooltip change_admin\" data-sid=\"$sid\" data-op=\"article_change_admin\"></a>
-							".str_replace("{SID}",$sid, $publish_now)."
+							".$publish_now."
 							<a href=\"".$admin_file.".php?op=module_edit_boxess&mid=$articles_mid&module_part=".(($post_type != 'Articles') ? strtolower($post_type)."_":"")."more&special_page=post_".$sid."\" title=\""._BLOCKS_LAYOUT."\" class=\"table-icon icon-15 info-tooltip\"></a>
 						</td>
 						</tr>";
@@ -330,9 +330,9 @@ if (check_admin_permission($module_name, false, true))
 		include("footer.php");
 	}
 	
-	function article_admin($sid=0, $mode="new", $submit='', $article_fields=array(), $article_image_upload=array(), $micro_data=array(), $go_to_pings=1, $post_type = 'Articles')
+	function article_admin($sid=0, $mode="edit", $submit='', $article_fields=array(), $article_image_upload=array(), $micro_data=array(), $go_to_pings=1, $post_type = 'Articles')
 	{
-		global $db, $aid, $visitor_ip, $admin_file, $nuke_configs, $nuke_articles_configs_cacheData, $PnValidator, $module_name, $PingOptimizer, $nuke_meta_keys_parts, $all_post_types, $hooks, $cache;
+		global $db, $aid, $visitor_ip, $admin_file, $nuke_configs, $nuke_articles_configs_cacheData, $PnValidator, $module_name, $PingOptimizer, $all_post_types, $hooks, $cache;
 		
 		$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
 		$nuke_modules_cacheData = get_cache_file_contents('nuke_modules');
@@ -341,22 +341,24 @@ if (check_admin_permission($module_name, false, true))
 		$sid = intval($sid);
 		$row = array();
 	
-		$mode = (!in_array($mode, array("new", "edit", "delete", "publish_now", "grapesjs", "auto_save"))) ? "new":$mode;
+		$mode = (!in_array($mode, array("edit", "delete", "publish_now", "grapesjs", "auto_save"))) ? "edit":$mode;
 		$article_status = "publish";
 		$article_aid = '';
+		$radminsuper = false;
+		$radminarticle = false;
 		
 		$all_positions_data = (isset($nuke_configs['positions'])) ? phpnuke_unserialize(stripslashes($nuke_configs['positions'])):array();
-		
-		// determine radminsuper & article_aid & article_status & counter
-		if($mode == "delete" || $mode == 'edit' || $mode == 'auto_save' || $mode == 'publish_now' || $mode == 'grapesjs')
-		{
-			$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
 	
-			$radminsuper = intval($nuke_authors_cacheData[$aid]['radminsuper']);
-			
-			$articles_admins = ($nuke_modules_cacheData_by_title[$post_type]['admins'] != '') ? explode(",", $nuke_modules_cacheData_by_title[$post_type]['admins']):array();
-			$radminarticle = (in_array($aid, $articles_admins)) ? true:false;
-			
+		$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
+
+		$radminsuper = (intval($nuke_authors_cacheData[$aid]['radminsuper']) == 1) ? true:false;;
+		
+		$articles_admins = ($nuke_modules_cacheData_by_title['Articles']['admins'] != '') ? explode(",", $nuke_modules_cacheData_by_title['Articles']['admins']):array();
+		$radminarticle = (in_array($aid, $articles_admins)) ? true:false;
+
+		// determine radminsuper & article_aid & article_status & counter
+		if($sid != 0 && in_array($mode, array('delete', 'edit', 'auto_save', 'publish_now', 'grapesjs')))
+		{			
 			$result2 = $db->table(POSTS_TABLE)
 							->where("sid", $sid)
 							->first([
@@ -364,10 +366,13 @@ if (check_admin_permission($module_name, false, true))
 								"status as article_status", 
 								"title as old_title", 
 							]);
-
-			$article_aid = filter($result2['article_aid'], "nohtml");
-			$article_status = filter($result2['article_status'], "nohtml");
-			$old_title = filter($result2['old_title'], "nohtml");
+			if($result2->count() > 0)
+			{
+				$article_aid = filter($result2['article_aid'], "nohtml");
+				$article_status = filter($result2['article_status'], "nohtml");
+				$old_title = filter($result2['old_title'], "nohtml");
+			}
+			
 			if($article_aid == '' && $article_status == 'pending')
 				$article_aid = $aid;
 				
@@ -375,44 +380,87 @@ if (check_admin_permission($module_name, false, true))
 							->where("sid", $sid)
 							->first();
 		}
-		elseif($sid == 0)
+		
+		if($sid == 0)
 		{
 			$db->table(POSTS_TABLE)
 				->insert(["sid" => null, 'status' => 'draft', 'time' => _NOWTIME]);
 			$sid = $db->lastInsertId();
 			$row['sid'] = $sid;
+			$row['aid'] = $article_aid;
 			$row['status'] = 'draft';
 			$row['time'] = _NOWTIME;
 			
-			$db->table(POSTS_TABLE)
+			$db->table(AUTHORS_TABLE)
+				->where("aid", $article_aid)
+				->update([
+					'counter' => ["+", 1]
+				]);
+			
+			$del_result = $db->table(POSTS_TABLE)
 				->where('status', 'draft')
 				->where('title', '')
-				->where('time', '<=', (_NOWTIME-86400))
-				->delete();
+				->where('time', '<=', (_NOWTIME-100))
+				->select(['sid','aid']);
+			if($del_result->count() > 0)
+			{
+				$del_rows = $del_result->results();
+				foreach($del_rows as $del_row)
+				{
+					$del_sid = $del_row['sid'];
+					$del_aid = $del_row['aid'];
+					
+					$db->table(AUTHORS_TABLE)
+						->where("aid", $del_aid)
+						->update([
+							'counter' => ["-", 1]
+						]);
+					$db->table(POSTS_TABLE)
+						->where('sid', $del_sid)
+						->delete();
+				}
+			}
 		}
 		
 		if(isset($article_fields['post_type']) && $article_fields['post_type'] != '')
 			$post_type = $article_fields['post_type'];
 		elseif(isset($row['post_type']) && $row['post_type'] != '')
 			$post_type = $row['post_type'];
-		elseif(!isset($post_type) || $post_type == '')
-			$post_type = 'Articles';
 		
 		if($article_aid == '')
 			$article_aid = $aid;
 		
+		// check admin permission
+		if($mode == "edit" || $mode == "delete" || $mode == "auto_save" || $mode == "publish_now")
+		{
+			if ((!$radminarticle OR $article_aid != $row['aid']) AND !$radminsuper)
+			{
+				if($mode != 'auto_save')
+				{
+					include("header.php");
+					$html_output .= title(_ARTICLES_ADMIN, _NOTAUTHORIZED1."<br><br>"._NOTAUTHORIZED2);
+					include("footer.php");
+				}
+				else
+				{
+					die(_NOTAUTHORIZED1." "._NOTAUTHORIZED2);
+				}
+			}
+		}
+		
 		// delete article
 		if($mode == "delete")
 		{
-			if (($radminarticle AND $article_aid == $aid) OR ($radminsuper == 1))
+			$hooks->do_action("delete_post_before", $sid);	
+			if (($radminarticle AND $article_aid == $aid) OR $radminsuper)
 			{
 				csrfProtector::authorisePost(true);
-				$module_folder = $row['post_type'];
-				if(file_exists("files/$module_folder/$sid.jpg"))
-					unlink("files/$module_folder/$sid.jpg");
 				
-				if(file_exists("files/$module_folder/thumbs/$sid.jpg"))
-				unlink("files/$module_folder/thumbs/$sid.jpg");
+				if(file_exists("files/".$row['post_type']."/$sid.jpg"))
+					unlink("files/".$row['post_type']."/$sid.jpg");
+				
+				if(file_exists("files/".$row['post_type']."/thumbs/$sid.jpg"))
+				unlink("files/".$row['post_type']."/thumbs/$sid.jpg");
 				
 				$db->table(POSTS_TABLE)
 					->where("sid", $sid)
@@ -420,11 +468,11 @@ if (check_admin_permission($module_name, false, true))
 				
 				$db->table(COMMENTS_TABLE)
 					->where("post_id", $sid)
-					->where("module", $module_folder)
+					->where("module", $row['post_type'])
 					->delete();
 				
 				$db->table(SCORES_TABLE)
-					->where("db_table", $module_folder)
+					->where("db_table", $row['post_type'])
 					->where("post_id", $sid)
 					->delete();
 				
@@ -439,40 +487,12 @@ if (check_admin_permission($module_name, false, true))
 					->update([
 						'counter' => ["-", 1]
 					]);
-				$hooks->do_action("delete_post", $sid);	
+				$hooks->do_action("delete_post_after", $sid);	
 				cache_system("nuke_authors");
 				add_log(sprintf(_ARTICLE_DELETE_LOG, $old_title), 1);
-				$PingOptimizer->phpnuke_FuturePingDelete($module_folder, $sid);
-				Header("Location: ".$admin_file.".php?op=articles&post_type=$module_folder");
-			}
-			else
-			{
-				include("header.php");
-				$html_output .= GraphicAdmin();
-				$html_output .= OpenAdminTable();
-				$html_output .= "<div class=\"text-center\"><font class=\"title\"><b>"._ARTICLES_ADMIN."</b></font></div>";
-				$html_output .= CloseAdminTable();
-				$html_output .= OpenAdminTable();
-				$html_output .= "<div class=\"text-center\"><b>"._NOTAUTHORIZED1."</b><br><br>"._NOTAUTHORIZED2."<br><br>"._GOBACK."</div>";
-				$html_output .= CloseAdminTable();
-				include("footer.php");
-			}
-		}
-		
-		// check edit or publish permission
-		if($mode == "edit" || $mode == "auto_save" || $mode == "publish_now")
-		{
-			if ((!$radminarticle OR $article_aid != $row['aid']) AND ($radminsuper != 1))
-			{
-				include("header.php");
-				$html_output .= GraphicAdmin();
-				$html_output .= OpenAdminTable();
-				$html_output .= "<div class=\"text-center\"><font class=\"title\"><b>"._ARTICLES_ADMIN."</b></font></div>";
-				$html_output .= CloseAdminTable();
-				$html_output .= OpenAdminTable();
-				$html_output .= "<div class=\"text-center\"><b>"._NOTAUTHORIZED1."</b><br><br>"._NOTAUTHORIZED2."<br><br>"._GOBACK."</div>";
-				$html_output .= CloseAdminTable();
-				include("footer.php");
+				$PingOptimizer->phpnuke_FuturePingDelete($row['post_type'], $sid);
+				redirect_to("".$admin_file.".php?op=articles&post_type=".$row['post_type']."");
+				die();
 			}
 		}
 		
@@ -500,9 +520,7 @@ if (check_admin_permission($module_name, false, true))
 			header("location: ".$admin_file.".php?op=article_admin&mode=edit&sid=$sid");
 			die();			
 		}
-		
-		$languageslists = get_dir_list('language', 'files');
-		
+				
 		$preview_contents = '';
 		
 		if(isset($article_fields['status']) && $article_fields['status'] == 'preview')
@@ -542,7 +560,7 @@ if (check_admin_permission($module_name, false, true))
 				
 			$preview_article_image = "";
 			if($row['post_image'] != '')
-				$preview_article_image = "<img src=\"".$nuke_configs['nukeurl']."index.php?timthumb=true&src=".$row['post_image']."&q=90&w=150\" />";
+				$preview_article_image = "<img src=\"".LinkToGT("index.php?timthumb=true&src=".$row['post_image']."&q=90&w=150")."\" />";
 				
 			$preview_contents .="<div class=\"form-textarea\"><p align=\"center\"><b>"._PREVIEW."</b></p><br /><br />";
 			$preview_contents .="<div>$preview_article_image</div>";
@@ -555,7 +573,7 @@ if (check_admin_permission($module_name, false, true))
 		}
 
 		// submit edited data
-		if(isset($submit) && isset($article_fields) && !empty($article_fields) && (!isset($article_fields['status']) || $article_fields['status'] != 'preview'))
+		if(isset($submit) && isset($article_fields) && !empty($article_fields) && isset($article_fields['status']) && $article_fields['status'] != 'preview')
 		{
 			$items	= array();
 			
@@ -610,20 +628,17 @@ if (check_admin_permission($module_name, false, true))
 				{
 					$hooks->add_filter("set_page_title", function(){return array("articles_admins" => _ADD_NEW_ARTICLE);});
 					include("header.php");
-					$html_output .= GraphicAdmin();
-					$html_output .= articles_menu();
-					$html_output .= OpenAdminTable();
-					$html_output .= '<p align=\"center\">'._ERROR_IN_OP.' :<br /><Br />'.$PnValidator->get_readable_errors(true,'gump-field','gump-error-message','<br /><br />')._GOBACK."</p>";
-					$html_output .= CloseAdminTable();
+					$html_output .= title(_ERROR_IN_OP, $PnValidator->get_readable_errors(true,'gump-field','gump-error-message','<br /><br />'), articles_menu());
 					include("footer.php");
 				}
 			}
 			
 			if(!isset($article_fields['meta_fields']))
 				$article_fields['meta_fields'] = array();
-			insert_update_meta_fields($article_fields['meta_fields'], $sid, $article_fields['post_type']);
+			else
+				insert_update_meta_fields($article_fields['meta_fields'], $sid, $article_fields['post_type']);
 			
-			if(isset($article_fields['set_publish_date']) && $article_fields['set_publish_date'] == 1)
+			if($mode != 'auto_save' && isset($article_fields['set_publish_date']) && $article_fields['set_publish_date'] == 1)
 			{
 				$datetime[0] = (isset($article_fields['publish_date'])) ? $article_fields['publish_date']:"";
 				$datetime[1] = ((isset($article_fields['publish_time'])) ? implode(":",$article_fields['publish_time']):"0:0").":0";
@@ -636,7 +651,7 @@ if (check_admin_permission($module_name, false, true))
 					$items['status'] = "future";	
 			}
 			else
-				$items['time'] = ($mode == "edit") ? $row['time']:_NOWTIME;	
+				$items['time'] = $row['time'];	
 			
 			unset($article_fields['publish_date']);
 			unset($article_fields['publish_time']);
@@ -645,10 +660,17 @@ if (check_admin_permission($module_name, false, true))
 			foreach($article_fields as $key => $value)
 			{
 				// check if post_url is empty and set value for it
-				if($key == 'post_url' && $value == '')
+				if($key == 'post_url' && $mode != 'auto_save')
 				{
-					$value = trim(sanitize(str2url($article_fields['title'])), "-");
+					if($value == '')
+					{
+						$value = $article_fields['title'];
+					}
+					
+					$value = trim(sanitize(str2url($value)), "-");
+					
 					$value = get_unique_post_slug(POSTS_TABLE, "sid", $sid, "post_url", $value, $article_fields['status'], false, " AND post_type = '".$article_fields['post_type']."'");
+					
 				}
 				
 				if($key == "status" && isset($items['status']))
@@ -658,7 +680,13 @@ if (check_admin_permission($module_name, false, true))
 
 				if($key == "tags")
 				{
-					$items['tags'] = (is_array($article_fields['tags'])) ? implode(",", $article_fields['tags']):str_replace(":",",", $article_fields['tags']);
+					$items['tags'] = (is_array($article_fields['tags'])) ? implode(",", $article_fields['tags']):str_replace(array(":",'-'),",", $article_fields['tags']);
+					continue;
+				}
+				
+				if($key == "time" && $mode != 'auto_save')
+				{
+					$items['time'] = str_replace("'", "", $value);
 					continue;
 				}
 				
@@ -673,7 +701,7 @@ if (check_admin_permission($module_name, false, true))
 				$items[$key] = $value;
 			}
 			
-			$items = $hooks->apply_filters("post_fields_parse", $items, $article_fields);
+			$items = $hooks->apply_filters("post_fields_parse", $items, $sid, $article_fields);
 			
 			unset($article_fields['meta_fields']);
 			unset($items['meta_fields']);
@@ -694,27 +722,13 @@ if (check_admin_permission($module_name, false, true))
 			$items['micro_data'] = $hooks->apply_filters("post_micro_data_parse", $items['micro_data'], $items, $article_fields);
 
 			// save to db
-			if($mode == "new")
+			if($mode == "edit" || $mode == "auto_save")
 			{
-				$items['time'] = str_replace("'", "", $items['time']);
-
-				$hooks->do_action("newpost_before_save", $items, $article_fields);
-				
-				if($mode != 'draft' && $mode != 'pending')
-				
-					$db->table(AUTHORS_TABLE)
-						->where("aid", $items['aid'])
-						->update([
-							'counter' => ["+", 1]
-						]);
+				$hooks->do_action("post_before_update", $sid, $items, $article_fields);
 				
 				$post_url = LinkToGT(articleslink($sid, $items['title'], $items['post_url'], $items['time'], $items['cat_link'], $items['post_type']));
 				
-				add_log(sprintf(_ADD_ARTICLE_LOG, "<a href=\"$post_url\" target=\"_blank\">".$items['title']."</a>"), 1);
-				
-				$hooks->do_action("newpost_after_save", $sid, $items, $article_fields);
-				
-				if(($items['status'] == 'publish' || $items['status'] == 'future') && $go_to_pings == 1)
+				if($go_to_pings == 1)
 				{
 					$ping_data = array(
 						"poster" => $items['aid'], 
@@ -729,24 +743,27 @@ if (check_admin_permission($module_name, false, true))
 					
 					$PingOptimizer->phpnuke_Ping();
 				}
-			}
-			
-			if($mode == "edit" || $mode == "auto_save")
-			{
-				$hooks->do_action("post_before_update", $sid, $items, $article_fields);
+				
+				if($mode == 'auto_save')
+					unset($items['status']);
 				
 				$db->table(POSTS_TABLE)
 					->where("sid", $sid)
 					->update($items);
-					
-				if($mode != 'auto_save')
-					add_log(sprintf(_EDIT_ARTICLE_LOG, $items['title']), 1);
 				
-				$hooks->do_action("post_after_update", $sid, $items, $article_fields);
+				if($mode == 'edit')
+				{
+					$hooks->do_action("post_after_update", $sid, $items, $article_fields);
+					add_log(sprintf((($row['title'] != '') ? _EDIT_ARTICLE_LOG:_ADD_ARTICLE_LOG), "<a href=\"$post_url\" target=\"_blank\">".$items['title']."</a>"), 1);
+				}
+				elseif($mode == 'auto_save')
+				{
+					$hooks->do_action("post_after_auto_save", $sid, $items, $article_fields);
+				}
 			}
 			
 			// add new tags
-			$row['tags'] = $hooks->apply_filters("post_tags_parse", $row['tags'], $row, $article_fields);
+			$row['tags'] = $hooks->apply_filters("post_tags_parse", $row['tags'], $sid, $row, $article_fields);
 			$old_tags = ((isset($row['tags']) && $row['tags'] != '' && !is_array($row['tags'])) ? explode(",", $row['tags']):array());
 			update_tags($old_tags, $items['tags']);
 			
@@ -767,7 +784,7 @@ if (check_admin_permission($module_name, false, true))
 			
 			$hooks->do_action("post_save_finish", $sid, $items, $article_fields);
 			
-			header("location: ".$admin_file.".php?op=article_admin&mode=edit&sid=$sid");
+			redirect_to("".$admin_file.".php?op=article_admin&mode=edit&sid=$sid");
 			die();
 		}
 		
@@ -778,6 +795,8 @@ if (check_admin_permission($module_name, false, true))
 		
 		$categories = new categories_list($nuke_categories_cacheData[$post_type]);
 		$categories->categories_list();
+		
+		$languageslists = get_dir_list('language', 'files');
 		
 		$article_fields = array(
 			"sid"			=> ((intval($sid) != 0) ?				$sid:0),
@@ -856,7 +875,7 @@ if (check_admin_permission($module_name, false, true))
 		
 		$hooks->do_action("post_form_before", $article_fields);
 		
-		if($mode != 'new' || $article_fields['status'] == 'preview')
+		if($article_fields['status'] == 'preview')
 		{
 			if($article_fields['post_image'] != '')
 			{
@@ -880,8 +899,8 @@ if (check_admin_permission($module_name, false, true))
 		$publish_datetime['time'] = date("H:i", $datetime);
 		$set_publish_date = ($datetime > _NOWTIME) ? "checked":"";
 
-		$post_link = LinkToGT(articleslink($sid, $article_fields['title'], $article_fields['post_url'], $article_fields['time'], $article_fields['cat_link'], $article_fields['post_type']));
-		$short_link = LinkToGT(articleslink($sid, $article_fields['title'], $article_fields['post_url'], $article_fields['time'], $article_fields['cat_link'], $article_fields['post_type'], "short"));
+		$post_link = ($article_fields['title'] != '') ? LinkToGT(articleslink($sid, $article_fields['title'], $article_fields['post_url'], $article_fields['time'], $article_fields['cat_link'], $article_fields['post_type'])):"";
+		$short_link =($article_fields['title'] != '') ?  LinkToGT(articleslink($sid, $article_fields['title'], $article_fields['post_url'], $article_fields['time'], $article_fields['cat_link'], $article_fields['post_type'], "short")):"";
 				
 		include("".INCLUDE_PATH."/micro_data.php");
 		
@@ -896,6 +915,9 @@ if (check_admin_permission($module_name, false, true))
 		$contents .= OpenAdminTable();
 		$contents .= $preview_contents;
 		$contents = $hooks->apply_filters("post_form_scripts", $contents);
+		
+		$post_fields = array();
+		
 		$contents .="
 		<script src=\"".INCLUDE_PATH."/Ajax/jquery/micro_data_toggle.js\"></script>
 		<!-- MiniColors -->
@@ -910,24 +932,11 @@ if (check_admin_permission($module_name, false, true))
 		
 		<form action=\"".$admin_file.".php\" method=\"post\" enctype=\"multipart/form-data\" id=\"article_form\">
 			<table width=\"100%\" class=\"id-form product-table no-border\">";
-				/*if($mode == 'edit' && $article_fields['post_type'] == 'Statics')
-				{
-				$contents .="<tr>
-					<td colspan=\"2\">"._STATIC_PAGE_NOT_AUTO."</td>
-				</tr>";
-				}*/
-				if($mode == 'new')
-				{
 				$contents .="<tr>
 					<td colspan=\"2\">".sprintf(_ADD_NEW_POST_IN_FORMAT, $all_post_types[$post_type])."</td>
-				</tr>
-				<tr>
-					<th style=\"width:200px\"></th>
-					<td class=\"dleft aright\">$grapesjs_btn</td>
 				</tr>";
-				}
 				
-				if($mode == 'edit')
+				if($post_link != '')
 				{
 				$contents .="<tr>
 					<th style=\"width:200px\">"._POST_LINK."</th>
@@ -942,26 +951,33 @@ if (check_admin_permission($module_name, false, true))
 					</td>
 				</tr>";
 				}
-				$contents .="<tr><td><input type=\"hidden\" name=\"article_fields[post_type]\" id=\"post_type\" value=\"".$article_fields['post_type']."\" /></td></tr>";
+				else
+				{
 				$contents .="<tr>
+					<th style=\"width:200px\"></th>
+					<td class=\"dleft aright\">$grapesjs_btn</td>
+				</tr>";
+				}
+				
+				$post_fields['title'] = "<tr>
 					<th style=\"width:200px\">"._TITLE."</th>
 					<td><input type=\"text\" size=\"40\" name=\"article_fields[title]\" id=\"title_field\" value=\"".$article_fields['title']."\" class=\"inp-form\" minlength=\"3\" data-validation=\"required\" data-validation-error-msg=\""._TITLE_IS_REQUIRED."\" /></td>
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['post_url'] = "<tr>
 					<th>"._PERMALINK."</th>
 					<td>
 						<input type=\"text\" size=\"40\" name=\"article_fields[post_url]\" id=\"post_url\" value=\"".$article_fields['post_url']."\" class=\"inp-form\" />
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['title_lead'] = "<tr>
 					<th>"._ARTICLE_LEAD."</th>
 					<td><input type=\"text\" size=\"40\" name=\"article_fields[title_lead]\" value=\"".$article_fields['title_lead']."\" class=\"inp-form\" /></td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['title_color'] = "<tr>
 					<th>"._TITLE_COLOR."</th>
 					<td><input type=\"text\" name=\"article_fields[title_color]\" size=\"37\" data-letterCase=\"uppercase\" value=\"".$article_fields['title_color']."\" class=\"color-picker inp-form\" id=\"swatches-opacity\" class=\"demo\" data-opacity=\"1\" data-swatches=\"#fff|#000|#f00|#0f0|#00f|#ff0\" value=\"#000\" /></td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['cat_link'] = "<tr>
 					<th>"._MAIN_CAT."</th>
 					<td>
 					<select name=\"article_fields[cat_link]\" class=\"styledselect-select\" data-validation=\"required\">";
@@ -969,12 +985,12 @@ if (check_admin_permission($module_name, false, true))
 					foreach($categories->result as $cid => $catname)
 					{
 						$sel = ($cid == $article_fields['cat_link']) ? "selected":"";
-						$contents .= "<option value=\"$cid\" $sel>".str_replace("-"," ", $catname)."</option>";
+						$post_fields['cat_link'] .= "<option value=\"$cid\" $sel>".str_replace("-"," ", $catname)."</option>";
 					}					
-					$contents .= "</select>
+					$post_fields['cat_link'] .= "</select>
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['cat'] = "<tr>
 					<th>"._RELATED_CATS."</th>
 					<td>
 					<select name=\"article_fields[cat][]\" class=\"styledselect-select\" multiple=\"multiple\" style=\"width:100%\">";
@@ -982,22 +998,22 @@ if (check_admin_permission($module_name, false, true))
 					foreach($categories->result as $cid => $catname)
 					{
 						$sel = (in_array($cid, $article_fields['cat'])) ? "selected":"";
-						$contents .= "<option value=\"$cid\" $sel>".str_replace("-"," ", $catname)."</option>";
+						$post_fields['cat'] .= "<option value=\"$cid\" $sel>".str_replace("-"," ", $catname)."</option>";
 					}					
-					$contents .= "</select>
+					$post_fields['cat'] .= "</select>
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['ihome'] = "<tr>
 					<th>"._SHOW_IN_MAIN_PAGE."</th>
 					<td><input type=\"radio\" name=\"article_fields[ihome]\" value=\"1\" class=\"styled\" data-label=\""._YES."\" $ihome_checked1 /><input type=\"radio\" name=\"article_fields[ihome]\" value=\"0\" class=\"styled\" data-label=\""._NO."\" $ihome_checked2 /></td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['allow_comment'] = "<tr>
 					<th>"._ALLOW_COMMENT."</th>
 					<td><input type=\"radio\" name=\"article_fields[allow_comment]\" value=\"1\" class=\"styled\" data-label=\""._ACTIVE."\" $allow_comment_checked1 /><input type=\"radio\" name=\"article_fields[allow_comment]\" value=\"0\" class=\"styled\" data-label=\""._INACTIVE."\" $allow_comment_checked2 /></td>					
 				</tr>";
 				if($nuke_configs['multilingual'] == 1)
 				{
-					$contents .= "
+					$post_fields['alanguage'] = "
 					<tr>
 						<th>"._LANGUAGE."</th>
 						<td>
@@ -1010,36 +1026,37 @@ if (check_admin_permission($module_name, false, true))
 									if($languageslist == 'index.html' || $languageslist == '.htaccess' || $languageslist == 'alphabets.php') continue;
 									$languageslist = str_replace(".php", "", $languageslist);
 									$sel = ($languageslist == $article_fields['alanguage']) ? "selected":"";
-									$contents .= "<option value=\"$languageslist\" $sel>".ucfirst($languageslist)."</option>";
+									$post_fields['alanguage'] .= "<option value=\"$languageslist\" $sel>".ucfirst($languageslist)."</option>";
 								}
 							}
-							$contents .= "
+							$post_fields['alanguage'] .= "
 							</select>
 						</td>
 					</tr>";
 				}
 				else
-					$contents .= "<input type=\"hidden\" name=\"article_fields[alanguage]\" value=\"\" />";
+					$post_fields['alanguage'] = "<input type=\"hidden\" name=\"article_fields[alanguage]\" value=\"\" />";
+				
 				if(isset($all_positions_data[$post_type]) && !empty($all_positions_data[$post_type]))
 				{
-				$contents .= "<tr>
+				$post_fields['position'] = "<tr>
 					<th>"._POSITION."</th>
 					<td>
 						<select name=\"article_fields[position]\" class=\"styledselect-select\">";
 						foreach($all_positions_data[$post_type] as $position_id => $position_data)
 						{
 							$sel = ($position_id == $article_fields['position']) ? "selected":"";
-							$contents .= "<option value=\"$position_id\" $sel>".$position_data['position_title']."</option>\n";
+							$post_fields['position'] .= "<option value=\"$position_id\" $sel>".$position_data['position_title']."</option>\n";
 						}
-						$contents .= "</select>
+						$post_fields['position'] .= "</select>
 					</td>					
 				</tr>";
 				}
-				$contents .= "<tr>
+				$post_fields['post_pass'] = "<tr>
 					<th>"._PASSWORD."</th>
 					<td><input type=\"text\" size=\"40\" name=\"article_fields[post_pass]\" value=\"".$article_fields['post_pass']."\" class=\"inp-form\" /></td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['post_image'] = "<tr>
 					<th>"._POST_IMAGE."</th>
 					<td>
 						$post_image<br />
@@ -1053,24 +1070,24 @@ if (check_admin_permission($module_name, false, true))
 							<input type=\"file\" class=\"file_1\" name=\"article_image_upload\" /> 
 						</div>
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['hometext'] = "<tr>
 					<th>"._HOMETEXT."</th>
 					<td>
 						".wysiwyg_textarea("article_fields[hometext]", $article_fields['hometext'], "PHPNukeAdmin", "50", "12")."
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['bodytext'] = "<tr>
 					<th>"._BODYTEXT."</th>
 					<td>
 						".wysiwyg_textarea("article_fields[bodytext]", $article_fields['bodytext'], "PHPNukeAdmin", "50", "12")."
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['download'] = "<tr>
 					<th>"._ARTICLE_FILES."</th>
 					<td>".get_post_download_files($article_fields['download'], _ARTICLE_FILES, "article_fields[download]")."</td>				
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['permissions'] = "<tr>
 					<th>"._SHOWN_FOR."</th>
 					<td>";
 						$permissions = get_groups_permissions();
@@ -1078,11 +1095,11 @@ if (check_admin_permission($module_name, false, true))
 						{
 							$checked = (($mode == 'new' && $key == 0) || in_array($key, $article_fields['permissions'])) ? "checked":'';
 							
-							$contents .= "<input data-label=\"$premission_name\" type=\"checkbox\" class=\"styled\" id=\"edit-block-permission_$key\" value=\"$key\" name=\"article_fields[permissions][]\" $checked />&nbsp; ";
+							$post_fields['permissions'] .= "<input data-label=\"$premission_name\" type=\"checkbox\" class=\"styled\" id=\"edit-block-permission_$key\" value=\"$key\" name=\"article_fields[permissions][]\" $checked />&nbsp; ";
 						}
-					$contents .= "</td>					
-				</tr>
-				<tr>
+					$post_fields['permissions'] .= "</td>					
+				</tr>";
+				$post_fields['tags'] = "<tr>
 					<th>"._KEYWORDS."</th>
 					<td>
 						<select class=\"styledselect-select tag-input\" name=\"article_fields[tags][]\" multiple=\"multiple\" style=\"width:100%\">";
@@ -1092,12 +1109,12 @@ if (check_admin_permission($module_name, false, true))
 							if(!is_array($article_fields['tags']))
 								$article_fields['tags'] = explode(",", $article_fields['tags']);
 							foreach($article_fields['tags'] as $tag)
-								$contents .= "<option value=\"$tag\" selected>$tag</option>\n";
+								$post_fields['tags'] .= "<option value=\"$tag\" selected>$tag</option>\n";
 						}
-						$contents .= "</select>
+						$post_fields['tags'] .= "</select>
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['publish_date'] = "<tr>
 					<th>"._PUBLISH_DATE."</th>
 					<td>
 						<script src=\"".INCLUDE_PATH."/Ajax/jquery/datepicker/js/jquery.ui.datepicker-cc.js\" type=\"text/javascript\"></script>
@@ -1114,21 +1131,21 @@ if (check_admin_permission($module_name, false, true))
 						{
 							$hour = correct_date_number($h);
 							$selected = ($publish_hour == $hour) ? "selected":"";
-							$contents .= "<option value=\"$hour\" $selected>$hour</option>\n";
+							$post_fields['publish_date'] .= "<option value=\"$hour\" $selected>$hour</option>\n";
 						}
-						$contents .= "</select>
+						$post_fields['publish_date'] .= "</select>
 						&nbsp; <select name=\"article_fields[publish_time][min]\" class=\"styledselect-select\" style=\"width:70px;\">";
 						for($m=0;$m < 60; $m++)
 						{
 							$min = ($m < 10) ? "0".$m:$m;
 							$selected = ($publish_min == $min) ? "selected":"";
-							$contents .= "<option value=\"$min\" $selected>$min</option>\n";
+							$post_fields['publish_date'] .= "<option value=\"$min\" $selected>$min</option>\n";
 						}
-						$contents .= "</select>
+						$post_fields['publish_date'] .= "</select>
 						".bubble_show("<div style=\"margin-top:-7px;\"><input id=\"set_publish_date\" type='checkbox' class='styled' name='article_fields[set_publish_date]' value='1' data-label=\""._SET_PUBLISH_DATE."\" $set_publish_date style=\"top:10px;\"></div>")."
 					</td>
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['micro_data'] = "<tr>
 					<th>"._POST_METADATA."</th>
 					<td>
 						<table width=\"100%\">
@@ -1136,42 +1153,50 @@ if (check_admin_permission($module_name, false, true))
 						</table>
 					</td>					
 				</tr>";
-				if($mode == 'new' || $article_status == 'pending')
-				{
-					$check1 = ($article_fields['status'] == 'draft') ? "checked":"";
-					$check2 = ($article_fields['status'] == 'publish') ? "checked":"";
-					$check3 = ($article_fields['status'] == 'preview') ? "checked":"";
-				$contents .= "<tr>
+				
+				$check1 = ($article_fields['status'] == 'draft') ? "checked":"";
+				$check2 = ($article_fields['status'] == 'publish') ? "checked":"";
+				$check3 = ($article_fields['status'] == 'preview') ? "checked":"";
+				$post_fields['status'] = "<tr>
 					<th>"._PUBLISH_AS."</th>
 					<td id=\"publish_btns\">
 						<input type=\"radio\" name=\"article_fields[status]\" value=\"draft\" class=\"styled\" data-label=\""._DRAFT."\" $check1 /> &nbsp; 
 						<input type=\"radio\" name=\"article_fields[status]\" value=\"publish\" class=\"styled\" data-label=\""._IMMEDIATE_PUBLISH."\" $check2 /> &nbsp; 
 						<input type=\"radio\" name=\"article_fields[status]\" value=\"preview\" class=\"styled\" data-label=\""._PREVIEW."\" $check3 /> &nbsp; 
 					</td>					
-				</tr>
-				<tr>
+				</tr>";
+				$post_fields['go_to_pings'] = "<tr>
 					<th>"._INFORM_TO_PING_SERICES."</th>
 					<td><input type=\"radio\" name=\"go_to_pings\" value=\"1\" class=\"styled\" data-label=\""._YES."\" checked /><input type=\"radio\" name=\"go_to_pings\" value=\"0\" class=\"styled\" data-label=\""._NO."\" /></td>					
 				</tr>";
-				}
 				
-				$contents = $hooks->apply_filters("bulid_meta_fields", $contents, $post_type, $article_fields);
+				$post_fields['meta_fields'] =  $hooks->apply_filters("bulid_meta_fields", '', $post_type, $article_fields);
 
-				$contents .= "
+				$post_fields['submit'] = "
 				<tr>
 					<td colspan=\"2\">
 						
 						<input type=\"submit\" name=\"submit\" value=\"submit\" class=\"form-submit\" />
 					</td>					
 				</tr>";
-			$contents .= "</table>
-			<input type=\"hidden\" name=\"op\" value=\"article_admin\" />
-			<input type=\"hidden\" name=\"article_fields[aid]\" value=\"$article_aid\" />
-			<input type=\"hidden\" name=\"article_fields[ip]\" value=\"$visitor_ip\" />
-			<input type=\"hidden\" name=\"sid\" value=\"$sid\" />
-			<input type=\"hidden\" name=\"mode\" value=\"$mode\" />
-			<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> ";
+				$post_fields['hiddens'] = "
+				<tr>
+					<td colspan=\"2\">
+						<input type=\"hidden\" name=\"op\" value=\"article_admin\" />
+						<input type=\"hidden\" name=\"article_fields[aid]\" value=\"$article_aid\" />
+						<input type=\"hidden\" name=\"article_fields[ip]\" value=\"$visitor_ip\" />
+						<input type=\"hidden\" name=\"sid\" value=\"$sid\" />
+						<input type=\"hidden\" name=\"mode\" value=\"$mode\" />
+						<input type=\"hidden\" name=\"article_fields[post_type]\" id=\"post_type\" value=\"".$article_fields['post_type']."\" />
+						<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" />
+					</td>					
+				</tr>";
+			
+				$post_fields = $hooks->apply_filters("post_fields_inputs", $post_fields, $post_type, $article_fields);
+				$contents .= implode("\n\t\t\t", $post_fields);
+			
 			$contents = $hooks->apply_filters("post_after_inputs", $contents, $post_type, $article_fields);
+			$contents .= "</table>";
 		$contents .= "</form>
 		<script>
 			$(\"#set_publish_date\").on(\"change\",function(){
@@ -1693,7 +1718,7 @@ if (check_admin_permission($module_name, false, true))
 	$submit = filter(request_var('submit', '', '_POST'), "nohtml");
 	$article_image_upload = request_var('article_image_upload', array(), '_FILES');
 	$go_to_pings = (isset($go_to_pings)) ? intval($go_to_pings):1;
-	$mode = (isset($mode)) ? filter($mode, "nohtml"):'new';
+	$mode = (isset($mode)) ? filter($mode, "nohtml"):'edit';
 	$article_fields = request_var('article_fields', array(), '_POST');
 	$micro_data = request_var('micro_data', array(), '_POST');
 	$sid = (isset($sid)) ? intval($sid):0;

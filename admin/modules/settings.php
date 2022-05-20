@@ -258,6 +258,11 @@ if (check_admin_permission($filename))
 		$check2 = (intval($nuke_configs['mobile_mode']) == 0) ? "checked":"";
 		$contents .= "<input type='radio' class='styled' name='config_fields[mobile_mode]' value='1' data-label=\"" . _ACTIVE . "\" $check1> &nbsp;<input type='radio' class='styled' name='config_fields[mobile_mode]' value='0' data-label=\"" . _INACTIVE . "\" $check2>";
 
+		$contents .= "</td></tr><tr><th>"._ENABLE_ADMIN_BAR."</th><td>";
+		$check1 = (intval($nuke_configs['admin_bar']) == 1) ? "checked":"";
+		$check2 = (intval($nuke_configs['admin_bar']) == 0) ? "checked":"";
+		$contents .= "<input type='radio' class='styled' name='config_fields[admin_bar]' value='1' data-label=\"" . _ACTIVE . "\" $check1> &nbsp;<input type='radio' class='styled' name='config_fields[admin_bar]' value='0' data-label=\"" . _INACTIVE . "\" $check2>";
+
 		$contents .="</td></tr>
 		<tr><td>&nbsp;</td><td halign=\"left\"><input type='hidden' name='op' value='save_configs'><input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 		<br><br><input class=\"form-submit\" type='submit' name='submit' name='submit' value='" . _SAVECHANGES . "'></form></td></tr></table>";

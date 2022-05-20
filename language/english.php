@@ -926,6 +926,7 @@ $nuke_languages['english'] = array_merge($nuke_languages['english'], array(
 	"_POSITIVEANDNEGATIVE_VOTE" => "Positive And Negative ",
 	"_LIKE_DISLIKE_VOTE" => "Like And Dislike ",
 	"_ENABLE_MOBILE_MODE" => "Mobile Module ",
+	"_ENABLE_ADMIN_BAR" => "Admin Bar",
 	"_SELECT_SITE_TEMPLATE" => "Select Skin ",
 	"_DEFAULTTHEME" => "Default Skin ",
 	"_THEME_COLOR" => "Theme Color",

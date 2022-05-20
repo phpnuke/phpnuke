@@ -500,6 +500,7 @@ function article_show($sid=0, $post_url='', $mode = '', $main_module = 'Articles
 		$hooks->do_action("post_url_related", $post_url, $REQUESTURL, $main_module);
 		//check if link is related to another module
 		$result = $db->table(POSTS_TABLE)
+					->where('post_type',$main_module)
 					->where('post_url',$post_url)
 					->where('status', 'publish')
 					->select(['sid']);
