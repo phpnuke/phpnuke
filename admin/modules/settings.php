@@ -170,7 +170,7 @@ if (check_admin_permission($filename))
 			if(isset($config_fields['language']))
 				$pn_Cookies->set("nukelang",$config_fields['language'],(365*24*3600));
 				
-			$hooks->do_action("save_cinfigs_after", $config_fields, $return_op, $log_message, $array_level);
+			$hooks->do_action("save_configs_after", $config_fields, $return_op, $log_message, $array_level);
 			
 			cache_system("nuke_configs");
 			$pn_Sessions->destroy();

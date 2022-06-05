@@ -278,7 +278,7 @@ if (check_admin_permission($filename))
 				
 			if(isset($nav_fields['final_items']))
 			{
-				$nav_fields['final_items'] = objectToArray(json_decode($nav_fields['final_items']));
+				nav_fields['final_items'] = (is_array($nav_fields['final_items'])) ? $nav_fields['final_items']:objectToArray(json_decode($nav_fields['final_items']));
 				$db->sql_query("UPDATE ".NAV_MENUS_TABLE." SET nav_title = '".$nav_fields['general_title']."', lang_nav_title = '".addslashes(phpnuke_serialize($nav_fields['lang_titles']))."', nav_location = '".$nav_fields['nav_location']."', status = '".$nav_fields['nav_status']."', date = '"._NOWTIME."' WHERE nav_id = '$nav_id'");
 				
 				$unnested_nav_fields = array_flatten($nav_fields['final_items'], 0, 'nid', 'pid', 'children', array('remove','title','url','target','xfn','href','classes', 'styles', 'status'), array());

@@ -250,6 +250,7 @@ function ya_html_output($ya_config, $contents)
 		$hooks->add_functions_vars(
 			'ya_html_output_assets',
 			array(
+				"module_name" => $module_name,
 				"ya_config" => $ya_config,
 			)
 		);

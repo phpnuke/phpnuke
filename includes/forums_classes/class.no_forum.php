@@ -47,6 +47,7 @@ class users_system{
 		$this->users_table							= USERS_TABLE;
 		$this->groups_table							= GROUPS_TABLE;
 		$this->profile_url 							= LinkToGT('index.php?modname=Users&op=userinfo&username=%2$s');
+		$this->login_url 							= LinkToGT('index.php?modname=Users&op=login');
 		$this->register_url 						= LinkToGT('index.php?modname=Users&op=register');
 		$this->passlost_url 						= LinkToGT('index.php?modname=Users&op=reset_password');
 		$this->collation							= $pn_dbcharset;

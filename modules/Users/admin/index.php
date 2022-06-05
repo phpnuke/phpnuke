@@ -368,7 +368,7 @@ if (check_admin_permission($module_name, false, true))
 			);
 			
 			phpnuke_mail($userinfo['user_email'], sprintf(_USER_APPROVED, $userinfo['username'], $nuke_configs['sitename']), $message);
-			add_log(sprintf(_USER_APPROVED, $userinfo['username']), 1);
+			add_log(sprintf(_USER_APPROVED, $nuke_configs['sitename'], $userinfo['username']), 1);
 			redirect_to("".$admin_file.".php?op=users");
 			die();			
 		}

@@ -1720,7 +1720,13 @@ function show_modules_boxes($module_name, $part='index', $active_boxes=array(), 
 	{
 		if(!empty($o_val))
 		{
-			$classes = (isset($theme_boxes_templates[$o_key.'_module_boxes'][$middle_module_boxes])) ? $theme_boxes_templates[$o_key.'_module_boxes'][$middle_module_boxes]:"";
+			if(isset($theme_boxes_templates[$o_key.'_module_boxes']))
+			{
+				if((isset($theme_boxes_templates[$o_key.'_module_boxes'][$middle_module_boxes])))
+					$classes = $theme_boxes_templates[$o_key.'_module_boxes'][$middle_module_boxes];
+				elseif(!is_array($theme_boxes_templates[$o_key.'_module_boxes']))
+					$classes = $theme_boxes_templates[$o_key.'_module_boxes'];
+			}
 			
 			$template_pattern = str_replace(array( 
 				"{".strtoupper($o_key)."_MODULES_BOXES_CLASSES}", 
