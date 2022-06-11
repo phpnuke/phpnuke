@@ -17,38 +17,42 @@ $contents .= "
 <form action=\"".LinkToGT("index.php?modname=Credits")."\" id=\"credit_form\" method=\"post\" class=\"form-horizontal\" style=\"padding:10px;\" enctype=\"multipart/form-data\">
 	<div class=\"form-group\">
 		<label class=\"col-sm-2 control-label\">"._CREDITS_PAY_METHOD."</label>
-		<div class=\"col-sm-5\">";
-		if($gateways_list != '')
-		{
-			$contents .= "<input type=\"radio\" name=\"credit_method\" value=\"1\" id=\"online_credit\" data-label=\""._CREDITS_PAY_ONLINE."\" checked /> <label for=\"online_credit\">"._CREDITS_PAY_ONLINE."</label>";
-		}
-		$contents .= "</div>";
-		if(isset($order_data) && !empty($order_data))
-		{
-			if($user_credits_allowed-$order_data['amount'] > 0)
-			{
-				$contents .= "<div class=\"col-sm-5\">
-					<input type=\"radio\" name=\"credit_method\" value=\"3\" id=\"offline_credit\" data-label=\""._CREDITS_PAY_BY_CREDIT."\" /> <label for=\"offline_credit\">"._CREDITS_PAY_BY_CREDIT."</label>
-					</div>";
-			}
-			else
+		<div class=\"col-sm-10\">";
+			if($gateways_list != '')
 			{
 				$contents .= "
-				<div class=\"col-sm-5\">
-				</div>
-				<div class=\"col-sm-12 alert alert-info text-justify\" style=\"margin:5px 0px;\">
-					<span>"._CREDITS_PAY_BY_CREDIT_ERROR."</span>
-				</div>
-				";
+				<div class=\"radio-inline\">
+					<label>
+						<input type=\"radio\" name=\"credit_method\" id=\"online_credit\" value=\"1\" style=\"margin-top:2px;\" />
+						"._CREDITS_PAY_ONLINE."
+					</label>
+				</div>";
 			}
-		}
-		else
-		{
-		$contents .= "<div class=\"col-sm-5\">
-			<input type=\"radio\" name=\"credit_method\" value=\"2\" id=\"offline_credit\" data-label=\""._CREDITS_PAY_OFFLINE."\" ".(($gateways_list == '' && (!isset($order_data) || empty($order_data))) ? "checked":"")." /> <label for=\"offline_credit\">"._CREDITS_PAY_OFFLINE."</label>
-		</div>";
-		}
-	$contents .= "</div>";
+			$contents .= "
+			<div class=\"radio-inline\">
+				<label>
+					<input type=\"radio\" name=\"credit_method\" id=\"offline_credit\" value=\"2\" style=\"margin-top:2px;\" ".(($gateways_list == '') ? "checked":"")." />
+					"._CREDITS_PAY_OFFLINE."
+				</label>
+			</div>";
+			
+			if(isset($order_data) && !empty($order_data))
+			{
+				if($user_credits_allowed-$order_data['amount'] > 0)
+				{
+					$contents .= "
+						<div class=\"radio-inline\">
+							<label>
+								<input type=\"radio\" name=\"credit_method\" id=\"user_credit_remain\" value=\"3\" style=\"margin-top:2px;\" />
+								"._CREDITS_PAY_BY_CREDIT."
+							</label>
+						</div>";
+				}
+			}
+		
+			$contents .= "
+		</div>
+	</div>";
 	if(isset($order_data) && !empty($order_data))
 	{
 		foreach($order_data as $order_key => $order_value)
@@ -56,34 +60,34 @@ $contents .= "
 			$contents .= "<input type=\"hidden\" name=\"order_data[$order_key]\" value=\"$order_value\" />";
 		}
 		$contents .= "
-			<input type=\"hidden\" name=\"order_data_json\" value=\"".str_replace('"', "'", json_encode($order_data))."\" />
-			<div class=\"form-group\">
-				<label class=\"col-sm-2 control-label\">"._CREDITS_AMOUNT."</label>
-				<div class=\"col-sm-10 form-control-static\">
-					$amount_in_ex_rate ".number_format($amount,0)." "._RIAL."
-				</div>
+		<input type=\"hidden\" name=\"order_data_json\" value=\"".str_replace('"', "'", json_encode($order_data))."\" />
+		<div class=\"form-group\">
+			<label class=\"col-sm-2 control-label\">"._CREDITS_AMOUNT."</label>
+			<div class=\"col-sm-10 form-control-static\">
+				$amount_in_ex_rate ".number_format($amount,0)." "._RIAL."
 			</div>
-			<div class=\"form-group\">
-				<label class=\"col-sm-2 control-label\">"._CREDITS_ACCOUNT_REMAIN."</label>
-				<div class=\"col-sm-10 form-control-static\">
-					".number_format($userinfo['user_credit'],0)." "._RIAL."
-				</div>
+		</div>
+		<div class=\"form-group\">
+			<label class=\"col-sm-2 control-label\">"._CREDITS_ACCOUNT_REMAIN."</label>
+			<div class=\"col-sm-10 form-control-static\">
+				".number_format($userinfo['user_credit'],0)." "._RIAL."
 			</div>
-			<div class=\"form-group\">
-				<label class=\"col-sm-2 control-label\">"._CREDITS_ORDER_TITLE."</label>
-				<div class=\"col-sm-10 form-control-static\">
-					<a href=\"".$order_data['link']."\">".$order_data['title']."</a>
-				</div>
+		</div>
+		<div class=\"form-group\">
+			<label class=\"col-sm-2 control-label\">"._CREDITS_ORDER_TITLE."</label>
+			<div class=\"col-sm-10 form-control-static\">
+				<a href=\"".$order_data['link']."\">".$order_data['title']."</a>
 			</div>
-			<div class=\"form-group\">
-				<label class=\"col-sm-2 control-label\">"._CREDITS_ORDER_ID."</label>
-				<div class=\"col-sm-10 form-control-static\">
-					".$order_data['id']."
-				</div>
+		</div>
+		<div class=\"form-group\">
+			<label class=\"col-sm-2 control-label\">"._CREDITS_ORDER_ID."</label>
+			<div class=\"col-sm-10 form-control-static\">
+				".$order_data['id']."
 			</div>
-		";
+		</div>";
 	}
-	$contents .= "<div class=\"credit_form\">
+	$contents .= "
+	<div class=\"credit_form\">
 		<div id=\"online_form\" style=\"display:".(($gateways_list == '') ? 'none':'block').";\">";
 			if($gateways_list != '')
 			{
@@ -105,7 +109,8 @@ $contents .= "
 				</div>
 			</div>";
 			}
-			$contents .= "<div class=\"form-group\" style=\"display:none;\">
+			$contents .= "
+			<div class=\"form-group\" style=\"display:none;\">
 				<label class=\"col-sm-2 control-label\">"._TITLE."</label>
 				<div class=\"col-sm-10\">
 					<input class=\"form-control\" id=\"online_credit_title\" name=\"online_credit[title]\" type=\"text\" placeholder=\""._OPTIONAL."\" value=\"".((isset($order_data['title'])) ? $order_data['title']:"")."\">
@@ -125,9 +130,18 @@ $contents .= "
 			$contents .= "<div class=\"form-group\">
 				<label class=\"col-sm-2 control-label\">"._CREDITS_AMOUNT."</label>
 				<div class=\"col-sm-10\">
-					<input class=\"form-control digit_group_numbers\" id=\"offline_credit_amount\" name=\"offline_credit[amount]\" type=\"text\" placeholder=\""._CREDITS_AMOUNT_IN_RIAL."\" data-validation=\"required\" />
+					<input class=\"form-control digit_group_numbers\" id=\"offline_credit_amount\" name=\"offline_credit[amount]\" type=\"text\" placeholder=\""._CREDITS_AMOUNT_IN_RIAL."\" data-validation=\"required\">
 				</div>
-			</div>
+			</div>";
+			}
+			else
+			{
+			$contents .= "
+			<div class=\"form-group\">
+				<input name=\"offline_credit[amount]\" type=\"hidden\" value=\"".((isset($order_data['amount'])) ? $order_data['amount']:"")."\">
+			</div>";
+			}
+			$contents .= "
 			<div class=\"form-group\">
 				<label class=\"col-sm-2 control-label\">"._CREDITS_RECEIPT_DATE."</label>
 				<div class=\"col-sm-10\">
@@ -152,9 +166,8 @@ $contents .= "
 					</div>
 					<br />"._CREDITS_RECEIPT_PICTURE_DESC."<br />
 				</div>
-			</div>";
-			}
-			$contents .= "<div class=\"form-group\" style=\"display:none;\">
+			</div>
+			<div class=\"form-group\" style=\"display:none;\">
 				<label class=\"col-sm-2 control-label\">"._TITLE."</label>
 				<div class=\"col-sm-10\">
 					<input class=\"form-control\" id=\"offline_credit_title\" name=\"offline_credit[title]\" type=\"text\" placeholder=\""._OPTIONAL."\" value=\"".((isset($order_data['title'])) ? $order_data['title']:"")."\">
