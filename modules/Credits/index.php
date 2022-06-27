@@ -336,7 +336,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			$payment_data['datetime'] = to_mktime($offline_credit['date']);
 			$payment_data['number'] = $offline_credit['number'];
 			$imgContent = '';
-			if(isset($offline_credit_file["tmp_name"]))
+			if(isset($offline_credit_file["tmp_name"]) && $offline_credit_file["tmp_name"] != '')
 			{
 				$check = getimagesize($offline_credit_file["tmp_name"]);
 				if($check !== false)
@@ -450,7 +450,7 @@ function credit_create_form($order_data, $credit_method, $credit_gateway, $offli
 			else
 				$errors[] = _CREDITS_REMAIN_LESS_THAN_AMOUNT;
 			
-			$hooks->do_action("credits_action_after_deposit");
+			$hooks->do_action("credits_action_after_deposit", $tid);
 			
 			redirect_to($order_link);
 			die();
@@ -650,7 +650,7 @@ function credit_response($tid, $credit_gateway='')
 							$userinfo = $users_system->getuserinfo(true);
 						}
 						
-						$hooks->do_action("credits_after_response");
+						$hooks->do_action("credits_after_response", $tid);
 						
 						redirect_to($row['order_link']);
 						die();

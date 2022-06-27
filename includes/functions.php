@@ -1720,6 +1720,7 @@ function show_modules_boxes($module_name, $part='index', $active_boxes=array(), 
 	{
 		if(!empty($o_val))
 		{
+			$classes = '';
 			if(isset($theme_boxes_templates[$o_key.'_module_boxes']))
 			{
 				if((isset($theme_boxes_templates[$o_key.'_module_boxes'][$middle_module_boxes])))

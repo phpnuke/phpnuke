@@ -317,7 +317,7 @@ function _check_register_fields($field = 'username', $value = '', $default_value
 			$user_data = $user_info->results()[0];
 	}
 	
-	if(is_user() && !defined("ADMIN_FILE"))
+	if(is_user() && !is_admin())
 		$default_value = (isset($userinfo[$field])) ? $userinfo[$field]:$default_value;
 		
 	if(($value != $default_value && $default_value != '') || $default_value == '')

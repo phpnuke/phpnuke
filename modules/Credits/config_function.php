@@ -323,6 +323,8 @@ function _credit_view($tid, $in_admin = false)
 					$details['other_online_data'] = "<table width=\"100%\">";
 					foreach($row['data'] as $row_data_key => $row_data_val)
 					{
+						if(is_array($row_data_val))
+							continue;
 						$details['other_online_data'] .= "<tr><td>$row_data_key</td><td>$row_data_val</td></tr>";
 					}
 					$details['other_online_data'] .= "</table>";
@@ -749,6 +751,7 @@ function credits_theme_assets($theme_setup)
 	
 	if($op == "main")
 	{
+		$defer_js[] = "<script src=\"".$nuke_configs['nukecdnurl']."modules/aghsat/includes/digits.js\"></script>";
 		$defer_js[] = "
 		<script>
 			$(document).ready(function(){
@@ -761,17 +764,6 @@ function credits_theme_assets($theme_setup)
 					$(\"#online_form\").hide();
 				});
 				
-				$('.digit_group_numbers').on('focus', function(){
-					var this_num = $(this).val();
-					this_num = this_num.replace(/,/g, '').replace(' ', '').replace('"._RIAL."', '');
-					 $(this).val(this_num);
-				});
-				$('.digit_group_numbers').on('blur', function(){
-					var x = $(this).val();
-					var parts = x.toString().split(".");
-					parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, \",\").replace(' ', '').replace('"._RIAL."', '');
-					$(this).val(parts.join(\".\")+' "._RIAL."');
-				});
 				$.validate({
 					form : '#credit_form',
 					modules : 'security',

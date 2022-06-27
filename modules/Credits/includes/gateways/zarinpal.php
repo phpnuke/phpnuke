@@ -70,7 +70,7 @@ class zarinpal_gateway{
 	{
 		global $db, $module_name, $pn_Sessions, $nuke_configs, $pn_credits_config;
 		
-		$redirect = $nuke_configs['nukeurl']."index.php?modname=$module_name&op=credit_response&tid=$tid&amount=".$form_data['amount']."&credit_gateway=".$this->gateway_name."&csrf_token="._PN_CSRF_TOKEN."";
+		$redirect = $nuke_configs['nukeurl']."index.php?modname=$module_name&op=credit_response&tid=$tid&amount=".$form_data['amount']."&credit_gateway=".$this->gateway_name."&csrf_token="._PN_CSRF_TOKEN."&order_id=".$form_data['factor_number']."";
 
 		$meta_data = array();
 		if(isset($form_data['mail']) && $form_data['mail'] != '')
@@ -126,7 +126,7 @@ class zarinpal_gateway{
 	{
 		global $Authority, $amount, $pn_Sessions, $module_name, $nuke_configs, $pn_credits_config;
 
-		$site_id = $pn_Sessions->get("zarinpal_".$order_id."", false);
+		$site_id = $pn_Sessions->get("zarinpal_".$factor_number."", false);
 		$this->response['result']			= false;
 		$this->response['error_code'] = 0;
 		$this->response['error_message'] = "خطای نامشخص";
@@ -145,6 +145,7 @@ class zarinpal_gateway{
 		));
 
 		$result = curl_exec($ch);
+		$err = curl_error($ch);
 		curl_close($ch);
 		$result = json_decode($result, true);
 		if ($err) {

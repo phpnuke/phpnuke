@@ -156,6 +156,8 @@ class idpay_gateway{
 			}
 			else
 			{
+				unset($this->response['error_code']);
+				unset($this->response['error_message']);
 				$this->response['gateway']			= $this->gateway_name;
 				$this->response['gateway_title']	= $this->gateway_title;
 				$this->response['status']			= ((isset($this->transaction_result[$result->status])) ? $this->transaction_result[$result->status]:"نامشخص");
