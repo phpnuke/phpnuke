@@ -113,6 +113,13 @@ if (check_admin_permission($filename))
 		{
 			$config_fields = $hooks->apply_filters("save_cinfigs", $config_fields, $return_op, $log_message, $array_level);
 			
+			if(isset($config_fields['have_forum']))
+			{
+				$users_table = $db->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME IN ('".$nuke_configs['forum_prefix']."users') AND TABLE_SCHEMA='".$config_fields['forum_db']."'");
+				if($users_table->count() <= 0)
+					$config_fields['have_forum'] = 0;
+			}
+			
 			$insert_query = array();
 			$query_set = array();
 			$query_IN = array();

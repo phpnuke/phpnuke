@@ -123,10 +123,10 @@ function credits_list($sort = 'DESC', $order_by = '')
 /*$order_data = array(
 	"amount" => 20,
 	"ex_rate" => "GBP",
-	"title" => "تست برداشت از حساب اعتباری",
-	"desc" => "شرح مختصر برداشت",
+	"title" => "&#1578;&#1587;&#1578; &#1576;&#1585;&#1583;&#1575;&#1588;&#1578; &#1575;&#1586; &#1581;&#1587;&#1575;&#1576; &#1575;&#1593;&#1578;&#1576;&#1575;&#1585;&#1740;",
+	"desc" => "&#1588;&#1585;&#1581; &#1605;&#1582;&#1578;&#1589;&#1585; &#1576;&#1585;&#1583;&#1575;&#1588;&#1578;",
 	"part" => 'vip',
-	"part_desc" => 'فروش اکانت VPN',
+	"part_desc" => '&#1601;&#1585;&#1608;&#1588; &#1575;&#1705;&#1575;&#1606;&#1578; VPN',
 	"id" => $order_id,
 	"link" => LinkToGT("index.php?modname=feedback"),
 	"reward" => 30
@@ -568,7 +568,7 @@ function credit_response($tid, $credit_gateway='')
 								"title" => $row['title'],
 								"description" => $row['description'],
 								"order_part" => (isset($row['order_part'])) ? $row['order_part']:"",
-								"order_id" => (isset($row['order_id'])) ? $row['order_id']:"",
+								"order_id" => (isset($row['order_id'])) ? $row['order_id']:"0",
 								"order_link" => (isset($row['order_link'])) ? $row['order_link']:"",
 								"order_data" => phpnuke_serialize($order_data),
 							);

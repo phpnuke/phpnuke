@@ -21,8 +21,8 @@ global $users_system, $userinfo, $nuke_configs;
 
 $statistics_contents = $users_system->user_statistics();
 
-if(file_exists("themes/".$nuke_configs['ThemeSel']."/userinfo.php"))
-	include("themes/".$nuke_configs['ThemeSel']."/userinfo.php");
+if(file_exists("themes/".$nuke_configs['ThemeSel']."/user_info.php"))
+	include("themes/".$nuke_configs['ThemeSel']."/user_info.php");
 else
 {
 	$content = "

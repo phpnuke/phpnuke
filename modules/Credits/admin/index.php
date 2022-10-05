@@ -362,7 +362,7 @@ if (check_admin_permission($module_name, false, true))
 						</div>
 						<input type=\"hidden\" name=\"csrf_token\" value=\""._PN_CSRF_TOKEN."\" /> 
 						&nbsp; <input type=\"submit\" class=\"form-submit\" />&nbsp; 
-						<a href=\"".LinkToGT("index.php?modname=Credits&op=delete_all_filters&in_admin=1")."\" class=\"btn btn-info del-filters\">"._CREDITS_DELETE_ALL_FILTERS."</a>
+						<a href=\"".LinkToGT("index.php?modname=Credits&op=delete_all_filters&in_admin=true")."\" class=\"btn btn-lightblue del-filters\">"._CREDITS_DELETE_ALL_FILTERS."</a>
 					</form>
 				</td>
 				<td valign=\"top\">
@@ -824,7 +824,7 @@ if (check_admin_permission($module_name, false, true))
 					"title" => (isset($credits_fields['title']) && $credits_fields['title'] != '') ? $credits_fields['title']:"",
 					"description" => (isset($credits_fields['description']) && $credits_fields['description'] != '') ? $credits_fields['description']:"",
 					"order_part" => '',
-					"order_id" => '',
+					"order_id" => '0',
 					"order_link" => '',
 					"order_data" => '',
 				);

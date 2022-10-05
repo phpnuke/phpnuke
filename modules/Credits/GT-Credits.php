@@ -9,7 +9,8 @@ $rewrite_rule["credits"] = array(
 );
 
 $friendly_links = array(
-    'index.php\?modname=Credits&op=delete_all_filters(&in_admin=true)?$' => 'credits/delete-filters/$1/',
+    'index.php\?modname=Credits&op=delete_all_filters&in_admin=true?$' => 'credits/delete-filters/$1/in-admin/',
+    'index.php\?modname=Credits&op=delete_all_filters$' => 'credits/delete-filters/$1/',
     'index.php\?modname=Credits&op=credit_view&tid=([0-9]{1,}+)$' => 'credits/view/$1/',
     'index.php\?modname=Credits&op=credits_list&order_by=([^/]+)&sort=([^/]+)&page=([0-9]{1,}+)$' => 'credits/list/$1/$2/page/$3/',
     'index.php\?modname=Credits&op=credits_list&order_by=([^/]+)&sort=([^/]+)$' => 'credits/list/$1/$2/',
