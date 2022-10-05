@@ -238,6 +238,15 @@ function ya_html_output($ya_config, $contents)
 	}, 10);		
 	unset($meta_tags);
 		
+	$hooks->add_functions_vars(
+		'ya_html_output_assets',
+		array(
+			"module_name" => $module_name,
+			"ya_config" => $ya_config,
+		)
+	);
+	$hooks->add_filter("site_theme_headers", "ya_html_output_assets", 10);
+	
 	if($ya_config['login_sign_up_theme'] == 1)
 	{
 		$content = login_sign_up_theme("header");
@@ -246,16 +255,7 @@ function ya_html_output($ya_config, $contents)
 		die($content);
 	}
 	else
-	{
-		$hooks->add_functions_vars(
-			'ya_html_output_assets',
-			array(
-				"module_name" => $module_name,
-				"ya_config" => $ya_config,
-			)
-		);
-		$hooks->add_filter("site_theme_headers", "ya_html_output_assets", 10);
-		
+	{		
 		include("header.php");
 		
 		$html_output .= show_modules_boxes($module_name, "login_sighnup", array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);

@@ -7342,25 +7342,30 @@ if ($strip == "nohtml")
 
 function filter($str , $strip="")
 {
-	if ($strip == "nohtml"){
-		$str = filter_var($str, FILTER_SANITIZE_STRING);
-		$str = strip_tags(trim($str));
-		return $str;
-	}else {
-		/*if(isset($_POST))
-		{
-			foreach ($_POST as $key => $value)							
-			$_POST[$key] =str_replace("'", '', $_POST[$key]);		
+	if($str !== null)
+	{
+		if ($strip == "nohtml"){
+			$str = htmlspecialchars($str, ENT_QUOTES);
+			$str = strip_tags(trim($str));
+			return $str;
+		}else {
+			/*if(isset($_POST))
+			{
+				foreach ($_POST as $key => $value)							
+				$_POST[$key] =str_replace("'", '', $_POST[$key]);		
+			}
+			if(isset($_GET))
+			{
+				foreach ($_GET as $key => $value)							
+				$_GET[$key] =str_replace("'", '', $_GET[$key]);		
+			}*/
+			$str = addslashes(trim($str));
+			$str= mres($str);
+			return $str;
 		}
-		if(isset($_GET))
-		{
-			foreach ($_GET as $key => $value)							
-			$_GET[$key] =str_replace("'", '', $_GET[$key]);		
-		}*/
-		$str = addslashes(trim($str));
-		$str= mres($str);
-		return $str;
 	}
+	else
+		return $str;
 } //End Nuke 8.4 Fix
 
 function FixQuotes ($what = "")
