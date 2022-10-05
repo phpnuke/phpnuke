@@ -23,6 +23,7 @@ require_once("mainfile.php");
 	
 $html_output = '';
 
+
 if(defined("ADMIN_FILE"))
 {
 	$has_micrometa = (isset($has_micrometa)) ? $has_micrometa:false;

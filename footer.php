@@ -20,6 +20,7 @@ if (stristr(htmlentities($_SERVER['PHP_SELF']), "footer.php"))
 
 define('NUKE_FOOTER', true);
 global $db, $hooks, $nuke_configs, $users_system, $userinfo;
+
 function footmsg()
 {
 	global $foot1, $foot2, $foot3, $copyright, $total_time, $start_time, $commercial_license, $footmsg;
