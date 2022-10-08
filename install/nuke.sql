@@ -212,6 +212,7 @@ CREATE TABLE `{NUKEPREFIX}comments` (
   `post_title` varchar(600) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `date` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `name` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `user_id` int(11) NOT NULL DEFAULT 0,
   `username` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `url` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
