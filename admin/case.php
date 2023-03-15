@@ -1,199 +1,151 @@
 <?php
-
-/************************************************************************/
-/* PHP-NUKE: Web Portal System										  */
-/* ===========================										  */
-/*																	  */
-/* Copyright (c) 2006 by Francisco Burzi								*/
-/* http://phpnuke.org												   */
-/*																	  */
-/* This program is free software. You can redistribute it and/or modify */
-/* it under the terms of the GNU General Public License as published by */
-/* the Free Software Foundation; either version 2 of the License.	   */
-/************************************************************************/
-
 if (!defined('ADMIN_FILE')) {
-	die ("Access Denied");
+    exit('Access Denied');
 }
 
-switch($op) {
-	//authors
-	case "mod_authors":
-	case "modifyadmin":
-	case "UpdateAuthor":
-	case "AddAuthor":
-	case "deladmin2":
-	case "deladmin":
-	case "assignarticles":
-	case "deladminconf":
-	case "remove_permission":
-		include("admin/modules/authors.php");
-	break;
-	
-	//database
-	case "database":
-	case "BackupDB":
-	case "OptimizeDB":
-	case "CheckDB":
-	case "AnalyzeDB":
-	case "RepairDB":
-	case "StatusDB":
-		include("admin/modules/backup.php");
-	break;
-	
-	//blocks
-	case "BlocksAdmin":
-	case "BlocksEdit":
-	case "BlocksSave":   
-	case "HeadlinesDel":
-	case "HeadlinesAdd":
-	case "HeadlinesSave":
-	case "HeadlinesAdmin":
-	case "HeadlinesEdit":
-	case "updateweight":
-	case "remove_block":
-	case "info_block":
-	case "change_block_status":
-	case "preview_block":
-		include("admin/modules/blocks.php");
-	break;
-	
-	//bookmarks
-	case "bookmarks":
-	case "save_bookmarks":
-	case "editbookmark":
-	case "updatebookmarksweight":
-		include("admin/modules/bookmarks.php");
-	break;
-	
-	//caches
-	case "cache":
-	case "FlushCache":	
-	case "updatecache":
-		include("admin/modules/cache.php");
-	break;
-	
-	//categories
-	case "categories":
-	case "categories_admin":
-	case "categories_delete":
-		include("admin/modules/categories.php");
-	break;
-	
-	//comments
-	case "comments":
-	case "comments_edit":
-	case "comments_delete":
-	case "comments_reply":
-	case "comments_status":
-		include("admin/modules/comments.php");
-	break;
-	
-	//points_groups
-	case "points_groups":
-	case "group_add":
-	case "group_edit":
-	case "group_edit_save":
-	case "group_del":
-	case "points_update":
-		include("admin/modules/points_groups.php");
-	break;
-	
-	//languages
-	case "language":
-	case "edit_language_word":
-	case "delete_language_word":
-	case "language_options":
-		include("admin/modules/language.php");
-	break;
+$modules = [
+    //authors
+    'mod_authors' => 'authors',
+    'modifyadmin' => 'authors',
+    'UpdateAuthor' => 'authors',
+    'AddAuthor' => 'authors',
+    'deladmin2' => 'authors',
+    'deladmin' => 'authors',
+    'assignarticles' => 'authors',
+    'deladminconf' => 'authors',
+    'remove_permission' => 'authors',
 
-	//medias
-	case "media_browser":
-	case "media_get_menu_files":
-	case "media_get_files":
-	case "media_upload":
-	case "delete_media":
-	case "get_media_metadata":
-		include("admin/modules/media.php");
-	break;
-	
-	//meta_tags seo
-	case "seo":
-	case "saveseo":
-	case "savesets":
-	case "showfeed":
-	case "savepings":
-		include("admin/modules/meta_tags.php");
-	break;
-	
-	//modules
-	case "modules":
-	case "module_status":
-	case "module_edit":
-	case "module_edit_boxess":
-	case "home_module":
-	case "upload_module":
-		include("admin/modules/modules.php");
-	break;
-	
-	//mtsn
-	case "mtsn_admin":
-	case "set_config":
-	case "ip_ban_page":
-	case "deleteip":
-	case "addnewip":
-	case "clearallip":
-	case "searchip":
-		include("admin/modules/mtsn.php");
-	break;
-	
-	
-	//hreferrer
-	case "hreferrer":
-	case "delreferrer":
-		include("admin/modules/referrers.php");
-	break;
-	
-	//settings
-	case "settings":
-	case "save_configs":
-	case "options_menu":
-	case "general_config":
-	case "themes_config":
-	case "comments_config":
-	case "language_config":
-	case "referers_config":
-	case "mailing_config":
-	case "security_config":
-	case "uploads_config":
-	case "forums_config":
-	case "smilies_config":
-	case "sms_config":
-	case "others_config":
-		include("admin/modules/settings.php");
-	break;
-	
-	//upgrade
-	case "upgrade":
-		include("admin/modules/upgrade.php");
-	break;
-	
-	//reports
-	case "reports":
-	case "reports_delete":
-		include("admin/modules/reports.php");
-	break;
-	
-	//nav_menus
-	case "nav_menus":
-	case "nav_menus_admin":
-		include("admin/modules/nav_menus.php");
-	break;
-	
-	//grapesjs
-	case "grapesjs":
-		grapesjs_admin();
-	break;
+    //database
+    'database' => 'backup',
+    'BackupDB' => 'backup',
+    'OptimizeDB' => 'backup',
+    'CheckDB' => 'backup',
+    'AnalyzeDB' => 'backup',
+    'RepairDB' => 'backup',
+    'StatusDB' => 'backup',
+
+    //blocks
+    'BlocksAdmin' => 'blocks',
+    'BlocksEdit' => 'blocks',
+    'BlocksSave' => 'blocks',
+    'HeadlinesDel' => 'blocks',
+    'HeadlinesAdd' => 'blocks',
+    'HeadlinesSave' => 'blocks',
+    'HeadlinesAdmin' => 'blocks',
+    'HeadlinesEdit' => 'blocks',
+    'updateweight' => 'blocks',
+    'remove_block' => 'blocks',
+    'info_block' => 'blocks',
+    'change_block_status' => 'blocks',
+    'preview_block' => 'blocks',
+
+    //bookmarks
+    'bookmarks' => 'bookmarks',
+    'save_bookmarks' => 'bookmarks',
+    'editbookmark' => 'bookmarks',
+    'updatebookmarksweight' => 'bookmarks',
+
+    //caches
+    'cache' => 'cache',
+    'FlushCache' => 'cache',
+    'updatecache' => 'cache',
+
+    //categories
+    'categories' => 'categories',
+    'categories_admin' => 'categories',
+    'categories_delete' => 'categories',
+
+    //comments
+    'comments' => 'comments',
+    'comments_edit' => 'comments',
+    'comments_delete' => 'comments',
+    'comments_reply' => 'comments',
+    'comments_status' => 'comments',
+
+    //points_groups
+    'points_groups' => 'points_groups',
+    'group_add' => 'points_groups',
+    'group_edit' => 'points_groups',
+    'group_edit_save' => 'points_groups',
+    'group_del' => 'points_groups',
+    'points_update' => 'points_groups',
+
+    //languages
+    'language' => 'language',
+    'edit_language_word' => 'language',
+    'delete_language_word' => 'language',
+    'language_options' => 'language',
+
+    //medias
+'media_browser' => 'media',
+'media_get_menu_files' => 'media',
+'media_get_files' => 'media',
+'media_upload' => 'media',
+'delete_media' => 'media',
+'get_media_metadata' => 'media',
+
+//meta_tags seo
+'seo' => 'meta_tags',
+'saveseo' => 'meta_tags',
+'savesets' => 'meta_tags',
+'showfeed' => 'meta_tags',
+'savepings' => 'meta_tags',
+
+//modules
+'modules' => 'modules',
+'module_status' => 'modules',
+'module_edit' => 'modules',
+'module_edit_boxess' => 'modules',
+'home_module' => 'modules',
+'upload_module' => 'modules',
+
+//mtsn
+'mtsn_admin' => 'mtsn',
+'set_config' => 'mtsn',
+'ip_ban_page' => 'mtsn',
+'deleteip' => 'mtsn',
+'addnewip' => 'mtsn',
+'clearallip' => 'mtsn',
+'searchip' => 'mtsn',
+
+//hreferrer
+'hreferrer' => 'referrers',
+'delreferrer' => 'referrers',
+
+//settings
+'settings' => 'settings',
+'save_configs' => 'settings',
+'options_menu' => 'settings',
+'general_config' => 'settings',
+'themes_config' => 'settings',
+'comments_config' => 'settings',
+'language_config' => 'settings',
+'referers_config' => 'settings',
+'mailing_config' => 'settings',
+'security_config' => 'settings',
+'uploads_config' => 'settings',
+'forums_config' => 'settings',
+'smilies_config' => 'settings',
+'sms_config' => 'settings',
+'others_config' => 'settings',
+
+//upgrade
+'upgrade' => 'upgrade',
+
+//reports
+'reports' => 'reports',
+'reports_delete' => 'reports',
+
+//nav_menus
+'nav_menus' => 'nav_menus',
+'nav_menus_admin' => 'nav_menus',
+
+//grapesjs
+'grapesjs' => 'grapesjs',
+];
+
+if (isset($modules[$op])) {
+include_once "admin/modules/{$modules[$op]}.php";
+} else {
+exit("Invalid operation: $op");
 }
-
-?>
